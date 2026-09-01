@@ -25,7 +25,7 @@ export function Navbar() {
     >
       <div className="container-narrow flex items-center justify-between">
         {/* Brand Logo */}
-        <a href="#home" className="group flex items-center gap-3">
+        <a href="/" className="group flex items-center gap-3">
           <div className="relative flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-500 font-extrabold text-slate-950 shadow-md">
             <span className="text-sm tracking-tight font-black">CE</span>
           </div>
@@ -39,7 +39,7 @@ export function Navbar() {
               </span>
             </div>
             <div className="text-[9px] font-semibold tracking-widest text-slate-400 uppercase">
-              Debt Advisory & Assistance
+              Salaried Debt Advisory
             </div>
           </div>
         </a>
@@ -50,7 +50,7 @@ export function Navbar() {
             <a
               key={l.href}
               href={l.href}
-              className="rounded px-3.5 py-1.5 text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-all"
+              className="rounded px-3 py-1.5 text-xs font-semibold text-slate-300 hover:bg-slate-800 hover:text-white transition-all"
             >
               {l.label}
             </a>
@@ -58,18 +58,19 @@ export function Navbar() {
         </nav>
 
         {/* Action CTAs */}
-        <div className="hidden items-center gap-3 lg:flex">
+        <div className="hidden items-center gap-2.5 lg:flex">
           <a
-            href="tel:+910000000000"
-            className="inline-flex items-center gap-2 text-xs font-semibold text-slate-300 hover:text-white transition-colors px-3 py-1.5 rounded-md hover:bg-slate-800"
+            href="https://wa.me/919876543210?text=Hi%2C%20I%20would%20like%20help%20with%20my%20loans%2FEMIs%20and%20want%20to%20understand%20my%20options."
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-400 hover:text-emerald-300 transition-colors px-3 py-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10"
           >
-            <Phone className="h-3.5 w-3.5 text-emerald-400" />
-            <span>Speak to Expert</span>
+            <span>💬 Talk to Expert</span>
           </a>
 
           <a
             href="#lead-form"
-            className="inline-flex h-9 items-center justify-center gap-1.5 rounded-lg bg-emerald-500 px-4 text-xs font-bold text-slate-950 hover:bg-emerald-400 transition-all shadow-sm"
+            className="inline-flex h-9 items-center justify-center gap-1.5 rounded-lg bg-emerald-500 px-4 text-xs font-extrabold text-slate-950 hover:bg-emerald-400 transition-all shadow-sm"
           >
             <span>Check Eligibility</span>
             <ArrowRight className="h-3.5 w-3.5" />

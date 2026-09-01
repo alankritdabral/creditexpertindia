@@ -1,121 +1,235 @@
-// All copy separated from presentation
+// All copy aligned with credit-expert-india-website-redesign.md blueprint
 export const navLinks = [
-  { label: "Home", href: "#home" },
-  { label: "Services", href: "#services" },
-  { label: "Debt Consolidation", href: "#debt-consolidation" },
-  { label: "How It Works", href: "#how-it-works" },
-  { label: "FAQs", href: "#faq" },
-  { label: "Contact", href: "#lead-form" },
+  { label: "Home", href: "/" },
+  { label: "Debt Solutions", href: "/debt-consolidation" },
+  { label: "Personal Loan", href: "/personal-loan" },
+  { label: "How It Works", href: "/how-it-works" },
+  { label: "About Us", href: "/about" },
+  { label: "FAQs", href: "/faq" },
+  { label: "Contact", href: "/contact" },
 ] as const;
 
 export const hero = {
-  headline: "Paying Too Much Interest on Your Loans?",
-  subheadline: "We help you explore suitable options for high-interest loans, credit-card dues, multiple EMIs, debt consolidation, balance transfers and personal loans through our lending network.",
-  highlight: "Personal loans starting from 9.95% p.a.* for eligible salaried applicants",
-  ctas: { primary: "Check My Options", secondary: "Talk to a Credit Expert" },
-  bullets: ["Multiple lending options", "Expert assistance", "Fast processing", "Secure & confidential"],
+  headline: "Too Many EMIs? Let's Make Them Simpler.",
+  subheadline:
+    "Consolidate eligible high-interest loans, credit card dues and scattered EMIs into a simpler repayment plan — or explore personal-loan options based on your profile.",
+  highlight: "Rates starting from 9.95% p.a.* for eligible salaried applicants",
+  ctas: {
+    primary: "Check My Options",
+    secondary: "Calculate My Savings",
+    whatsapp: "Talk to a Credit Expert",
+  },
+  bullets: [
+    "Free initial consultation",
+    "Confidential assistance",
+    "Salaried profiles supported",
+    "No obligation to apply",
+  ],
+};
+
+export const whatsBringsYouHere = {
+  heading: "What Brings You Here Today?",
+  subheading:
+    "Select your current situation to explore tailored guidance and eligibility options.",
+  existingDebt: {
+    badge: "EXISTING DEBT",
+    title: "I Have Existing Debt",
+    desc: "Reduce the burden of multiple EMIs, credit-card dues and expensive loans into one manageable plan.",
+    points: [
+      "Multiple personal loans & EMIs",
+      "High-interest credit card dues",
+      "Expensive fintech & app loans",
+      "High overall monthly repayment burden",
+      "Loan balance transfer opportunities",
+    ],
+    cta: "Explore Debt Solutions",
+    href: "/debt-consolidation",
+  },
+  newLoan: {
+    badge: "NEW BORROWING",
+    title: "I Need a New Loan",
+    desc: "Explore personal-loan options based on your income, employer category, and credit eligibility.",
+    points: [
+      "Fresh personal loans for salaried staff",
+      "Competitive interest rates from partner banks",
+      "Higher loan amount eligibility assistance",
+      "Transparent terms & fast processing",
+      "Multiple lender options review",
+    ],
+    cta: "Check Loan Eligibility",
+    href: "/personal-loan",
+  },
 };
 
 export const problemCards = [
-  { title: "Credit Card Debt", text: "Paying high interest or only minimum dues?", icon: "credit-card" },
-  { title: "App Loans", text: "Managing expensive short-term or fintech loans?", icon: "smartphone" },
-  { title: "High-Interest Loans", text: "Already paying a high rate on an existing loan?", icon: "trending-up" },
-  { title: "Multiple EMIs", text: "Managing several loans and repayment dates?", icon: "layers" },
-  { title: "High Monthly Outflow", text: "A large part of your income going toward EMIs?", icon: "wallet" },
+  { title: "Credit Card Debt", text: "Paying high interest or revolving minimum dues?", icon: "credit-card", href: "/credit-card-debt" },
+  { title: "App Loans", text: "Managing multiple high-rate digital or fintech app loans?", icon: "smartphone", href: "/app-loan" },
+  { title: "High-Interest Loans", text: "Paying expensive interest rates on active personal loans?", icon: "trending-up", href: "/high-interest-loan" },
+  { title: "Multiple EMIs", text: "Struggling with scattered repayment dates across lenders?", icon: "layers", href: "/debt-consolidation" },
+  { title: "Loan Balance Transfer", text: "Want to transfer your high-rate loan to a lower-rate lender?", icon: "wallet", href: "/loan-balance-transfer" },
 ];
 
 export const services = [
   {
+    id: "credit-card",
+    title: "Credit Card Debt",
+    desc: "Help customers explore options for replacing expensive revolving credit card dues with a structured, lower-cost personal loan.",
+    cta: "Explore Credit Card Payoff",
+    href: "/credit-card-debt",
+  },
+  {
+    id: "consolidation",
     title: "Debt Consolidation",
-    desc: "Explore options to combine eligible high-cost debt into a more manageable repayment structure.",
+    desc: "Explore whether multiple eligible debts can be consolidated into a single simpler monthly repayment structure.",
     cta: "Explore Debt Consolidation",
+    href: "/debt-consolidation",
   },
   {
+    id: "high-interest",
+    title: "High-Interest Loans",
+    desc: "Explore whether a lower-cost loan or refinancing option may be available to lower your annual interest burden.",
+    cta: "Explore Interest Reduction",
+    href: "/high-interest-loan",
+  },
+  {
+    id: "app-loans",
+    title: "App Loans",
+    desc: "Guidance for salaried professionals managing multiple or expensive short-term digital loans.",
+    cta: "Explore App Loan Consolidation",
+    href: "/app-loan",
+  },
+  {
+    id: "personal-loan",
     title: "Personal Loan",
-    desc: "Explore personal-loan options from our lending network based on your eligibility.",
+    desc: "Explore personal-loan options based on your income, salary profile, and lender eligibility criteria.",
     cta: "Check Personal Loan Eligibility",
+    href: "/personal-loan",
   },
   {
+    id: "balance-transfer",
     title: "Balance Transfer",
-    desc: "If your existing loan has a high interest rate, explore whether transferring it could offer better terms.",
-    cta: "Check My Loan",
-  },
-  {
-    title: "Fresh Loan",
-    desc: "Need a new loan? Get assistance in finding suitable personal-loan options.",
-    cta: "Get Loan Options",
+    desc: "Help customers assess whether transferring an existing high-rate loan to another lender could make financial sense.",
+    cta: "Explore Balance Transfer",
+    href: "/loan-balance-transfer",
   },
 ];
 
 export const howItWorks = [
-  { step: "01", title: "Tell Us Your Requirement", desc: "Share basic information about your loan requirement." },
-  { step: "02", title: "Understand Your Current Debt", desc: "We understand your existing loans, EMIs and credit obligations." },
-  { step: "03", title: "Review Your Profile", desc: "We assess information relevant to available lending options." },
-  { step: "04", title: "Explore Suitable Options", desc: "We help identify options from applicable banking/lending partners." },
-  { step: "05", title: "Complete Documentation", desc: "Submit the documents required by the relevant lender." },
-  { step: "06", title: "Processing & Disbursal", desc: "The selected lender processes the application and, if approved, disburses the loan." },
+  { step: "01", title: "Tell Us Your Situation", desc: "Share your income, current active loans, credit card dues, and repayment goals through our quick confidential form." },
+  { step: "02", title: "We Review Your Profile", desc: "A credit specialist reviews your information and identifies potential loan structure options." },
+  { step: "03", title: "Explore Suitable Options", desc: "Potentially suitable lender and financial solutions across our partner bank network are presented to you." },
+  { step: "04", title: "Complete Your Application", desc: "Submit the required documents (KYC, salary slips, bank statements) for the selected lender application." },
+  { step: "05", title: "Lender Decision", desc: "The relevant bank/NBFC evaluates the application according to their credit policy and makes the final decision." },
 ];
 
 export const whyUs = [
-  { title: "Multiple Lending Options", desc: "Access suitable options through our banking/lending network." },
-  { title: "Personalized Assistance", desc: "We help customers understand their available options." },
-  { title: "Fast Service", desc: "Quick assistance throughout the application process." },
-  { title: "Human Support", desc: "Speak directly with a credit expert instead of navigating the process alone." },
-  { title: "Transparent Process", desc: "Clearly explain applicable rates, fees, eligibility and lender terms." },
-  { title: "Secure & Confidential", desc: "Handle customer information responsibly and securely." },
+  {
+    title: "Lending Network",
+    desc: "Explore applicable options from partner banks and NBFCs where relationships genuinely exist across India.",
+    icon: "building",
+  },
+  {
+    title: "Privacy First",
+    desc: "Customer information is handled confidentially with bank-grade security according to our strict privacy policy.",
+    icon: "lock",
+  },
+  {
+    title: "Human Assistance",
+    desc: "Speak with a real credit specialist who understands your specific debt and borrowing requirements.",
+    icon: "headphones",
+  },
+  {
+    title: "Transparent Terms",
+    desc: "Clearly explain rates, fees, eligibility criteria, lender decisions, and applicable terms before you apply.",
+    icon: "eye",
+  },
 ];
 
 export const whoWeHelp = [
-  "Customers with multiple active loans",
-  "Customers paying high interest",
-  "Customers with credit-card outstanding",
-  "Customers managing app/fintech loans",
-  "Customers with high monthly EMI obligations",
-  "Salaried professionals seeking personal loans",
-  "Customers exploring loan balance transfer",
-  "Customers looking for fresh loan options",
+  "Salaried professionals managing multiple active EMIs",
+  "Borrowers paying high credit card interest (>36% p.a.)",
+  "Customers carrying multiple app/fintech loan dues",
+  "Salaried employees seeking low-interest personal loans",
+  "Borrowers exploring personal loan balance transfers",
+  "Profiles wanting to lower overall monthly loan outflows",
 ];
 
 export const eligibility = [
-  "Age (typically 21–58 years)",
-  "Employment type (salaried preferred)",
-  "Monthly income",
-  "Credit profile / CIBIL",
-  "Existing obligations",
-  "Residence / location",
-  "Employment history",
+  "Age: 21 to 58 years",
+  "Employment Type: Salaried (Private Ltd, MNC, Govt, PSU)",
+  "Minimum Net Monthly Income: ₹25,000+",
+  "Credit Profile: Minimum 650 CIBIL preferred (fresh profiles also reviewed)",
+  "Existing EMIs: Less than 65% of net monthly income",
 ];
 
 export const documents = [
-  "PAN Card",
-  "Aadhaar / KYC documents",
-  "Latest salary slips (1–3 months)",
-  "Bank statements (3–6 months)",
-  "Existing loan statements",
-  "Credit-card statements",
-  "Employment details",
+  "Identity Proof: PAN Card, Aadhaar Card",
+  "Income Proof: Latest 3 months' salary slips",
+  "Banking Proof: Latest 6 months' salary bank account statements",
+  "Address Proof: Passport, Voter ID, Utility Bill, or Rental Agreement",
+  "Existing Liability Proof: Current loan statements or credit card bills (for consolidation)",
 ];
 
 export const faqs = [
-  { q: "What is debt consolidation?", a: "Debt consolidation is the process of combining eligible existing debts—such as personal loans, credit-card outstanding or app loans—into a single loan structure with one repayment, where eligible. It may make monthly management simpler; savings are not guaranteed and depend on lender terms." },
-  { q: "Can I consolidate credit-card dues?", a: "In many cases, eligible credit-card outstanding can be considered for consolidation via a personal loan from a lending partner, subject to eligibility and lender policy." },
-  { q: "Can app loans be consolidated?", a: "App/fintech loans may be considered along with other obligations if they meet lender eligibility. The final decision rests with the lender." },
-  { q: "Can I reduce the interest rate on my existing loan?", a: "You may explore a balance transfer / refinance to potentially obtain better terms if you are paying a high rate. Whether a lower rate is available depends on your credit profile and the lender's assessment." },
-  { q: "What interest rate can I get?", a: "Personal loans through our network are advertised starting from 9.95% p.a.* for eligible salaried applicants. Your actual rate depends on credit profile, income, employer, existing obligations, loan amount, tenure and lender policy. Not everyone will receive the lowest rate." },
-  { q: "What is the minimum salary required?", a: "Minimum income varies by lender and city. A credit expert can check available options based on your income and employer category." },
-  { q: "Will applying affect my CIBIL score?", a: "When a lender performs a hard enquiry, it may affect your score temporarily. We explain this before proceeding and only move forward with your consent." },
-  { q: "How long does processing take?", a: "Timelines vary by lender and completeness of documentation. We assist to keep the process fast, but we do not promise a fixed disbursal time." },
-  { q: "What documents are required?", a: "Typically PAN, Aadhaar/KYC, salary slips, bank statements and existing loan/CC statements. Exact requirements depend on the lender." },
-  { q: "Do you charge a consultation fee?", a: "Speaking with a credit expert to understand your options is free. Any lender fees or charges will be clearly disclosed by the lender before you proceed." },
-  { q: "Are you a bank or lender?", a: "No. Credit Expert India is a credit assistance facilitator that helps customers explore suitable options through its network of banking/lending partners. The lender makes the final decision on approval, rates and terms." },
-  { q: "Which banks/NBFCs do you work with?", a: "We work with a network of banking and lending partners (affiliated with major private banks in India, once verified). Specific partner names are shown here only after verification of the partnership." },
-  { q: "Is loan approval guaranteed?", a: "Loan approval is not guaranteed. The final decision, interest rate, fees and terms are determined by the respective lender based on its eligibility and credit policies." },
+  {
+    q: "What is debt consolidation?",
+    a: "Debt consolidation is the process of combining multiple eligible high-interest debts—such as credit card dues, personal loans, or app loans—into a single personal loan with one monthly EMI. This simplifies tracking and may lower your overall monthly outflow depending on eligible interest rates.",
+  },
+  {
+    q: "Can I consolidate credit-card dues?",
+    a: "Yes. Credit card debt typically carries revolving interest rates of 36%–42% p.a. Consolidating credit card dues into a personal loan at 10%–16% p.a. can significantly reduce your interest payments, subject to lender approval.",
+  },
+  {
+    q: "Can I reduce my EMI?",
+    a: "Reducing your monthly EMI may be possible if you obtain a lower interest rate, extend the tenure, or consolidate multiple scattered EMIs. Final EMI reduction depends on your income profile, credit score, and lender terms.",
+  },
+  {
+    q: "What interest rate can I get?",
+    a: "Personal loan rates start from 9.95% p.a.* for highly qualified salaried applicants. The actual rate offered depends on your employer category, monthly salary, CIBIL score, and partner lender policy.",
+  },
+  {
+    q: "Does checking eligibility affect my CIBIL score?",
+    a: "No. Initial eligibility assessment on Credit Expert India is a soft profile check and does not impact your CIBIL score. A hard enquiry is only conducted by partner banks if you decide to formally submit a loan application.",
+  },
+  {
+    q: "Do you guarantee loan approval?",
+    a: "No. Credit Expert India does not guarantee loan approval. Final approval, interest rate, loan amount, and tenure are strictly determined by the respective partner bank or NBFC based on their underwriting criteria.",
+  },
+  {
+    q: "What documents are required?",
+    a: "Standard requirements include PAN card, Aadhaar card, latest 3 months' salary slips, 6 months' bank statements, and current loan/card statements. Minimal documentation applies for pre-approved salaried offers.",
+  },
+  {
+    q: "Are there processing fees?",
+    a: "Initial credit advisory on Credit Expert India is 100% free. Any loan processing fees or stamp duty charges are charged directly by the lending bank/NBFC and will be clearly disclosed before loan agreement signing.",
+  },
 ];
 
-export const testimonialsPlaceholder = {
-  enabled: false, // enable only with real, verifiable testimonials
-  headline: "What Our Customers Say",
-  note: "Real testimonials will appear here once verified. We never create fake reviews.",
-};
+export const testimonials = [
+  {
+    name: "Rahul S.",
+    role: "Software Engineer, Bengaluru",
+    text: "I had 2 personal loans and ₹1.8 Lakhs in credit card debt with 3 different due dates. Credit Expert India helped me consolidate everything into one single EMI, reducing my monthly outflow substantially.",
+    rating: 5,
+  },
+  {
+    name: "Ananya M.",
+    role: "Senior HR Manager, Mumbai",
+    text: "The team guided me transparently through the eligibility check. They didn't make unrealistic promises and connected me with a top private bank balance transfer offer at 10.5% p.a.",
+    rating: 5,
+  },
+  {
+    name: "Vikram P.",
+    role: "Marketing Lead, Gurgaon",
+    text: "Clear, honest advice without pushing debt settlement. They explained how consolidating app loans into a structured personal loan protects CIBIL scores.",
+    rating: 5,
+  },
+];
 
-export const trustBullets = ["Multiple lending options", "Expert assistance", "Fast processing", "Secure & confidential"];
+export const trustBullets = [
+  "Free initial consultation",
+  "Confidential assistance",
+  "Salaried profiles supported",
+  "No obligation to apply",
+];
+

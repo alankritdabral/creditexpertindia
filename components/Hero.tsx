@@ -121,13 +121,13 @@ export function Hero() {
 
             {/* Main Headline */}
             <h1 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl leading-[1.12]">
-              Reduce Expensive Loan Interest. <br className="hidden sm:inline" />
-              <span className="text-emerald-400">Consolidate All EMIs Into One.</span>
+              Too Many EMIs? <br className="hidden sm:inline" />
+              <span className="text-emerald-400">Let's Make Them Simpler.</span>
             </h1>
 
-            {/* Subheadline */}
+            {/* Supporting copy */}
             <p className="text-base leading-7 text-slate-300 sm:text-lg sm:leading-8 max-w-[580px]">
-              Combine high-interest credit card dues, app loans & scattered EMIs into a single structured personal loan. Lower your monthly outflow through premier private bank options.
+              Consolidate eligible high-interest loans, credit card dues and scattered EMIs into a simpler repayment plan — or explore personal-loan options based on your profile.
             </p>
 
             {/* Key Value Cards */}
@@ -138,11 +138,11 @@ export function Hero() {
                   <span className="text-base sm:text-lg font-bold text-emerald-400">From 9.95% p.a.*</span>
                 </div>
                 <div className="px-2">
-                  <span className="text-[11px] font-medium text-slate-400 uppercase tracking-wider block">Credit Score</span>
-                  <span className="text-base sm:text-lg font-bold text-white">0 Score Impact</span>
+                  <span className="text-[11px] font-medium text-slate-400 uppercase tracking-wider block">Eligibility Check</span>
+                  <span className="text-base sm:text-lg font-bold text-white">Soft Enquiry</span>
                 </div>
                 <div className="pl-2">
-                  <span className="text-[11px] font-medium text-slate-400 uppercase tracking-wider block">Eligibility</span>
+                  <span className="text-[11px] font-medium text-slate-400 uppercase tracking-wider block">Target Profile</span>
                   <span className="text-base sm:text-lg font-bold text-white">Salaried Staff</span>
                 </div>
               </div>
@@ -154,7 +154,7 @@ export function Hero() {
                 href="#lead-form"
                 className="inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-emerald-500 px-7 text-sm font-bold text-slate-950 hover:bg-emerald-400 transition-colors shadow-lg shadow-emerald-500/20"
               >
-                <span>Check My Loan Options</span>
+                <span>Check My Options</span>
                 <ArrowRight className="h-4 w-4" />
               </a>
 
@@ -163,23 +163,36 @@ export function Hero() {
                 className="inline-flex h-12 items-center justify-center gap-2 rounded-lg border border-slate-700 bg-slate-800/60 px-6 text-sm font-semibold text-slate-200 hover:bg-slate-800 hover:text-white transition-colors"
               >
                 <TrendingDown className="h-4 w-4 text-emerald-400" />
-                <span>Simulate Monthly Savings</span>
+                <span>Calculate My Savings</span>
+              </a>
+
+              <a
+                href="https://wa.me/919876543210?text=Hi%2C%20I%20would%20like%20help%20with%20my%20loans%2FEMIs%20and%20want%20to%20understand%20my%20options."
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-emerald-600/20 border border-emerald-500/40 px-5 text-sm font-semibold text-emerald-300 hover:bg-emerald-600/30 transition-colors"
+              >
+                <span>💬 Talk to Expert</span>
               </a>
             </div>
 
-            {/* Trust List */}
-            <div className="flex flex-wrap items-center gap-y-2 gap-x-6 text-xs text-slate-400 font-medium pt-1">
+            {/* Trust Microcopy */}
+            <div className="flex flex-wrap items-center gap-y-2 gap-x-6 text-xs text-slate-300 font-medium pt-1">
               <div className="flex items-center gap-1.5">
                 <CheckCircle2 className="h-4 w-4 text-emerald-400" />
-                <span>Multiple Lending Partners</span>
+                <span>Free initial consultation</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <CheckCircle2 className="h-4 w-4 text-emerald-400" />
-                <span>100% Confidential Assistance</span>
+                <span>Confidential assistance</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <CheckCircle2 className="h-4 w-4 text-emerald-400" />
-                <span>Zero Upfront Consultation Fee</span>
+                <span>Salaried profiles supported</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+                <span>No obligation to apply</span>
               </div>
             </div>
           </div>

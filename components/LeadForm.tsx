@@ -232,9 +232,18 @@ export function LeadForm() {
               disabled={status === "loading"}
               className="shimmer-btn flex h-14 w-full items-center justify-center gap-2 rounded-full bg-[#091328] text-xs font-extrabold tracking-wider text-white shadow-xl hover:bg-[#132247] disabled:opacity-60"
             >
-              {status === "loading" ? "SUBMITTING..." : "CHECK MY LOAN OPTIONS NOW"}
+              {status === "loading" ? "SUBMITTING..." : "CHECK MY OPTIONS NOW"}
               <ArrowRight className="h-4 w-4 text-emerald-400" />
             </motion.button>
+
+            <a
+              href="https://wa.me/919876543210?text=Hi%2C%20I%20would%20like%20help%20with%20my%20loans%2FEMIs%20and%20want%20to%20understand%20my%20options."
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-xs font-extrabold tracking-wider text-emerald-700 hover:bg-emerald-500/20 transition-all"
+            >
+              <span>💬 TALK TO A CREDIT EXPERT VIA WHATSAPP</span>
+            </a>
 
             <AnimatePresence>
               {msg && (

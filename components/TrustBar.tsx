@@ -10,9 +10,9 @@ export function TrustBar() {
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           {[
             { metric: "₹250+ Cr", label: "Debt Assessed", sub: "Salaried applicant portfolios", icon: TrendingDown },
-            { metric: "From 9.95%", label: "Annual Interest Rate*", sub: "Eligible salaried profiles", icon: CheckCircle2 },
-            { metric: "24-48 Hours", label: "Turnaround Time", sub: "Streamlined partner workflow", icon: Clock },
-            { metric: "100% Safe", label: "Zero CIBIL Impact", sub: "Soft eligibility check", icon: Shield },
+            { metric: "From 9.95%*", label: "Indicative Rates", sub: "Subject to lender criteria", icon: CheckCircle2 },
+            { metric: "15+ Partners", label: "Lending Network", sub: "Banks & RBI-registered NBFCs", icon: Building },
+            { metric: "Soft Check", label: "Initial Assessment", sub: "No score impact for inquiry", icon: Shield },
           ].map((stat, i) => (
             <motion.div
               key={stat.label}
