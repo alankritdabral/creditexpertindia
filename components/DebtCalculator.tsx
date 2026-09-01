@@ -2,143 +2,110 @@
 import { useState } from 'react';
 
 export function DebtCalculator() {
-  const [amount, setAmount] = useState<string>('');
-  const [rate, setRate] = useState<string>('');
+  const [income, setIncome] = useState<string>('');
+  const [totalDebt, setTotalDebt] = useState<string>('');
   const [emi, setEmi] = useState<string>('');
-  const [tenure, setTenure] = useState<string>('');
+  const [activeLoans, setActiveLoans] = useState<string>('');
 
-  const isFilled = amount && rate && emi;
+  const incomeNum = Number(income) || 0;
+  const emiNum = Number(emi) || 0;
   
-  // Illustrative calculation: assuming a 5 year tenure at 10.5% (optimistic) for potential EMI
-  const outstandingNum = Number(amount) || 0;
-  const currentEmiNum = Number(emi) || 0;
-  
-  const r = 10.5 / (12 * 100);
-  const n = 60; // 5 years
-  const potentialEmiNum = outstandingNum > 0 ? (outstandingNum * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1) : 0;
-  const potentialDifferenceNum = currentEmiNum > potentialEmiNum ? currentEmiNum - potentialEmiNum : 0;
-
-  const currentEmiStr = currentEmiNum ? `₹${currentEmiNum.toLocaleString('en-IN', {maximumFractionDigits: 0})}` : "₹0";
-  const potentialEmiStr = potentialEmiNum ? `₹${potentialEmiNum.toLocaleString('en-IN', {maximumFractionDigits: 0})}` : "₹0";
-  const potentialDifferenceStr = potentialDifferenceNum ? `₹${potentialDifferenceNum.toLocaleString('en-IN', {maximumFractionDigits: 0})}` : "₹0";
+  const debtBurden = incomeNum > 0 ? Math.min(Math.round((emiNum / incomeNum) * 100), 100) : 0;
+  const isFilled = income && totalDebt && emi && activeLoans;
 
   return (
-    <section className="py-24 sm:py-32 bg-white" id="debt-health-check">
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        <div className="mx-auto max-w-2xl lg:text-center">
-          <p className="text-base font-semibold leading-7 text-primary tracking-wide uppercase">
-            DEBT X-RAY
-          </p>
-          <h2 className="mt-2 text-4xl font-medium tracking-[-1px] text-ink sm:text-5xl">
-            Let's see where your money is going.
-          </h2>
-          <p className="mt-6 text-lg leading-[1.5] text-ink-mute font-light">
-            Enter your current debt details to see if a better repayment path exists.
-          </p>
-        </div>
+    <section className="py-24 sm:py-32 bg-soft-blue" id="debt-health-check">
+      <div className="mx-auto max-w-7xl px-6 lg:px-8 flex flex-col items-center text-center">
+        
+        <h2 className="text-3xl font-medium tracking-tight text-text-main sm:text-5xl mb-12 max-w-2xl">
+          YOUR DEBT X-RAY
+        </h2>
 
-        <div className="mx-auto mt-16 max-w-4xl bg-canvas-soft border border-hairline rounded-[12px] p-8 sm:p-12 shadow-sm grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
-          <div className="space-y-8">
-            <div>
-              <label className="block text-[15px] font-light leading-6 text-ink">
-                Total Outstanding Debt
-              </label>
-              <div className="mt-2 relative rounded-[6px] shadow-sm">
-                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                  <span className="text-ink-mute sm:text-sm">₹</span>
-                </div>
+        <div className="w-full max-w-lg bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 overflow-hidden text-left">
+          <div className="p-8 sm:p-10 space-y-6">
+            
+            <div className="flex justify-between items-center border-b border-gray-100 pb-4">
+              <label className="text-sm font-medium text-text-muted">Monthly income</label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted font-medium">₹</span>
                 <input
                   type="number"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  className="block w-full rounded-[6px] border border-hairline py-2 pl-10 text-ink placeholder:text-ink-mute focus:ring-2 focus:ring-inset focus:ring-primary focus:border-primary sm:text-[15px] sm:leading-6 [font-feature-settings:'tnum']"
-                  placeholder="650000"
+                  value={income}
+                  onChange={(e) => setIncome(e.target.value)}
+                  className="w-32 sm:w-40 bg-gray-50 rounded-lg py-2 pl-7 pr-3 text-right text-text-main font-semibold outline-none focus:ring-2 focus:ring-brand-blue/50"
+                  placeholder="75000"
                 />
               </div>
             </div>
 
-            <div>
-              <label className="block text-[15px] font-light leading-6 text-ink">
-                Total Current EMI
-              </label>
-              <div className="mt-2 relative rounded-[6px] shadow-sm">
-                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                  <span className="text-ink-mute sm:text-sm">₹</span>
-                </div>
+            <div className="flex justify-between items-center border-b border-gray-100 pb-4">
+              <label className="text-sm font-medium text-text-muted">Total debt</label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted font-medium">₹</span>
+                <input
+                  type="number"
+                  value={totalDebt}
+                  onChange={(e) => setTotalDebt(e.target.value)}
+                  className="w-32 sm:w-40 bg-gray-50 rounded-lg py-2 pl-7 pr-3 text-right text-text-main font-semibold outline-none focus:ring-2 focus:ring-brand-blue/50"
+                  placeholder="820000"
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-between items-center border-b border-gray-100 pb-4">
+              <label className="text-sm font-medium text-text-muted">Monthly EMI</label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted font-medium">₹</span>
                 <input
                   type="number"
                   value={emi}
                   onChange={(e) => setEmi(e.target.value)}
-                  className="block w-full rounded-[6px] border border-hairline py-2 pl-10 text-ink placeholder:text-ink-mute focus:ring-2 focus:ring-inset focus:ring-primary focus:border-primary sm:text-[15px] sm:leading-6 [font-feature-settings:'tnum']"
-                  placeholder="35000"
+                  className="w-32 sm:w-40 bg-gray-50 rounded-lg py-2 pl-7 pr-3 text-right text-text-main font-semibold outline-none focus:ring-2 focus:ring-brand-blue/50"
+                  placeholder="38500"
                 />
               </div>
             </div>
 
-            <div>
-              <label className="block text-[15px] font-light leading-6 text-ink">
-                Average Interest Rate
-              </label>
-              <div className="mt-2 relative rounded-[6px] shadow-sm">
-                <input
-                  type="number"
-                  value={rate}
-                  onChange={(e) => setRate(e.target.value)}
-                  className="block w-full rounded-[6px] border border-hairline py-2 pr-10 text-ink placeholder:text-ink-mute focus:ring-2 focus:ring-inset focus:ring-primary focus:border-primary sm:text-[15px] sm:leading-6 [font-feature-settings:'tnum']"
-                  placeholder="18"
-                />
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                  <span className="text-ink-mute sm:text-sm">%</span>
-                </div>
-              </div>
+            <div className="flex justify-between items-center border-b border-gray-100 pb-4">
+              <label className="text-sm font-medium text-text-muted">Active loans</label>
+              <input
+                type="number"
+                value={activeLoans}
+                onChange={(e) => setActiveLoans(e.target.value)}
+                className="w-20 bg-gray-50 rounded-lg py-2 px-3 text-right text-text-main font-semibold outline-none focus:ring-2 focus:ring-brand-blue/50"
+                placeholder="5"
+              />
+            </div>
+          </div>
+          
+          <div className="bg-gray-50 p-8 sm:p-10 border-t border-gray-100">
+            <h3 className="text-sm font-bold tracking-wider text-text-muted uppercase mb-4">
+              DEBT BURDEN
+            </h3>
+            
+            <div className="flex items-end gap-3 mb-4">
+              <span className={`text-5xl font-bold tracking-tight ${debtBurden > 50 ? 'text-warning-red' : 'text-text-main'}`}>
+                {debtBurden}%
+              </span>
             </div>
             
-            <button className="w-full rounded-full bg-primary px-6 py-4 text-base font-medium leading-none text-white shadow-sm hover:bg-primary-press transition-colors">
-              Get My Personalised Analysis
+            <div className="h-3 w-full bg-gray-200 rounded-full overflow-hidden mb-6">
+              <div 
+                className={`h-full rounded-full transition-all duration-500 ease-out ${debtBurden > 50 ? 'bg-warning-red' : 'bg-brand-blue'}`}
+                style={{ width: `${Math.max(debtBurden, 5)}%` }}
+              />
+            </div>
+
+            <p className="text-text-main text-lg mb-8">
+              You're putting <span className="font-semibold">₹{emiNum > 0 ? emiNum.toLocaleString('en-IN') : '0'}</span>/month toward debt.
+            </p>
+
+            <button className="w-full rounded-xl bg-brand-blue px-6 py-4 text-base font-medium text-white hover:bg-blue-700 transition-colors shadow-lg shadow-brand-blue/20">
+              Explore Possible Options
             </button>
           </div>
-
-          <div className="bg-ink rounded-[12px] p-8 border border-ink shadow-lg h-full flex flex-col justify-between text-white">
-            <div className="space-y-6">
-              <div className="flex justify-between items-end border-b border-white/10 pb-4">
-                <div>
-                  <p className="text-[10px] font-normal tracking-[0.1px] text-white/50 uppercase mb-1">CURRENT EMI</p>
-                  <p className="text-2xl font-light">{isFilled ? currentEmiStr : '—'} <span className="text-sm text-white/50">/ month</span></p>
-                </div>
-              </div>
-
-              <div className="flex justify-between items-end border-b border-white/10 pb-4">
-                <div>
-                  <p className="text-[10px] font-normal tracking-[0.1px] text-white/50 uppercase mb-1">CURRENT INTEREST</p>
-                  <p className="text-2xl font-light">{isFilled ? `${rate}%` : '—'}</p>
-                </div>
-              </div>
-              
-              <div className="flex justify-between items-end border-b border-white/10 pb-4">
-                <div>
-                  <p className="text-[10px] font-normal tracking-[0.1px] text-white/50 uppercase mb-1">OUTSTANDING</p>
-                  <p className="text-2xl font-light">{isFilled ? `₹${outstandingNum.toLocaleString('en-IN')}` : '—'}</p>
-                </div>
-              </div>
-
-              <div className="pt-4">
-                <p className="text-[10px] font-normal tracking-[0.1px] text-green-400 uppercase mb-1">POTENTIAL EMI*</p>
-                <p className="text-3xl font-medium text-white">{isFilled ? potentialEmiStr : '—'} {isFilled && <span className="text-sm text-white/50 font-light">/ month</span>}</p>
-              </div>
-              
-              <div>
-                <p className="text-[10px] font-normal tracking-[0.1px] text-green-400 uppercase mb-1">POTENTIAL DIFFERENCE</p>
-                <p className="text-xl font-medium text-green-400">{isFilled ? potentialDifferenceStr : '—'} {isFilled && <span className="text-sm text-green-400/70 font-light">/ month</span>}</p>
-              </div>
-            </div>
-            
-            <div className="mt-8">
-              <p className="text-[11px] leading-[1.4] text-white/50 font-light">
-                *Estimates are illustrative assuming a hypothetical 5-year tenure at a lower rate. Actual rates, eligibility and approval depend on the respective lender and borrower profile.
-              </p>
-            </div>
-          </div>
         </div>
+
       </div>
     </section>
   );

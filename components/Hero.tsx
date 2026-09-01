@@ -1,71 +1,38 @@
 export function Hero() {
   return (
-    <section className="relative pt-32 pb-24 sm:pt-48 sm:pb-32 bg-white flex flex-col justify-center items-center text-center min-h-[90vh] overflow-hidden">
-      {/* Background styling kept minimal for premium feel */}
-      <div className="mx-auto max-w-7xl px-6 lg:px-8 relative z-10 flex flex-col lg:flex-row items-center gap-16 lg:gap-24">
-        
-        {/* Text Content */}
-        <div className="flex-1 text-left">
-          <p className="text-xs font-semibold tracking-[0.1px] text-primary-deep uppercase mb-8">
-            DEBT CONSOLIDATION FOR SALARIED PROFESSIONALS
-          </p>
-          <h1 className="text-[48px] leading-[1.05] font-medium tracking-[-1px] text-ink sm:text-[64px] mb-6">
-            Your salary shouldn't disappear into EMIs.
-          </h1>
-          <p className="mt-6 text-lg leading-[1.5] text-ink-mute font-light max-w-xl">
-            We help salaried professionals understand high-interest loans, credit-card debt and multiple EMIs — and explore suitable repayment options from our lending network.
-          </p>
-          
-          <div className="mt-10 flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
-            <a
-              href="#debt-health-check"
-              className="rounded-full bg-primary px-6 py-3 text-base font-medium leading-none text-white shadow-sm hover:bg-primary-press transition-colors"
-            >
-              See My Options &rarr;
-            </a>
-            <a
-              href="#contact"
-              className="rounded-full bg-transparent px-6 py-3 text-base font-medium leading-none text-ink border border-ink/20 hover:bg-ink/5 transition-colors"
-            >
-              WhatsApp an Expert
-            </a>
-          </div>
-          <p className="mt-4 text-[13px] leading-[1.4] font-normal tracking-[-0.39px] text-ink-mute">
-            60-sec assessment · No upfront fee · Confidential
-          </p>
-        </div>
+    <section className="relative pt-32 pb-24 sm:pt-48 sm:pb-32 bg-warm-bg flex flex-col justify-center items-center text-center min-h-[90vh] overflow-hidden">
+      {/* Subtle blue radial glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-brand-blue/5 rounded-full blur-[100px] pointer-events-none" />
 
-        {/* Debt Transformation Visualization */}
-        <div className="flex-1 w-full max-w-md bg-white border border-ink/10 rounded-2xl p-8 shadow-sm text-left">
-          <div className="flex flex-col gap-4">
-            <div className="flex justify-between items-center text-ink-mute text-sm pb-2 border-b border-ink/5">
-              <span>Multiple Debts</span>
-            </div>
-            
-            <div className="flex justify-between items-center bg-red-50 text-red-700 px-4 py-3 rounded-lg text-sm font-medium">
-              <span>4 Personal Loans</span>
-            </div>
-            <div className="flex justify-between items-center bg-red-50 text-red-700 px-4 py-3 rounded-lg text-sm font-medium">
-              <span>2 Credit Cards</span>
-            </div>
-            <div className="flex justify-between items-center bg-red-50 text-red-700 px-4 py-3 rounded-lg text-sm font-medium">
-              <span>1 App Loan</span>
-            </div>
-            
-            <div className="flex justify-center py-2">
-              <svg className="w-5 h-5 text-ink/30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>
-            </div>
-            
-            <div className="flex justify-between items-center text-ink-mute text-sm pb-2 border-b border-ink/5">
-              <span>Debt Analysis</span>
-            </div>
-            
-            <div className="flex justify-between items-center bg-green-50 text-green-700 px-4 py-4 rounded-lg text-base font-medium border border-green-200">
-              <span>Potentially 1 Manageable Plan</span>
-            </div>
-          </div>
-        </div>
+      <div className="mx-auto max-w-4xl px-6 lg:px-8 relative z-10 flex flex-col items-center">
+        <p className="text-sm font-semibold tracking-widest text-text-muted uppercase mb-8">
+          CREDIT EXPERT INDIA
+        </p>
         
+        <h1 className="text-[56px] leading-[1.05] font-semibold tracking-tight text-primary sm:text-[76px] mb-4">
+          TOO MANY EMIs?
+        </h1>
+        
+        <h2 className="text-[40px] leading-[1.1] font-medium tracking-tight text-text-main sm:text-[56px] mb-8">
+          Let's simplify them.
+        </h2>
+        
+        <p className="text-lg leading-relaxed text-text-muted font-normal max-w-2xl mb-12 sm:text-xl">
+          Review your loans, cards and repayment burden.
+        </p>
+        
+        <div className="flex flex-col items-center gap-6 w-full sm:w-auto">
+          <a
+            href="#debt-health-check"
+            className="w-full sm:w-auto rounded-full bg-brand-blue px-8 py-4 text-lg font-medium text-white hover:bg-blue-700 transition-colors shadow-lg shadow-brand-blue/20"
+          >
+            Check My Debt Options &rarr;
+          </a>
+          
+          <p className="text-[14px] leading-relaxed font-medium text-text-muted">
+            Free &middot; Confidential &middot; No obligation
+          </p>
+        </div>
       </div>
     </section>
   );

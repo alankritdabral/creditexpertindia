@@ -67,7 +67,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <html lang="en" className={`${inter.variable} ${manrope.variable} h-full antialiased font-sans scroll-smooth`}>
-      <body className="min-h-full flex flex-col bg-white text-ink [font-feature-settings:'ss01']">
+      <body className="min-h-full flex flex-col bg-background text-text-main [font-feature-settings:'ss01']">
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
         <Navbar />

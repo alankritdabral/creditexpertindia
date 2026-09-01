@@ -7,63 +7,49 @@ const banks = [
   { id: "icici", name: "ICICI Bank" },
   { id: "axis", name: "Axis Bank" },
   { id: "kotak", name: "Kotak Mahindra" },
-  { id: "indusind", name: "IndusInd Bank" },
-  { id: "yes", name: "Yes Bank" },
-  { id: "idfc", name: "IDFC First" },
-  { id: "federal", name: "Federal Bank" },
-  { id: "bandhan", name: "Bandhan Bank" },
-  { id: "rbl", name: "RBL Bank" },
-  { id: "southindian", name: "South Indian Bank" },
-  { id: "cityunion", name: "City Union Bank" },
-  { id: "dcb", name: "DCB Bank" },
-  { id: "dhanlaxmi", name: "Dhanlaxmi Bank" },
-  { id: "csb", name: "CSB Bank" },
-  { id: "karnataka", name: "Karnataka Bank" },
-  { id: "kvb", name: "Karur Vysya" },
-  { id: "tmb", name: "TMB" },
-  { id: "jk", name: "J&K Bank" },
-  { id: "nainital", name: "Nainital Bank" },
-  { id: "idbi", name: "IDBI Bank" }
+  { id: "idfc", name: "IDFC First" }
 ];
 
-const duplicatedBanks = [...banks, ...banks];
+const duplicatedBanks = [...banks, ...banks, ...banks, ...banks];
 
 export function Partners() {
   return (
-    <div className="bg-canvas py-16 border-y border-hairline overflow-hidden w-full">
-      <div className="mx-auto max-w-7xl px-6 lg:px-8 w-full">
-        <div className="mx-auto max-w-2xl text-center mb-10">
-          <h2 className="text-xl font-medium tracking-[0.5px] leading-[1.15] text-ink uppercase">
-            Our lending network
-          </h2>
-        </div>
+    <section className="bg-white py-24 border-y border-gray-100 overflow-hidden w-full">
+      <div className="mx-auto max-w-7xl px-6 lg:px-8 w-full flex flex-col items-center">
         
-        <div className="relative flex overflow-hidden w-full opacity-60 grayscale transition-all duration-500 hover:grayscale-0">
-          <div className="animate-marquee flex items-center gap-16 whitespace-nowrap min-w-max py-4">
+        <h2 className="text-3xl font-medium tracking-tight text-text-main sm:text-4xl text-center mb-16">
+          Access to a wide lending network
+        </h2>
+        
+        <div className="relative flex overflow-hidden w-full max-w-5xl opacity-70 grayscale transition-all duration-500 hover:grayscale-0 hover:opacity-100">
+          <div className="animate-marquee flex items-center gap-24 whitespace-nowrap min-w-max py-4">
             {duplicatedBanks.map((bank, i) => (
-              <div key={i} className="flex items-center gap-3">
+              <div key={i} className="flex items-center gap-4">
                 <Image 
                   src={`/logos/${bank.id}.png`} 
                   alt={bank.name} 
-                  width={32}
-                  height={32}
-                  className="h-8 w-8 object-contain rounded-sm"
+                  width={40}
+                  height={40}
+                  className="h-10 w-10 object-contain rounded-md"
                   onError={(e) => {
                     e.currentTarget.style.display = 'none';
                   }}
                 />
-                <span className="text-[20px] font-semibold text-ink-mute tracking-tight">{bank.name}</span>
+                <span className="text-2xl font-bold text-text-muted tracking-tight">{bank.name}</span>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="mx-auto max-w-3xl text-center mt-12">
-          <p className="text-[12px] leading-[1.5] text-ink-mute font-light">
-            Credit Expert India is not itself a bank or NBFC. Final loan approval, interest rate and loan terms are determined by the respective lender based on their policies and your credit profile.
+        <div className="mx-auto max-w-2xl text-center mt-16 space-y-4">
+          <p className="text-lg text-text-main font-medium">
+            We help you explore suitable options across our lending network.
+          </p>
+          <p className="text-[13px] leading-relaxed text-text-muted font-normal max-w-3xl mx-auto">
+            Credit Expert India is not itself a bank or NBFC. Final loan approval, interest rate and loan terms are determined by the respective lender based on their policies and your credit profile. Only displaying lenders with whom we have authorized relationships.
           </p>
         </div>
       </div>
-    </div>
+    </section>
   );
 }

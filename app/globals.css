@@ -2,35 +2,37 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #0d253d;
-  --primary: #533afd;
-  --primary-deep: #4434d4;
-  --primary-press: #2e2b8c;
-  --brand-dark-900: #1c1e54;
-  --canvas-cream: #f5e9d4;
-  --canvas-soft: #f6f9fc;
-  --ink: #0d253d;
-  --hairline: #e3e8ee;
+  --foreground: #14202B;
+  --primary: #071A2B;
+  --brand-blue: #246BFE;
+  --savings-green: #18A66A;
+  --warm-bg: #F8F7F3;
+  --soft-blue: #EEF4FF;
+  --soft-green: #EFFAF5;
+  --warning-red: #E85D4A;
+  --text-main: #14202B;
+  --text-muted: #64717D;
   
-  --card-shadow: 0 10px 30px -5px rgba(0, 55, 112, 0.08);
+  --card-shadow: 0 10px 30px -5px rgba(7, 26, 43, 0.08);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-primary: var(--primary);
-  --color-primary-deep: var(--primary-deep);
-  --color-primary-press: var(--primary-press);
-  --color-brand-dark-900: var(--brand-dark-900);
-  --color-canvas-cream: var(--canvas-cream);
-  --color-canvas-soft: var(--canvas-soft);
-  --color-ink: var(--ink);
-  --color-hairline: var(--hairline);
-  /* Override blue-600 so we don't have to change every single utility class if they used blue-600 */
-  --color-blue-600: var(--primary);
-  --color-blue-500: var(--primary-deep);
-  --color-blue-800: var(--primary-press);
-  --color-blue-900: var(--brand-dark-900);
+  --color-brand-blue: var(--brand-blue);
+  --color-savings-green: var(--savings-green);
+  --color-warm-bg: var(--warm-bg);
+  --color-soft-blue: var(--soft-blue);
+  --color-soft-green: var(--soft-green);
+  --color-warning-red: var(--warning-red);
+  --color-text-main: var(--text-main);
+  --color-text-muted: var(--text-muted);
+  --color-blue-600: var(--brand-blue);
+  --color-emerald-500: var(--savings-green);
+  --color-red-500: var(--warning-red);
+  --color-slate-900: var(--text-main);
+  --color-slate-500: var(--text-muted);
   
   --font-sans: "sohne-var", "SF Pro Display", var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-mono: var(--font-geist-mono);
