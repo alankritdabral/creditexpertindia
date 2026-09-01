@@ -17,7 +17,7 @@ export function Hero() {
   return (
     <section ref={containerRef} id="home" className="relative flex flex-col items-center justify-start min-h-[140vh] bg-slate-50 pt-32 pb-20 text-center overflow-hidden">
       {/* Background Texture & Glows */}
-      <div className="absolute inset-0 -z-10 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03] mix-blend-overlay"></div>
+      <div className="absolute inset-0 -z-10 bg-[url('/noise.svg')] opacity-[0.03] mix-blend-overlay"></div>
       <div className="absolute top-[-10%] left-1/2 h-[800px] w-[800px] -translate-x-1/2 rounded-full bg-slate-200/50 blur-[150px] pointer-events-none" />
 
       <div className="container-narrow relative z-10 flex flex-col items-center">
