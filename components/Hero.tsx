@@ -1,38 +1,61 @@
-export function Hero() {
-  return (
-    <section className="relative pt-32 pb-24 sm:pt-48 sm:pb-32 bg-warm-bg flex flex-col justify-center items-center text-center min-h-[90vh] overflow-hidden">
-      {/* Subtle blue radial glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-brand-blue/5 rounded-full blur-[100px] pointer-events-none" />
+"use client";
+import { useRef } from "react";
+import { useScroll, useTransform, motion } from "framer-motion";
+import { AnimatedWord } from "./AnimatedWord";
+import { InteractiveDebtVisualizer } from "./InteractiveDebtVisualizer";
 
-      <div className="mx-auto max-w-4xl px-6 lg:px-8 relative z-10 flex flex-col items-center">
-        <p className="text-sm font-semibold tracking-widest text-text-muted uppercase mb-8">
-          CREDIT EXPERT INDIA
-        </p>
-        
-        <h1 className="text-[56px] leading-[1.05] font-semibold tracking-tight text-primary sm:text-[76px] mb-4">
-          TOO MANY EMIs?
-        </h1>
-        
-        <h2 className="text-[40px] leading-[1.1] font-medium tracking-tight text-text-main sm:text-[56px] mb-8">
-          Let's simplify them.
-        </h2>
-        
-        <p className="text-lg leading-relaxed text-text-muted font-normal max-w-2xl mb-12 sm:text-xl">
-          Review your loans, cards and repayment burden.
-        </p>
-        
-        <div className="flex flex-col items-center gap-6 w-full sm:w-auto">
-          <a
-            href="#debt-health-check"
-            className="w-full sm:w-auto rounded-full bg-brand-blue px-8 py-4 text-lg font-medium text-white hover:bg-blue-700 transition-colors shadow-lg shadow-brand-blue/20"
-          >
-            Check My Debt Options &rarr;
-          </a>
-          
-          <p className="text-[14px] leading-relaxed font-medium text-text-muted">
-            Free &middot; Confidential &middot; No obligation
+export function Hero() {
+  const containerRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end end"]
+  });
+
+  const bottomOpacity = useTransform(scrollYProgress, [0.8, 0.9], [0, 1]);
+  const bottomY = useTransform(scrollYProgress, [0.8, 0.9], [50, 0]);
+  const bottomPointerEvents = useTransform(scrollYProgress, (v) => v > 0.85 ? "auto" : "none");
+
+  return (
+    <section ref={containerRef} className="relative bg-warm-bg h-[350vh]">
+      <div className="sticky top-0 h-screen w-full flex flex-col justify-start sm:justify-center items-center text-center overflow-x-clip pt-28 sm:pt-12 pb-12">
+        {/* Subtle blue radial glow */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-brand-blue/5 rounded-full blur-[100px] pointer-events-none" />
+
+        <div className="mx-auto max-w-4xl px-6 lg:px-8 relative z-10 flex flex-col items-center shrink-0">
+          <p className="text-sm font-semibold tracking-widest text-text-muted uppercase mb-4 sm:mb-8 mt-8">
+            CREDIT EXPERT INDIA
           </p>
+          <h1 className="text-[36px] min-[360px]:text-[42px] min-[400px]:text-[48px] leading-[1.1] font-semibold tracking-tight text-primary sm:text-[76px] mb-4 sm:mb-8 flex flex-row flex-nowrap whitespace-nowrap justify-center items-center">
+            We <AnimatedWord /> Debt.
+          </h1>
+          <div className="max-w-2xl space-y-4 mb-2">
+            <p className="text-lg leading-relaxed text-text-main font-medium sm:text-xl">
+              From high-interest loans and multiple EMIs to credit card debt — we help you take control of what you owe.
+            </p>
+          </div>
         </div>
+        
+        {/* Interactive Scroll Visualizer now controlled by Hero's scroll progress */}
+        <InteractiveDebtVisualizer scrollYProgress={scrollYProgress} />
+        
+        <motion.div 
+          style={{ opacity: bottomOpacity, y: bottomY, pointerEvents: bottomPointerEvents as any }}
+          className="mx-auto max-w-4xl px-6 lg:px-8 relative z-10 flex flex-col items-center mt-2 shrink-0"
+        >
+          <div className="max-w-2xl mb-6 text-center">
+            <p className="text-lg leading-relaxed text-text-muted font-normal sm:text-[19px]">
+              Get expert guidance to reduce your interest burden, manage your repayments, consolidate eligible debts, and work towards becoming debt-free.
+            </p>
+          </div>
+          <div className="flex flex-col items-center gap-6 w-full sm:w-auto">
+            <a
+              href="#debt-health-check"
+              className="w-full sm:w-auto rounded-full bg-brand-blue px-8 py-4 text-lg font-medium text-white hover:bg-blue-700 transition-colors shadow-lg shadow-brand-blue/20"
+            >
+              Talk to an Expert
+            </a>
+          </div>
+        </motion.div>
       </div>
     </section>
   );
