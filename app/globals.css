@@ -31,7 +31,7 @@
   --color-teal: var(--teal);
   --color-muted: var(--muted);
   --color-border: var(--border);
-  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-mono: var(--font-geist-mono);
 }
 
@@ -76,7 +76,7 @@ html.lenis body {
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-jakarta), ui-sans-serif, system-ui, -apple-system, sans-serif;
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

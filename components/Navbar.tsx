@@ -25,24 +25,22 @@ export function Navbar() {
         }`}
       >
         {/* Brand Logo */}
-        <a href="/" className="group flex items-center gap-2.5 ml-2">
-          <div className="relative flex h-8 w-8 items-center justify-center rounded-xl bg-slate-900 font-extrabold text-white shadow-lg shadow-slate-900/20">
-            <span className="text-xs tracking-tight font-black">CE</span>
+        <a href="/" className="group flex items-center gap-2 ml-1">
+          <div className="relative flex h-7 w-7 items-center justify-center rounded-lg bg-slate-900 text-white shadow-sm">
+            <span className="text-[10px] font-black">CE</span>
           </div>
-          <div className="flex items-center gap-1.5">
-            <span className="text-lg font-bold tracking-tight text-slate-900">
-              Credit Expert
-            </span>
-          </div>
+          <span className="text-base font-bold tracking-tight text-slate-900">
+            Credit Expert
+          </span>
         </a>
 
         {/* Desktop Nav Links */}
-        <nav className="hidden items-center gap-1 lg:flex bg-white/50 backdrop-blur-md px-2 py-1.5 rounded-full border border-slate-200/50 shadow-sm">
+        <nav className="hidden lg:flex items-center gap-4">
           {navLinks.map((l) => (
             <a
               key={l.href}
               href={l.href}
-              className="relative rounded-full px-4 py-1.5 text-sm font-semibold text-slate-600 transition-colors hover:text-slate-900 hover:bg-slate-100/80"
+              className="text-sm font-medium text-slate-600 transition-colors hover:text-slate-900"
             >
               {l.label}
             </a>
@@ -50,19 +48,13 @@ export function Navbar() {
         </nav>
 
         {/* Action CTAs */}
-        <div className="hidden items-center gap-3 lg:flex mr-1">
-          <a
-            href="#login"
-            className="text-sm font-bold text-slate-600 hover:text-slate-900 transition-colors px-2"
-          >
-            Log in
-          </a>
+        <div className="hidden lg:flex items-center mr-1">
           <a
             href="#lead-form"
-            className="group flex h-10 items-center justify-center gap-2 rounded-full bg-slate-900 px-5 text-sm font-bold text-white transition-all hover:scale-105 hover:bg-black hover:shadow-xl hover:shadow-slate-900/20 active:scale-95"
+            className="group flex h-9 items-center justify-center gap-1.5 rounded-full bg-slate-900 px-4 text-xs font-bold tracking-tight text-white transition-all hover:bg-black"
           >
             <span>Get started</span>
-            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+            <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
           </a>
         </div>
 

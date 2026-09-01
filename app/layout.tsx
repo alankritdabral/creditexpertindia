@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -8,10 +8,9 @@ import { SmoothScroll } from "@/components/SmoothScroll";
 import { ScrollProgress } from "@/components/ScrollProgress";
 import { siteConfig } from "@/lib/config";
 
-const jakartaSans = Plus_Jakarta_Sans({
-  variable: "--font-jakarta",
+const geistSans = Geist({
+  variable: "--font-geist-sans",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
 });
 
 const geistMono = Geist_Mono({
@@ -67,7 +66,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   };
 
   return (
-    <html lang="en" className={`${jakartaSans.variable} ${geistMono.variable} h-full antialiased font-sans`}>
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased font-sans`}>
       <body className="min-h-full flex flex-col bg-white text-slate-900">
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
