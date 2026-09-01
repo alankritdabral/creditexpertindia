@@ -29,12 +29,12 @@ const duplicatedBanks = [...banks, ...banks];
 
 export function Partners() {
   return (
-    <div className="bg-white py-12 border-b border-hairline overflow-hidden w-full">
+    <div className="bg-canvas py-16 border-y border-hairline overflow-hidden w-full">
       <div className="mx-auto max-w-7xl px-6 lg:px-8 w-full">
         <div className="mx-auto max-w-2xl text-center mb-10">
-          <p className="text-[14px] font-semibold tracking-[0.5px] leading-[1.15] text-ink-mute uppercase">
-            Trusted by 21+ banks of India
-          </p>
+          <h2 className="text-xl font-medium tracking-[0.5px] leading-[1.15] text-ink uppercase">
+            Our lending network
+          </h2>
         </div>
         
         <div className="relative flex overflow-hidden w-full opacity-60 grayscale transition-all duration-500 hover:grayscale-0">
@@ -53,6 +53,12 @@ export function Partners() {
               </div>
             ))}
           </div>
+        </div>
+
+        <div className="mx-auto max-w-3xl text-center mt-12">
+          <p className="text-[12px] leading-[1.5] text-ink-mute font-light">
+            Credit Expert India is not itself a bank or NBFC. Final loan approval, interest rate and loan terms are determined by the respective lender based on their policies and your credit profile.
+          </p>
         </div>
       </div>
     </div>

@@ -7,13 +7,13 @@ export function Hero() {
         {/* Text Content */}
         <div className="flex-1 text-left">
           <p className="text-xs font-semibold tracking-[0.1px] text-primary-deep uppercase mb-8">
-            CREDIT EXPERT INDIA
+            DEBT CONSOLIDATION FOR SALARIED PROFESSIONALS
           </p>
           <h1 className="text-[48px] leading-[1.05] font-medium tracking-[-1px] text-ink sm:text-[64px] mb-6">
-            Too many EMIs? <br/> Let&apos;s simplify them.
+            Your salary shouldn't disappear into EMIs.
           </h1>
           <p className="mt-6 text-lg leading-[1.5] text-ink-mute font-light max-w-xl">
-            Review your loans, credit-card dues and repayment burden to understand whether consolidation, refinancing or another repayment option could work better for you.
+            We help salaried professionals understand high-interest loans, credit-card debt and multiple EMIs — and explore suitable repayment options from our lending network.
           </p>
           
           <div className="mt-10 flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
@@ -21,17 +21,17 @@ export function Hero() {
               href="#debt-health-check"
               className="rounded-full bg-primary px-6 py-3 text-base font-medium leading-none text-white shadow-sm hover:bg-primary-press transition-colors"
             >
-              Check My Debt Options
+              See My Options &rarr;
             </a>
             <a
               href="#contact"
               className="rounded-full bg-transparent px-6 py-3 text-base font-medium leading-none text-ink border border-ink/20 hover:bg-ink/5 transition-colors"
             >
-              Talk to a Credit Expert
+              WhatsApp an Expert
             </a>
           </div>
           <p className="mt-4 text-[13px] leading-[1.4] font-normal tracking-[-0.39px] text-ink-mute">
-            Free · Confidential · No obligation
+            60-sec assessment · No upfront fee · Confidential
           </p>
         </div>
 
