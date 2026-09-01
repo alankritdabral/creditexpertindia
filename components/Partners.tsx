@@ -1,5 +1,6 @@
 'use client';
 import React from 'react';
+import Image from 'next/image';
 
 const banks = [
   { id: "hdfc", name: "HDFC Bank" },
@@ -41,9 +42,11 @@ export function Partners() {
           <div className="animate-marquee flex items-center gap-16 whitespace-nowrap min-w-max py-4">
             {duplicatedBanks.map((bank, i) => (
               <div key={i} className="flex items-center gap-3">
-                <img 
+                <Image 
                   src={`/logos/${bank.id}.png`} 
                   alt={bank.name} 
+                  width={32}
+                  height={32}
                   className="h-8 w-8 object-contain rounded-sm"
                   onError={(e) => {
                     e.currentTarget.style.display = 'none';
