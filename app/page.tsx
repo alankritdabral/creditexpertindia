@@ -1,4 +1,5 @@
 import { Hero } from "@/components/Hero";
+import { DebtHealthCheck } from "@/components/DebtHealthCheck";
 import { Partners } from "@/components/Partners";
 import { TheProblem } from "@/components/TheProblem";
 import { WhatWeHelpWith } from "@/components/WhatWeHelpWith";
@@ -18,14 +19,12 @@ export default function Home() {
     <>
       <Hero />
       <Partners />
-      <TheProblem />
-      <WhatWeHelpWith />
-      <WhatBringsYouHere />
-      <HowItWorks />
-      <DebtCalculator />
+      <DebtHealthCheck />
       <DifferentApproach />
+      <DebtCalculator />
       <BeforeAfter />
       <WhyUs />
+      <HowItWorks />
       <CaseStudies />
       <TrustBar />
       <FAQ />
