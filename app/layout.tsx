@@ -66,16 +66,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   };
 
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased font-sans`}>
-      <body className="min-h-full flex flex-col bg-white text-slate-900">
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased font-sans scroll-smooth`}>
+      <body className="min-h-full flex flex-col bg-white text-ink [font-feature-settings:'ss01']">
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
-        <ScrollProgress />
-        <SmoothScroll />
         <Navbar />
         <main className="flex-1 pb-[72px] lg:pb-0">{children}</main>
         <Footer />
-        <MobileStickyCTA />
       </body>
     </html>
   );

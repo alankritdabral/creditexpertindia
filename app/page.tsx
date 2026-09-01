@@ -1,9 +1,15 @@
 import { Hero } from "@/components/Hero";
-import { TrustBar } from "@/components/TrustBar";
+import { Partners } from "@/components/Partners";
+import { TheProblem } from "@/components/TheProblem";
+import { WhatWeHelpWith } from "@/components/WhatWeHelpWith";
 import { WhatBringsYouHere } from "@/components/WhatBringsYouHere";
-import { LoanCalculator } from "@/components/LoanCalculator";
 import { HowItWorks } from "@/components/HowItWorks";
+import { DebtCalculator } from "@/components/DebtCalculator";
+import { DifferentApproach } from "@/components/DifferentApproach";
+import { BeforeAfter } from "@/components/BeforeAfter";
 import { WhyUs } from "@/components/WhyUs";
+import { CaseStudies } from "@/components/CaseStudies";
+import { TrustBar } from "@/components/TrustBar";
 import { FAQ } from "@/components/FAQ";
 import { LeadForm } from "@/components/LeadForm";
 
@@ -11,11 +17,17 @@ export default function Home() {
   return (
     <>
       <Hero />
-      <TrustBar />
+      <Partners />
+      <TheProblem />
+      <WhatWeHelpWith />
       <WhatBringsYouHere />
       <HowItWorks />
+      <DebtCalculator />
+      <DifferentApproach />
+      <BeforeAfter />
       <WhyUs />
-      <LoanCalculator />
+      <CaseStudies />
+      <TrustBar />
       <FAQ />
       <LeadForm />
     </>

@@ -1,8 +1,15 @@
 "use client";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { Menu, X, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { navLinks } from "@/content/site";
+
+const navLinks = [
+  { label: "How It Works", href: "/#how-it-works" },
+  { label: "Solutions", href: "/#solutions" },
+  { label: "About Us", href: "/#about-us" },
+  { label: "FAQ", href: "/#faq" },
+];
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
@@ -25,20 +32,17 @@ export function Navbar() {
         }`}
       >
         {/* Brand Logo */}
-        <a href="/" className="group flex items-center gap-2 ml-1">
-          <div className="relative flex h-7 w-7 items-center justify-center rounded-lg bg-slate-900 text-white shadow-sm">
-            <span className="text-[10px] font-black">CE</span>
-          </div>
+        <Link href="/" className="group flex items-center gap-2 ml-1">
           <span className="text-base font-bold tracking-tight text-slate-900">
-            Credit Expert
+            Credit Expert India
           </span>
-        </a>
+        </Link>
 
         {/* Desktop Nav Links */}
         <nav className="hidden lg:flex items-center gap-4">
           {navLinks.map((l) => (
             <a
-              key={l.href}
+               key={l.href}
               href={l.href}
               className="text-sm font-medium text-slate-600 transition-colors hover:text-slate-900"
             >
@@ -51,9 +55,9 @@ export function Navbar() {
         <div className="hidden lg:flex items-center mr-1">
           <a
             href="#lead-form"
-            className="group flex h-9 items-center justify-center gap-1.5 rounded-full bg-slate-900 px-4 text-xs font-bold tracking-tight text-white transition-all hover:bg-black"
+            className="group flex h-9 items-center justify-center gap-1.5 rounded-full bg-primary px-4 text-xs font-bold tracking-tight text-white transition-all hover:bg-primary-press"
           >
-            <span>Get started</span>
+            <span>Get My Free Assessment</span>
             <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
           </a>
         </div>
@@ -92,18 +96,11 @@ export function Navbar() {
               ))}
               <div className="mt-4 flex flex-col gap-2 pt-4 border-t border-slate-100">
                 <a
-                  href="#login"
-                  onClick={() => setOpen(false)}
-                  className="flex h-12 items-center justify-center rounded-xl bg-slate-50 text-sm font-bold text-slate-900 border border-slate-200"
-                >
-                  Log in
-                </a>
-                <a
                   href="#lead-form"
                   onClick={() => setOpen(false)}
-                  className="flex h-12 items-center justify-center rounded-xl bg-slate-900 text-sm font-bold text-white shadow-lg shadow-slate-900/20"
+                  className="flex h-12 items-center justify-center rounded-xl bg-primary text-sm font-bold text-white shadow-lg shadow-primary-press/20"
                 >
-                  Get started
+                  Get My Free Assessment
                 </a>
               </div>
             </div>
@@ -113,4 +110,3 @@ export function Navbar() {
     </header>
   );
 }
-

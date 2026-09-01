@@ -39,7 +39,7 @@ export function Testimonials() {
                   ))}
                 </div>
                 <p className="mt-4 text-xs sm:text-sm leading-6 text-slate-700 font-medium">
-                  "{t.text}"
+                  &quot;{t.text}&quot;
                 </p>
               </div>
 

@@ -1,45 +1,81 @@
-"use client";
-import { useState } from "react";
-import { ChevronDown } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-import { faqs } from "@/content/site";
-import { Reveal } from "@/components/ui/Reveal";
+'use client';
+import { Disclosure, Transition } from '@headlessui/react';
+import { ChevronDownIcon } from '@heroicons/react/24/outline';
+
+const faqs = [
+  {
+    question: "What does Credit Expert India do?",
+    answer: "We help customers understand their existing debt or borrowing requirements and explore suitable loan, consolidation or repayment options based on their situation."
+  },
+  {
+    question: "Can you help with multiple loans?",
+    answer: "Yes. We can review multiple loans and EMIs together and help you understand whether consolidation or another option may be suitable."
+  },
+  {
+    question: "Can you help with credit-card debt?",
+    answer: "We can review your credit-card dues and help you understand potential repayment or consolidation options available based on your situation."
+  },
+  {
+    question: "Do you guarantee loan approval?",
+    answer: "No. Final approval, interest rate, loan amount and tenure are decided by the respective lender based on its eligibility criteria."
+  },
+  {
+    question: "Do you guarantee lower interest rates?",
+    answer: "No. Rates depend on your profile, lender policies and prevailing terms. We help you explore suitable options."
+  },
+  {
+    question: "Is the assessment free?",
+    answer: "The initial assessment can be offered without obligation. Any applicable charges, if any, should always be communicated clearly before proceeding."
+  },
+  {
+    question: "Will taking another loan always help?",
+    answer: "No. A new loan isn't always the right solution. We first look at the existing situation and then discuss relevant options."
+  }
+];
 
 export function FAQ() {
-  const [open, setOpen] = useState<number | null>(0);
   return (
-    <section id="faq" className="bg-slate-50 py-14 sm:py-20">
-      <div className="container-narrow">
-        <Reveal>
-          <div className="mx-auto max-w-3xl text-center">
-            <p className="text-xs font-bold tracking-widest text-[#0E9F6E]">FAQS</p>
-            <h2 className="mt-3 text-[28px] font-bold tracking-tight text-[#0B1D3A] sm:text-[36px]">Your Questions, Answered Clearly</h2>
-            <p className="mt-2 text-sm leading-6 text-slate-600">We are conservative with claims because this is financial services. Here are the most asked questions.</p>
-          </div>
-        </Reveal>
+    <section id="faq" className="py-24 sm:py-32 bg-slate-50">
+      <div className="mx-auto max-w-7xl px-6 lg:px-8">
+        <div className="mx-auto max-w-2xl text-center mb-16">
+          <h2 className="text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl">
+            Questions, answered simply.
+          </h2>
+        </div>
 
-        <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="mx-auto mt-8 max-w-3xl overflow-hidden rounded-3xl border border-slate-200 bg-white">
-          {faqs.map((f, i) => {
-            const isOpen = open === i;
-            return (
-              <div key={f.q} className="border-b border-slate-100 last:border-b-0">
-                <button onClick={() => setOpen(isOpen ? null : i)} aria-expanded={isOpen} className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left sm:px-6">
-                  <span className="text-sm font-bold leading-6 text-[#0B1D3A] sm:text-[15px]">{f.q}</span>
-                  <motion.span animate={{ rotate: isOpen ? 180 : 0 }} transition={{ duration: 0.2 }} className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border ${isOpen ? "bg-[#0B1D3A] text-white border-[#0B1D3A]" : "bg-slate-50 text-slate-500 border-slate-200"}`}>
-                    <ChevronDown className="h-4 w-4" />
-                  </motion.span>
-                </button>
-                <AnimatePresence initial={false}>
-                  {isOpen && (
-                    <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }} className="overflow-hidden">
-                      <div className="px-5 pb-5 text-sm leading-6 text-slate-600 sm:px-6">{f.a}</div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            );
-          })}
-        </motion.div>
+        <div className="mx-auto max-w-3xl divide-y divide-slate-200">
+          {faqs.map((faq, index) => (
+            <Disclosure as="div" key={index} className="py-6">
+              {({ open }: { open: boolean }) => (
+                <>
+                  <dt>
+                    <Disclosure.Button className="flex w-full items-start justify-between text-left text-slate-900">
+                      <span className="text-lg font-semibold leading-7">{faq.question}</span>
+                      <span className="ml-6 flex h-7 items-center">
+                        <ChevronDownIcon
+                          className={`${open ? '-rotate-180' : 'rotate-0'} h-6 w-6 transform transition duration-200 ease-in-out text-slate-400`}
+                          aria-hidden="true"
+                        />
+                      </span>
+                    </Disclosure.Button>
+                  </dt>
+                  <Transition
+                    enter="transition duration-100 ease-out"
+                    enterFrom="transform scale-95 opacity-0"
+                    enterTo="transform scale-100 opacity-100"
+                    leave="transition duration-75 ease-out"
+                    leaveFrom="transform scale-100 opacity-100"
+                    leaveTo="transform scale-95 opacity-0"
+                  >
+                    <Disclosure.Panel as="dd" className="mt-4 pr-12">
+                      <p className="text-base leading-7 text-slate-600 font-light border-l-2 border-slate-200 pl-4 py-1">{faq.answer}</p>
+                    </Disclosure.Panel>
+                  </Transition>
+                </>
+              )}
+            </Disclosure>
+          ))}
+        </div>
       </div>
     </section>
   );

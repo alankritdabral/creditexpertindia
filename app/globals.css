@@ -2,36 +2,37 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #091328;
-  --navy: #091328;
-  --navy-dark: #040814;
-  --navy-light: #132247;
-  --navy-soft: #f8fafc;
-  --emerald: #10b981;
-  --emerald-dark: #059669;
-  --emerald-light: #ecfdf5;
-  --emerald-glow: rgba(16, 185, 129, 0.25);
-  --teal: #06b6d4;
-  --muted: #64748b;
-  --border: #e2e8f0;
-  --card-shadow: 0 10px 30px -5px rgba(9, 19, 40, 0.05);
-  --card-shadow-hover: 0 20px 40px -10px rgba(9, 19, 40, 0.12);
-  --glow-shadow: 0 0 50px -10px rgba(16, 185, 129, 0.3);
+  --foreground: #0d253d;
+  --primary: #533afd;
+  --primary-deep: #4434d4;
+  --primary-press: #2e2b8c;
+  --brand-dark-900: #1c1e54;
+  --canvas-cream: #f5e9d4;
+  --canvas-soft: #f6f9fc;
+  --ink: #0d253d;
+  --hairline: #e3e8ee;
+  
+  --card-shadow: 0 10px 30px -5px rgba(0, 55, 112, 0.08);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-navy: var(--navy);
-  --color-navy-dark: var(--navy-dark);
-  --color-navy-light: var(--navy-light);
-  --color-emerald: var(--emerald);
-  --color-emerald-dark: var(--emerald-dark);
-  --color-emerald-light: var(--emerald-light);
-  --color-teal: var(--teal);
-  --color-muted: var(--muted);
-  --color-border: var(--border);
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --color-primary: var(--primary);
+  --color-primary-deep: var(--primary-deep);
+  --color-primary-press: var(--primary-press);
+  --color-brand-dark-900: var(--brand-dark-900);
+  --color-canvas-cream: var(--canvas-cream);
+  --color-canvas-soft: var(--canvas-soft);
+  --color-ink: var(--ink);
+  --color-hairline: var(--hairline);
+  /* Override blue-600 so we don't have to change every single utility class if they used blue-600 */
+  --color-blue-600: var(--primary);
+  --color-blue-500: var(--primary-deep);
+  --color-blue-800: var(--primary-press);
+  --color-blue-900: var(--brand-dark-900);
+  
+  --font-sans: "sohne-var", "SF Pro Display", var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-mono: var(--font-geist-mono);
 }
 
@@ -168,5 +169,18 @@ body {
   .container-narrow {
     padding-inline: 2rem;
   }
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  animation: marquee 40s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
 }
 
