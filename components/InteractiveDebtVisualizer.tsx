@@ -8,45 +8,44 @@ export function InteractiveDebtVisualizer({ scrollYProgress }: { scrollYProgress
   // 0.6 - 0.9: Final Plan Fades In & Container Shrinks to pull text up!
 
   // --- Dynamic Container Height (The "Merge" effect) ---
-  // Using maxHeight so Tailwind classes can handle responsive heights
-  const containerMaxHeight = useTransform(scrollYProgress, [0.8, 0.9], [500, 0]);
+  const containerMaxHeight = useTransform(scrollYProgress, [0.55, 0.6, 1], [500, 0, 0]);
 
-  // --- Phase 1 & 2: Collapse Animations (0.05 -> 0.2) ---
-  const collapseY1 = useTransform(scrollYProgress, [0.05, 0.2], [0, 80]);
-  const collapseX1 = useTransform(scrollYProgress, [0.05, 0.2], [0, 80]);
+  // --- Phase 1 & 2: Collapse Animations (0.05 -> 0.12) ---
+  const collapseY1 = useTransform(scrollYProgress, [0.05, 0.12, 1], [0, 80, 80]);
+  const collapseX1 = useTransform(scrollYProgress, [0.05, 0.12, 1], [0, 80, 80]);
   
-  const collapseY2 = useTransform(scrollYProgress, [0.05, 0.2], [0, 80]);
-  const collapseX2 = useTransform(scrollYProgress, [0.05, 0.2], [0, -80]);
+  const collapseY2 = useTransform(scrollYProgress, [0.05, 0.12, 1], [0, 80, 80]);
+  const collapseX2 = useTransform(scrollYProgress, [0.05, 0.12, 1], [0, -80, -80]);
 
-  const collapseY3 = useTransform(scrollYProgress, [0.05, 0.2], [0, -80]);
-  const collapseX3 = useTransform(scrollYProgress, [0.05, 0.2], [0, 80]);
+  const collapseY3 = useTransform(scrollYProgress, [0.05, 0.12, 1], [0, -80, -80]);
+  const collapseX3 = useTransform(scrollYProgress, [0.05, 0.12, 1], [0, 80, 80]);
 
-  const collapseY4 = useTransform(scrollYProgress, [0.05, 0.2], [0, -80]);
-  const collapseX4 = useTransform(scrollYProgress, [0.05, 0.2], [0, -80]);
+  const collapseY4 = useTransform(scrollYProgress, [0.05, 0.12, 1], [0, -80, -80]);
+  const collapseX4 = useTransform(scrollYProgress, [0.05, 0.12, 1], [0, -80, -80]);
 
-  const beforeOpacity = useTransform(scrollYProgress, [0.15, 0.25], [1, 0]);
-  const beforeScale = useTransform(scrollYProgress, [0.15, 0.25], [1, 0.8]);
+  const beforeOpacity = useTransform(scrollYProgress, [0.1, 0.15, 1], [1, 0, 0]);
+  const beforeScale = useTransform(scrollYProgress, [0.1, 0.15, 1], [1, 0.8, 0.8]);
 
-  // --- Phase 3: Calculation View (0.2 -> 0.7) ---
-  const calcOpacity = useTransform(scrollYProgress, [0.2, 0.25, 0.55, 0.6], [0, 1, 1, 0]);
-  const calcScale = useTransform(scrollYProgress, [0.2, 0.25], [0.8, 1]);
+  // --- Phase 3: Calculation View (0.12 -> 0.4) ---
+  const calcOpacity = useTransform(scrollYProgress, [0.12, 0.15, 0.35, 0.4, 1], [0, 1, 1, 0, 0]);
+  const calcScale = useTransform(scrollYProgress, [0.12, 0.15, 1], [0.8, 1, 1]);
 
-  // Scrubbing Numbers (0.25 -> 0.5)
-  const rawRate = useTransform(scrollYProgress, [0.25, 0.5], [42, 11]);
+  // Scrubbing Numbers (0.15 -> 0.35)
+  const rawRate = useTransform(scrollYProgress, [0.15, 0.35, 1], [42, 11, 11]);
   const rateStr = useTransform(rawRate, (r) => `${Math.round(r)}% p.a.*`);
 
-  const rawOutflow = useTransform(scrollYProgress, [0.25, 0.5], [38500, 27800]);
+  const rawOutflow = useTransform(scrollYProgress, [0.15, 0.35, 1], [38500, 27800, 27800]);
   const outflowStr = useTransform(rawOutflow, (v) => `₹${Math.round(v).toLocaleString()}*`);
 
-  const rawTotal = useTransform(scrollYProgress, [0.25, 0.5], [13.86, 10.0]);
+  const rawTotal = useTransform(scrollYProgress, [0.15, 0.35, 1], [13.86, 10.0, 10.0]);
   const totalStr = useTransform(rawTotal, (v) => `₹${v.toFixed(2)} Lakhs*`);
 
-  // --- Phase 4: Final Plan (0.55 -> 0.65, fades out 0.8 -> 0.9) ---
-  const finalOpacity = useTransform(scrollYProgress, [0.55, 0.65, 0.8, 0.9], [0, 1, 1, 0]);
-  const finalScale = useTransform(scrollYProgress, [0.55, 0.65], [0.9, 1]);
+  // --- Phase 4: Final Plan (0.4 -> 0.45, fades out 0.55 -> 0.6) ---
+  const finalOpacity = useTransform(scrollYProgress, [0.4, 0.45, 0.55, 0.6, 1], [0, 1, 1, 0, 0]);
+  const finalScale = useTransform(scrollYProgress, [0.4, 0.45, 1], [0.9, 1, 1]);
 
   // --- Entire Visualizer Fade Out ---
-  const visualizerOpacity = useTransform(scrollYProgress, [0.8, 0.9], [1, 0]);
+  const visualizerOpacity = useTransform(scrollYProgress, [0.55, 0.6, 1], [1, 0, 0]);
 
   return (
     <motion.div 

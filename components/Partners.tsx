@@ -22,7 +22,7 @@ export function Partners() {
   ];
 
   return (
-    <section className="bg-white py-24 border-y border-gray-100 overflow-hidden w-full">
+    <section className="bg-white py-24 border-y border-gray-100 overflow-hidden w-full relative z-10 shadow-sm">
       <div className="mx-auto max-w-7xl px-6 lg:px-8 w-full flex flex-col items-center">
 
         <h2 className="text-3xl font-medium tracking-tight text-text-main sm:text-4xl text-center mb-16">
