@@ -16,12 +16,12 @@ export function Hero() {
 
   return (
     <section ref={containerRef} className="relative bg-warm-bg h-[600vh]">
-      <div className="sticky top-0 h-screen w-full flex flex-col justify-start sm:justify-center items-center text-center overflow-x-clip pt-28 sm:pt-32 pb-12 z-0">
+      <div className="sticky top-0 h-screen w-full flex flex-col justify-start sm:justify-center items-center text-center overflow-x-clip pt-20 sm:pt-32 pb-12 z-0">
         {/* Subtle blue radial glow */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-brand-blue/5 rounded-full blur-[100px] pointer-events-none" />
 
         <div className="mx-auto max-w-4xl px-6 lg:px-8 relative z-10 flex flex-col items-center shrink-0">
-          <h1 className="text-[42px] sm:text-[64px] md:text-[76px] leading-[1.05] font-bold tracking-tighter text-slate-900 mb-4 sm:mb-8 flex flex-col items-center justify-center mt-8 gap-3 sm:gap-4">
+          <h1 className="text-[42px] sm:text-[64px] md:text-[76px] leading-[1.05] font-bold tracking-tighter text-slate-900 mb-4 sm:mb-8 flex flex-col items-center justify-center mt-3 sm:mt-8 gap-3 sm:gap-4">
             <span className="block">We help you</span>
             <motion.span layout className="flex flex-row flex-nowrap whitespace-nowrap items-center">
               <AnimatedWord /> debt.

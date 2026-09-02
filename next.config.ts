@@ -10,8 +10,7 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
-  // @ts-expect-error - To allow local network testing
-  allowedDevOrigins: ['192.168.100.7'],
+  allowedDevOrigins: ['192.168.11.31'],
 };
 
 export default nextConfig;
