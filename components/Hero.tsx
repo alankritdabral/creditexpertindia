@@ -39,7 +39,7 @@ export function Hero() {
         
         <motion.div 
           initial={{ opacity: 0 }}
-          style={{ opacity: bottomOpacity, y: bottomY, pointerEvents: bottomPointerEvents as import("react").CSSProperties["pointerEvents"] }}
+          style={{ opacity: bottomOpacity, y: bottomY, pointerEvents: bottomPointerEvents }}
           className="mx-auto max-w-4xl px-6 lg:px-8 relative z-10 flex flex-col items-center mt-2 shrink-0"
         >
           <div className="max-w-2xl mb-6 text-center">
