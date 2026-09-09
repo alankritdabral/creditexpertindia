@@ -1,68 +1,111 @@
 "use client";
-import { useRef } from "react";
-import { useScroll, useTransform, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { AnimatedWord } from "./AnimatedWord";
-import { InteractiveDebtVisualizer } from "./InteractiveDebtVisualizer";
 
 export function Hero() {
-  const containerRef = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end end"]
-  });
-  const bottomMaxHeight = useTransform(scrollYProgress, [0.67, 0.73, 1], [0, 300, 300]);
-  const bottomOpacity = useTransform(scrollYProgress, [0.73, 0.79, 1], [0, 1, 1]);
-  const bottomY = useTransform(scrollYProgress, [0.73, 0.79, 1], [30, 0, 0]);
-  const bottomPointerEvents = useTransform(scrollYProgress, (v) => v > 0.76 ? "auto" : "none");
-
   return (
-    <section ref={containerRef} className="relative bg-warm-bg h-[600vh]">
-      <div className="sticky top-0 h-screen w-full flex flex-col justify-center items-center text-center overflow-x-clip px-4 sm:px-6 lg:px-8 pt-24 sm:pt-28 pb-8 z-0">
-        {/* Subtle blue radial glow */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-brand-blue/5 rounded-full blur-[100px] pointer-events-none" />
+    <section className="relative w-full pt-32 pb-32 lg:pt-48 lg:pb-40 bg-background overflow-hidden">
+      {/* Stripe-like Rich Slanted Background */}
+      <div className="absolute inset-0 -z-10 h-[110%] w-full" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 85%)' }}>
+        {/* Base Mesh */}
+        <div className="absolute inset-0 w-full h-full opacity-60 mix-blend-multiply" style={{
+          background: `
+            radial-gradient(circle at 15% 15%, #F7DCCB 0%, transparent 45%),
+            radial-gradient(circle at 85% 50%, #E8F5DF 0%, transparent 50%),
+            radial-gradient(circle at 70% 100%, #F7D2BC 0%, transparent 50%),
+            var(--background)
+          `
+        }} />
+        {/* Additional slanted stripes (Stripe signature) */}
+        <div className="absolute top-0 right-0 w-full h-[200%] max-w-[60%] transform origin-top-right -skew-y-12 bg-gradient-to-bl from-[#E2D6CC]/40 to-transparent" />
+        <div className="absolute top-0 right-0 w-full h-[150%] max-w-[40%] transform origin-top-right -skew-y-12 bg-gradient-to-bl from-white/30 to-transparent" />
+      </div>
 
-        <div className="mx-auto max-w-4xl relative z-10 flex flex-col items-center shrink-0">
-          <h1 className="text-[36px] sm:text-[64px] md:text-[76px] leading-[1.05] font-bold tracking-tighter text-slate-900 mb-3 sm:mb-6 flex flex-col items-center justify-center gap-2 sm:gap-4">
-            <span className="block">We help you</span>
-            <motion.span layout className="flex flex-row flex-nowrap whitespace-nowrap items-center">
-              <AnimatedWord /> debt.
-            </motion.span>
-          </h1>
-          <div className="max-w-2xl space-y-2 sm:space-y-4 mb-2 sm:mb-4">
-            <p className="text-base sm:text-xl leading-relaxed text-text-main font-medium">
-              From high-interest loans and multiple EMIs to credit card debt — we help you take control of what you owe.
+      <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
+          
+          {/* Left Column: Text & CTAs */}
+          <div className="max-w-2xl">
+            <h1 className="text-[48px] sm:text-[64px] lg:text-[76px] leading-[1.05] font-bold tracking-tighter text-slate-900 mb-6 flex flex-col gap-2">
+              <span className="block">We help you</span>
+              <motion.span layout className="flex flex-row flex-nowrap whitespace-nowrap items-center">
+                <AnimatedWord /> debt.
+              </motion.span>
+            </h1>
+            
+            <p className="text-[17px] sm:text-[19px] leading-relaxed text-text-muted font-medium mb-8 max-w-xl">
+              From high-interest loans and multiple EMIs to credit card debt — we help you take control of what you owe. Get expert guidance to reduce your interest burden, manage your repayments, consolidate eligible debts, and work towards becoming debt-free.
             </p>
+            
+            <div className="flex flex-col sm:flex-row items-center gap-4">
+              <a
+                href="#debt-health-check"
+                className="w-full sm:w-auto rounded-full bg-slate-900 px-8 py-4 text-base font-semibold text-white hover:bg-slate-800 transition-colors shadow-lg shadow-slate-900/20 text-center"
+              >
+                Talk to an Expert
+              </a>
+              <a
+                href="#how-it-works"
+                className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-full px-8 py-4 text-base font-semibold text-slate-900 hover:text-slate-600 transition-colors"
+              >
+                Explore how it works
+                <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" className="mt-0.5">
+                  <path d="M6.1584 3.13508C6.35985 2.89559 6.71885 2.86326 6.95834 3.06471L10.9583 6.43971C11.1278 6.58231 11.2268 6.7909 11.2268 7.01168C11.2268 7.23247 11.1278 7.44105 10.9583 7.58366L6.95834 10.9587C6.71885 11.1601 6.35985 11.1278 6.1584 10.8883C5.95695 10.6488 5.98928 10.2898 6.22877 10.0884L9.5539 7.28823L6.22877 4.01168C5.98928 3.81023 5.95695 3.45123 6.1584 3.13508Z" fill="currentColor" fillRule="evenodd" clipRule="evenodd"></path>
+                </svg>
+              </a>
+            </div>
           </div>
-        </div>
-        
-        {/* Interactive Scroll Visualizer now controlled by Hero's scroll progress */}
-        <InteractiveDebtVisualizer scrollYProgress={scrollYProgress} />
-        
-        <motion.div 
-          initial={{ opacity: 0 }}
-          style={{ 
-            maxHeight: bottomMaxHeight,
-            opacity: bottomOpacity, 
-            y: bottomY, 
-            pointerEvents: bottomPointerEvents 
-          }}
-          className="mx-auto max-w-4xl relative z-10 flex flex-col items-center shrink-0 overflow-hidden"
-        >
-          <div className="max-w-2xl mb-4 sm:mb-6 text-center">
-            <p className="text-base sm:text-[19px] leading-relaxed text-text-muted font-normal">
-              Get expert guidance to reduce your interest burden, manage your repayments, consolidate eligible debts, and work towards becoming debt-free.
-            </p>
-          </div>
-          <div className="flex flex-col items-center gap-4 sm:gap-6 w-full sm:w-auto">
-            <a
-              href="#debt-health-check"
-              className="w-full sm:w-auto rounded-full bg-brand-blue px-8 py-4 text-base sm:text-lg font-medium text-white hover:bg-blue-700 transition-colors shadow-lg shadow-brand-blue/20"
+
+          {/* Right Column: Abstract UI Graphics */}
+          <div className="relative w-full aspect-square max-w-[500px] mx-auto lg:ml-auto">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="absolute top-10 right-10 bg-white p-6 rounded-2xl shadow-2xl border border-slate-100 w-64 z-20"
             >
-              Talk to an Expert
-            </a>
+              <div className="text-[11px] font-bold text-text-muted uppercase mb-1">Total Payable</div>
+              <div className="text-2xl font-bold text-text-main mb-4">₹10.0 Lakhs*</div>
+              <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                <motion.div 
+                  initial={{ width: 0 }}
+                  animate={{ width: "65%" }}
+                  transition={{ duration: 1, delay: 0.8 }}
+                  className="h-full bg-savings-green"
+                />
+              </div>
+            </motion.div>
+
+            <motion.div 
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              className="absolute bottom-20 left-0 bg-white/90 backdrop-blur-sm p-6 rounded-2xl shadow-xl border border-slate-100 w-72 z-30"
+            >
+              <div className="flex justify-between items-center mb-3">
+                <div className="text-[11px] font-bold text-savings-green uppercase">One Clear Plan</div>
+              </div>
+              <div className="flex justify-between items-end border-b border-slate-100 pb-2 mb-2">
+                <span className="text-text-muted font-medium text-sm">Interest Rate</span>
+                <span className="text-lg font-bold text-text-main">11% p.a.*</span>
+              </div>
+              <div className="flex justify-between items-end border-b border-slate-100 pb-2">
+                <span className="text-text-muted font-medium text-sm">Monthly EMI</span>
+                <span className="text-lg font-bold text-text-main">₹27,800*</span>
+              </div>
+            </motion.div>
+
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 1 }}
+              className="absolute inset-0 bg-gradient-to-tr from-soft-green to-warm-bg rounded-[40px] opacity-20 -z-10 transform rotate-6"
+            />
           </div>
-        </motion.div>
+
+        </div>
       </div>
     </section>
   );
 }
+

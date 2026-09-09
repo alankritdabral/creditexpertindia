@@ -22,22 +22,45 @@ export function Partners() {
   ];
 
   return (
-    <section className="bg-white py-24 border-y border-gray-100 overflow-hidden w-full relative z-10 shadow-sm">
-      <div className="mx-auto max-w-7xl px-6 lg:px-8 w-full flex flex-col items-center">
-
-        <h2 className="text-3xl font-medium tracking-tight text-text-main sm:text-4xl text-center mb-16">
-          Our Impact & Banking Partners
-        </h2>
+    <section className="bg-white py-16 overflow-hidden w-full relative z-10 border-b border-slate-100">
+      <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8 w-full flex flex-col">
+        
+        {/* Banking Partners Slider (Stripe style top logo cloud) */}
+        <div className="mb-20">
+          <div className="relative flex overflow-hidden w-full transition-all duration-500 [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
+            <motion.div 
+              className="flex items-center gap-16 md:gap-24 whitespace-nowrap w-max py-4"
+              animate={{ x: ["0%", "-50%"] }}
+              transition={{ ease: "linear", duration: 40, repeat: Infinity }}
+            >
+              {duplicatedBanks.map((bank, i) => (
+                <div key={i} className="flex items-center gap-3 transition-all duration-300">
+                  <Image
+                    src={`/logos/${bank.id}.png`}
+                    alt={bank.name}
+                    width={32}
+                    height={32}
+                    className="h-8 w-8 object-contain rounded-md"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                    }}
+                  />
+                  <span className="text-xl font-bold text-slate-800 tracking-tight">{bank.name}</span>
+                </div>
+              ))}
+            </motion.div>
+          </div>
+        </div>
 
         {/* Impact Stats */}
-        <div className="w-full max-w-5xl mb-20">
-          <div className="grid grid-cols-2 gap-y-12 sm:grid-cols-4 gap-x-8">
+        <div className="w-full">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
             {stats.map((stat, i) => (
-              <div key={i} className="flex flex-col items-center text-center">
-                <div className="text-3xl sm:text-4xl lg:text-[40px] font-bold bg-clip-text text-transparent bg-gradient-to-r from-brand-blue to-blue-400 mb-3">
+              <div key={i} className="flex flex-col border-l border-slate-200 pl-6">
+                <div className="text-3xl sm:text-4xl font-bold text-slate-900 mb-2 tracking-tight">
                   {stat.value}
                 </div>
-                <div className="text-sm sm:text-base text-text-muted font-medium uppercase tracking-wide">
+                <div className="text-[15px] text-slate-600 font-medium">
                   {stat.label}
                 </div>
               </div>
@@ -45,39 +68,15 @@ export function Partners() {
           </div>
         </div>
 
-        {/* Banking Partners Slider */}
-        <div className="relative flex overflow-hidden w-full max-w-5xl transition-all duration-500">
-          <motion.div 
-            className="flex items-center gap-24 whitespace-nowrap w-max py-4"
-            animate={{ x: ["0%", "-50%"] }}
-            transition={{ ease: "linear", duration: 40, repeat: Infinity }}
-          >
-            {duplicatedBanks.map((bank, i) => (
-              <div key={i} className="flex items-center gap-4">
-                <Image
-                  src={`/logos/${bank.id}.png`}
-                  alt={bank.name}
-                  width={40}
-                  height={40}
-                  className="h-10 w-10 object-contain rounded-md"
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none';
-                  }}
-                />
-                <span className="text-2xl font-bold text-text-muted tracking-tight">{bank.name}</span>
-              </div>
-            ))}
-          </motion.div>
-        </div>
-
-        <div className="mx-auto max-w-2xl text-center mt-16 space-y-4">
-          <p className="text-lg text-text-main font-medium">
+        <div className="mt-16 space-y-4 max-w-3xl border-t border-slate-100 pt-8">
+          <p className="text-[15px] text-slate-800 font-medium">
             We help you explore suitable options across our lending network.
           </p>
-          <p className="text-[13px] leading-relaxed text-text-muted font-normal max-w-3xl mx-auto">
+          <p className="text-[13px] leading-relaxed text-slate-500">
             Credit Expert India is not itself a bank or NBFC. Final loan approval, interest rate and loan terms are determined by the respective lender based on their policies and your credit profile. Only displaying lenders with whom we have authorized relationships.
           </p>
         </div>
+
       </div>
     </section>
   );

@@ -1,19 +1,19 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #14202B;
-  --primary: #071A2B;
-  --brand-blue: #246BFE;
-  --savings-green: #18A66A;
-  --warm-bg: #F8F7F3;
-  --soft-blue: #EEF4FF;
-  --soft-green: #EFFAF5;
-  --warning-red: #E85D4A;
-  --text-main: #14202B;
-  --text-muted: #64717D;
+  --background: #F0EAE5;
+  --foreground: #180D0A;
+  --primary: #180D0A;
+  --brand-blue: #180D0A; /* Replaced with espresso */
+  --savings-green: #829679;
+  --warm-bg: #E2D6CC;
+  --soft-blue: #F3ECE7; /* Replaced with warm cream */
+  --soft-green: #EAF7E5;
+  --warning-red: #E74747;
+  --text-main: #180D0A;
+  --text-muted: #A8A29D;
   
-  --card-shadow: 0 10px 30px -5px rgba(7, 26, 43, 0.08);
+  --card-shadow: 0 10px 30px -5px rgba(24, 13, 10, 0.08);
 }
 
 @theme inline {
@@ -34,7 +34,7 @@
   --color-slate-900: var(--text-main);
   --color-slate-500: var(--text-muted);
   
-  --font-sans: var(--font-inter), "SF Pro Display", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-sans: var(--font-manrope), var(--font-inter), "SF Pro Display", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-mono: var(--font-geist-mono);
 }
 
@@ -79,7 +79,7 @@ html.lenis body {
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-inter), ui-sans-serif, system-ui, -apple-system, sans-serif;
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -93,33 +93,34 @@ body {
 }
 
 .glass-card-dark {
-  background: rgba(15, 28, 56, 0.75);
+  background: rgba(24, 13, 10, 0.75);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .bg-mesh-gradient {
-  background-image: 
-    radial-gradient(at 10% 10%, rgba(16, 185, 129, 0.12) 0px, transparent 50%),
-    radial-gradient(at 90% 20%, rgba(6, 182, 212, 0.1) 0px, transparent 50%),
-    radial-gradient(at 50% 90%, rgba(9, 19, 40, 0.04) 0px, transparent 50%);
+  background: 
+    radial-gradient(circle at 15% 15%, #F7DCCB 0%, transparent 45%),
+    radial-gradient(circle at 85% 50%, #E8F5DF 0%, transparent 50%),
+    radial-gradient(circle at 70% 100%, #F7D2BC 0%, transparent 50%),
+    #F0EAE5;
 }
 
 .text-gradient {
-  background: linear-gradient(135deg, #091328 0%, #1e293b 100%);
+  background: linear-gradient(135deg, #180D0A 0%, #785E47 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .text-gradient-emerald {
-  background: linear-gradient(135deg, #059669 0%, #10b981 50%, #34d399 100%);
+  background: linear-gradient(135deg, #829679 0%, #EAF7E5 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .text-gradient-gold {
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  background: linear-gradient(135deg, #F7D9C6 0%, #785E47 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
