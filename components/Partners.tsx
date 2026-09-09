@@ -3,12 +3,18 @@ import React from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 
+import hdfcLogo from '@/public/logos/hdfc.png';
+import iciciLogo from '@/public/logos/icici.png';
+import axisLogo from '@/public/logos/axis.png';
+import kotakLogo from '@/public/logos/kotak.png';
+import idfcLogo from '@/public/logos/idfc.png';
+
 const banks = [
-  { id: "hdfc", name: "HDFC Bank" },
-  { id: "icici", name: "ICICI Bank" },
-  { id: "axis", name: "Axis Bank" },
-  { id: "kotak", name: "Kotak Mahindra" },
-  { id: "idfc", name: "IDFC First" }
+  { id: "hdfc", name: "HDFC Bank", logo: hdfcLogo },
+  { id: "icici", name: "ICICI Bank", logo: iciciLogo },
+  { id: "axis", name: "Axis Bank", logo: axisLogo },
+  { id: "kotak", name: "Kotak Mahindra", logo: kotakLogo },
+  { id: "idfc", name: "IDFC First", logo: idfcLogo }
 ];
 
 const duplicatedBanks = [...banks, ...banks, ...banks, ...banks];
@@ -36,7 +42,7 @@ export function Partners() {
               {duplicatedBanks.map((bank, i) => (
                 <div key={i} className="flex items-center gap-3 transition-all duration-300">
                   <Image
-                    src={`/logos/${bank.id}.png`}
+                    src={bank.logo}
                     alt={bank.name}
                     width={32}
                     height={32}
