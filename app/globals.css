@@ -1,19 +1,20 @@
 @import "tailwindcss";
 
 :root {
-  --background: #F0EAE5;
-  --foreground: #180D0A;
-  --primary: #180D0A;
-  --brand-blue: #180D0A; /* Replaced with espresso */
-  --savings-green: #829679;
-  --warm-bg: #E2D6CC;
-  --soft-blue: #F3ECE7; /* Replaced with warm cream */
-  --soft-green: #EAF7E5;
-  --warning-red: #E74747;
-  --text-main: #180D0A;
-  --text-muted: #A8A29D;
+  --background: #FAFAFA;
+  --foreground: #0A2540;
+  --primary: #0A2540;
+  --brand-blue: #635BFF; 
+  --savings-green: #00D924;
+  --warm-bg: #F6F9FC;
+  --soft-blue: #F6F9FC; 
+  --soft-green: #E6F6ED;
+  --warning-red: #DF1B41;
+  --text-main: #0A2540;
+  --text-muted: #425466;
   
-  --card-shadow: 0 10px 30px -5px rgba(24, 13, 10, 0.08);
+  --card-shadow: 0 2px 5px -1px rgba(50, 50, 93, 0.25), 0 1px 3px -1px rgba(0, 0, 0, 0.3);
+  --card-shadow-hover: 0 13px 27px -5px rgba(50, 50, 93, 0.25), 0 8px 16px -8px rgba(0, 0, 0, 0.3);
 }
 
 @theme inline {
@@ -93,7 +94,7 @@ body {
 }
 
 .glass-card-dark {
-  background: rgba(24, 13, 10, 0.75);
+  background: rgba(15, 23, 42, 0.75);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -101,26 +102,34 @@ body {
 
 .bg-mesh-gradient {
   background: 
-    radial-gradient(circle at 15% 15%, #F7DCCB 0%, transparent 45%),
-    radial-gradient(circle at 85% 50%, #E8F5DF 0%, transparent 50%),
-    radial-gradient(circle at 70% 100%, #F7D2BC 0%, transparent 50%),
-    #F0EAE5;
+    radial-gradient(circle at 15% 15%, #E0F2FE 0%, transparent 45%),
+    radial-gradient(circle at 85% 50%, #ECFDF5 0%, transparent 50%),
+    radial-gradient(circle at 70% 100%, #EFF6FF 0%, transparent 50%),
+    #FFFFFF;
+}
+
+.bg-mesh-gradient-dark {
+  background: 
+    radial-gradient(circle at 15% 15%, #1E3A8A 0%, transparent 45%),
+    radial-gradient(circle at 85% 50%, #064E3B 0%, transparent 50%),
+    radial-gradient(circle at 70% 100%, #0F172A 0%, transparent 50%),
+    #0F172A;
 }
 
 .text-gradient {
-  background: linear-gradient(135deg, #180D0A 0%, #785E47 100%);
+  background: linear-gradient(135deg, #0F172A 0%, #1E3A8A 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .text-gradient-emerald {
-  background: linear-gradient(135deg, #829679 0%, #EAF7E5 100%);
+  background: linear-gradient(135deg, #10B981 0%, #34D399 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .text-gradient-gold {
-  background: linear-gradient(135deg, #F7D9C6 0%, #785E47 100%);
+  background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }

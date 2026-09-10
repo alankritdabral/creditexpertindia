@@ -1,0 +1,107 @@
+"use client";
+
+import React from "react";
+import Link from "next/link";
+import { ArrowRight, Calculator, CheckCircle2 } from "lucide-react";
+import { motion } from "framer-motion";
+import Image from "next/image";
+
+import hdfcLogo from '@/public/logos/hdfc.png';
+import iciciLogo from '@/public/logos/icici.png';
+import axisLogo from '@/public/logos/axis.png';
+import kotakLogo from '@/public/logos/kotak.png';
+
+export function HeroGridBlock() {
+  const [savedAmount, setSavedAmount] = React.useState(154329805.12);
+  const [isMounted, setIsMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsMounted(true);
+    let lastTime = performance.now();
+    let animationFrameId: number;
+
+    const updateCounter = (currentTime: number) => {
+      const deltaTime = currentTime - lastTime;
+      // Increase by roughly ₹5.3 every second (just an arbitrary fast-moving number)
+      const increment = (deltaTime / 1000) * 12.45;
+      
+      setSavedAmount(prev => prev + increment);
+      lastTime = currentTime;
+      animationFrameId = requestAnimationFrame(updateCounter);
+    };
+
+    animationFrameId = requestAnimationFrame(updateCounter);
+    return () => cancelAnimationFrame(animationFrameId);
+  }, []);
+
+  // Format currency with Indian numbering system and 2 decimal places
+  const formattedAmount = isMounted 
+    ? new Intl.NumberFormat('en-IN', {
+        style: 'currency',
+        currency: 'INR',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }).format(savedAmount)
+    : '₹15,43,29,805.12';
+
+  return (
+    <div className="flex flex-col justify-between h-full p-8 md:p-12">
+      <div>
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-50 border border-slate-200 text-slate-700 text-[11px] font-bold uppercase tracking-wider mb-8 shadow-sm">
+          <span className="relative flex h-1.5 w-1.5">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+          </span>
+          <span className="opacity-80">Interest Saved for Customers:</span>
+          <span className="text-emerald-600 font-mono tracking-tight">{formattedAmount}</span>
+        </div>
+
+        <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-text-main mb-6 leading-[1.1]">
+          Turn Multiple EMIs Into <br className="hidden md:block" />
+          <span className="text-brand-blue">One Smarter EMI.</span>
+        </h1>
+
+        <p className="text-lg text-text-muted mb-10 max-w-xl">
+          Credit Expert India helps you explore loan consolidation, refinancing, top-up loans and fresh financing options designed around your financial profile.
+        </p>
+
+        <div className="flex flex-col sm:flex-row items-center gap-4">
+          <Link href="#check-eligibility" className="w-full sm:w-auto px-6 py-3.5 bg-brand-blue text-white rounded-xl font-medium hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 group">
+            Check My Eligibility
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          </Link>
+          <Link href="#calculator" className="w-full sm:w-auto px-6 py-3.5 bg-white text-text-main border border-slate-200 hover:border-slate-300 rounded-xl font-medium hover:bg-slate-50 transition-colors flex items-center justify-center gap-2">
+            <Calculator className="w-4 h-4 text-brand-blue" />
+            Potential Savings
+          </Link>
+        </div>
+      </div>
+
+      <div className="mt-16 pt-8 border-t border-slate-100 overflow-hidden relative">
+        {/* Gradient fades for smooth edges */}
+        <div className="absolute left-0 bottom-0 top-16 w-16 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
+        <div className="absolute right-0 bottom-0 top-16 w-16 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
+        
+        <p className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-6">Trusted by 10 Lac+ Customers via Banking Partners</p>
+        
+        <div className="flex w-max animate-marquee opacity-60 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-500">
+          {[...Array(2)].map((_, i) => (
+            <div key={i} className="flex items-center gap-12 pr-12">
+              <Image src={hdfcLogo} alt="HDFC" className="h-6 w-auto object-contain" />
+              <Image src={iciciLogo} alt="ICICI" className="h-6 w-auto object-contain" />
+              <Image src={axisLogo} alt="Axis" className="h-6 w-auto object-contain" />
+              <Image src={kotakLogo} alt="Kotak" className="h-6 w-auto object-contain" />
+              
+              <Image src={hdfcLogo} alt="HDFC" className="h-6 w-auto object-contain" />
+              <Image src={iciciLogo} alt="ICICI" className="h-6 w-auto object-contain" />
+              <Image src={axisLogo} alt="Axis" className="h-6 w-auto object-contain" />
+              <Image src={kotakLogo} alt="Kotak" className="h-6 w-auto object-contain" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export { HeroVisualBlock } from "./HeroAnimation";

@@ -1,24 +1,17 @@
 "use client";
 import { motion } from "framer-motion";
 import { AnimatedWord } from "./AnimatedWord";
+import { AnimatedMeshBackground } from "./AnimatedMeshBackground";
 
 export function Hero() {
   return (
     <section className="relative w-full pt-32 pb-32 lg:pt-48 lg:pb-40 bg-background overflow-hidden">
       {/* Stripe-like Rich Slanted Background */}
       <div className="absolute inset-0 -z-10 h-[110%] w-full" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 85%)' }}>
-        {/* Base Mesh */}
-        <div className="absolute inset-0 w-full h-full opacity-60 mix-blend-multiply" style={{
-          background: `
-            radial-gradient(circle at 15% 15%, #F7DCCB 0%, transparent 45%),
-            radial-gradient(circle at 85% 50%, #E8F5DF 0%, transparent 50%),
-            radial-gradient(circle at 70% 100%, #F7D2BC 0%, transparent 50%),
-            var(--background)
-          `
-        }} />
+        <AnimatedMeshBackground />
         {/* Additional slanted stripes (Stripe signature) */}
-        <div className="absolute top-0 right-0 w-full h-[200%] max-w-[60%] transform origin-top-right -skew-y-12 bg-gradient-to-bl from-[#E2D6CC]/40 to-transparent" />
-        <div className="absolute top-0 right-0 w-full h-[150%] max-w-[40%] transform origin-top-right -skew-y-12 bg-gradient-to-bl from-white/30 to-transparent" />
+        <div className="absolute top-0 right-0 w-full h-[200%] max-w-[60%] transform origin-top-right -skew-y-12 bg-gradient-to-bl from-[#E2D6CC]/40 to-transparent pointer-events-none" />
+        <div className="absolute top-0 right-0 w-full h-[150%] max-w-[40%] transform origin-top-right -skew-y-12 bg-gradient-to-bl from-white/30 to-transparent pointer-events-none" />
       </div>
 
       <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8 relative z-10">

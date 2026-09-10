@@ -3,13 +3,14 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Menu, X, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { usePathname } from "next/navigation";
 
 const navLinks = [
-  { label: "Products", href: "/#products" },
-  { label: "Solutions", href: "/#solutions" },
-  { label: "Developers", href: "/#developers" },
-  { label: "Resources", href: "/#resources" },
-  { label: "Pricing", href: "/pricing" },
+  { label: "About", href: "/about" },
+  { label: "Debt Consolidation", href: "/debt-consolidation" },
+  { label: "Personal Loan", href: "/personal-loan" },
+  { label: "How It Works", href: "/how-it-works" },
+  { label: "Eligibility", href: "/eligibility" },
 ];
 
 export function Navbar() {
@@ -26,13 +27,13 @@ export function Navbar() {
 
   return (
     <>
-      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white/80 backdrop-blur-md shadow-sm py-4' : 'bg-transparent py-6'} px-4 sm:px-6 lg:px-8`}>
-        <div className="mx-auto max-w-[1280px] flex items-center justify-between">
+      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white/90 backdrop-blur-md shadow-sm py-3' : 'bg-white py-5'} border-b border-slate-200 px-4 md:px-6 lg:px-8`}>
+        <div className="mx-auto max-w-[1220px] flex items-center justify-between">
           
           {/* Brand Logo */}
           <Link href="/" className="flex items-center gap-2 group relative z-10 shrink-0">
-            <span className="text-xl font-bold tracking-tight text-slate-900 group-hover:opacity-80 transition-opacity">
-              Credit Expert India
+            <span className="text-[17px] font-extrabold tracking-tight text-slate-900 group-hover:opacity-70 transition-opacity">
+              Credit Expert
             </span>
           </Link>
 
@@ -43,7 +44,7 @@ export function Navbar() {
                 <li key={l.href}>
                   <a
                     href={l.href}
-                    className="text-[15px] font-medium text-slate-800 hover:text-slate-500 transition-colors"
+                    className="text-[14px] font-bold text-slate-600 hover:text-slate-900 transition-colors"
                   >
                     {l.label}
                   </a>
@@ -53,19 +54,19 @@ export function Navbar() {
           </nav>
 
           {/* Action CTAs */}
-          <div className="hidden lg:flex items-center gap-4 relative z-10 shrink-0">
+          <div className="hidden lg:flex items-center justify-end gap-6 relative z-10 shrink-0">
             <a
-              href="https://dashboard.stripe.com/login"
-              className="text-[15px] font-medium text-slate-800 hover:text-slate-500 transition-colors"
+              href="/contact"
+              className="text-[14px] font-bold text-slate-600 hover:text-slate-900 transition-colors"
             >
-              Sign in
+              Contact Us
             </a>
             <a
               href="#lead-form"
-              className="group flex items-center justify-center rounded-full bg-slate-900 px-4 py-2 text-sm font-medium text-white transition-all hover:bg-slate-700"
+              className="group flex items-center justify-center rounded-full bg-[#0A2540] px-4 py-2 text-[14px] font-bold text-white transition-all hover:bg-[#113355]"
             >
-              Contact sales
-              <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+              Get Free Assessment
+              <ArrowRight className="ml-1.5 h-4 w-4 transition-transform group-hover:translate-x-1" />
             </a>
           </div>
 
@@ -108,15 +109,15 @@ export function Navbar() {
                     onClick={() => setOpen(false)}
                     className="flex w-full items-center justify-center rounded-full bg-slate-900 px-6 py-4 text-lg font-medium text-white"
                   >
-                    Contact sales
+                    Get Free Assessment
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </a>
                   <a
-                    href="https://dashboard.stripe.com/login"
+                    href="/contact"
                     onClick={() => setOpen(false)}
                     className="flex w-full items-center justify-center px-6 py-4 text-lg font-medium text-slate-900"
                   >
-                    Sign in
+                    Contact Us
                   </a>
                 </div>
               </div>
