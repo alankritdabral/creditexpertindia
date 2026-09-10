@@ -49,7 +49,7 @@ function NotificationCard({
   body,
 }: (typeof NOTIFICATIONS)[0]) {
   return (
-    <div className="w-[230px] p-2.5 rounded-[16px] bg-white/70 backdrop-blur-2xl shadow-[0_2px_12px_rgba(0,0,0,0.08),inset_0_0_0_0.5px_rgba(255,255,255,0.8)] text-left select-none">
+    <div className="w-[230px] p-2.5 rounded-[16px] bg-white/95 backdrop-blur-md shadow-[0_2px_12px_rgba(0,0,0,0.08),inset_0_0_0_0.2px_rgba(255,255,255,0.4)] text-left select-none">
       <div className="flex justify-between items-center mb-1">
         <div className="flex items-center gap-1.5">
           <div
@@ -134,9 +134,9 @@ function StatusBar({ timeStr }: { timeStr: string }) {
 /* ─────────────────────────────────────────────
    Animation constants
    ───────────────────────────────────────────── */
-const CARD_HEIGHT = 62;
-const CARD_GAP = 6;
-const CARD_STEP = CARD_HEIGHT + CARD_GAP;
+const CARD_HEIGHT = 60; // Deliberately smaller than actual height to force overlap
+const CARD_GAP = 0; // Tighter stacking
+const CARD_STEP = CARD_HEIGHT + CARD_GAP; // total step per card
 const BOTTOM_ANCHOR = 200;
 const OFFSCREEN_BOTTOM = 350;
 
