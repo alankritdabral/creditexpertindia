@@ -14,7 +14,7 @@ export default function Home() {
       {/* Row 1: Hero & Visual/Video Block */}
       <section className="w-full bg-white border-t border-b border-slate-200">
         <div className="max-w-[1220px] mx-auto grid grid-cols-1 lg:grid-cols-12 border-x border-slate-200">
-          <div className="lg:col-span-8 border-b lg:border-b-0 lg:border-r border-slate-200">
+          <div className="lg:col-span-8">
             <HeroGridBlock />
           </div>
           <div className="lg:col-span-4 bg-warm-bg">

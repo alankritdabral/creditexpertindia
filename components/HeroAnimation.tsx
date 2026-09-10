@@ -106,25 +106,25 @@ function useLiveClock() {
    ───────────────────────────────────────────── */
 function StatusBar({ timeStr }: { timeStr: string }) {
   return (
-    <div className="flex justify-between items-center px-6 pt-3 pb-1 text-[10px] font-semibold text-slate-800">
+    <div className="flex justify-between items-center px-6 pt-3 pb-1 text-[10px] font-semibold text-white drop-shadow-sm">
       <span>{timeStr}</span>
       <div className="flex items-center gap-1">
         <svg width="14" height="10" viewBox="0 0 14 10" fill="none">
-          <rect x="0" y="6" width="2.5" height="4" rx="0.5" fill="#1e293b" />
-          <rect x="3.5" y="4" width="2.5" height="6" rx="0.5" fill="#1e293b" />
-          <rect x="7" y="2" width="2.5" height="8" rx="0.5" fill="#1e293b" />
-          <rect x="10.5" y="0" width="2.5" height="10" rx="0.5" fill="#1e293b" />
+          <rect x="0" y="6" width="2.5" height="4" rx="0.5" fill="#fff" />
+          <rect x="3.5" y="4" width="2.5" height="6" rx="0.5" fill="#fff" />
+          <rect x="7" y="2" width="2.5" height="8" rx="0.5" fill="#fff" />
+          <rect x="10.5" y="0" width="2.5" height="10" rx="0.5" fill="#fff" />
         </svg>
         <svg width="14" height="10" viewBox="0 0 14 10" fill="none">
-          <path d="M7 2C9.21 2 11.17 3.07 12.38 4.72L13.45 3.65C11.94 1.65 9.63 0.5 7 0.5C4.37 0.5 2.06 1.65 0.55 3.65L1.62 4.72C2.83 3.07 4.79 2 7 2Z" fill="#1e293b" />
-          <path d="M7 5C8.3 5 9.47 5.56 10.28 6.44L11.35 5.37C10.24 4.19 8.7 3.5 7 3.5C5.3 3.5 3.76 4.19 2.65 5.37L3.72 6.44C4.53 5.56 5.7 5 7 5Z" fill="#1e293b" />
-          <circle cx="7" cy="8.5" r="1.5" fill="#1e293b" />
+          <path d="M7 2C9.21 2 11.17 3.07 12.38 4.72L13.45 3.65C11.94 1.65 9.63 0.5 7 0.5C4.37 0.5 2.06 1.65 0.55 3.65L1.62 4.72C2.83 3.07 4.79 2 7 2Z" fill="#fff" />
+          <path d="M7 5C8.3 5 9.47 5.56 10.28 6.44L11.35 5.37C10.24 4.19 8.7 3.5 7 3.5C5.3 3.5 3.76 4.19 2.65 5.37L3.72 6.44C4.53 5.56 5.7 5 7 5Z" fill="#fff" />
+          <circle cx="7" cy="8.5" r="1.5" fill="#fff" />
         </svg>
         <div className="flex items-center">
-          <div className="w-[18px] h-[9px] rounded-[2px] border border-slate-800 flex items-center p-[1px]">
-            <div className="w-[12px] h-[5px] rounded-[1px] bg-slate-800" />
+          <div className="w-[18px] h-[9px] rounded-[2px] border border-white flex items-center p-[1px]">
+            <div className="w-[12px] h-[5px] rounded-[1px] bg-white" />
           </div>
-          <div className="w-[1.5px] h-[4px] rounded-r-sm bg-slate-800 ml-[0.5px]" />
+          <div className="w-[1.5px] h-[4px] rounded-r-sm bg-white ml-[0.5px]" />
         </div>
       </div>
     </div>
@@ -210,80 +210,108 @@ export function HeroVisualBlock() {
 
   const emiValue = useAnimatedCounter(25000, 18499, phase === "counting", 1800);
 
-  /* ── Master timeline ── */
-  const runTimeline = useCallback(async () => {
-    // Small delay to ensure framer-motion controls are fully attached to DOM nodes
-    await new Promise((r) => setTimeout(r, 100));
-
-    // Phone appears
-    setPhase("phone-in");
-    setVisibleCards(0);
-    await phoneControls.start({
-      opacity: 1, scale: 1, y: 0,
-      transition: { duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] },
-    });
-
-    // Notifications slide in from bottom one by one
-    setPhase("stacking");
-    for (let i = 0; i < 4; i++) {
-      await new Promise((r) => setTimeout(r, 250));
-      setVisibleCards(i + 1);
-      await new Promise((r) => setTimeout(r, 750));
-    }
-
-    // Hold stacked view
-    setPhase("stacked");
-    await new Promise((r) => setTimeout(r, 600));
-
-    // Pop out vertically
-    setPhase("fan-out");
-    await phoneControls.start({
-      opacity: 0, scale: 0.92,
-      transition: { duration: 0.5, ease: "easeIn" },
-    });
-    await new Promise((r) => setTimeout(r, 600));
-
-    // All cards vanish → show current EMI ₹25,000
-    setPhase("vanish");
-    await new Promise((r) => setTimeout(r, 800));
-
-    // Count down ₹25,000 → ₹18,499
-    setPhase("counting");
-    await new Promise((r) => setTimeout(r, 2200));
-
-    // Single consolidated EMI card appears
-    setPhase("single-emi");
-    await mergedControls.start({
-      opacity: 1, scale: 1,
-      transition: { ...GENTLE_SPRING },
-    });
-    await new Promise((r) => setTimeout(r, 400));
-
-    // Expand details
-    setPhase("details");
-    await mergedControls.start({
-      height: 290,
-      transition: { duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] },
-    });
-    await new Promise((r) => setTimeout(r, 2000));
-
-    // Hold & restart
-    setPhase("hold");
-    await new Promise((r) => setTimeout(r, 1500));
-
-    // Reset
-    await mergedControls.start({
-      opacity: 0, scale: 0.9,
-      transition: { duration: 0.4, ease: "easeIn" },
-    });
-    phoneControls.set({ opacity: 0, scale: 0.85, y: 30 });
-    mergedControls.set({ opacity: 0, scale: 0.5, height: 100 });
-    setLoopKey((k) => k + 1);
-  }, [phoneControls, mergedControls]);
-
   useEffect(() => {
+    let isActive = true;
+
+    const runTimeline = async () => {
+      // Small delay to ensure framer-motion controls are fully attached
+      await new Promise((r) => setTimeout(r, 50));
+      if (!isActive) return;
+
+      // Phone appears
+      setPhase("phone-in");
+      setVisibleCards(0);
+      
+      // Give React a tick to commit the state change before starting
+      await new Promise((r) => requestAnimationFrame(r));
+      if (!isActive) return;
+
+      await phoneControls.start({
+        opacity: 1, scale: 1, y: 0,
+        transition: { duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] },
+      });
+      if (!isActive) return;
+
+      // Notifications slide in from bottom one by one
+      setPhase("stacking");
+      for (let i = 0; i < 4; i++) {
+        await new Promise((r) => setTimeout(r, 250));
+        if (!isActive) return;
+        setVisibleCards(i + 1);
+        await new Promise((r) => setTimeout(r, 750));
+        if (!isActive) return;
+      }
+
+      // Hold stacked view
+      setPhase("stacked");
+      await new Promise((r) => setTimeout(r, 600));
+      if (!isActive) return;
+
+      // Pop out vertically
+      setPhase("fan-out");
+      await phoneControls.start({
+        opacity: 0, scale: 0.92,
+        transition: { duration: 0.5, ease: "easeIn" },
+      });
+      if (!isActive) return;
+      await new Promise((r) => setTimeout(r, 600));
+      if (!isActive) return;
+
+      // All cards vanish → show current EMI ₹25,000
+      setPhase("vanish");
+      await new Promise((r) => setTimeout(r, 800));
+      if (!isActive) return;
+
+      // Count down ₹25,000 → ₹18,499
+      setPhase("counting");
+      await new Promise((r) => setTimeout(r, 2200));
+      if (!isActive) return;
+
+      // Single consolidated EMI card appears
+      setPhase("single-emi");
+      await mergedControls.start({
+        opacity: 1, scale: 1,
+        transition: { ...GENTLE_SPRING },
+      });
+      if (!isActive) return;
+      await new Promise((r) => setTimeout(r, 400));
+      if (!isActive) return;
+
+      // Expand details
+      setPhase("details");
+      await mergedControls.start({
+        height: 290,
+        transition: { duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] },
+      });
+      if (!isActive) return;
+      await new Promise((r) => setTimeout(r, 2000));
+      if (!isActive) return;
+
+      // Hold & restart
+      setPhase("hold");
+      await new Promise((r) => setTimeout(r, 1500));
+      if (!isActive) return;
+
+      // Reset
+      await mergedControls.start({
+        opacity: 0, scale: 0.9,
+        transition: { duration: 0.4, ease: "easeIn" },
+      });
+      if (!isActive) return;
+
+      phoneControls.set({ opacity: 0, scale: 0.85, y: 30 });
+      mergedControls.set({ opacity: 0, scale: 0.5, height: 100 });
+      setLoopKey((k) => k + 1);
+    };
+
     runTimeline();
-  }, [loopKey, runTimeline]);
+
+    return () => {
+      isActive = false;
+      phoneControls.stop();
+      mergedControls.stop();
+    };
+  }, [loopKey, phoneControls, mergedControls]);
 
   /* ── Compute notification positions ── */
   const getCardStyle = (index: number) => {
@@ -318,13 +346,13 @@ export function HeroVisualBlock() {
   const showEmiCounter = phase === "vanish" || phase === "counting";
 
   return (
-    <div className="relative w-full h-full min-h-[600px] overflow-hidden flex flex-col justify-center items-center">
+    <div className="relative w-full h-full min-h-[600px] bg-white overflow-hidden flex flex-col justify-center items-center">
 
       {/* ── iPhone Frame ── */}
       <motion.div
         initial={{ opacity: 0, scale: 0.85, y: 30 }}
         animate={phoneControls}
-        className="absolute w-[270px] h-[560px] rounded-[44px] bg-white border-[8px] border-slate-200/60 shadow-[0_25px_60px_-12px_rgba(0,0,0,0.12),0_0_0_1px_rgba(0,0,0,0.04)] flex flex-col overflow-hidden"
+        className="absolute w-[270px] h-[560px] rounded-[44px] bg-brand-blue border-[8px] border-slate-900 shadow-[0_25px_60px_-12px_rgba(0,0,0,0.12),0_0_0_1px_rgba(0,0,0,0.04)] flex flex-col overflow-hidden"
       >
         <div className="relative flex justify-center pt-2">
           <div className="w-[90px] h-[26px] bg-black rounded-full" />
@@ -332,14 +360,14 @@ export function HeroVisualBlock() {
         <StatusBar timeStr={displayTime} />
         <div className="flex-1 px-4 pt-4">
           <div className="text-center mb-6">
-            <p className="text-[10px] text-slate-400 font-medium tracking-wide uppercase">{displayDate}</p>
-            <p className="text-[52px] font-light text-slate-800 leading-none tracking-tight" style={{ fontFamily: "var(--font-sans)" }}>
+            <p className="text-[10px] text-white/80 font-medium tracking-wide uppercase">{displayDate}</p>
+            <p className="text-[52px] font-light text-white leading-none tracking-tight drop-shadow-sm" style={{ fontFamily: "var(--font-sans)" }}>
               {displayTime}
             </p>
           </div>
         </div>
         <div className="pb-2 flex justify-center">
-          <div className="w-[100px] h-[4px] rounded-full bg-slate-300" />
+          <div className="w-[100px] h-[4px] rounded-full bg-white/50" />
         </div>
       </motion.div>
 
