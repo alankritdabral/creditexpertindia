@@ -119,7 +119,7 @@ export function StoriesSection() {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-50px" }}
-            className={`relative group rounded-[24px] overflow-hidden flex flex-col justify-end min-h-[400px] md:min-h-[480px] shadow-lg ${story.colSpan}`}
+            className={`relative group rounded-[24px] overflow-hidden flex flex-col justify-end min-h-[400px] md:min-h-[480px] shadow-lg hover:-translate-y-1 hover:shadow-xl hover:border hover:border-brand-blue/30 transition-all duration-300 ${story.colSpan}`}
           >
             {/* Background Image */}
             <Image
@@ -132,7 +132,7 @@ export function StoriesSection() {
             
             {/* Gradient Overlays */}
             <div className="absolute inset-0 bg-slate-900/10 mix-blend-multiply pointer-events-none" />
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-900/60 to-transparent opacity-90 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-900/70 via-70% to-slate-900/20 opacity-90 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
             {/* Content */}
             <div className="relative z-10 p-8 md:p-10 flex flex-col justify-end h-full w-full">

@@ -1,9 +1,46 @@
 import Link from 'next/link';
 import { siteConfig, contact } from '@/lib/config';
+import { ArrowRight, MessageCircle } from 'lucide-react';
 
 export function Footer() {
   return (
-    <footer className="bg-slate-50 border-t border-slate-200">
+    <footer className="bg-slate-50 border-t border-slate-200 pb-[72px] lg:pb-0">
+      {/* CTA Banner */}
+      <div className="bg-[#0A2540] relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-brand-blue/20 via-transparent to-brand-blue/10 pointer-events-none" />
+        <div className="mx-auto max-w-[1280px] px-4 py-12 sm:px-6 lg:px-8 relative z-10">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div>
+              <h3 className="text-xl md:text-2xl font-bold text-white tracking-tight">
+                Still have questions? Talk to an expert.
+              </h3>
+              <p className="text-slate-400 mt-1 text-sm">
+                Get a free, no-obligation assessment of your current loans and options.
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <a
+                href="#check-eligibility"
+                className="flex items-center gap-2 rounded-full bg-white px-6 py-3 text-[14px] font-bold text-slate-900 hover:bg-slate-100 transition-colors whitespace-nowrap"
+              >
+                Get Free Assessment
+                <ArrowRight className="w-4 h-4" />
+              </a>
+              <a
+                href={`https://wa.me/${contact.whatsapp.replace(/[^0-9]/g, '')}?text=Hi%2C%20I%20would%20like%20help%20with%20my%20loans.`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 rounded-full bg-[#25D366] px-5 py-3 text-[14px] font-bold text-white hover:bg-[#1DA851] transition-colors whitespace-nowrap"
+              >
+                <MessageCircle className="w-4 h-4" />
+                WhatsApp
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer Content */}
       <div className="mx-auto max-w-[1280px] px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
         <div className="xl:grid xl:grid-cols-4 xl:gap-8">
           <div className="space-y-8 xl:col-span-1">

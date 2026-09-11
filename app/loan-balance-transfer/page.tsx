@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function BalanceTransferPage() {
   return (
-    <main className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50">
       
       <section className="relative w-full pt-32 pb-24 lg:pt-40 lg:pb-32 bg-background overflow-hidden border-b border-slate-200">
         <div className="absolute inset-0 -z-10 h-full w-full">
@@ -41,6 +41,6 @@ export default function BalanceTransferPage() {
 
       <LoanCalculator />
       <LeadForm />
-    </main>
+    </div>
   );
 }

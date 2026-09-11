@@ -16,6 +16,7 @@ const navLinks = [
 export function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -39,15 +40,26 @@ export function Navbar() {
 
           {/* Desktop Nav Links */}
           <nav className="hidden lg:flex flex-1 items-center justify-center">
-            <ul className="flex items-center gap-6">
+            <ul className="flex items-center gap-1">
               {navLinks.map((l) => (
                 <li key={l.href}>
-                  <a
+                  <Link
                     href={l.href}
-                    className="text-[14px] font-bold text-slate-600 hover:text-slate-900 transition-colors"
+                    className={`relative px-4 py-2 text-[14px] font-bold transition-colors rounded-full flex items-center ${
+                      pathname === l.href
+                        ? 'text-brand-blue'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                    }`}
                   >
-                    {l.label}
-                  </a>
+                    {pathname === l.href && (
+                      <motion.div
+                        layoutId="navbar-active"
+                        className="absolute inset-0 bg-brand-blue/10 rounded-full"
+                        transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                      />
+                    )}
+                    <span className="relative z-10">{l.label}</span>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -63,7 +75,7 @@ export function Navbar() {
             </a>
             <a
               href="#lead-form"
-              className="group flex items-center justify-center rounded-full bg-[#0A2540] px-4 py-2 text-[14px] font-bold text-white transition-all hover:bg-[#113355]"
+              className="group flex items-center justify-center rounded-full bg-[#0A2540] px-4 py-2 text-[14px] font-bold text-white transition-all duration-300 hover:bg-[#113355] hover:shadow-[0_0_15px_rgba(10,37,64,0.3)] active:scale-95"
             >
               Get Free Assessment
               <ArrowRight className="ml-1.5 h-4 w-4 transition-transform group-hover:translate-x-1" />

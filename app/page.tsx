@@ -5,10 +5,11 @@ import { HowItWorks } from "@/components/HowItWorks";
 import { StoriesSection } from "@/components/StoriesSection";
 import { ScamProtection } from "@/components/ScamProtection";
 import { FAQ } from "@/components/FAQ";
+import { AnimatedSection } from "@/components/AnimatedSection";
 
 export default function Home() {
   return (
-    <main className="w-full pt-[76px]">
+    <div className="w-full pt-[76px]">
       
       {/* Row 1: Hero & Visual/Video Block */}
       <section className="w-full bg-white border-t border-b border-slate-200">
@@ -16,7 +17,7 @@ export default function Home() {
           <div className="lg:col-span-8">
             <HeroGridBlock />
           </div>
-          <div className="lg:col-span-4 bg-warm-bg">
+          <div className="hidden lg:block lg:col-span-4 bg-warm-bg">
             <HeroVisualBlock />
           </div>
         </div>
@@ -32,38 +33,44 @@ export default function Home() {
       {/* Row 3: How it Works & Scam Protection */}
       <section className="w-full bg-white border-b border-slate-200">
         <div className="max-w-[1220px] mx-auto grid grid-cols-1 lg:grid-cols-2 border-x border-slate-200">
-          <div className="p-8 md:p-12 border-b lg:border-b-0 lg:border-r border-slate-200">
+          <AnimatedSection className="p-8 md:p-12 border-b lg:border-b-0 lg:border-r border-slate-200">
             <HowItWorks />
-          </div>
-          <div className="p-8 md:p-12">
+          </AnimatedSection>
+          <AnimatedSection className="p-8 md:p-12" delay={0.15}>
             <ScamProtection />
-          </div>
+          </AnimatedSection>
         </div>
       </section>
 
       {/* Row 4: Calculator */}
       <section className="w-full bg-warm-bg border-b border-slate-200">
         <div className="max-w-[1220px] mx-auto p-8 md:p-12 border-x border-slate-200">
-          <SmartCalculator />
+          <AnimatedSection>
+            <SmartCalculator />
+          </AnimatedSection>
         </div>
       </section>
 
-      {/* Row 6: FAQ */}
+      {/* Row 5: FAQ */}
       <section className="w-full bg-white border-b border-slate-200">
         <div className="max-w-[1220px] mx-auto p-8 md:p-12 border-x border-slate-200">
-          <div className="max-w-4xl mx-auto">
-            <FAQ />
-          </div>
+          <AnimatedSection>
+            <div className="max-w-4xl mx-auto">
+              <FAQ />
+            </div>
+          </AnimatedSection>
         </div>
       </section>
 
       {/* Row 6: Eligibility Form */}
       <section className="w-full bg-warm-bg border-b border-slate-200">
         <div className="max-w-[1220px] mx-auto p-8 md:p-12 border-x border-slate-200">
-          <EligibilityForm />
+          <AnimatedSection>
+            <EligibilityForm />
+          </AnimatedSection>
         </div>
       </section>
 
-    </main>
+    </div>
   );
 }

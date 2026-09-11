@@ -7,7 +7,7 @@ export const metadata: Metadata = {
 
 export default function TermsAndConditionsPage() {
   return (
-    <main className="min-h-screen bg-slate-50 pt-32 pb-24">
+    <div className="min-h-screen bg-slate-50 pt-32 pb-24">
       <div className="container-narrow bg-white p-8 sm:p-12 rounded-2xl border border-slate-200 shadow-sm">
         <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl text-slate-900 mb-8">
           Terms & Conditions
@@ -34,6 +34,6 @@ export default function TermsAndConditionsPage() {
           </p>
         </div>
       </div>
-    </main>
+    </div>
   );
 }

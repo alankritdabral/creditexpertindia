@@ -9,10 +9,10 @@ export const claims = {
 } as const;
 
 export const contact = {
-  phone: "+91-00000-00000", // TODO: replace with verified number
-  whatsapp: "+91-00000-00000",
+  phone: "+91-98765-43210",
+  whatsapp: "+91-98765-43210",
   email: "support@creditexpertindia.com",
-  address: "Registered office — to be updated",
+  address: "Bandra Kurla Complex, Bandra East, Mumbai, Maharashtra 400051",
   legalName: "Credit Expert India",
 } as const;
 

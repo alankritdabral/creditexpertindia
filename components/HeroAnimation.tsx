@@ -391,7 +391,7 @@ export function HeroVisualBlock() {
           scale: showEmiCounter ? 1 : 0.8,
           y: showEmiCounter ? 0 : 20,
         }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
+        transition={{ duration: showEmiCounter ? 0.5 : 0.2, ease: "easeOut" }}
         className="absolute z-20 text-center"
       >
         <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
@@ -429,7 +429,7 @@ export function HeroVisualBlock() {
       <motion.div
         initial={{ opacity: 0, scale: 0.5, height: 100 }}
         animate={mergedControls}
-        className="absolute z-30 w-[300px] bg-white rounded-2xl border border-slate-100 overflow-hidden flex flex-col shadow-[0_20px_50px_-12px_rgba(29,78,216,0.15)]"
+        className="absolute z-30 w-[300px] bg-white rounded-2xl border border-slate-100 overflow-hidden flex flex-col shadow-[0_20px_50px_-12px_rgba(29,78,216,0.15)]" style={{ backgroundColor: '#fff' }}
       >
         <div className="p-5 bg-gradient-to-br from-white via-white to-blue-50/40 border-b border-slate-100">
           <p className="text-[10px] font-bold text-brand-blue uppercase tracking-widest mb-1.5">

@@ -70,8 +70,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-full flex flex-col bg-background text-text-main [font-feature-settings:'ss01'] overflow-x-hidden">
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
+        <ScrollProgress />
         <Navbar />
-        <main className="flex-1 pb-[72px] lg:pb-0">{children}</main>
+        <main className="flex-1">{children}</main>
+        <MobileStickyCTA />
         <Footer />
       </body>
     </html>
