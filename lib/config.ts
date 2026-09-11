@@ -9,9 +9,8 @@ export const claims = {
 } as const;
 
 export const contact = {
-  phone: "+91-98765-43210",
-  whatsapp: "+91-98765-43210",
-  email: "support@creditexpertindia.com",
+  whatsapp: "+91-9761471212",
+  email: "akash.tyagi@creditexpertindia.com",
   address: "2nd floor, Jumpstart Coworking Space in Dehradun | Shared Office Space | Virtual Office Space, Haridwar Bypass Rd, opp. Nilaya Hills, Saraswati Vihar, Ajabpur Kalan, Dehradun, Uttarakhand 248001",
   legalName: "Credit Expert India",
 } as const;
