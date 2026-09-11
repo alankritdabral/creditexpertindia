@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import logoWithName from '@/public/img/logo_with_name.png';
 import { siteConfig, contact } from '@/lib/config';
 import { ArrowRight, MessageCircle } from 'lucide-react';
 
@@ -47,7 +48,7 @@ export function Footer() {
           <div className="space-y-8 xl:col-span-1">
             <Link href="/" className="inline-block">
               <Image 
-                src="/img/logo_with_name.png"
+                src={logoWithName}
                 alt={siteConfig.name}
                 width={160}
                 height={40}
