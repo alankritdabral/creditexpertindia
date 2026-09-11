@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Menu, X, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
@@ -33,9 +34,14 @@ export function Navbar() {
           
           {/* Brand Logo */}
           <Link href="/" className="flex items-center gap-2 group relative z-10 shrink-0">
-            <span className="text-[17px] font-extrabold tracking-tight text-slate-900 group-hover:opacity-70 transition-opacity">
-              Credit Expert
-            </span>
+            <Image 
+              src="/img/logo_with_name.png"
+              alt="Credit Expert"
+              width={160}
+              height={40}
+              className="h-9 md:h-10 w-auto object-contain group-hover:opacity-80 transition-opacity"
+              priority
+            />
           </Link>
 
           {/* Desktop Nav Links */}

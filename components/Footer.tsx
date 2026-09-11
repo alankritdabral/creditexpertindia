@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { siteConfig, contact } from '@/lib/config';
 import { ArrowRight, MessageCircle } from 'lucide-react';
 
@@ -44,9 +45,15 @@ export function Footer() {
       <div className="mx-auto max-w-[1280px] px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
         <div className="xl:grid xl:grid-cols-4 xl:gap-8">
           <div className="space-y-8 xl:col-span-1">
-            <span className="text-[17px] font-bold tracking-tight text-slate-900">
-              {siteConfig.name}
-            </span>
+            <Link href="/" className="inline-block">
+              <Image 
+                src="/img/logo_with_name.png"
+                alt={siteConfig.name}
+                width={160}
+                height={40}
+                className="h-10 w-auto object-contain"
+              />
+            </Link>
             <p className="text-[15px] leading-relaxed text-slate-500 font-medium">
               We're not a bank. We're your credit-side guide to help you find clearer financial options.
             </p>
