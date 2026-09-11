@@ -14,7 +14,11 @@ import kotakLogo from '@/public/logos/kotak.png';
 export function HeroGridBlock() {
   const [savedAmount, setSavedAmount] = React.useState(154329805.12);
   const [isMounted, setIsMounted] = React.useState(false);
-  const words = ["reduce", "manage", "clear"];
+  const words = [
+    { text: "reduce", color: "#2563EB" },
+    { text: "manage", color: "#7C3AED" },
+    { text: "clear", color: "#16A34A" }
+  ];
   const [wordIndex, setWordIndex] = React.useState(0);
   const shouldReduceMotion = useReducedMotion();
 
@@ -69,8 +73,11 @@ export function HeroGridBlock() {
         <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-text-main mb-6 leading-[1.1]">
           A smarter way to <br className="hidden md:block" />
           <span className="inline-flex items-center">
-            <span className="inline-block whitespace-nowrap text-brand-blue mr-2 lg:mr-3 text-left">
-              {words[wordIndex]}
+            <span 
+              className="inline-block whitespace-nowrap mr-2 lg:mr-3 text-left"
+              style={{ color: words[wordIndex].color }}
+            >
+              {words[wordIndex].text}
             </span>
             <span className="text-text-main">your debt.</span>
           </span>
