@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { ArrowRight, Calculator, CheckCircle2 } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import Image from "next/image";
 
 import hdfcLogo from '@/public/logos/hdfc.png';
@@ -14,6 +14,9 @@ import kotakLogo from '@/public/logos/kotak.png';
 export function HeroGridBlock() {
   const [savedAmount, setSavedAmount] = React.useState(154329805.12);
   const [isMounted, setIsMounted] = React.useState(false);
+  const words = ["reduce", "manage", "clear"];
+  const [wordIndex, setWordIndex] = React.useState(0);
+  const shouldReduceMotion = useReducedMotion();
 
   React.useEffect(() => {
     setIsMounted(true);
@@ -33,6 +36,13 @@ export function HeroGridBlock() {
     animationFrameId = requestAnimationFrame(updateCounter);
     return () => cancelAnimationFrame(animationFrameId);
   }, []);
+
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      setWordIndex((prev) => (prev + 1) % words.length);
+    }, 2400); // 1.8s pause + 0.6s transition = 2.4s interval
+    return () => clearInterval(interval);
+  }, [words.length]);
 
   // Format currency with Indian numbering system and 2 decimal places
   const formattedAmount = isMounted 
@@ -57,8 +67,13 @@ export function HeroGridBlock() {
         </div>
 
         <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-text-main mb-6 leading-[1.1]">
-          Turn Multiple EMIs Into <br className="hidden md:block" />
-          <span className="text-brand-blue">One Smarter EMI.</span>
+          A smarter way to <br className="hidden md:block" />
+          <span className="inline-flex items-center">
+            <span className="inline-block whitespace-nowrap text-brand-blue mr-2 lg:mr-3 text-left">
+              {words[wordIndex]}
+            </span>
+            <span className="text-text-main">your debt.</span>
+          </span>
         </h1>
 
         <p className="text-lg text-text-muted mb-10 max-w-xl">
@@ -84,7 +99,7 @@ export function HeroGridBlock() {
         
         <p className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-6">Trusted by 10 Lac+ Customers via Banking Partners</p>
         
-        <div className="flex w-max animate-marquee opacity-60 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-500">
+        <div className="flex w-max animate-marquee opacity-100 transition-all duration-500">
           {[...Array(2)].map((_, i) => (
             <div key={i} className="flex items-center gap-12 pr-12">
               <Image src={hdfcLogo} alt="HDFC" className="h-6 w-auto object-contain" />

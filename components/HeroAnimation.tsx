@@ -287,21 +287,8 @@ export function HeroVisualBlock() {
       await new Promise((r) => setTimeout(r, 2000));
       if (!isActive) return;
 
-      // Hold & restart
+      // Hold
       setPhase("hold");
-      await new Promise((r) => setTimeout(r, 1500));
-      if (!isActive) return;
-
-      // Reset
-      await mergedControls.start({
-        opacity: 0, scale: 0.9,
-        transition: { duration: 0.4, ease: "easeIn" },
-      });
-      if (!isActive) return;
-
-      phoneControls.set({ opacity: 0, scale: 0.85, y: 30 });
-      mergedControls.set({ opacity: 0, scale: 0.5, height: 100 });
-      setLoopKey((k) => k + 1);
     };
 
     runTimeline();
