@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import logoWithName from "@/public/img/logo_with_name.png";
+import logo from "@/public/img/logo.png";
 import { Menu, X, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
@@ -36,7 +36,7 @@ export function Navbar() {
           {/* Brand Logo */}
           <Link href="/" className="flex items-center gap-2 group relative z-10 shrink-0">
             <Image 
-              src={logoWithName}
+              src={logo}
               alt="Credit Expert"
               width={160}
               height={40}
