@@ -46,7 +46,7 @@ export default function ContactPage() {
               <Phone className="h-5 w-5" />
             </div>
             <h3 className="mt-3 text-sm font-extrabold text-slate-900">Phone Support</h3>
-            <p className="mt-1 text-xs text-slate-600 font-medium">{contact.phone}</p>
+            <p className="mt-1 text-xs text-slate-600 font-medium">{contact.whatsapp}</p>
           </div>
 
           <div className="rounded-2xl bg-slate-50 p-6 border border-slate-200">
