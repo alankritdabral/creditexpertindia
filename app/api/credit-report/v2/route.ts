@@ -67,12 +67,7 @@ export async function POST(req: Request) {
       }
     }
 
-    // 4. PAN Rate Limiting
-    const panLimit = await checkRateLimit(`rate:pan:${panHmac}`, 2, 86400); // 2 reqs per 24 hours
-    if (!panLimit.allowed) {
-      console.warn(`[CIBIL V2] PAN Rate Limit Exceeded for PAN HMAC: ${panHmac}`);
-      return NextResponse.json({ error: "Report limit reached for this PAN." }, { status: 429 });
-    }
+    // 4. (PAN Rate Limiting Removed per user request)
 
     // 5. Idempotency & Locking (Prevent double billing)
     if (!idempotencyKey) {
