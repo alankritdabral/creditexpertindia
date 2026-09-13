@@ -38,6 +38,34 @@ export async function checkRateLimit(
     return { allowed: true };
   }
 }
+/**
+ * Reads the current usage of a key without incrementing it.
+ */
+export async function getRateLimitUsage(identifier: string): Promise<number> {
+  if (!redis) return 0;
+  try {
+    const val = await redis.get<number>(identifier);
+    return val || 0;
+  } catch (e) {
+    console.error('getRateLimitUsage error:', e);
+    return 0;
+  }
+}
+
+/**
+ * Explicitly increments a limit and sets expiry if it's the first hit.
+ */
+export async function incrementRateLimit(identifier: string, windowInSeconds: number): Promise<void> {
+  if (!redis) return;
+  try {
+    const current = await redis.incr(identifier);
+    if (current === 1) {
+      await redis.expire(identifier, windowInSeconds);
+    }
+  } catch (e) {
+    console.error('incrementRateLimit error:', e);
+  }
+}
 
 /**
  * Attempts to acquire an idempotency lock for a specific request.

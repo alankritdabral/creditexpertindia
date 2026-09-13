@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { checkRateLimit, acquireIdempotencyLock, releaseIdempotencyLock } from "@/lib/requestGuard";
+import { checkRateLimit, acquireIdempotencyLock, releaseIdempotencyLock, getRateLimitUsage, incrementRateLimit } from "@/lib/requestGuard";
 import { generateHmac, encrypt, decrypt } from "@/lib/security";
 import { db } from "@/lib/firebase";
 
@@ -26,11 +26,19 @@ export async function POST(req: Request) {
     const panHmac = generateHmac(pan);
     const mobileHmac = generateHmac(mobile);
 
-    // 2. IP Rate Limiting (Redis Request Guard)
-    const ipLimit = await checkRateLimit(`rate:ip:${ip}`, 10, 600); // 10 reqs per 10 mins
-    if (!ipLimit.allowed) {
-      console.warn(`[CIBIL V1] IP Rate Limit Exceeded for IP: ${ip}`);
-      return NextResponse.json({ error: "Too many requests. Please try again later." }, { status: 429 });
+    // 2. IP Spam Guard (1 req per second strictly to block brute-force loops)
+    const ipSpamLimit = await checkRateLimit(`rate:ip:spam:${ip}`, 1, 1);
+    if (!ipSpamLimit.allowed) {
+      console.warn(`[CIBIL V1] IP Spam Guard triggered for IP: ${ip}`);
+      return NextResponse.json({ error: "Too many requests. Please slow down." }, { status: 429 });
+    }
+
+    // 2.5 IP Daily Success Limit (Max 10 SUCCESSFUL distinct searches per day)
+    const ipSuccessKey = `rate:ip:success:${ip}`;
+    const ipSuccessUsage = await getRateLimitUsage(ipSuccessKey);
+    if (ipSuccessUsage >= 10) {
+      console.warn(`[CIBIL V1] IP Daily Success Limit Reached for IP: ${ip}`);
+      return NextResponse.json({ error: "You have reached your daily search limit." }, { status: 429 });
     }
 
     // 3. Database Caching Check (Check if we already have this PAN)
@@ -134,6 +142,9 @@ export async function POST(req: Request) {
             },
             createdAt: new Date(),
           });
+          
+          // Increment the IP success counter (Valid for 24 hours)
+          await incrementRateLimit(ipSuccessKey, 86400);
         } catch (dbError) {
           console.error("Failed to save report to Firestore:", dbError);
         }
