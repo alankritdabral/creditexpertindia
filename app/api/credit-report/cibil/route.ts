@@ -27,13 +27,13 @@ export async function POST(req: Request) {
     const mobileHmac = generateHmac(mobile);
 
     // 2. Rate Limiting (Redis Request Guard)
-    const ipLimit = await checkRateLimit(`rate:ip:${ip}`, 10, 600); // 10 reqs per 10 mins
+    const ipLimit = await checkRateLimit(`rate:ip:${ip}`, 1, 1); // 10 reqs per 10 mins
     if (!ipLimit.allowed) {
       console.warn(`[CIBIL V1] IP Rate Limit Exceeded for IP: ${ip}`);
       return NextResponse.json({ error: "Too many requests. Please try again later." }, { status: 429 });
     }
 
-    const panLimit = await checkRateLimit(`rate:pan:${panHmac}`, 2, 86400); // 2 reqs per 24 hours
+    const panLimit = await checkRateLimit(`rate:pan:${panHmac}`, 1, 1); // 2 reqs per 24 hours
     if (!panLimit.allowed) {
       console.warn(`[CIBIL V1] PAN Rate Limit Exceeded for PAN HMAC: ${panHmac}`);
       return NextResponse.json({ error: "Report limit reached for this PAN." }, { status: 429 });
@@ -41,7 +41,7 @@ export async function POST(req: Request) {
 
     // 3. Idempotency & Locking
     if (!idempotencyKey) {
-      idempotencyKey = `idem:${panHmac}:${mobileHmac}`; 
+      idempotencyKey = `idem:${panHmac}:${mobileHmac}`;
     } else {
       idempotencyKey = `idem:${idempotencyKey}`;
     }
