@@ -28,10 +28,16 @@ export async function POST(req: Request) {
 
     // 2. Rate Limiting (Redis Request Guard)
     const ipLimit = await checkRateLimit(`rate:ip:${ip}`, 10, 600); // 10 reqs per 10 mins
-    if (!ipLimit.allowed) return NextResponse.json({ error: "Too many requests. Please try again later." }, { status: 429 });
+    if (!ipLimit.allowed) {
+      console.warn(`[CIBIL V2] IP Rate Limit Exceeded for IP: ${ip}`);
+      return NextResponse.json({ error: "Too many requests. Please try again later." }, { status: 429 });
+    }
 
     const panLimit = await checkRateLimit(`rate:pan:${panHmac}`, 2, 86400); // 2 reqs per 24 hours
-    if (!panLimit.allowed) return NextResponse.json({ error: "Report limit reached for this PAN." }, { status: 429 });
+    if (!panLimit.allowed) {
+      console.warn(`[CIBIL V2] PAN Rate Limit Exceeded for PAN HMAC: ${panHmac}`);
+      return NextResponse.json({ error: "Report limit reached for this PAN." }, { status: 429 });
+    }
 
     // 3. Idempotency & Locking (Prevent double billing)
     if (!idempotencyKey) {
@@ -43,12 +49,14 @@ export async function POST(req: Request) {
 
     const locked = await acquireIdempotencyLock(idempotencyKey, 30);
     if (!locked) {
+      console.warn(`[CIBIL V2] Idempotency Lock Collision for Key: ${idempotencyKey}`);
       return NextResponse.json({ error: "A request is already being processed." }, { status: 429 });
     }
 
     // 4. Check API Key configuration
     const apiKey = process.env.SUREPASS_API_KEY || process.env.SUREPASS_API_TOKEN;
     if (!apiKey) {
+      console.error("[CIBIL V2] Internal configuration error: Missing API Key");
       await releaseIdempotencyLock(idempotencyKey);
       return NextResponse.json({ error: "Internal configuration error" }, { status: 500 });
     }
@@ -105,6 +113,7 @@ export async function POST(req: Request) {
       }
       return NextResponse.json(data);
     } else if (response.status === 422 || data.status_code === 422) {
+      console.warn("[CIBIL V2] Surepass Validation Error:", data);
       return NextResponse.json(data, { status: 422 });
     } else {
       console.error("Surepass API V2 error:", data);
