@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { checkRateLimit, acquireIdempotencyLock, releaseIdempotencyLock } from "@/lib/requestGuard";
-import { generateHmac, encrypt } from "@/lib/security";
+import { generateHmac, encrypt, decrypt } from "@/lib/security";
 import { db } from "@/lib/firebase";
 
 // Helper to get client IP in Next.js App Router
@@ -26,20 +26,55 @@ export async function POST(req: Request) {
     const panHmac = generateHmac(pan);
     const mobileHmac = generateHmac(mobile);
 
-    // 2. Rate Limiting (Redis Request Guard)
+    // 2. IP Rate Limiting (Redis Request Guard)
     const ipLimit = await checkRateLimit(`rate:ip:${ip}`, 10, 600); // 10 reqs per 10 mins
     if (!ipLimit.allowed) {
       console.warn(`[CIBIL V2] IP Rate Limit Exceeded for IP: ${ip}`);
       return NextResponse.json({ error: "Too many requests. Please try again later." }, { status: 429 });
     }
 
+    // 3. Database Caching Check (Check if we already have this PAN)
+    if (db) {
+      try {
+        const snapshot = await db.collection("credit_reports").where("panHash", "==", panHmac).get();
+        if (!snapshot.empty) {
+          // Find the most recent record manually
+          const docs = snapshot.docs.map(doc => doc.data());
+          docs.sort((a, b) => b.createdAt.toDate().getTime() - a.createdAt.toDate().getTime());
+          
+          const latestReport = docs[0];
+          const reportDate = latestReport.createdAt.toDate();
+          
+          // Check if it's within the 30-day window
+          const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+          
+          if (reportDate > thirtyDaysAgo) {
+            console.log(`[CIBIL V2] Cache HIT for PAN HMAC: ${panHmac}`);
+            // Decrypt the cached Surepass JSON response
+            const cachedData = JSON.parse(decrypt(latestReport.encryptedData));
+            return NextResponse.json(cachedData);
+          } else {
+            console.warn(`[CIBIL V2] Cache EXPIRED for PAN HMAC: ${panHmac}`);
+            // Report is older than 30 days. Block the request and tell them to contact support.
+            return NextResponse.json(
+              { error: "Your credit report on file has expired. Please contact support to authorize a fresh pull." },
+              { status: 403 }
+            );
+          }
+        }
+      } catch (dbError) {
+        console.error("Failed to query Firestore for cache:", dbError);
+      }
+    }
+
+    // 4. PAN Rate Limiting
     const panLimit = await checkRateLimit(`rate:pan:${panHmac}`, 2, 86400); // 2 reqs per 24 hours
     if (!panLimit.allowed) {
       console.warn(`[CIBIL V2] PAN Rate Limit Exceeded for PAN HMAC: ${panHmac}`);
       return NextResponse.json({ error: "Report limit reached for this PAN." }, { status: 429 });
     }
 
-    // 3. Idempotency & Locking (Prevent double billing)
+    // 5. Idempotency & Locking (Prevent double billing)
     if (!idempotencyKey) {
       // If client didn't send one, generate one based on payload to prevent exact duplicate requests in a short window
       idempotencyKey = `idem:${panHmac}:${mobileHmac}`; 
@@ -53,7 +88,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "A request is already being processed." }, { status: 429 });
     }
 
-    // 4. Check API Key configuration
+    // 6. Check API Key configuration
     const apiKey = process.env.SUREPASS_API_KEY || process.env.SUREPASS_API_TOKEN;
     if (!apiKey) {
       console.error("[CIBIL V2] Internal configuration error: Missing API Key");
@@ -61,7 +96,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Internal configuration error" }, { status: 500 });
     }
 
-    // 5. Fetch from Surepass
+    // 7. Fetch from Surepass
     const response = await fetch("https://kyc-api.surepass.app/api/v1/credit-report-v2/fetch-report", {
       method: "POST",
       headers: {
@@ -80,10 +115,10 @@ export async function POST(req: Request) {
 
     const data = await response.json();
 
-    // 6. Release Idempotency Lock now that API call is done
+    // 8. Release Idempotency Lock now that API call is done
     await releaseIdempotencyLock(idempotencyKey);
 
-    // 7. Handle Response & Encrypt Data for Firestore
+    // 9. Handle Response & Encrypt Data for Firestore
     if (response.ok && data.success) {
       if (db) {
         try {
