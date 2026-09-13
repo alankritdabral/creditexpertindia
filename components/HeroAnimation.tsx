@@ -159,6 +159,7 @@ function useAnimatedCounter(from: number, to: number, isActive: boolean, duratio
 
   useEffect(() => {
     if (!isActive) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setValue(from);
       return;
     }

@@ -23,6 +23,7 @@ export function HeroGridBlock() {
   const shouldReduceMotion = useReducedMotion();
 
   React.useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsMounted(true);
     let lastTime = performance.now();
     let animationFrameId: number;
