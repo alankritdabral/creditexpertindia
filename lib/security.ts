@@ -1,22 +1,19 @@
 import crypto from 'crypto';
 
-// The secret must be exactly 32 bytes for AES-256
-// In production, ensure this is a strong, random 32-byte hex string
-const ENCRYPTION_SECRET = process.env.ENCRYPTION_SECRET || ''; 
-
-// The HMAC secret can be any strong string
-const HMAC_SECRET = process.env.HMAC_SECRET || '';
+// The secrets are read directly from process.env at runtime
+// to avoid Next.js static bundling issues.
 
 /**
  * Creates a one-way deterministic hash of a string (e.g., PAN, Mobile)
  * used for lookup and rate-limiting without storing the plaintext.
  */
 export function generateHmac(text: string): string {
-  if (!HMAC_SECRET) {
+  const secret = process.env.HMAC_SECRET;
+  if (!secret) {
     throw new Error('HMAC_SECRET is not configured');
   }
   return crypto
-    .createHmac('sha256', HMAC_SECRET)
+    .createHmac('sha256', secret)
     .update(text)
     .digest('hex');
 }
@@ -26,11 +23,12 @@ export function generateHmac(text: string): string {
  * Returns the format: iv:authTag:encryptedData
  */
 export function encrypt(text: string): string {
-  if (!ENCRYPTION_SECRET || Buffer.from(ENCRYPTION_SECRET, 'hex').length !== 32) {
+  const secret = process.env.ENCRYPTION_SECRET;
+  if (!secret || Buffer.from(secret, 'hex').length !== 32) {
     throw new Error('ENCRYPTION_SECRET must be a 32-byte hex string');
   }
   
-  const key = Buffer.from(ENCRYPTION_SECRET, 'hex');
+  const key = Buffer.from(secret, 'hex');
   const iv = crypto.randomBytes(12); // 96-bit IV recommended for GCM
   
   const cipher = crypto.createCipheriv('aes-256-gcm', key, iv);
@@ -47,11 +45,12 @@ export function encrypt(text: string): string {
  * Decrypts a string that was encrypted with encrypt()
  */
 export function decrypt(encryptedText: string): string {
-  if (!ENCRYPTION_SECRET || Buffer.from(ENCRYPTION_SECRET, 'hex').length !== 32) {
+  const secret = process.env.ENCRYPTION_SECRET;
+  if (!secret || Buffer.from(secret, 'hex').length !== 32) {
     throw new Error('ENCRYPTION_SECRET must be a 32-byte hex string');
   }
 
-  const key = Buffer.from(ENCRYPTION_SECRET, 'hex');
+  const key = Buffer.from(secret, 'hex');
   const [ivHex, authTagHex, dataHex] = encryptedText.split(':');
   
   if (!ivHex || !authTagHex || !dataHex) {
