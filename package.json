@@ -10,6 +10,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "@google-cloud/firestore": "^9.1.0",
     "@headlessui/react": "^2.2.10",
     "@heroicons/react": "^2.2.0",
     "@upstash/redis": "^1.38.4",
