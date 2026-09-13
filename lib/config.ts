@@ -11,7 +11,7 @@ export const claims = {
 export const contact = {
   whatsapp: "+91-9761471212",
   email: "akash.tyagi@creditexpertindia.com",
-  address: "2nd floor, Jumpstart Coworking Space in Dehradun | Shared Office Space | Virtual Office Space, Haridwar Bypass Rd, opp. Nilaya Hills, Saraswati Vihar, Ajabpur Kalan, Dehradun, Uttarakhand 248001",
+  address: "2nd floor, Jumpstart Haridwar Bypass Rd, opp. Nilaya Hills, Saraswati Vihar, Ajabpur Kalan, Dehradun, Uttarakhand 248001",
   legalName: "Credit Expert India",
 } as const;
 
