@@ -3,6 +3,8 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, Check, Plus, Trash2, User, Phone, Mail, MapPin, Briefcase, Building2, Shield, CreditCard, Loader2, AlertCircle, ChevronDown, ChevronUp } from "lucide-react";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { db } from "@/lib/firebaseClient";
 
 type Loan = {
   id: string;
@@ -22,7 +24,7 @@ export function EligibilityForm() {
     name: "", mobile: "", email: "", city: "", employmentType: "Salaried",
     monthlyIncome: "", employer: "", salaryMode: "Bank Transfer",
     requirement: "",
-    pan: "", gender: "male", consent: false, bureau: "v1"
+    pan: "", gender: "male", consent: false, bureau: "v1_json"
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -67,10 +69,19 @@ export function EligibilityForm() {
     setLoading(true);
 
     try {
-      const isV2 = formData.bureau === "v2";
-      const endpoint = isV2
-        ? "https://kyc-api.surepass.app/api/v1/credit-report-v2/fetch-report"
-        : "https://kyc-api.surepass.app/api/v1/credit-report-cibil/fetch-report";
+      const isV2 = formData.bureau.startsWith("v2");
+      const isPdf = formData.bureau.endsWith("_pdf");
+      
+      let endpoint = "";
+      if (isV2) {
+        endpoint = isPdf 
+          ? "https://kyc-api.surepass.app/api/v1/credit-report-v2/fetch-pdf-report"
+          : "https://kyc-api.surepass.app/api/v1/credit-report-v2/fetch-report";
+      } else {
+        endpoint = isPdf
+          ? "https://kyc-api.surepass.app/api/v1/credit-report-cibil/fetch-report-pdf"
+          : "https://kyc-api.surepass.app/api/v1/credit-report-cibil/fetch-report";
+      }
 
       const apiKey = process.env.NEXT_PUBLIC_SUREPASS_API_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc4OTIyMzQ5NywianRpIjoiNmY0OWQ5ZDYtNGVhNy00ZjJmLWJlZmUtODExNjg2MGE0ZjQzIiwidHlwZSI6ImFjY2VzcyIsImlkZW50aXR5IjoiZGV2LmNyZWRpdGV4cGVydGluZGlhQHN1cmVwYXNzLmlvIiwibmJmIjoxNzg5MjIzNDk3LCJleHAiOjIxMDQ1ODM0OTcsImVtYWlsIjoiY3JlZGl0ZXhwZXJ0aW5kaWFAc3VyZXBhc3MuaW8iLCJ0ZW5hbnRfaWQiOiJtYWluIiwidXNlcl9jbGFpbXMiOnsic2NvcGVzIjpbInVzZXIiXX19.zOfjOTG1XrixzmUowCWgSADg281qLkI_asb-t7M_0dg";
       if (!apiKey) {
@@ -111,6 +122,29 @@ export function EligibilityForm() {
         setError(data.message || data.error || "Failed to fetch credit report. Please check your details.");
       } else {
         setCibilData(data.data);
+        
+        // Automatically open/download the PDF if it exists
+        if (data.data?.credit_report_link) {
+          // Using window.open is the most reliable way to handle cross-origin S3 PDF links
+          window.open(data.data.credit_report_link, "_blank");
+        }
+        
+        // Save to Firestore (non-blocking)
+        try {
+          await addDoc(collection(db, "credit_reports"), {
+            name: formData.name || "Customer",
+            mobile: formData.mobile,
+            pan: formData.pan,
+            gender: formData.gender,
+            bureau: formData.bureau,
+            credit_score: data.data?.credit_score || null,
+            credit_report_link: data.data?.credit_report_link || null,
+            timestamp: serverTimestamp(),
+          });
+        } catch (dbError) {
+          console.error("Failed to save to database:", dbError);
+        }
+
         nextStep();
       }
     } catch (e) {
@@ -337,15 +371,23 @@ export function EligibilityForm() {
 
               {/* Bureau Selection */}
               <div className="pt-2">
-                <p className="text-sm font-semibold text-text-main mb-3">Select Credit Bureau</p>
-                <div className="grid grid-cols-2 gap-3">
-                  <label className={`flex items-center gap-2 p-3 border rounded-xl cursor-pointer transition-all ${formData.bureau === 'v1' ? 'border-brand-blue bg-blue-50/50' : 'border-slate-200 hover:bg-slate-50'}`}>
-                    <input type="radio" name="bureau" value="v1" checked={formData.bureau === 'v1'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-brand-blue accent-brand-blue" />
-                    <span className="text-sm font-medium text-slate-700">Surepass Cibil (V1)</span>
+                <p className="text-sm font-semibold text-text-main mb-3">Select Credit Bureau & Format</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <label className={`flex items-center gap-2 p-3 border rounded-xl cursor-pointer transition-all ${formData.bureau === 'v1_json' ? 'border-brand-blue bg-blue-50/50' : 'border-slate-200 hover:bg-slate-50'}`}>
+                    <input type="radio" name="bureau" value="v1_json" checked={formData.bureau === 'v1_json'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-brand-blue accent-brand-blue" />
+                    <span className="text-sm font-medium text-slate-700">CIBIL (Dashboard)</span>
                   </label>
-                  <label className={`flex items-center gap-2 p-3 border rounded-xl cursor-pointer transition-all ${formData.bureau === 'v2' ? 'border-brand-blue bg-blue-50/50' : 'border-slate-200 hover:bg-slate-50'}`}>
-                    <input type="radio" name="bureau" value="v2" checked={formData.bureau === 'v2'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-brand-blue accent-brand-blue" />
-                    <span className="text-sm font-medium text-slate-700">Surepass Experian (V2)</span>
+                  <label className={`flex items-center gap-2 p-3 border rounded-xl cursor-pointer transition-all ${formData.bureau === 'v1_pdf' ? 'border-brand-blue bg-blue-50/50' : 'border-slate-200 hover:bg-slate-50'}`}>
+                    <input type="radio" name="bureau" value="v1_pdf" checked={formData.bureau === 'v1_pdf'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-brand-blue accent-brand-blue" />
+                    <span className="text-sm font-medium text-slate-700">CIBIL (PDF Only)</span>
+                  </label>
+                  <label className={`flex items-center gap-2 p-3 border rounded-xl cursor-pointer transition-all ${formData.bureau === 'v2_json' ? 'border-brand-blue bg-blue-50/50' : 'border-slate-200 hover:bg-slate-50'}`}>
+                    <input type="radio" name="bureau" value="v2_json" checked={formData.bureau === 'v2_json'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-brand-blue accent-brand-blue" />
+                    <span className="text-sm font-medium text-slate-700">Equifax (Dashboard)</span>
+                  </label>
+                  <label className={`flex items-center gap-2 p-3 border rounded-xl cursor-pointer transition-all ${formData.bureau === 'v2_pdf' ? 'border-brand-blue bg-blue-50/50' : 'border-slate-200 hover:bg-slate-50'}`}>
+                    <input type="radio" name="bureau" value="v2_pdf" checked={formData.bureau === 'v2_pdf'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-brand-blue accent-brand-blue" />
+                    <span className="text-sm font-medium text-slate-700">Equifax (PDF Only)</span>
                   </label>
                 </div>
               </div>
@@ -366,10 +408,25 @@ export function EligibilityForm() {
           </motion.div>
         );
       case 6:
-        const report = cibilData?.credit_report?.[0];
-        const consumerSummary = report?.response?.consumerSummaryresp;
-        const accountSummary = consumerSummary?.accountSummary;
-        const inquirySummary = consumerSummary?.inquirySummary;
+        const isEquifax = formData.bureau.startsWith("v2");
+        
+        let accountSummary = null;
+        let inquirySummary = null;
+        let accounts = null;
+        let equifaxPersonalInfo = null;
+
+        if (!isEquifax) {
+          const report = cibilData?.credit_report?.[0];
+          const consumerSummary = report?.response?.consumerSummaryresp;
+          accountSummary = consumerSummary?.accountSummary;
+          inquirySummary = consumerSummary?.inquirySummary;
+          accounts = report?.accounts;
+        } else {
+          // Equifax JSON parsing
+          const cirReportData = cibilData?.credit_report?.CCRResponse?.CIRReportDataLst?.[0]?.CIRReportData;
+          equifaxPersonalInfo = cirReportData?.IDAndContactInfo?.PersonalInfo;
+        }
+
         const score = cibilData?.credit_score;
 
         let scoreLabel = "Not Available";
@@ -394,7 +451,14 @@ export function EligibilityForm() {
             <div className="mb-10">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-2xl font-bold text-text-main">Credit Report</h3>
-                <span className="text-xs font-semibold px-3 py-1 bg-[#F1EFE7] text-[#4A3D36] rounded-full">Updated: {new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
+                <div className="flex items-center gap-3">
+                  {cibilData?.credit_report_link && (
+                    <a href={cibilData.credit_report_link} target="_blank" rel="noopener noreferrer" className="text-xs font-bold px-4 py-1.5 bg-brand-blue text-white rounded-full hover:bg-blue-700 transition-colors shadow-sm flex items-center gap-1">
+                      Download PDF
+                    </a>
+                  )}
+                  <span className="text-xs font-semibold px-3 py-1.5 bg-[#F1EFE7] text-[#4A3D36] rounded-full">Updated: {new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
+                </div>
               </div>
 
               {/* Score Hero Card */}
@@ -480,12 +544,37 @@ export function EligibilityForm() {
                 </div>
               )}
 
+              {/* Equifax Personal Info (Fallback) */}
+              {isEquifax && (
+                 <div className="bg-[#FAF8F5] border border-[#EBE6DD] rounded-3xl p-5 mb-6">
+                  <h4 className="text-sm font-extrabold text-[#382F2A] mb-4">Equifax Profile Data</h4>
+                  {equifaxPersonalInfo && (
+                    <div className="grid grid-cols-2 gap-4 mb-4">
+                       <div>
+                         <p className="text-[10px] uppercase tracking-wider font-bold text-[#8B7C73]">Name</p>
+                         <p className="text-sm font-bold text-[#382F2A]">{equifaxPersonalInfo.Name?.FullName || 'N/A'}</p>
+                       </div>
+                       <div>
+                         <p className="text-[10px] uppercase tracking-wider font-bold text-[#8B7C73]">Date of Birth</p>
+                         <p className="text-sm font-bold text-[#382F2A]">{equifaxPersonalInfo.DateOfBirth || 'N/A'}</p>
+                       </div>
+                    </div>
+                  )}
+                  <div className="p-3 bg-white border border-[#EBE6DD] rounded-xl text-center">
+                    <p className="text-xs text-[#8B7C73] leading-relaxed">
+                      Equifax does not return detailed credit accounts in their JSON response. 
+                      <br/>Please use the <strong>Equifax (PDF Only)</strong> option to view full account details.
+                    </p>
+                  </div>
+                 </div>
+              )}
+
               {/* Accounts List */}
-              {report?.accounts && report.accounts.length > 0 && (
+              {accounts && accounts.length > 0 && (
                 <div>
                   <h4 className="text-lg font-bold text-[#382F2A] mb-4">Credit Accounts</h4>
                   <div className="space-y-3">
-                    {report.accounts.map((acc: any, i: number) => {
+                    {accounts.map((acc: any, i: number) => {
                       const isExpanded = expandedAccount === acc.accountNumber;
                       return (
                         <div key={i} className="bg-white border border-[#EBE6DD] rounded-2xl overflow-hidden transition-all shadow-sm">
