@@ -264,8 +264,8 @@ export function analyzeLenderEligibility({ profile, catBLoans }: { profile: any,
   const requiresApp = hasApp;
   const requiresOD = hasOD;
   
-  let eligibleLenders = [];
-  let ineligibleLenders = [];
+  const eligibleLenders = [];
+  const ineligibleLenders = [];
 
   for (const lender of LENDERS) {
     const eligibility = lender.eligibility;
@@ -274,7 +274,7 @@ export function analyzeLenderEligibility({ profile, catBLoans }: { profile: any,
 
     let isEligible = true;
     let matchScore = 100; // Base score out of 100
-    let rejectionReasons = [];
+    const rejectionReasons = [];
     
     // 1. Hard knockouts
     if (Number(netSalary) < eligibility.min_salary) {
@@ -310,7 +310,7 @@ export function analyzeLenderEligibility({ profile, catBLoans }: { profile: any,
     }
 
     // Takeover Policy Compatibility
-    let liabilityFit = 25;
+    const liabilityFit = 25;
     if (plCount === 1 && !requiresMultiPL && !requiresCC && !requiresApp && !requiresOD) {
       if (takeover["Personal Loan"] === 'NOT_SUPPORTED' || takeover["Personal Loan"] === 'POLICY_CHECK') {
         isEligible = false;

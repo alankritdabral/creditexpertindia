@@ -25,7 +25,7 @@ export function calculateRateFromEMI(p: number, emi: number, months: number): nu
   
   for (let i = 0; i < 50; i++) {
     mid = (low + high) / 2;
-    let guessEmi = calculateEMI(p, mid, months);
+    const guessEmi = calculateEMI(p, mid, months);
     if (guessEmi > emi) {
       high = mid;
     } else {
@@ -51,10 +51,10 @@ export function getEmisPaid(disbursedDate: string): number {
   const d = new Date(disbursedDate);
   const now = new Date();
   
-  let firstEmiMonthOffset = d.getDate() <= 20 ? 1 : 2;
+  const firstEmiMonthOffset = d.getDate() <= 20 ? 1 : 2;
   const firstEmiDate = new Date(d.getFullYear(), d.getMonth() + firstEmiMonthOffset, 1);
   
-  let months = (now.getFullYear() - firstEmiDate.getFullYear()) * 12 + (now.getMonth() - firstEmiDate.getMonth());
+  const months = (now.getFullYear() - firstEmiDate.getFullYear()) * 12 + (now.getMonth() - firstEmiDate.getMonth());
   return Math.max(0, months);
 }
 
@@ -74,10 +74,10 @@ export function processLoans(loans: any[]) {
     const r = Number(l.rate);
     const n = Number(l.tenure);
     
-    let calculatedEmi = l.emi ? Number(l.emi) : calculateEMI(p, r, n);
-    let emisPaid = getEmisPaid(l.disbursedDate);
+    const calculatedEmi = l.emi ? Number(l.emi) : calculateEMI(p, r, n);
+    const emisPaid = getEmisPaid(l.disbursedDate);
     
-    let calculatedOutstanding = (l.currentOutstanding || l.outstanding)
+    const calculatedOutstanding = (l.currentOutstanding || l.outstanding)
       ? Number(l.currentOutstanding || l.outstanding) 
       : calculateOutstanding(p, r, n, emisPaid);
 
