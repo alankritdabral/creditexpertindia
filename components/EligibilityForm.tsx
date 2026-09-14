@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, Check, Plus, Trash2, User, Phone, Mail, MapPin, Briefcase, Building2, Shield, CreditCard, Loader2, AlertCircle, ChevronDown, ChevronUp } from "lucide-react";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { collection, doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebaseClient";
 
 type Loan = {
@@ -53,15 +53,16 @@ export function EligibilityForm() {
 
   const handleFetchReport = async () => {
     if (!formData.consent) {
-      setError("Please provide consent to fetch your credit report.");
+      setError("Please accept the credit report consent.");
       return;
     }
-    if (!formData.pan || !/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/i.test(formData.pan)) {
-      setError("Please enter a valid PAN.");
+    const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/i;
+    if (!panRegex.test(formData.pan)) {
+      setError("Please enter a valid 10-character PAN number.");
       return;
     }
-    if (!formData.mobile || !/^[6-9]\d{9}$/.test(formData.mobile)) {
-      setError("Please enter a valid mobile number in step 1.");
+    if (formData.mobile.length !== 10) {
+      setError("Please enter a valid 10-digit mobile number.");
       return;
     }
 
@@ -69,6 +70,48 @@ export function EligibilityForm() {
     setLoading(true);
 
     try {
+      // 1. Check Database First
+      const docId = `${formData.pan.toUpperCase()}_${formData.mobile}_${formData.bureau}`;
+      const docRef = doc(db, "credit_reports", docId);
+      
+      try {
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          let createdAt = new Date();
+          if (data.created_at) {
+            createdAt = typeof data.created_at.toDate === 'function' ? data.created_at.toDate() : new Date(data.created_at);
+          }
+          const daysOld = (new Date().getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24);
+          
+          if (daysOld > 30) {
+            setError("Your report in our system has expired (older than 30 days). Please contact support for a new assessment.");
+            setLoading(false);
+            return;
+          } else {
+            // Less than 30 days old
+            const isPdf = formData.bureau.endsWith("_pdf");
+            if (isPdf) {
+              setError("You recently generated a PDF report. For security, PDF links expire quickly. Please contact support to retrieve it.");
+              setLoading(false);
+              return;
+            } else {
+              // Dashboard cache hit!
+              if (data.raw_api_data) {
+                setCibilData(data.raw_api_data);
+                setStep(6);
+                setLoading(false);
+                return;
+              }
+            }
+          }
+        }
+      } catch (e) {
+        console.error("Error checking cache:", e);
+        // Continue to fetch if DB read fails (e.g. missing permissions)
+      }
+
+      // 2. Not in DB or no cache -> Fetch from Surepass
       const isV2 = formData.bureau.startsWith("v2");
       const isPdf = formData.bureau.endsWith("_pdf");
       
@@ -129,20 +172,23 @@ export function EligibilityForm() {
           window.open(data.data.credit_report_link, "_blank");
         }
         
-        // Save to Firestore (non-blocking)
+        // Save to Firebase
         try {
-          await addDoc(collection(db, "credit_reports"), {
-            name: formData.name || "Customer",
+          const docId = `${formData.pan.toUpperCase()}_${formData.mobile}_${formData.bureau}`;
+          await setDoc(doc(db, "credit_reports", docId), {
+            name: formData.name,
             mobile: formData.mobile,
-            pan: formData.pan,
+            pan: formData.pan.toUpperCase(),
             gender: formData.gender,
             bureau: formData.bureau,
             credit_score: data.data?.credit_score || null,
-            credit_report_link: data.data?.credit_report_link || null,
-            timestamp: serverTimestamp(),
+            pdf_link: data.data?.credit_report_link || null,
+            raw_api_data: data.data, // Save the full response to rebuild dashboard later
+            created_at: serverTimestamp(),
+            mode: mode
           });
-        } catch (dbError) {
-          console.error("Failed to save to database:", dbError);
+        } catch (e) {
+          console.error("Error saving to Firebase", e);
         }
 
         nextStep();
