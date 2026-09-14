@@ -67,21 +67,42 @@ export function EligibilityForm() {
     setLoading(true);
 
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "";
-      const endpoint = formData.bureau === "v2" 
-        ? `${baseUrl}/api/credit-report/v2` 
-        : `${baseUrl}/api/credit-report/cibil`;
+      const isV2 = formData.bureau === "v2";
+      const endpoint = isV2
+        ? "https://kyc-api.surepass.app/api/v1/credit-report-v2/fetch-report"
+        : "https://kyc-api.surepass.app/api/v1/credit-report-cibil/fetch-report";
+
+      const apiKey = process.env.NEXT_PUBLIC_SUREPASS_API_KEY;
+      if (!apiKey) {
+        setError("API key is not configured.");
+        setLoading(false);
+        return;
+      }
+
+      const bodyPayload = isV2 
+        ? {
+            name: formData.name || "Customer",
+            id_number: formData.pan,
+            id_type: "pan",
+            mobile: formData.mobile,
+            consent: "Y",
+            gender: formData.gender
+          }
+        : {
+            mobile: formData.mobile,
+            pan: formData.pan,
+            name: formData.name || "Customer",
+            gender: formData.gender,
+            consent: "Y"
+          };
 
       const res = await fetch(endpoint, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          mobile: formData.mobile,
-          pan: formData.pan,
-          name: formData.name || "Customer",
-          gender: formData.gender,
-          consent: "Y"
-        })
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${apiKey}`
+        },
+        body: JSON.stringify(bodyPayload)
       });
 
       const data = await res.json();

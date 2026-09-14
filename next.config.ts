@@ -4,7 +4,6 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: "export",
-  serverExternalPackages: ["firebase-admin", "@google-cloud/firestore"],
   images: {
     unoptimized: true,
   },
