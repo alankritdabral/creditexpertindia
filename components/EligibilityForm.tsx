@@ -104,12 +104,7 @@ export function EligibilityForm() {
           : "https://kyc-api.surepass.app/api/v1/credit-report-cibil/fetch-report";
       }
 
-      const apiKey = process.env.NEXT_PUBLIC_SUREPASS_API_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc4OTIyMzQ5NywianRpIjoiNmY0OWQ5ZDYtNGVhNy00ZjJmLWJlZmUtODExNjg2MGE0ZjQzIiwidHlwZSI6ImFjY2VzcyIsImlkZW50aXR5IjoiZGV2LmNyZWRpdGV4cGVydGluZGlhQHN1cmVwYXNzLmlvIiwibmJmIjoxNzg5MjIzNDk3LCJleHAiOjIxMDQ1ODM0OTcsImVtYWlsIjoiY3JlZGl0ZXhwZXJ0aW5kaWFAc3VyZXBhc3MuaW8iLCJ0ZW5hbnRfaWQiOiJtYWluIiwidXNlcl9jbGFpbXMiOnsic2NvcGVzIjpbInVzZXIiXX19.zOfjOTG1XrixzmUowCWgSADg281qLkI_asb-t7M_0dg";
-      if (!apiKey) {
-        setError("API key is not configured.");
-        setLoading(false);
-        return;
-      }
+
 
       const bodyPayload = isV2
         ? {
@@ -128,13 +123,13 @@ export function EligibilityForm() {
           consent: "Y"
         };
 
-      const res = await fetch(endpoint, {
+      // Send the request through our new Next.js API Route which talks to the VPS proxy
+      const res = await fetch("/api/surepass", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${apiKey}`
         },
-        body: JSON.stringify(bodyPayload)
+        body: JSON.stringify({ endpoint, bodyPayload })
       });
 
       const data = await res.json();
