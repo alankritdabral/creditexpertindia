@@ -72,33 +72,33 @@ export function EligibilityForm() {
         ? "https://kyc-api.surepass.app/api/v1/credit-report-v2/fetch-report"
         : "https://kyc-api.surepass.app/api/v1/credit-report-cibil/fetch-report";
 
-      const apiKey = process.env.NEXT_PUBLIC_SUREPASS_API_KEY;
+      const apiKey = process.env.NEXT_PUBLIC_SUREPASS_API_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc4OTIyMzQ5NywianRpIjoiNmY0OWQ5ZDYtNGVhNy00ZjJmLWJlZmUtODExNjg2MGE0ZjQzIiwidHlwZSI6ImFjY2VzcyIsImlkZW50aXR5IjoiZGV2LmNyZWRpdGV4cGVydGluZGlhQHN1cmVwYXNzLmlvIiwibmJmIjoxNzg5MjIzNDk3LCJleHAiOjIxMDQ1ODM0OTcsImVtYWlsIjoiY3JlZGl0ZXhwZXJ0aW5kaWFAc3VyZXBhc3MuaW8iLCJ0ZW5hbnRfaWQiOiJtYWluIiwidXNlcl9jbGFpbXMiOnsic2NvcGVzIjpbInVzZXIiXX19.zOfjOTG1XrixzmUowCWgSADg281qLkI_asb-t7M_0dg";
       if (!apiKey) {
         setError("API key is not configured.");
         setLoading(false);
         return;
       }
 
-      const bodyPayload = isV2 
+      const bodyPayload = isV2
         ? {
-            name: formData.name || "Customer",
-            id_number: formData.pan,
-            id_type: "pan",
-            mobile: formData.mobile,
-            consent: "Y",
-            gender: formData.gender
-          }
+          name: formData.name || "Customer",
+          id_number: formData.pan,
+          id_type: "pan",
+          mobile: formData.mobile,
+          consent: "Y",
+          gender: formData.gender
+        }
         : {
-            mobile: formData.mobile,
-            pan: formData.pan,
-            name: formData.name || "Customer",
-            gender: formData.gender,
-            consent: "Y"
-          };
+          mobile: formData.mobile,
+          pan: formData.pan,
+          name: formData.name || "Customer",
+          gender: formData.gender,
+          consent: "Y"
+        };
 
       const res = await fetch(endpoint, {
         method: "POST",
-        headers: { 
+        headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${apiKey}`
         },
