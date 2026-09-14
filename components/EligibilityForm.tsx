@@ -67,7 +67,11 @@ export function EligibilityForm() {
     setLoading(true);
 
     try {
-      const endpoint = formData.bureau === "v2" ? "/api/credit-report/v2" : "/api/credit-report/cibil";
+      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "";
+      const endpoint = formData.bureau === "v2" 
+        ? `${baseUrl}/api/credit-report/v2` 
+        : `${baseUrl}/api/credit-report/cibil`;
+
       const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
