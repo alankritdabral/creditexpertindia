@@ -459,6 +459,7 @@ export function EligibilityForm() {
         let accountSummary = null;
         let inquirySummary = null;
         let accounts = null;
+        let enquiries = null;
         let equifaxPersonalInfo = null;
 
         if (!isEquifax) {
@@ -467,10 +468,20 @@ export function EligibilityForm() {
           accountSummary = consumerSummary?.accountSummary;
           inquirySummary = consumerSummary?.inquirySummary;
           accounts = report?.accounts;
+          enquiries = report?.enquiries;
         } else {
           // Equifax JSON parsing
-          const cirReportData = cibilData?.credit_report?.CCRResponse?.CIRReportDataLst?.[0]?.CIRReportData;
-          equifaxPersonalInfo = cirReportData?.IDAndContactInfo?.PersonalInfo;
+          const cirDataList = cibilData?.credit_report?.CCRResponse?.CIRReportDataLst || [];
+          const firstCirData = cirDataList[0]?.CIRReportData;
+          equifaxPersonalInfo = firstCirData?.IDAndContactInfo?.PersonalInfo;
+          
+          if (cirDataList.length > 0) {
+            enquiries = cirDataList.map((item: any) => ({
+              memberShortName: item.InquiryResponseHeader?.CustomerName || "Unknown Lender",
+              enquiryDate: item.InquiryResponseHeader?.Date || "N/A",
+              enquiryAmount: 0 // Equifax JSON doesn't provide an amount here
+            }));
+          }
         }
 
         const score = cibilData?.credit_score;
@@ -587,6 +598,27 @@ export function EligibilityForm() {
                   <p className="text-[11px] text-[#8B7C73] leading-relaxed">
                     <span className="font-bold text-[#382F2A]">Note:</span> Frequent credit enquiries can be one factor considered in credit assessment. The impact depends on the overall credit profile.
                   </p>
+                </div>
+              )}
+
+              {/* Enquiries List */}
+              {enquiries && enquiries.length > 0 && (
+                <div className="mb-6">
+                  <h4 className="text-lg font-bold text-[#382F2A] mb-4">Recent Enquiries</h4>
+                  <div className="space-y-3">
+                    {enquiries.map((enq: any, i: number) => (
+                      <div key={i} className="bg-white border border-[#EBE6DD] rounded-2xl p-4 shadow-sm flex items-center justify-between">
+                         <div className="text-left">
+                           <p className="text-sm font-bold text-[#382F2A]">{enq.memberShortName || 'Unknown Lender'}</p>
+                           <p className="text-xs font-semibold text-[#8B7C73] mt-0.5">Date: {enq.enquiryDate || 'N/A'}</p>
+                         </div>
+                         <div className="text-right">
+                           <p className="text-sm font-bold text-[#382F2A]">₹{Number(enq.enquiryAmount || 0).toLocaleString('en-IN')}</p>
+                           <p className="text-[10px] font-semibold text-[#8B7C73] uppercase tracking-wider mt-0.5">Amount</p>
+                         </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
 
