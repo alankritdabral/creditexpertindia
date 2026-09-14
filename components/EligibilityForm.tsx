@@ -5,21 +5,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, Check, Plus, Trash2, User, Phone, Mail, MapPin, Briefcase, Building2, Shield, CreditCard, Loader2, AlertCircle, ChevronDown, ChevronUp } from "lucide-react";
 import { collection, doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebaseClient";
-
-type Loan = {
-  id: string;
-  type: string;
-  lender: string;
-  outstanding: number;
-  emi: number;
-  rate: number;
-  tenure: number;
-};
-
+import { analyzeLenderEligibility } from "@/lib/lenderEngine";
 export function EligibilityForm() {
-  const [step, setStep] = useState(0);
-  const [mode, setMode] = useState<'full' | 'cibil' | null>(null);
-  const [loans, setLoans] = useState<Loan[]>([{ id: '1', type: 'Personal Loan', lender: '', outstanding: 0, emi: 0, rate: 0, tenure: 0 }]);
+  const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     name: "", mobile: "", email: "", city: "", employmentType: "Salaried",
     monthlyIncome: "", employer: "", salaryMode: "Bank Transfer",
@@ -30,25 +18,16 @@ export function EligibilityForm() {
   const [error, setError] = useState<string | null>(null);
   const [cibilData, setCibilData] = useState<any>(null);
   const [expandedAccount, setExpandedAccount] = useState<string | null>(null);
+  const [dashboardTab, setDashboardTab] = useState<"enquiries" | "ongoing" | "closed" | "eligibility">("enquiries");
+  const [userOverrides, setUserOverrides] = useState<any>({});
+  const [loanOverrides, setLoanOverrides] = useState<any>({});
 
-  const nextStep = () => {
-    if (mode === 'cibil' && step === 5) setStep(6);
-    else setStep(s => Math.min(s + 1, 6));
-  };
-  const prevStep = () => {
-    if (mode === 'cibil' && step === 5) { setStep(0); setMode(null); }
-    else if (step === 1) { setStep(0); setMode(null); }
-    else setStep(s => Math.max(s - 1, 1));
-  };
-
-  const addLoan = () => {
-    setLoans([...loans, { id: Math.random().toString(), type: 'Personal Loan', lender: '', outstanding: 0, emi: 0, rate: 0, tenure: 0 }]);
-  };
-
-  const removeLoan = (id: string) => {
-    if (loans.length > 1) {
-      setLoans(loans.filter(l => l.id !== id));
+  const processFetchedReport = (reportData: any) => {
+    setCibilData(reportData);
+    if (reportData?.credit_report_link) {
+      window.open(reportData.credit_report_link, "_blank");
     }
+    setStep(6);
   };
 
   const handleFetchReport = async () => {
@@ -98,8 +77,7 @@ export function EligibilityForm() {
             } else {
               // Dashboard cache hit!
               if (data.raw_api_data) {
-                setCibilData(data.raw_api_data);
-                setStep(6);
+                processFetchedReport(data.raw_api_data);
                 setLoading(false);
                 return;
               }
@@ -164,14 +142,6 @@ export function EligibilityForm() {
       if (!res.ok || !data.success) {
         setError(data.message || data.error || "Failed to fetch credit report. Please check your details.");
       } else {
-        setCibilData(data.data);
-        
-        // Automatically open/download the PDF if it exists
-        if (data.data?.credit_report_link) {
-          // Using window.open is the most reliable way to handle cross-origin S3 PDF links
-          window.open(data.data.credit_report_link, "_blank");
-        }
-        
         // Save to Firebase
         try {
           const docId = `${formData.pan.toUpperCase()}_${formData.mobile}_${formData.bureau}`;
@@ -184,14 +154,13 @@ export function EligibilityForm() {
             credit_score: data.data?.credit_score || null,
             pdf_link: data.data?.credit_report_link || null,
             raw_api_data: data.data, // Save the full response to rebuild dashboard later
-            created_at: serverTimestamp(),
-            mode: mode
+            created_at: serverTimestamp()
           });
         } catch (e) {
           console.error("Error saving to Firebase", e);
         }
 
-        nextStep();
+        processFetchedReport(data.data);
       }
     } catch (e) {
       setError("A network error occurred. Please try again.");
@@ -200,197 +169,17 @@ export function EligibilityForm() {
     }
   };
 
-  const totalOutstanding = loans.reduce((acc, curr) => acc + (Number(curr.outstanding) || 0), 0);
-  const totalEmi = loans.reduce((acc, curr) => acc + (Number(curr.emi) || 0), 0);
-
-  // Very rough estimate for demo
-  const estConsolidatedEmi = Math.round(totalOutstanding * 0.021); // Assuming roughly 2.1% of principal for 60m @ 11.5%
-
   const renderStep = () => {
     switch (step) {
-      case 0:
-        return (
-          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="text-center">
-            <h3 className="text-2xl font-bold text-text-main mb-6">How can we help you?</h3>
-            <div className="grid gap-4 sm:grid-cols-2 text-left">
-              <button
-                onClick={() => { setMode('full'); setStep(1); }}
-                className="p-6 bg-white border border-slate-200 rounded-2xl hover:border-brand-blue hover:shadow-md transition-all flex flex-col gap-3 group"
-              >
-                <div className="w-12 h-12 bg-blue-50 text-brand-blue rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <Briefcase className="w-6 h-6" />
-                </div>
-                <div>
-                  <h4 className="text-lg font-bold text-slate-900">Full Assessment</h4>
-                  <p className="text-sm text-slate-500 leading-relaxed mt-1">Check your eligibility for personal loans and consolidation options.</p>
-                </div>
-              </button>
-
-              <button
-                onClick={() => { setMode('cibil'); setStep(5); }}
-                className="p-6 bg-white border border-slate-200 rounded-2xl hover:border-emerald-500 hover:shadow-md transition-all flex flex-col gap-3 group"
-              >
-                <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <CreditCard className="w-6 h-6" />
-                </div>
-                <div>
-                  <h4 className="text-lg font-bold text-slate-900">Quick CIBIL Check</h4>
-                  <p className="text-sm text-slate-500 leading-relaxed mt-1">Fetch my credit report and score securely without full assessment.</p>
-                </div>
-              </button>
-            </div>
-          </motion.div>
-        );
       case 1:
         return (
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-            <h3 className="text-2xl font-bold text-text-main mb-6">Basic Information</h3>
+            <h3 className="text-2xl font-bold text-text-main mb-6">Credit Profile & Identity</h3>
             <div className="space-y-4">
               <div className="relative">
                 <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                <input type="text" placeholder="Full Name" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} className="w-full bg-white border border-slate-200 rounded-xl pl-11 pr-4 py-3.5 focus:ring-2 focus:ring-brand-blue/30 focus:border-brand-blue outline-none transition-all" />
+                <input type="text" placeholder="Full Name (As per PAN)" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} className="w-full bg-white border border-slate-200 rounded-xl pl-11 pr-4 py-3.5 focus:ring-2 focus:ring-brand-blue/30 focus:border-brand-blue outline-none transition-all" />
               </div>
-              <div className="relative">
-                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                <input type="tel" placeholder="Mobile Number" value={formData.mobile} onChange={e => setFormData({ ...formData, mobile: e.target.value })} className="w-full bg-white border border-slate-200 rounded-xl pl-11 pr-4 py-3.5 focus:ring-2 focus:ring-brand-blue/30 focus:border-brand-blue outline-none transition-all" />
-              </div>
-              <div className="relative">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                <input type="email" placeholder="Email Address" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} className="w-full bg-white border border-slate-200 rounded-xl pl-11 pr-4 py-3.5 focus:ring-2 focus:ring-brand-blue/30 focus:border-brand-blue outline-none transition-all" />
-              </div>
-              <div className="relative">
-                <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                <input type="text" placeholder="City" value={formData.city} onChange={e => setFormData({ ...formData, city: e.target.value })} className="w-full bg-white border border-slate-200 rounded-xl pl-11 pr-4 py-3.5 focus:ring-2 focus:ring-brand-blue/30 focus:border-brand-blue outline-none transition-all" />
-              </div>
-              <div className="relative">
-                <Briefcase className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                <select value={formData.employmentType} onChange={e => setFormData({ ...formData, employmentType: e.target.value })} className="w-full bg-white border border-slate-200 rounded-xl pl-11 pr-4 py-3.5 focus:ring-2 focus:ring-brand-blue/30 focus:border-brand-blue outline-none text-text-main transition-all">
-                  <option>Salaried Professional</option>
-                  <option>Self Employed</option>
-                  <option>Business Owner</option>
-                </select>
-              </div>
-            </div>
-          </motion.div>
-        );
-      case 2:
-        return (
-          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-            <h3 className="text-2xl font-bold text-text-main mb-6">Income Details</h3>
-            <div className="space-y-4">
-              <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-medium">₹</span>
-                <input type="number" placeholder="Net Monthly Income" value={formData.monthlyIncome} onChange={e => setFormData({ ...formData, monthlyIncome: e.target.value })} className="w-full bg-white border border-slate-200 rounded-xl pl-9 pr-4 py-3.5 focus:ring-2 focus:ring-brand-blue/30 focus:border-brand-blue outline-none transition-all" />
-              </div>
-              <div className="relative">
-                <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                <input type="text" placeholder="Employer Name" value={formData.employer} onChange={e => setFormData({ ...formData, employer: e.target.value })} className="w-full bg-white border border-slate-200 rounded-xl pl-11 pr-4 py-3.5 focus:ring-2 focus:ring-brand-blue/30 focus:border-brand-blue outline-none transition-all" />
-              </div>
-              <select value={formData.salaryMode} onChange={e => setFormData({ ...formData, salaryMode: e.target.value })} className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3.5 focus:ring-2 focus:ring-brand-blue/30 focus:border-brand-blue outline-none text-text-main transition-all">
-                <option>Salary Credit Mode: Bank Transfer</option>
-                <option>Salary Credit Mode: Cheque</option>
-                <option>Salary Credit Mode: Cash</option>
-              </select>
-            </div>
-          </motion.div>
-        );
-      case 3:
-        return (
-          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-            <h3 className="text-2xl font-bold text-text-main mb-6">Existing Loans</h3>
-            <div className="space-y-6 max-h-[400px] overflow-y-auto pr-2">
-              {loans.map((loan, idx) => (
-                <div key={loan.id} className="bg-slate-50 p-4 rounded-xl border border-slate-200 relative">
-                  {loans.length > 1 && (
-                    <button onClick={() => removeLoan(loan.id)} className="absolute top-4 right-4 text-slate-400 hover:text-warning-red">
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  )}
-                  <p className="text-sm font-medium text-text-muted mb-3">Loan #{idx + 1}</p>
-                  <div className="grid grid-cols-2 gap-3">
-                    <select
-                      className="col-span-2 bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none"
-                      value={loan.type}
-                      onChange={(e) => {
-                        const newLoans = [...loans];
-                        newLoans[idx].type = e.target.value;
-                        setLoans(newLoans);
-                      }}
-                    >
-                      <option>Personal Loan</option>
-                      <option>Credit Card</option>
-                      <option>App Loan</option>
-                      <option>Consumer Loan</option>
-                    </select>
-                    <input
-                      type="number" placeholder="Outstanding (₹)"
-                      value={loan.outstanding || ''}
-                      className="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none"
-                      onChange={(e) => {
-                        const newLoans = [...loans];
-                        newLoans[idx].outstanding = Number(e.target.value);
-                        setLoans(newLoans);
-                      }}
-                    />
-                    <input
-                      type="number" placeholder="EMI (₹)"
-                      value={loan.emi || ''}
-                      className="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none"
-                      onChange={(e) => {
-                        const newLoans = [...loans];
-                        newLoans[idx].emi = Number(e.target.value);
-                        setLoans(newLoans);
-                      }}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-            <button onClick={addLoan} className="mt-4 flex items-center gap-2 text-brand-blue font-medium text-sm hover:underline">
-              <Plus className="w-4 h-4" /> Add Another Loan
-            </button>
-          </motion.div>
-        );
-      case 4:
-        return (
-          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-            <h3 className="text-2xl font-bold text-text-main mb-6">What are you looking for?</h3>
-            <div className="space-y-3">
-              {['Consolidate my loans', 'Reduce my EMI', 'Balance transfer', 'Top-up loan', 'Fresh personal loan', "I'm not sure"].map((opt) => (
-                <label key={opt} className="flex items-center gap-3 p-4 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors">
-                  <input type="radio" name="requirement" value={opt} checked={formData.requirement === opt} onChange={e => setFormData({ ...formData, requirement: e.target.value })} className="w-4 h-4 text-brand-blue accent-brand-blue" />
-                  <span className="text-text-main font-medium">{opt}</span>
-                </label>
-              ))}
-            </div>
-          </motion.div>
-        );
-      case 5:
-        return (
-          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-            <h3 className="text-2xl font-bold text-text-main mb-2">Credit Profile Assessment</h3>
-            <p className="text-text-muted mb-6 text-sm">We need to review your credit profile to show you precise offers.</p>
-
-            {error && (
-              <div className="mb-4 p-3 rounded-lg bg-red-50 border border-red-200 flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
-                <p className="text-sm text-red-800">{error}</p>
-              </div>
-            )}
-
-            <div className="space-y-4">
-              {mode === 'cibil' && (
-                <>
-                  <div className="relative">
-                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                    <input type="text" placeholder="Full Name" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} className="w-full bg-white border border-slate-200 rounded-xl pl-11 pr-4 py-3.5 focus:ring-2 focus:ring-brand-blue/30 focus:border-brand-blue outline-none transition-all" />
-                  </div>
-                  <div className="relative">
-                    <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                    <input type="tel" placeholder="Mobile Number" value={formData.mobile} onChange={e => setFormData({ ...formData, mobile: e.target.value })} className="w-full bg-white border border-slate-200 rounded-xl pl-11 pr-4 py-3.5 focus:ring-2 focus:ring-brand-blue/30 focus:border-brand-blue outline-none transition-all" />
-                  </div>
-                </>
-              )}
               <div className="relative">
                 <CreditCard className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <input
@@ -401,6 +190,10 @@ export function EligibilityForm() {
                   className="w-full bg-white border border-slate-200 rounded-xl pl-11 pr-4 py-3.5 focus:ring-2 focus:ring-brand-blue/30 focus:border-brand-blue outline-none transition-all uppercase"
                   maxLength={10}
                 />
+              </div>
+              <div className="relative">
+                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <input type="tel" placeholder="Mobile Number" value={formData.mobile} onChange={e => setFormData({ ...formData, mobile: e.target.value })} className="w-full bg-white border border-slate-200 rounded-xl pl-11 pr-4 py-3.5 focus:ring-2 focus:ring-brand-blue/30 focus:border-brand-blue outline-none transition-all" />
               </div>
               <div className="relative">
                 <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -447,12 +240,29 @@ export function EligibilityForm() {
                 />
                 <span className="text-xs text-text-muted leading-relaxed">
                   <strong>Credit Report Consent</strong><br />
-                  By continuing, you consent to us retrieving your credit report from the credit bureau for eligibility assessment. I agree to the above and authorize Credit Expert India to retrieve my credit report.
+                  By continuing, I consent and authorize Credit Expert India to securely retrieve my credit report from the credit bureau.
                 </span>
               </label>
+
+              {error && (
+                <div className="p-3 rounded-lg bg-red-50 border border-red-200 flex items-start gap-3">
+                  <AlertCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
+                  <p className="text-sm text-red-800">{error}</p>
+                </div>
+              )}
+
+              <button 
+                onClick={handleFetchReport}
+                disabled={loading}
+                className="w-full mt-6 bg-brand-blue text-white py-4 rounded-xl font-bold shadow-lg shadow-brand-blue/20 hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
+              >
+                {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <span>Fetch Credit Report</span>}
+                {!loading && <ArrowRight className="w-5 h-5" />}
+              </button>
             </div>
           </motion.div>
         );
+
       case 6:
         const isEquifax = formData.bureau.startsWith("v2");
         
@@ -481,8 +291,44 @@ export function EligibilityForm() {
               enquiryDate: item.InquiryResponseHeader?.Date || "N/A",
               enquiryAmount: 0 // Equifax JSON doesn't provide an amount here
             }));
+            inquirySummary = { totalInquiry: cirDataList.length };
           }
         }
+
+        const safeAccounts = accounts || [];
+        // Assuming dateClosed indicates closed, or balance 0
+        const closedAccounts = safeAccounts.filter((a: any) => a.dateClosed || (Number(a.currentBalance) === 0));
+        const activeAccounts = safeAccounts.filter((a: any) => !closedAccounts.includes(a));
+
+        // Call Eligibility Engine
+        const engineProfile = {
+          netSalary: Number(userOverrides.netSalary) || Number(formData.monthlyIncome) || 50000,
+          employer: userOverrides.employer || formData.employer || "Unknown",
+          hasBounce: userOverrides.hasBounce || "no",
+          hasLatePayment: userOverrides.hasLatePayment || "no",
+          hasActiveOverdue: userOverrides.hasActiveOverdue || ((accountSummary?.overdueAccounts || 0) > 0 ? "yes" : "no"),
+          wantsTopUp: userOverrides.wantsTopUp || "no"
+        };
+        
+        const catBLoans = activeAccounts.map((acc: any) => {
+          const overrides = loanOverrides[acc.accountNumber] || {};
+          return {
+            id: acc.accountNumber,
+            type: overrides.type || (
+              (acc.accountType || "").includes("Personal") ? "Personal Loan" :
+              (acc.accountType || "").includes("Credit") ? "Credit Card" :
+              (acc.accountType || "").includes("Overdraft") ? "Overdraft" : "Unknown"
+            ),
+            wantsBT: overrides.wantsBT || "yes",
+            originalAmount: overrides.originalAmount || acc.highCreditAmount || 0,
+            currentOutstanding: overrides.currentOutstanding || acc.currentBalance || 0,
+            rate: overrides.rate || acc.interest_rate || 0,
+            emi: overrides.emi || acc.emiAmount || 0
+          };
+        }).filter((l: any) => l.wantsBT === 'yes');
+        
+        const { eligibleLenders, ineligibleLenders } = analyzeLenderEligibility({ profile: engineProfile, catBLoans });
+
 
         const score = cibilData?.credit_score;
 
@@ -570,7 +416,28 @@ export function EligibilityForm() {
                 </>
               )}
 
-              {/* Enquiries Summary */}
+              
+              {/* Dashboard Tabs */}
+              <div className="flex bg-slate-100 p-1 rounded-xl mb-6 overflow-x-auto no-scrollbar">
+                {[
+                  { id: 'enquiries', label: 'Recent Enquiries' },
+                  { id: 'ongoing', label: 'Ongoing Loans' },
+                  { id: 'closed', label: 'Closed Loans' },
+                  { id: 'eligibility', label: 'Eligibility Check' }
+                ].map(tab => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setDashboardTab(tab.id as any)}
+                    className={`flex-1 py-2 px-3 text-xs font-bold rounded-lg whitespace-nowrap transition-all ${dashboardTab === tab.id ? 'bg-white text-brand-blue shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+
+              {dashboardTab === 'enquiries' && (
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                  {/* Enquiries Summary */}
               {inquirySummary && (
                 <div className="bg-[#FAF8F5] border border-[#EBE6DD] rounded-3xl p-5 mb-6">
                   <h4 className="text-sm font-extrabold text-[#382F2A] mb-4">Credit Enquiries</h4>
@@ -579,21 +446,33 @@ export function EligibilityForm() {
                       <p className="text-xl font-bold text-[#382F2A]">{inquirySummary?.totalInquiry || 0}</p>
                       <p className="text-[10px] uppercase tracking-wider font-semibold text-[#8B7C73]">Total</p>
                     </div>
-                    <div className="w-px h-8 bg-[#EBE6DD]"></div>
-                    <div>
-                      <p className="text-xl font-bold text-[#382F2A]">{inquirySummary?.inquiryPast30Days || 0}</p>
-                      <p className="text-[10px] uppercase tracking-wider font-semibold text-[#8B7C73]">30 Days</p>
-                    </div>
-                    <div className="w-px h-8 bg-[#EBE6DD]"></div>
-                    <div>
-                      <p className="text-xl font-bold text-[#382F2A]">{inquirySummary?.inquiryPast12Months || 0}</p>
-                      <p className="text-[10px] uppercase tracking-wider font-semibold text-[#8B7C73]">12 Mos</p>
-                    </div>
-                    <div className="w-px h-8 bg-[#EBE6DD]"></div>
-                    <div>
-                      <p className="text-xl font-bold text-[#382F2A]">{inquirySummary?.inquiryPast24Months || 0}</p>
-                      <p className="text-[10px] uppercase tracking-wider font-semibold text-[#8B7C73]">24 Mos</p>
-                    </div>
+                    {inquirySummary?.inquiryPast30Days !== undefined && (
+                      <>
+                        <div className="w-px h-8 bg-[#EBE6DD]"></div>
+                        <div>
+                          <p className="text-xl font-bold text-[#382F2A]">{inquirySummary?.inquiryPast30Days || 0}</p>
+                          <p className="text-[10px] uppercase tracking-wider font-semibold text-[#8B7C73]">30 Days</p>
+                        </div>
+                      </>
+                    )}
+                    {inquirySummary?.inquiryPast12Months !== undefined && (
+                      <>
+                        <div className="w-px h-8 bg-[#EBE6DD]"></div>
+                        <div>
+                          <p className="text-xl font-bold text-[#382F2A]">{inquirySummary?.inquiryPast12Months || 0}</p>
+                          <p className="text-[10px] uppercase tracking-wider font-semibold text-[#8B7C73]">12 Mos</p>
+                        </div>
+                      </>
+                    )}
+                    {inquirySummary?.inquiryPast24Months !== undefined && (
+                      <>
+                        <div className="w-px h-8 bg-[#EBE6DD]"></div>
+                        <div>
+                          <p className="text-xl font-bold text-[#382F2A]">{inquirySummary?.inquiryPast24Months || 0}</p>
+                          <p className="text-[10px] uppercase tracking-wider font-semibold text-[#8B7C73]">24 Mos</p>
+                        </div>
+                      </>
+                    )}
                   </div>
                   <p className="text-[11px] text-[#8B7C73] leading-relaxed">
                     <span className="font-bold text-[#382F2A]">Note:</span> Frequent credit enquiries can be one factor considered in credit assessment. The impact depends on the overall credit profile.
@@ -601,7 +480,8 @@ export function EligibilityForm() {
                 </div>
               )}
 
-              {/* Enquiries List */}
+              
+                  {/* Enquiries List */}
               {enquiries && enquiries.length > 0 && (
                 <div className="mb-6">
                   <h4 className="text-lg font-bold text-[#382F2A] mb-4">Recent Enquiries</h4>
@@ -613,8 +493,12 @@ export function EligibilityForm() {
                            <p className="text-xs font-semibold text-[#8B7C73] mt-0.5">Date: {enq.enquiryDate || 'N/A'}</p>
                          </div>
                          <div className="text-right">
-                           <p className="text-sm font-bold text-[#382F2A]">₹{Number(enq.enquiryAmount || 0).toLocaleString('en-IN')}</p>
-                           <p className="text-[10px] font-semibold text-[#8B7C73] uppercase tracking-wider mt-0.5">Amount</p>
+                           {Number(enq.enquiryAmount) > 0 && (
+                             <>
+                               <p className="text-sm font-bold text-[#382F2A]">₹{Number(enq.enquiryAmount).toLocaleString('en-IN')}</p>
+                               <p className="text-[10px] font-semibold text-[#8B7C73] uppercase tracking-wider mt-0.5">Amount</p>
+                             </>
+                           )}
                          </div>
                       </div>
                     ))}
@@ -622,37 +506,18 @@ export function EligibilityForm() {
                 </div>
               )}
 
-              {/* Equifax Personal Info (Fallback) */}
-              {isEquifax && (
-                 <div className="bg-[#FAF8F5] border border-[#EBE6DD] rounded-3xl p-5 mb-6">
-                  <h4 className="text-sm font-extrabold text-[#382F2A] mb-4">Equifax Profile Data</h4>
-                  {equifaxPersonalInfo && (
-                    <div className="grid grid-cols-2 gap-4 mb-4">
-                       <div>
-                         <p className="text-[10px] uppercase tracking-wider font-bold text-[#8B7C73]">Name</p>
-                         <p className="text-sm font-bold text-[#382F2A]">{equifaxPersonalInfo.Name?.FullName || 'N/A'}</p>
-                       </div>
-                       <div>
-                         <p className="text-[10px] uppercase tracking-wider font-bold text-[#8B7C73]">Date of Birth</p>
-                         <p className="text-sm font-bold text-[#382F2A]">{equifaxPersonalInfo.DateOfBirth || 'N/A'}</p>
-                       </div>
-                    </div>
-                  )}
-                  <div className="p-3 bg-white border border-[#EBE6DD] rounded-xl text-center">
-                    <p className="text-xs text-[#8B7C73] leading-relaxed">
-                      Equifax does not return detailed credit accounts in their JSON response. 
-                      <br/>Please use the <strong>Equifax (PDF Only)</strong> option to view full account details.
-                    </p>
-                  </div>
-                 </div>
+              
+                </motion.div>
               )}
 
-              {/* Accounts List */}
-              {accounts && accounts.length > 0 && (
+              {dashboardTab === 'ongoing' && (
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                  {/* Accounts List */}
+              {activeAccounts && activeAccounts.length > 0 && (
                 <div>
-                  <h4 className="text-lg font-bold text-[#382F2A] mb-4">Credit Accounts</h4>
+                  <h4 className="text-lg font-bold text-[#382F2A] mb-4">Ongoing Loans</h4>
                   <div className="space-y-3">
-                    {accounts.map((acc: any, i: number) => {
+                    {activeAccounts.map((acc: any, i: number) => {
                       const isExpanded = expandedAccount === acc.accountNumber;
                       return (
                         <div key={i} className="bg-white border border-[#EBE6DD] rounded-2xl overflow-hidden transition-all shadow-sm">
@@ -716,33 +581,279 @@ export function EligibilityForm() {
                   </div>
                 </div>
               )}
-            </div>
 
-            {/* Original Consolidation Estimates */}
-            {mode === 'full' && (
-              <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-6 mb-8 text-left">
-                <h4 className="font-semibold text-emerald-800 mb-4 text-center">You may be able to simplify your repayments.</h4>
-                <div className="flex justify-between items-center py-3 border-b border-emerald-200/50">
-                  <span className="text-text-muted text-sm">Self-Reported Current EMI</span>
-                  <span className="font-semibold line-through text-slate-400">₹{totalEmi.toLocaleString('en-IN')}</span>
+              
+                  {(!activeAccounts || activeAccounts.length === 0) && (
+                    <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 text-center">
+                      <p className="text-sm font-medium text-slate-500">No ongoing loans found.</p>
+                    </div>
+                  )}
+                </motion.div>
+              )}
+
+              {dashboardTab === 'closed' && (
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                  {/* Accounts List */}
+              {closedAccounts && closedAccounts.length > 0 && (
+                <div>
+                  <h4 className="text-lg font-bold text-[#382F2A] mb-4">Closed Loans</h4>
+                  <div className="space-y-3">
+                    {closedAccounts.map((acc: any, i: number) => {
+                      const isExpanded = expandedAccount === acc.accountNumber;
+                      return (
+                        <div key={i} className="bg-white border border-[#EBE6DD] rounded-2xl overflow-hidden transition-all shadow-sm">
+                          <button
+                            onClick={() => setExpandedAccount(isExpanded ? null : acc.accountNumber)}
+                            className="w-full flex items-center justify-between p-4 hover:bg-[#FAF8F5] transition-colors"
+                          >
+                            <div className="text-left">
+                              <p className="text-sm font-bold text-[#382F2A]">{acc.memberShortName || 'Unknown Lender'}</p>
+                              <p className="text-xs font-semibold text-[#8B7C73] mt-0.5">{acc.accountType || 'Unknown Type'}</p>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <div className="text-right">
+                                <p className="text-sm font-bold text-[#382F2A]">₹{Number(acc.currentBalance || 0).toLocaleString('en-IN')}</p>
+                                <p className="text-[10px] font-semibold text-[#8B7C73] uppercase tracking-wider mt-0.5">Balance</p>
+                              </div>
+                              {isExpanded ? <ChevronUp className="w-4 h-4 text-[#8B7C73]" /> : <ChevronDown className="w-4 h-4 text-[#8B7C73]" />}
+                            </div>
+                          </button>
+
+                          <AnimatePresence>
+                            {isExpanded && (
+                              <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: "auto", opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                className="border-t border-[#EBE6DD]"
+                              >
+                                <div className="p-4 grid grid-cols-2 gap-y-4 gap-x-2 bg-[#FAF8F5]">
+                                  <div>
+                                    <p className="text-[10px] font-bold text-[#8B7C73] uppercase">Account Number</p>
+                                    <p className="text-sm font-semibold text-[#382F2A]">{acc.accountNumber || 'N/A'}</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-[10px] font-bold text-[#8B7C73] uppercase">High Credit</p>
+                                    <p className="text-sm font-semibold text-[#382F2A]">₹{Number(acc.highCreditAmount || 0).toLocaleString('en-IN')}</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-[10px] font-bold text-[#8B7C73] uppercase">EMI</p>
+                                    <p className="text-sm font-semibold text-[#382F2A]">{acc.emiAmount ? `₹${Number(acc.emiAmount).toLocaleString('en-IN')}` : 'N/A'}</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-[10px] font-bold text-[#8B7C73] uppercase">Interest Rate</p>
+                                    <p className="text-sm font-semibold text-[#382F2A]">{acc.interest_rate ? `${acc.interest_rate}%` : 'N/A'}</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-[10px] font-bold text-[#8B7C73] uppercase">Date Opened</p>
+                                    <p className="text-sm font-semibold text-[#382F2A]">{acc.dateOpened || 'N/A'}</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-[10px] font-bold text-[#8B7C73] uppercase">Date Reported</p>
+                                    <p className="text-sm font-semibold text-[#382F2A]">{acc.dateReported || 'N/A'}</p>
+                                  </div>
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
-                <div className="flex justify-between items-center py-3 border-b border-emerald-200/50">
-                  <span className="text-text-muted text-sm">Self-Reported Outstanding</span>
-                  <span className="font-semibold text-slate-700">₹{totalOutstanding.toLocaleString('en-IN')}</span>
-                </div>
-                <div className="flex justify-between items-center py-3">
-                  <span className="text-emerald-700 font-medium">Potential New EMI</span>
-                  <span className="font-bold text-emerald-600 text-xl">₹{estConsolidatedEmi.toLocaleString('en-IN')}</span>
-                </div>
-                {totalEmi > estConsolidatedEmi && (
-                  <div className="mt-4 bg-white rounded-xl p-4 text-center border border-emerald-100">
-                    <span className="block text-sm text-text-muted mb-1">Potential monthly difference</span>
-                    <span className="text-2xl font-bold text-emerald-500">₹{(totalEmi - estConsolidatedEmi).toLocaleString('en-IN')}</span>
+              )}
+
+              
+                  {(!closedAccounts || closedAccounts.length === 0) && (
+                    <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 text-center">
+                      <p className="text-sm font-medium text-slate-500">No closed loans found.</p>
+                    </div>
+                  )}
+                </motion.div>
+              )}
+
+              {dashboardTab === 'eligibility' && (
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                  {/* Equifax Personal Info (Fallback) */}
+              {isEquifax && (
+                 <div className="bg-[#FAF8F5] border border-[#EBE6DD] rounded-3xl p-5 mb-6">
+                  <h4 className="text-sm font-extrabold text-[#382F2A] mb-4">Equifax Profile Data</h4>
+                  {equifaxPersonalInfo && (
+                    <div className="grid grid-cols-2 gap-4 mb-4">
+                       <div>
+                         <p className="text-[10px] uppercase tracking-wider font-bold text-[#8B7C73]">Name</p>
+                         <p className="text-sm font-bold text-[#382F2A]">{equifaxPersonalInfo.Name?.FullName || 'N/A'}</p>
+                       </div>
+                       <div>
+                         <p className="text-[10px] uppercase tracking-wider font-bold text-[#8B7C73]">Date of Birth</p>
+                         <p className="text-sm font-bold text-[#382F2A]">{equifaxPersonalInfo.DateOfBirth || 'N/A'}</p>
+                       </div>
+                    </div>
+                  )}
+                  <div className="p-3 bg-white border border-[#EBE6DD] rounded-xl text-center">
+                    <p className="text-xs text-[#8B7C73] leading-relaxed">
+                      Equifax does not return detailed credit accounts in their JSON response. 
+                      <br/>Please use the <strong>Equifax (PDF Only)</strong> option to view full account details.
+                    </p>
+                  </div>
+                 </div>
+              )}
+
+              
+                  
+                  {/* Profile Edit & Open Loans Form */}
+                  <div className="mb-6">
+                    <h4 className="text-lg font-bold text-[#382F2A] mb-4">Complete Profile for Accurate Eligibility</h4>
+                    
+                    <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 mb-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-xs font-semibold text-slate-600 mb-1 block">Net Monthly Salary</label>
+                          <input 
+                            type="number" 
+                            value={userOverrides.netSalary || formData.monthlyIncome || ""} 
+                            onChange={e => setUserOverrides({...userOverrides, netSalary: e.target.value})} 
+                            className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm focus:border-brand-blue outline-none"
+                            placeholder="e.g. 50000"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs font-semibold text-slate-600 mb-1 block">Employer</label>
+                          <input 
+                            type="text" 
+                            value={userOverrides.employer || formData.employer || ""} 
+                            onChange={e => setUserOverrides({...userOverrides, employer: e.target.value})} 
+                            className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm focus:border-brand-blue outline-none"
+                            placeholder="e.g. TCS"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs font-semibold text-slate-600 mb-1 block">Any EMI Bounce (6M)?</label>
+                          <select 
+                            value={userOverrides.hasBounce || "no"} 
+                            onChange={e => setUserOverrides({...userOverrides, hasBounce: e.target.value})}
+                            className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm focus:border-brand-blue outline-none"
+                          >
+                            <option value="no">No</option>
+                            <option value="yes">Yes</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="text-xs font-semibold text-slate-600 mb-1 block">Want Top-Up Loan?</label>
+                          <select 
+                            value={userOverrides.wantsTopUp || "no"} 
+                            onChange={e => setUserOverrides({...userOverrides, wantsTopUp: e.target.value})}
+                            className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm focus:border-brand-blue outline-none"
+                          >
+                            <option value="no">No</option>
+                            <option value="yes">Yes</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+
+                    <h4 className="text-lg font-bold text-[#382F2A] mb-4">Review Open Loans</h4>
+                    <div className="space-y-4 mb-8">
+                      {catBLoans.length === 0 && <p className="text-sm text-slate-500">No active loans found to evaluate.</p>}
+                      {catBLoans.map((loan: any, idx: number) => {
+                        const l = loanOverrides[loan.id] || {};
+                        return (
+                          <div key={loan.id} className="bg-white border border-[#EBE6DD] rounded-2xl p-4 shadow-sm">
+                            <div className="flex justify-between items-center mb-3 border-b border-slate-100 pb-2">
+                              <p className="font-bold text-sm text-[#382F2A]">Loan #{idx + 1} ({loan.type})</p>
+                              <label className="text-xs font-semibold flex items-center gap-1.5 cursor-pointer text-slate-600">
+                                <input 
+                                  type="checkbox" 
+                                  checked={loan.wantsBT === 'yes'}
+                                  onChange={e => setLoanOverrides({...loanOverrides, [loan.id]: {...l, wantsBT: e.target.checked ? 'yes' : 'no'}})}
+                                  className="w-4 h-4 text-brand-blue accent-brand-blue rounded border-slate-300"
+                                />
+                                Consolidate This?
+                              </label>
+                            </div>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                               <div>
+                                 <label className="text-[10px] uppercase font-bold text-[#8B7C73]">EMI</label>
+                                 <input 
+                                   type="number" 
+                                   value={loan.emi || ""} 
+                                   onChange={e => setLoanOverrides({...loanOverrides, [loan.id]: {...l, emi: e.target.value}})}
+                                   className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-brand-blue"
+                                 />
+                               </div>
+                               <div>
+                                 <label className="text-[10px] uppercase font-bold text-[#8B7C73]">Interest Rate %</label>
+                                 <input 
+                                   type="number" 
+                                   value={loan.rate || ""} 
+                                   onChange={e => setLoanOverrides({...loanOverrides, [loan.id]: {...l, rate: e.target.value}})}
+                                   className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-brand-blue"
+                                 />
+                               </div>
+                               <div>
+                                 <label className="text-[10px] uppercase font-bold text-[#8B7C73]">Type</label>
+                                 <select 
+                                   value={loan.type || "Personal Loan"} 
+                                   onChange={e => setLoanOverrides({...loanOverrides, [loan.id]: {...l, type: e.target.value}})}
+                                   className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-brand-blue"
+                                 >
+                                   <option value="Personal Loan">Personal Loan</option>
+                                   <option value="Credit Card">Credit Card</option>
+                                   <option value="App Loan">App Loan</option>
+                                   <option value="Overdraft">Overdraft</option>
+                                   <option value="Unknown">Unknown</option>
+                                 </select>
+                               </div>
+                               <div>
+                                 <label className="text-[10px] uppercase font-bold text-[#8B7C73]">Current Bal.</label>
+                                 <input 
+                                   type="number" 
+                                   value={loan.currentOutstanding || ""} 
+                                   onChange={e => setLoanOverrides({...loanOverrides, [loan.id]: {...l, currentOutstanding: e.target.value}})}
+                                   className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-brand-blue"
+                                 />
+                               </div>
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Eligibility Engine Results */}
+
+              <div className="mb-6">
+                <h4 className="text-lg font-bold text-[#382F2A] mb-4">Eligible Consolidation Options</h4>
+                {eligibleLenders.length > 0 ? (
+                  <div className="space-y-3">
+                    {eligibleLenders.map((lender: any, i: number) => (
+                      <div key={i} className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-bold text-emerald-900">{lender.name}</p>
+                          <p className="text-xs font-semibold text-emerald-700 mt-0.5">Est. Rate: {lender.headlineRate}%</p>
+                        </div>
+                        <div className="text-right">
+                          <span className="text-[10px] font-bold px-2 py-1 bg-emerald-100 text-emerald-800 rounded-full uppercase">
+                            {lender.outcome === 'ELIGIBLE' ? 'High Match' : 'Conditional'}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-center">
+                    <p className="text-sm font-medium text-amber-800">
+                      Based on this initial data, standard consolidation options require deeper review. 
+                    </p>
                   </div>
                 )}
               </div>
-            )}
 
+            
+                </motion.div>
+              )}
+
+</div>
             <button className="w-full py-4 bg-brand-blue text-white rounded-xl font-medium hover:bg-blue-800 transition-all duration-300 active:scale-95 shadow-sm hover:shadow-md">
               Speak with a Consolidation Expert
             </button>
@@ -762,65 +873,13 @@ export function EligibilityForm() {
       </div>
 
       <div className="w-full bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-200/60 overflow-hidden">
-        {/* Progress Bar */}
-        {step > 0 && (
-          <div className="flex h-2 w-full bg-slate-100">
-            <motion.div
-              className="bg-brand-blue h-full"
-              initial={{ width: mode === 'cibil' ? "50%" : "16.6%" }}
-              animate={{ width: mode === 'cibil' ? (step === 5 ? "50%" : "100%") : `${(step / 6) * 100}%` }}
-              transition={{ duration: 0.3 }}
-            />
-          </div>
-        )}
-        {step > 0 && step < 6 && (
-          <div className="px-8 md:px-12 pt-4 pb-0">
-            <p className="text-xs font-semibold text-text-muted tracking-wide">
-              {mode === 'cibil' ? `Step 1 of 1` : `Step ${step} of 5`}
-            </p>
-          </div>
-        )}
-
         <div className="p-8 md:p-12">
           <AnimatePresence mode="wait">
             {renderStep()}
           </AnimatePresence>
 
-          {step > 0 && step < 6 && (
-            <div className="mt-8 flex items-center justify-between pt-6 border-t border-slate-100">
-              <button
-                onClick={prevStep}
-                disabled={loading}
-                className={`px-6 py-2 rounded-lg font-medium transition-all duration-300 active:scale-95 ${step === 0 ? 'hidden' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900 disabled:opacity-50'}`}
-              >
-                Back
-              </button>
-
-              {step === 5 ? (
-                <button
-                  onClick={handleFetchReport}
-                  disabled={loading}
-                  className="px-8 py-3 bg-brand-blue text-white rounded-xl font-medium hover:bg-blue-700 transition-all duration-300 active:scale-95 shadow-sm hover:shadow-md flex items-center gap-2 group disabled:opacity-70 disabled:hover:bg-brand-blue disabled:active:scale-100"
-                >
-                  {loading ? (
-                    <><Loader2 className="w-4 h-4 animate-spin" /> Fetching...</>
-                  ) : (
-                    <><Shield className="w-4 h-4" /> Fetch Credit Report</>
-                  )}
-                </button>
-              ) : (
-                <button
-                  onClick={nextStep}
-                  disabled={loading}
-                  className="px-8 py-3 bg-brand-blue text-white rounded-xl font-medium hover:bg-blue-700 transition-all duration-300 active:scale-95 shadow-sm hover:shadow-md flex items-center gap-2 group"
-                >
-                  Next Step <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-                </button>
-              )}
-            </div>
-          )}
-          {step > 0 && step < 6 && (
-            <div className="flex items-center justify-center gap-2 pt-4 text-xs text-slate-400">
+          {step === 1 && (
+            <div className="flex items-center justify-center gap-2 pt-8 text-xs text-slate-400">
               <Shield className="w-3.5 h-3.5" />
               <span>Your information is secure and never shared without consent.</span>
             </div>
