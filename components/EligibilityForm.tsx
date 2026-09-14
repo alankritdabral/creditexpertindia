@@ -52,7 +52,7 @@ export function EligibilityForm() {
       // 1. Check Database First
       const docId = `${formData.pan.toUpperCase()}_${formData.mobile}_${formData.bureau}`;
       const docRef = doc(db, "credit_reports", docId);
-      
+
       try {
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
@@ -62,7 +62,7 @@ export function EligibilityForm() {
             createdAt = typeof data.created_at.toDate === 'function' ? data.created_at.toDate() : new Date(data.created_at);
           }
           const daysOld = (new Date().getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24);
-          
+
           if (daysOld > 30) {
             setError("Your report in our system has expired (older than 30 days). Please contact support for a new assessment.");
             setLoading(false);
@@ -92,10 +92,10 @@ export function EligibilityForm() {
       // 2. Not in DB or no cache -> Fetch from Surepass
       const isV2 = formData.bureau.startsWith("v2");
       const isPdf = formData.bureau.endsWith("_pdf");
-      
+
       let endpoint = "";
       if (isV2) {
-        endpoint = isPdf 
+        endpoint = isPdf
           ? "https://kyc-api.surepass.app/api/v1/credit-report-v2/fetch-pdf-report"
           : "https://kyc-api.surepass.app/api/v1/credit-report-v2/fetch-report";
       } else {
@@ -251,7 +251,7 @@ export function EligibilityForm() {
                 </div>
               )}
 
-              <button 
+              <button
                 onClick={handleFetchReport}
                 disabled={loading}
                 className="w-full mt-6 bg-brand-blue text-white py-4 rounded-xl font-bold shadow-lg shadow-brand-blue/20 hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
@@ -265,7 +265,7 @@ export function EligibilityForm() {
 
       case 6:
         const isEquifax = formData.bureau.startsWith("v2");
-        
+
         let accountSummary = null;
         let inquirySummary = null;
         let accounts = null;
@@ -284,7 +284,7 @@ export function EligibilityForm() {
           const cirDataList = cibilData?.credit_report?.CCRResponse?.CIRReportDataLst || [];
           const firstCirData = cirDataList[0]?.CIRReportData;
           equifaxPersonalInfo = firstCirData?.IDAndContactInfo?.PersonalInfo;
-          
+
           if (cirDataList.length > 0) {
             enquiries = cirDataList.map((item: any) => ({
               memberShortName: item.InquiryResponseHeader?.CustomerName || "Unknown Lender",
@@ -296,8 +296,8 @@ export function EligibilityForm() {
         }
 
         const safeAccounts = accounts || [];
-        // Assuming dateClosed indicates closed, or balance 0
-        const closedAccounts = safeAccounts.filter((a: any) => a.dateClosed || (Number(a.currentBalance) === 0));
+        // A closed loan is exactly one that has 0 balance left
+        const closedAccounts = safeAccounts.filter((a: any) => Number(a.currentBalance) === 0);
         const activeAccounts = safeAccounts.filter((a: any) => !closedAccounts.includes(a));
 
         // Call Eligibility Engine
@@ -309,15 +309,15 @@ export function EligibilityForm() {
           hasActiveOverdue: userOverrides.hasActiveOverdue || ((accountSummary?.overdueAccounts || 0) > 0 ? "yes" : "no"),
           wantsTopUp: userOverrides.wantsTopUp || "no"
         };
-        
+
         const catBLoans = activeAccounts.map((acc: any) => {
           const overrides = loanOverrides[acc.accountNumber] || {};
           return {
             id: acc.accountNumber,
             type: overrides.type || (
               (acc.accountType || "").includes("Personal") ? "Personal Loan" :
-              (acc.accountType || "").includes("Credit") ? "Credit Card" :
-              (acc.accountType || "").includes("Overdraft") ? "Overdraft" : "Unknown"
+                (acc.accountType || "").includes("Credit") ? "Credit Card" :
+                  (acc.accountType || "").includes("Overdraft") ? "Overdraft" : "Unknown"
             ),
             wantsBT: overrides.wantsBT || "yes",
             originalAmount: overrides.originalAmount || acc.highCreditAmount || 0,
@@ -326,7 +326,7 @@ export function EligibilityForm() {
             emi: overrides.emi || acc.emiAmount || 0
           };
         }).filter((l: any) => l.wantsBT === 'yes');
-        
+
         const { eligibleLenders, ineligibleLenders } = analyzeLenderEligibility({ profile: engineProfile, catBLoans });
 
 
@@ -416,7 +416,7 @@ export function EligibilityForm() {
                 </>
               )}
 
-              
+
               {/* Dashboard Tabs */}
               <div className="flex bg-slate-100 p-1 rounded-xl mb-6 overflow-x-auto no-scrollbar">
                 {[
@@ -438,151 +438,151 @@ export function EligibilityForm() {
               {dashboardTab === 'enquiries' && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                   {/* Enquiries Summary */}
-              {inquirySummary && (
-                <div className="bg-[#FAF8F5] border border-[#EBE6DD] rounded-3xl p-5 mb-6">
-                  <h4 className="text-sm font-extrabold text-[#382F2A] mb-4">Credit Enquiries</h4>
-                  <div className="flex items-center justify-between gap-2 text-center border-b border-[#EBE6DD] pb-4 mb-4">
-                    <div>
-                      <p className="text-xl font-bold text-[#382F2A]">{inquirySummary?.totalInquiry || 0}</p>
-                      <p className="text-[10px] uppercase tracking-wider font-semibold text-[#8B7C73]">Total</p>
-                    </div>
-                    {inquirySummary?.inquiryPast30Days !== undefined && (
-                      <>
-                        <div className="w-px h-8 bg-[#EBE6DD]"></div>
+                  {inquirySummary && (
+                    <div className="bg-[#FAF8F5] border border-[#EBE6DD] rounded-3xl p-5 mb-6">
+                      <h4 className="text-sm font-extrabold text-[#382F2A] mb-4">Credit Enquiries</h4>
+                      <div className="flex items-center justify-between gap-2 text-center border-b border-[#EBE6DD] pb-4 mb-4">
                         <div>
-                          <p className="text-xl font-bold text-[#382F2A]">{inquirySummary?.inquiryPast30Days || 0}</p>
-                          <p className="text-[10px] uppercase tracking-wider font-semibold text-[#8B7C73]">30 Days</p>
+                          <p className="text-xl font-bold text-[#382F2A]">{inquirySummary?.totalInquiry || 0}</p>
+                          <p className="text-[10px] uppercase tracking-wider font-semibold text-[#8B7C73]">Total</p>
                         </div>
-                      </>
-                    )}
-                    {inquirySummary?.inquiryPast12Months !== undefined && (
-                      <>
-                        <div className="w-px h-8 bg-[#EBE6DD]"></div>
-                        <div>
-                          <p className="text-xl font-bold text-[#382F2A]">{inquirySummary?.inquiryPast12Months || 0}</p>
-                          <p className="text-[10px] uppercase tracking-wider font-semibold text-[#8B7C73]">12 Mos</p>
-                        </div>
-                      </>
-                    )}
-                    {inquirySummary?.inquiryPast24Months !== undefined && (
-                      <>
-                        <div className="w-px h-8 bg-[#EBE6DD]"></div>
-                        <div>
-                          <p className="text-xl font-bold text-[#382F2A]">{inquirySummary?.inquiryPast24Months || 0}</p>
-                          <p className="text-[10px] uppercase tracking-wider font-semibold text-[#8B7C73]">24 Mos</p>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                  <p className="text-[11px] text-[#8B7C73] leading-relaxed">
-                    <span className="font-bold text-[#382F2A]">Note:</span> Frequent credit enquiries can be one factor considered in credit assessment. The impact depends on the overall credit profile.
-                  </p>
-                </div>
-              )}
-
-              
-                  {/* Enquiries List */}
-              {enquiries && enquiries.length > 0 && (
-                <div className="mb-6">
-                  <h4 className="text-lg font-bold text-[#382F2A] mb-4">Recent Enquiries</h4>
-                  <div className="space-y-3">
-                    {enquiries.map((enq: any, i: number) => (
-                      <div key={i} className="bg-white border border-[#EBE6DD] rounded-2xl p-4 shadow-sm flex items-center justify-between">
-                         <div className="text-left">
-                           <p className="text-sm font-bold text-[#382F2A]">{enq.memberShortName || 'Unknown Lender'}</p>
-                           <p className="text-xs font-semibold text-[#8B7C73] mt-0.5">Date: {enq.enquiryDate || 'N/A'}</p>
-                         </div>
-                         <div className="text-right">
-                           {Number(enq.enquiryAmount) > 0 && (
-                             <>
-                               <p className="text-sm font-bold text-[#382F2A]">₹{Number(enq.enquiryAmount).toLocaleString('en-IN')}</p>
-                               <p className="text-[10px] font-semibold text-[#8B7C73] uppercase tracking-wider mt-0.5">Amount</p>
-                             </>
-                           )}
-                         </div>
+                        {inquirySummary?.inquiryPast30Days !== undefined && (
+                          <>
+                            <div className="w-px h-8 bg-[#EBE6DD]"></div>
+                            <div>
+                              <p className="text-xl font-bold text-[#382F2A]">{inquirySummary?.inquiryPast30Days || 0}</p>
+                              <p className="text-[10px] uppercase tracking-wider font-semibold text-[#8B7C73]">30 Days</p>
+                            </div>
+                          </>
+                        )}
+                        {inquirySummary?.inquiryPast12Months !== undefined && (
+                          <>
+                            <div className="w-px h-8 bg-[#EBE6DD]"></div>
+                            <div>
+                              <p className="text-xl font-bold text-[#382F2A]">{inquirySummary?.inquiryPast12Months || 0}</p>
+                              <p className="text-[10px] uppercase tracking-wider font-semibold text-[#8B7C73]">12 Mos</p>
+                            </div>
+                          </>
+                        )}
+                        {inquirySummary?.inquiryPast24Months !== undefined && (
+                          <>
+                            <div className="w-px h-8 bg-[#EBE6DD]"></div>
+                            <div>
+                              <p className="text-xl font-bold text-[#382F2A]">{inquirySummary?.inquiryPast24Months || 0}</p>
+                              <p className="text-[10px] uppercase tracking-wider font-semibold text-[#8B7C73]">24 Mos</p>
+                            </div>
+                          </>
+                        )}
                       </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+                      <p className="text-[11px] text-[#8B7C73] leading-relaxed">
+                        <span className="font-bold text-[#382F2A]">Note:</span> Frequent credit enquiries can be one factor considered in credit assessment. The impact depends on the overall credit profile.
+                      </p>
+                    </div>
+                  )}
 
-              
+
+                  {/* Enquiries List */}
+                  {enquiries && enquiries.length > 0 && (
+                    <div className="mb-6">
+                      <h4 className="text-lg font-bold text-[#382F2A] mb-4">Recent Enquiries</h4>
+                      <div className="space-y-3">
+                        {enquiries.map((enq: any, i: number) => (
+                          <div key={i} className="bg-white border border-[#EBE6DD] rounded-2xl p-4 shadow-sm flex items-center justify-between">
+                            <div className="text-left">
+                              <p className="text-sm font-bold text-[#382F2A]">{enq.memberShortName || 'Unknown Lender'}</p>
+                              <p className="text-xs font-semibold text-[#8B7C73] mt-0.5">Date: {enq.enquiryDate || 'N/A'}</p>
+                            </div>
+                            <div className="text-right">
+                              {Number(enq.enquiryAmount) > 0 && (
+                                <>
+                                  <p className="text-sm font-bold text-[#382F2A]">₹{Number(enq.enquiryAmount).toLocaleString('en-IN')}</p>
+                                  <p className="text-[10px] font-semibold text-[#8B7C73] uppercase tracking-wider mt-0.5">Amount</p>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+
                 </motion.div>
               )}
 
               {dashboardTab === 'ongoing' && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                   {/* Accounts List */}
-              {activeAccounts && activeAccounts.length > 0 && (
-                <div>
-                  <h4 className="text-lg font-bold text-[#382F2A] mb-4">Ongoing Loans</h4>
-                  <div className="space-y-3">
-                    {activeAccounts.map((acc: any, i: number) => {
-                      const isExpanded = expandedAccount === acc.accountNumber;
-                      return (
-                        <div key={i} className="bg-white border border-[#EBE6DD] rounded-2xl overflow-hidden transition-all shadow-sm">
-                          <button
-                            onClick={() => setExpandedAccount(isExpanded ? null : acc.accountNumber)}
-                            className="w-full flex items-center justify-between p-4 hover:bg-[#FAF8F5] transition-colors"
-                          >
-                            <div className="text-left">
-                              <p className="text-sm font-bold text-[#382F2A]">{acc.memberShortName || 'Unknown Lender'}</p>
-                              <p className="text-xs font-semibold text-[#8B7C73] mt-0.5">{acc.accountType || 'Unknown Type'}</p>
-                            </div>
-                            <div className="flex items-center gap-3">
-                              <div className="text-right">
-                                <p className="text-sm font-bold text-[#382F2A]">₹{Number(acc.currentBalance || 0).toLocaleString('en-IN')}</p>
-                                <p className="text-[10px] font-semibold text-[#8B7C73] uppercase tracking-wider mt-0.5">Balance</p>
-                              </div>
-                              {isExpanded ? <ChevronUp className="w-4 h-4 text-[#8B7C73]" /> : <ChevronDown className="w-4 h-4 text-[#8B7C73]" />}
-                            </div>
-                          </button>
-
-                          <AnimatePresence>
-                            {isExpanded && (
-                              <motion.div
-                                initial={{ height: 0, opacity: 0 }}
-                                animate={{ height: "auto", opacity: 1 }}
-                                exit={{ height: 0, opacity: 0 }}
-                                className="border-t border-[#EBE6DD]"
+                  {activeAccounts && activeAccounts.length > 0 && (
+                    <div>
+                      <h4 className="text-lg font-bold text-[#382F2A] mb-4">Ongoing Loans</h4>
+                      <div className="space-y-3">
+                        {activeAccounts.map((acc: any, i: number) => {
+                          const isExpanded = expandedAccount === acc.accountNumber;
+                          return (
+                            <div key={i} className="bg-white border border-[#EBE6DD] rounded-2xl overflow-hidden transition-all shadow-sm">
+                              <button
+                                onClick={() => setExpandedAccount(isExpanded ? null : acc.accountNumber)}
+                                className="w-full flex items-center justify-between p-4 hover:bg-[#FAF8F5] transition-colors"
                               >
-                                <div className="p-4 grid grid-cols-2 gap-y-4 gap-x-2 bg-[#FAF8F5]">
-                                  <div>
-                                    <p className="text-[10px] font-bold text-[#8B7C73] uppercase">Account Number</p>
-                                    <p className="text-sm font-semibold text-[#382F2A]">{acc.accountNumber || 'N/A'}</p>
-                                  </div>
-                                  <div>
-                                    <p className="text-[10px] font-bold text-[#8B7C73] uppercase">High Credit</p>
-                                    <p className="text-sm font-semibold text-[#382F2A]">₹{Number(acc.highCreditAmount || 0).toLocaleString('en-IN')}</p>
-                                  </div>
-                                  <div>
-                                    <p className="text-[10px] font-bold text-[#8B7C73] uppercase">EMI</p>
-                                    <p className="text-sm font-semibold text-[#382F2A]">{acc.emiAmount ? `₹${Number(acc.emiAmount).toLocaleString('en-IN')}` : 'N/A'}</p>
-                                  </div>
-                                  <div>
-                                    <p className="text-[10px] font-bold text-[#8B7C73] uppercase">Interest Rate</p>
-                                    <p className="text-sm font-semibold text-[#382F2A]">{acc.interest_rate ? `${acc.interest_rate}%` : 'N/A'}</p>
-                                  </div>
-                                  <div>
-                                    <p className="text-[10px] font-bold text-[#8B7C73] uppercase">Date Opened</p>
-                                    <p className="text-sm font-semibold text-[#382F2A]">{acc.dateOpened || 'N/A'}</p>
-                                  </div>
-                                  <div>
-                                    <p className="text-[10px] font-bold text-[#8B7C73] uppercase">Date Reported</p>
-                                    <p className="text-sm font-semibold text-[#382F2A]">{acc.dateReported || 'N/A'}</p>
-                                  </div>
+                                <div className="text-left">
+                                  <p className="text-sm font-bold text-[#382F2A]">{acc.memberShortName || 'Unknown Lender'}</p>
+                                  <p className="text-xs font-semibold text-[#8B7C73] mt-0.5">{acc.accountType || 'Unknown Type'}</p>
                                 </div>
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
+                                <div className="flex items-center gap-3">
+                                  <div className="text-right">
+                                    <p className="text-sm font-bold text-[#382F2A]">₹{Number(acc.currentBalance || 0).toLocaleString('en-IN')}</p>
+                                    <p className="text-[10px] font-semibold text-[#8B7C73] uppercase tracking-wider mt-0.5">Balance</p>
+                                  </div>
+                                  {isExpanded ? <ChevronUp className="w-4 h-4 text-[#8B7C73]" /> : <ChevronDown className="w-4 h-4 text-[#8B7C73]" />}
+                                </div>
+                              </button>
 
-              
+                              <AnimatePresence>
+                                {isExpanded && (
+                                  <motion.div
+                                    initial={{ height: 0, opacity: 0 }}
+                                    animate={{ height: "auto", opacity: 1 }}
+                                    exit={{ height: 0, opacity: 0 }}
+                                    className="border-t border-[#EBE6DD]"
+                                  >
+                                    <div className="p-4 grid grid-cols-2 gap-y-4 gap-x-2 bg-[#FAF8F5]">
+                                      <div>
+                                        <p className="text-[10px] font-bold text-[#8B7C73] uppercase">Account Number</p>
+                                        <p className="text-sm font-semibold text-[#382F2A]">{acc.accountNumber || 'N/A'}</p>
+                                      </div>
+                                      <div>
+                                        <p className="text-[10px] font-bold text-[#8B7C73] uppercase">High Credit</p>
+                                        <p className="text-sm font-semibold text-[#382F2A]">₹{Number(acc.highCreditAmount || 0).toLocaleString('en-IN')}</p>
+                                      </div>
+                                      <div>
+                                        <p className="text-[10px] font-bold text-[#8B7C73] uppercase">EMI</p>
+                                        <p className="text-sm font-semibold text-[#382F2A]">{acc.emiAmount ? `₹${Number(acc.emiAmount).toLocaleString('en-IN')}` : 'N/A'}</p>
+                                      </div>
+                                      <div>
+                                        <p className="text-[10px] font-bold text-[#8B7C73] uppercase">Interest Rate</p>
+                                        <p className="text-sm font-semibold text-[#382F2A]">{acc.interest_rate ? `${acc.interest_rate}%` : 'N/A'}</p>
+                                      </div>
+                                      <div>
+                                        <p className="text-[10px] font-bold text-[#8B7C73] uppercase">Date Opened</p>
+                                        <p className="text-sm font-semibold text-[#382F2A]">{acc.dateOpened || 'N/A'}</p>
+                                      </div>
+                                      <div>
+                                        <p className="text-[10px] font-bold text-[#8B7C73] uppercase">Date Reported</p>
+                                        <p className="text-sm font-semibold text-[#382F2A]">{acc.dateReported || 'N/A'}</p>
+                                      </div>
+                                    </div>
+                                  </motion.div>
+                                )}
+                              </AnimatePresence>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+
                   {(!activeAccounts || activeAccounts.length === 0) && (
                     <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 text-center">
                       <p className="text-sm font-medium text-slate-500">No ongoing loans found.</p>
@@ -594,76 +594,76 @@ export function EligibilityForm() {
               {dashboardTab === 'closed' && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                   {/* Accounts List */}
-              {closedAccounts && closedAccounts.length > 0 && (
-                <div>
-                  <h4 className="text-lg font-bold text-[#382F2A] mb-4">Closed Loans</h4>
-                  <div className="space-y-3">
-                    {closedAccounts.map((acc: any, i: number) => {
-                      const isExpanded = expandedAccount === acc.accountNumber;
-                      return (
-                        <div key={i} className="bg-white border border-[#EBE6DD] rounded-2xl overflow-hidden transition-all shadow-sm">
-                          <button
-                            onClick={() => setExpandedAccount(isExpanded ? null : acc.accountNumber)}
-                            className="w-full flex items-center justify-between p-4 hover:bg-[#FAF8F5] transition-colors"
-                          >
-                            <div className="text-left">
-                              <p className="text-sm font-bold text-[#382F2A]">{acc.memberShortName || 'Unknown Lender'}</p>
-                              <p className="text-xs font-semibold text-[#8B7C73] mt-0.5">{acc.accountType || 'Unknown Type'}</p>
-                            </div>
-                            <div className="flex items-center gap-3">
-                              <div className="text-right">
-                                <p className="text-sm font-bold text-[#382F2A]">₹{Number(acc.currentBalance || 0).toLocaleString('en-IN')}</p>
-                                <p className="text-[10px] font-semibold text-[#8B7C73] uppercase tracking-wider mt-0.5">Balance</p>
-                              </div>
-                              {isExpanded ? <ChevronUp className="w-4 h-4 text-[#8B7C73]" /> : <ChevronDown className="w-4 h-4 text-[#8B7C73]" />}
-                            </div>
-                          </button>
-
-                          <AnimatePresence>
-                            {isExpanded && (
-                              <motion.div
-                                initial={{ height: 0, opacity: 0 }}
-                                animate={{ height: "auto", opacity: 1 }}
-                                exit={{ height: 0, opacity: 0 }}
-                                className="border-t border-[#EBE6DD]"
+                  {closedAccounts && closedAccounts.length > 0 && (
+                    <div>
+                      <h4 className="text-lg font-bold text-[#382F2A] mb-4">Closed Loans</h4>
+                      <div className="space-y-3">
+                        {closedAccounts.map((acc: any, i: number) => {
+                          const isExpanded = expandedAccount === acc.accountNumber;
+                          return (
+                            <div key={i} className="bg-white border border-[#EBE6DD] rounded-2xl overflow-hidden transition-all shadow-sm">
+                              <button
+                                onClick={() => setExpandedAccount(isExpanded ? null : acc.accountNumber)}
+                                className="w-full flex items-center justify-between p-4 hover:bg-[#FAF8F5] transition-colors"
                               >
-                                <div className="p-4 grid grid-cols-2 gap-y-4 gap-x-2 bg-[#FAF8F5]">
-                                  <div>
-                                    <p className="text-[10px] font-bold text-[#8B7C73] uppercase">Account Number</p>
-                                    <p className="text-sm font-semibold text-[#382F2A]">{acc.accountNumber || 'N/A'}</p>
-                                  </div>
-                                  <div>
-                                    <p className="text-[10px] font-bold text-[#8B7C73] uppercase">High Credit</p>
-                                    <p className="text-sm font-semibold text-[#382F2A]">₹{Number(acc.highCreditAmount || 0).toLocaleString('en-IN')}</p>
-                                  </div>
-                                  <div>
-                                    <p className="text-[10px] font-bold text-[#8B7C73] uppercase">EMI</p>
-                                    <p className="text-sm font-semibold text-[#382F2A]">{acc.emiAmount ? `₹${Number(acc.emiAmount).toLocaleString('en-IN')}` : 'N/A'}</p>
-                                  </div>
-                                  <div>
-                                    <p className="text-[10px] font-bold text-[#8B7C73] uppercase">Interest Rate</p>
-                                    <p className="text-sm font-semibold text-[#382F2A]">{acc.interest_rate ? `${acc.interest_rate}%` : 'N/A'}</p>
-                                  </div>
-                                  <div>
-                                    <p className="text-[10px] font-bold text-[#8B7C73] uppercase">Date Opened</p>
-                                    <p className="text-sm font-semibold text-[#382F2A]">{acc.dateOpened || 'N/A'}</p>
-                                  </div>
-                                  <div>
-                                    <p className="text-[10px] font-bold text-[#8B7C73] uppercase">Date Reported</p>
-                                    <p className="text-sm font-semibold text-[#382F2A]">{acc.dateReported || 'N/A'}</p>
-                                  </div>
+                                <div className="text-left">
+                                  <p className="text-sm font-bold text-[#382F2A]">{acc.memberShortName || 'Unknown Lender'}</p>
+                                  <p className="text-xs font-semibold text-[#8B7C73] mt-0.5">{acc.accountType || 'Unknown Type'}</p>
                                 </div>
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
+                                <div className="flex items-center gap-3">
+                                  <div className="text-right">
+                                    <p className="text-sm font-bold text-[#382F2A]">₹{Number(acc.currentBalance || 0).toLocaleString('en-IN')}</p>
+                                    <p className="text-[10px] font-semibold text-[#8B7C73] uppercase tracking-wider mt-0.5">Balance</p>
+                                  </div>
+                                  {isExpanded ? <ChevronUp className="w-4 h-4 text-[#8B7C73]" /> : <ChevronDown className="w-4 h-4 text-[#8B7C73]" />}
+                                </div>
+                              </button>
 
-              
+                              <AnimatePresence>
+                                {isExpanded && (
+                                  <motion.div
+                                    initial={{ height: 0, opacity: 0 }}
+                                    animate={{ height: "auto", opacity: 1 }}
+                                    exit={{ height: 0, opacity: 0 }}
+                                    className="border-t border-[#EBE6DD]"
+                                  >
+                                    <div className="p-4 grid grid-cols-2 gap-y-4 gap-x-2 bg-[#FAF8F5]">
+                                      <div>
+                                        <p className="text-[10px] font-bold text-[#8B7C73] uppercase">Account Number</p>
+                                        <p className="text-sm font-semibold text-[#382F2A]">{acc.accountNumber || 'N/A'}</p>
+                                      </div>
+                                      <div>
+                                        <p className="text-[10px] font-bold text-[#8B7C73] uppercase">High Credit</p>
+                                        <p className="text-sm font-semibold text-[#382F2A]">₹{Number(acc.highCreditAmount || 0).toLocaleString('en-IN')}</p>
+                                      </div>
+                                      <div>
+                                        <p className="text-[10px] font-bold text-[#8B7C73] uppercase">EMI</p>
+                                        <p className="text-sm font-semibold text-[#382F2A]">{acc.emiAmount ? `₹${Number(acc.emiAmount).toLocaleString('en-IN')}` : 'N/A'}</p>
+                                      </div>
+                                      <div>
+                                        <p className="text-[10px] font-bold text-[#8B7C73] uppercase">Interest Rate</p>
+                                        <p className="text-sm font-semibold text-[#382F2A]">{acc.interest_rate ? `${acc.interest_rate}%` : 'N/A'}</p>
+                                      </div>
+                                      <div>
+                                        <p className="text-[10px] font-bold text-[#8B7C73] uppercase">Date Opened</p>
+                                        <p className="text-sm font-semibold text-[#382F2A]">{acc.dateOpened || 'N/A'}</p>
+                                      </div>
+                                      <div>
+                                        <p className="text-[10px] font-bold text-[#8B7C73] uppercase">Date Reported</p>
+                                        <p className="text-sm font-semibold text-[#382F2A]">{acc.dateReported || 'N/A'}</p>
+                                      </div>
+                                    </div>
+                                  </motion.div>
+                                )}
+                              </AnimatePresence>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+
                   {(!closedAccounts || closedAccounts.length === 0) && (
                     <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 text-center">
                       <p className="text-sm font-medium text-slate-500">No closed loans found.</p>
@@ -675,63 +675,63 @@ export function EligibilityForm() {
               {dashboardTab === 'eligibility' && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                   {/* Equifax Personal Info (Fallback) */}
-              {isEquifax && (
-                 <div className="bg-[#FAF8F5] border border-[#EBE6DD] rounded-3xl p-5 mb-6">
-                  <h4 className="text-sm font-extrabold text-[#382F2A] mb-4">Equifax Profile Data</h4>
-                  {equifaxPersonalInfo && (
-                    <div className="grid grid-cols-2 gap-4 mb-4">
-                       <div>
-                         <p className="text-[10px] uppercase tracking-wider font-bold text-[#8B7C73]">Name</p>
-                         <p className="text-sm font-bold text-[#382F2A]">{equifaxPersonalInfo.Name?.FullName || 'N/A'}</p>
-                       </div>
-                       <div>
-                         <p className="text-[10px] uppercase tracking-wider font-bold text-[#8B7C73]">Date of Birth</p>
-                         <p className="text-sm font-bold text-[#382F2A]">{equifaxPersonalInfo.DateOfBirth || 'N/A'}</p>
-                       </div>
+                  {isEquifax && (
+                    <div className="bg-[#FAF8F5] border border-[#EBE6DD] rounded-3xl p-5 mb-6">
+                      <h4 className="text-sm font-extrabold text-[#382F2A] mb-4">Equifax Profile Data</h4>
+                      {equifaxPersonalInfo && (
+                        <div className="grid grid-cols-2 gap-4 mb-4">
+                          <div>
+                            <p className="text-[10px] uppercase tracking-wider font-bold text-[#8B7C73]">Name</p>
+                            <p className="text-sm font-bold text-[#382F2A]">{equifaxPersonalInfo.Name?.FullName || 'N/A'}</p>
+                          </div>
+                          <div>
+                            <p className="text-[10px] uppercase tracking-wider font-bold text-[#8B7C73]">Date of Birth</p>
+                            <p className="text-sm font-bold text-[#382F2A]">{equifaxPersonalInfo.DateOfBirth || 'N/A'}</p>
+                          </div>
+                        </div>
+                      )}
+                      <div className="p-3 bg-white border border-[#EBE6DD] rounded-xl text-center">
+                        <p className="text-xs text-[#8B7C73] leading-relaxed">
+                          Equifax does not return detailed credit accounts in their JSON response.
+                          <br />Please use the <strong>Equifax (PDF Only)</strong> option to view full account details.
+                        </p>
+                      </div>
                     </div>
                   )}
-                  <div className="p-3 bg-white border border-[#EBE6DD] rounded-xl text-center">
-                    <p className="text-xs text-[#8B7C73] leading-relaxed">
-                      Equifax does not return detailed credit accounts in their JSON response. 
-                      <br/>Please use the <strong>Equifax (PDF Only)</strong> option to view full account details.
-                    </p>
-                  </div>
-                 </div>
-              )}
 
-              
-                  
+
+
                   {/* Profile Edit & Open Loans Form */}
                   <div className="mb-6">
                     <h4 className="text-lg font-bold text-[#382F2A] mb-4">Complete Profile for Accurate Eligibility</h4>
-                    
+
                     <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 mb-6">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                           <label className="text-xs font-semibold text-slate-600 mb-1 block">Net Monthly Salary</label>
-                          <input 
-                            type="number" 
-                            value={userOverrides.netSalary || formData.monthlyIncome || ""} 
-                            onChange={e => setUserOverrides({...userOverrides, netSalary: e.target.value})} 
+                          <input
+                            type="number"
+                            value={userOverrides.netSalary || formData.monthlyIncome || ""}
+                            onChange={e => setUserOverrides({ ...userOverrides, netSalary: e.target.value })}
                             className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm focus:border-brand-blue outline-none"
                             placeholder="e.g. 50000"
                           />
                         </div>
                         <div>
                           <label className="text-xs font-semibold text-slate-600 mb-1 block">Employer</label>
-                          <input 
-                            type="text" 
-                            value={userOverrides.employer || formData.employer || ""} 
-                            onChange={e => setUserOverrides({...userOverrides, employer: e.target.value})} 
+                          <input
+                            type="text"
+                            value={userOverrides.employer || formData.employer || ""}
+                            onChange={e => setUserOverrides({ ...userOverrides, employer: e.target.value })}
                             className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm focus:border-brand-blue outline-none"
                             placeholder="e.g. TCS"
                           />
                         </div>
                         <div>
                           <label className="text-xs font-semibold text-slate-600 mb-1 block">Any EMI Bounce (6M)?</label>
-                          <select 
-                            value={userOverrides.hasBounce || "no"} 
-                            onChange={e => setUserOverrides({...userOverrides, hasBounce: e.target.value})}
+                          <select
+                            value={userOverrides.hasBounce || "no"}
+                            onChange={e => setUserOverrides({ ...userOverrides, hasBounce: e.target.value })}
                             className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm focus:border-brand-blue outline-none"
                           >
                             <option value="no">No</option>
@@ -740,9 +740,9 @@ export function EligibilityForm() {
                         </div>
                         <div>
                           <label className="text-xs font-semibold text-slate-600 mb-1 block">Want Top-Up Loan?</label>
-                          <select 
-                            value={userOverrides.wantsTopUp || "no"} 
-                            onChange={e => setUserOverrides({...userOverrides, wantsTopUp: e.target.value})}
+                          <select
+                            value={userOverrides.wantsTopUp || "no"}
+                            onChange={e => setUserOverrides({ ...userOverrides, wantsTopUp: e.target.value })}
                             className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm focus:border-brand-blue outline-none"
                           >
                             <option value="no">No</option>
@@ -762,57 +762,57 @@ export function EligibilityForm() {
                             <div className="flex justify-between items-center mb-3 border-b border-slate-100 pb-2">
                               <p className="font-bold text-sm text-[#382F2A]">Loan #{idx + 1} ({loan.type})</p>
                               <label className="text-xs font-semibold flex items-center gap-1.5 cursor-pointer text-slate-600">
-                                <input 
-                                  type="checkbox" 
+                                <input
+                                  type="checkbox"
                                   checked={loan.wantsBT === 'yes'}
-                                  onChange={e => setLoanOverrides({...loanOverrides, [loan.id]: {...l, wantsBT: e.target.checked ? 'yes' : 'no'}})}
+                                  onChange={e => setLoanOverrides({ ...loanOverrides, [loan.id]: { ...l, wantsBT: e.target.checked ? 'yes' : 'no' } })}
                                   className="w-4 h-4 text-brand-blue accent-brand-blue rounded border-slate-300"
                                 />
                                 Consolidate This?
                               </label>
                             </div>
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                               <div>
-                                 <label className="text-[10px] uppercase font-bold text-[#8B7C73]">EMI</label>
-                                 <input 
-                                   type="number" 
-                                   value={loan.emi || ""} 
-                                   onChange={e => setLoanOverrides({...loanOverrides, [loan.id]: {...l, emi: e.target.value}})}
-                                   className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-brand-blue"
-                                 />
-                               </div>
-                               <div>
-                                 <label className="text-[10px] uppercase font-bold text-[#8B7C73]">Interest Rate %</label>
-                                 <input 
-                                   type="number" 
-                                   value={loan.rate || ""} 
-                                   onChange={e => setLoanOverrides({...loanOverrides, [loan.id]: {...l, rate: e.target.value}})}
-                                   className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-brand-blue"
-                                 />
-                               </div>
-                               <div>
-                                 <label className="text-[10px] uppercase font-bold text-[#8B7C73]">Type</label>
-                                 <select 
-                                   value={loan.type || "Personal Loan"} 
-                                   onChange={e => setLoanOverrides({...loanOverrides, [loan.id]: {...l, type: e.target.value}})}
-                                   className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-brand-blue"
-                                 >
-                                   <option value="Personal Loan">Personal Loan</option>
-                                   <option value="Credit Card">Credit Card</option>
-                                   <option value="App Loan">App Loan</option>
-                                   <option value="Overdraft">Overdraft</option>
-                                   <option value="Unknown">Unknown</option>
-                                 </select>
-                               </div>
-                               <div>
-                                 <label className="text-[10px] uppercase font-bold text-[#8B7C73]">Current Bal.</label>
-                                 <input 
-                                   type="number" 
-                                   value={loan.currentOutstanding || ""} 
-                                   onChange={e => setLoanOverrides({...loanOverrides, [loan.id]: {...l, currentOutstanding: e.target.value}})}
-                                   className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-brand-blue"
-                                 />
-                               </div>
+                              <div>
+                                <label className="text-[10px] uppercase font-bold text-[#8B7C73]">EMI</label>
+                                <input
+                                  type="number"
+                                  value={loan.emi || ""}
+                                  onChange={e => setLoanOverrides({ ...loanOverrides, [loan.id]: { ...l, emi: e.target.value } })}
+                                  className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-brand-blue"
+                                />
+                              </div>
+                              <div>
+                                <label className="text-[10px] uppercase font-bold text-[#8B7C73]">Interest Rate %</label>
+                                <input
+                                  type="number"
+                                  value={loan.rate || ""}
+                                  onChange={e => setLoanOverrides({ ...loanOverrides, [loan.id]: { ...l, rate: e.target.value } })}
+                                  className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-brand-blue"
+                                />
+                              </div>
+                              <div>
+                                <label className="text-[10px] uppercase font-bold text-[#8B7C73]">Type</label>
+                                <select
+                                  value={loan.type || "Personal Loan"}
+                                  onChange={e => setLoanOverrides({ ...loanOverrides, [loan.id]: { ...l, type: e.target.value } })}
+                                  className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-brand-blue"
+                                >
+                                  <option value="Personal Loan">Personal Loan</option>
+                                  <option value="Credit Card">Credit Card</option>
+                                  <option value="App Loan">App Loan</option>
+                                  <option value="Overdraft">Overdraft</option>
+                                  <option value="Unknown">Unknown</option>
+                                </select>
+                              </div>
+                              <div>
+                                <label className="text-[10px] uppercase font-bold text-[#8B7C73]">Current Bal.</label>
+                                <input
+                                  type="number"
+                                  value={loan.currentOutstanding || ""}
+                                  onChange={e => setLoanOverrides({ ...loanOverrides, [loan.id]: { ...l, currentOutstanding: e.target.value } })}
+                                  className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-brand-blue"
+                                />
+                              </div>
                             </div>
                           </div>
                         )
@@ -822,38 +822,38 @@ export function EligibilityForm() {
 
                   {/* Eligibility Engine Results */}
 
-              <div className="mb-6">
-                <h4 className="text-lg font-bold text-[#382F2A] mb-4">Eligible Consolidation Options</h4>
-                {eligibleLenders.length > 0 ? (
-                  <div className="space-y-3">
-                    {eligibleLenders.map((lender: any, i: number) => (
-                      <div key={i} className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex items-center justify-between">
-                        <div>
-                          <p className="text-sm font-bold text-emerald-900">{lender.name}</p>
-                          <p className="text-xs font-semibold text-emerald-700 mt-0.5">Est. Rate: {lender.headlineRate}%</p>
-                        </div>
-                        <div className="text-right">
-                          <span className="text-[10px] font-bold px-2 py-1 bg-emerald-100 text-emerald-800 rounded-full uppercase">
-                            {lender.outcome === 'ELIGIBLE' ? 'High Match' : 'Conditional'}
-                          </span>
-                        </div>
+                  <div className="mb-6">
+                    <h4 className="text-lg font-bold text-[#382F2A] mb-4">Eligible Consolidation Options</h4>
+                    {eligibleLenders.length > 0 ? (
+                      <div className="space-y-3">
+                        {eligibleLenders.map((lender: any, i: number) => (
+                          <div key={i} className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex items-center justify-between">
+                            <div>
+                              <p className="text-sm font-bold text-emerald-900">{lender.name}</p>
+                              <p className="text-xs font-semibold text-emerald-700 mt-0.5">Est. Rate: {lender.headlineRate}%</p>
+                            </div>
+                            <div className="text-right">
+                              <span className="text-[10px] font-bold px-2 py-1 bg-emerald-100 text-emerald-800 rounded-full uppercase">
+                                {lender.outcome === 'ELIGIBLE' ? 'High Match' : 'Conditional'}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
                       </div>
-                    ))}
+                    ) : (
+                      <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-center">
+                        <p className="text-sm font-medium text-amber-800">
+                          Based on this initial data, standard consolidation options require deeper review.
+                        </p>
+                      </div>
+                    )}
                   </div>
-                ) : (
-                  <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-center">
-                    <p className="text-sm font-medium text-amber-800">
-                      Based on this initial data, standard consolidation options require deeper review. 
-                    </p>
-                  </div>
-                )}
-              </div>
 
-            
+
                 </motion.div>
               )}
 
-</div>
+            </div>
             <button className="w-full py-4 bg-brand-blue text-white rounded-xl font-medium hover:bg-blue-800 transition-all duration-300 active:scale-95 shadow-sm hover:shadow-md">
               Speak with a Consolidation Expert
             </button>
