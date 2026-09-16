@@ -11,21 +11,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // INTERNAL_PROXY_SECRET must match the one configured on the VPS
-    const internalSecret = process.env.INTERNAL_PROXY_SECRET || "Shashidabral410@";
-    const proxyDomain = "https://api.creditexpertindia.com";
+    const surepassToken = process.env.SUREPASS_API_KEY;
 
-    // Extract the path from the endpoint
-    const url = new URL(endpoint);
-    const path = url.pathname;
-
-    const proxyUrl = `${proxyDomain}${path}`;
-
-    const res = await fetch(proxyUrl, {
+    const res = await fetch(endpoint, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${internalSecret}`,
+        "Authorization": `Bearer ${surepassToken}`,
       },
       body: JSON.stringify(bodyPayload),
     });
@@ -37,11 +29,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(data, { status: res.status });
     } else {
       const text = await res.text();
-      return NextResponse.json({ error: "Invalid response from proxy", details: text }, { status: res.status });
+      return NextResponse.json({ error: "Invalid response from Surepass API", details: text }, { status: res.status });
     }
 
   } catch (error: any) {
-    console.error("Surepass proxy error:", error);
+    console.error("Surepass API error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

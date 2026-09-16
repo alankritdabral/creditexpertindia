@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, Check, Plus, Trash2, User, Phone, Mail, MapPin, Briefcase, Building2, Shield, CreditCard, Loader2, AlertCircle, ChevronDown, ChevronUp } from "lucide-react";
 import { collection, doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebaseClient";
 import { analyzeLenderEligibility } from "@/lib/lenderEngine";
+import { EMPLOYERS } from "@/lib/employers";
 export function EligibilityForm() {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
@@ -21,6 +22,44 @@ export function EligibilityForm() {
   const [dashboardTab, setDashboardTab] = useState<"enquiries" | "ongoing" | "closed" | "eligibility">("enquiries");
   const [userOverrides, setUserOverrides] = useState<any>({});
   const [loanOverrides, setLoanOverrides] = useState<any>({});
+
+  const [showEmployerDropdown, setShowEmployerDropdown] = useState(false);
+  const [employerSearch, setEmployerSearch] = useState("");
+  const employerDropdownRef = useRef<HTMLDivElement>(null);
+  
+  const [debouncedEmployerSearch, setDebouncedEmployerSearch] = useState(employerSearch);
+  const [asyncEmployers, setAsyncEmployers] = useState(EMPLOYERS);
+  const [isSearchingEmployer, setIsSearchingEmployer] = useState(false);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedEmployerSearch(employerSearch);
+    }, 300);
+    return () => clearTimeout(handler);
+  }, [employerSearch]);
+
+  useEffect(() => {
+    const fetchEmployersFromDB = async () => {
+      setIsSearchingEmployer(true);
+      await new Promise(resolve => setTimeout(resolve, 400));
+      const results = EMPLOYERS.filter(e => 
+        e.toLowerCase().includes(debouncedEmployerSearch.toLowerCase()) || e.includes("Other")
+      );
+      setAsyncEmployers(results);
+      setIsSearchingEmployer(false);
+    };
+    fetchEmployersFromDB();
+  }, [debouncedEmployerSearch]);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (employerDropdownRef.current && !employerDropdownRef.current.contains(event.target as Node)) {
+        setShowEmployerDropdown(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const processFetchedReport = (reportData: any) => {
     setCibilData(reportData);
@@ -207,16 +246,16 @@ export function EligibilityForm() {
               <div className="pt-2">
                 <p className="text-sm font-semibold text-text-main mb-3">Select Credit Bureau & Format</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <label className={`flex items-center gap-2 p-3 border rounded-xl transition-all opacity-50 cursor-not-allowed ${formData.bureau === 'v1_json' ? 'border-brand-blue bg-blue-50/50' : 'border-slate-200'}`}>
-                    <input type="radio" disabled name="bureau" value="v1_json" checked={formData.bureau === 'v1_json'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-brand-blue accent-brand-blue cursor-not-allowed" />
+                  <label className={`flex items-center gap-2 p-3 border rounded-xl cursor-pointer transition-all ${formData.bureau === 'v1_json' ? 'border-brand-blue bg-blue-50/50' : 'border-slate-200 hover:bg-slate-50'}`}>
+                    <input type="radio" name="bureau" value="v1_json" checked={formData.bureau === 'v1_json'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-brand-blue accent-brand-blue" />
                     <span className="text-sm font-medium text-slate-700">CIBIL (Dashboard)</span>
                   </label>
-                  <label className={`flex items-center gap-2 p-3 border rounded-xl transition-all opacity-50 cursor-not-allowed ${formData.bureau === 'v1_pdf' ? 'border-brand-blue bg-blue-50/50' : 'border-slate-200'}`}>
-                    <input type="radio" disabled name="bureau" value="v1_pdf" checked={formData.bureau === 'v1_pdf'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-brand-blue accent-brand-blue cursor-not-allowed" />
+                  <label className={`flex items-center gap-2 p-3 border rounded-xl cursor-pointer transition-all ${formData.bureau === 'v1_pdf' ? 'border-brand-blue bg-blue-50/50' : 'border-slate-200 hover:bg-slate-50'}`}>
+                    <input type="radio" name="bureau" value="v1_pdf" checked={formData.bureau === 'v1_pdf'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-brand-blue accent-brand-blue" />
                     <span className="text-sm font-medium text-slate-700">CIBIL (PDF Only)</span>
                   </label>
-                  <label className={`flex items-center gap-2 p-3 border rounded-xl transition-all opacity-50 cursor-not-allowed ${formData.bureau === 'v2_json' ? 'border-brand-blue bg-blue-50/50' : 'border-slate-200'}`}>
-                    <input type="radio" disabled name="bureau" value="v2_json" checked={formData.bureau === 'v2_json'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-brand-blue accent-brand-blue cursor-not-allowed" />
+                  <label className={`flex items-center gap-2 p-3 border rounded-xl cursor-pointer transition-all ${formData.bureau === 'v2_json' ? 'border-brand-blue bg-blue-50/50' : 'border-slate-200 hover:bg-slate-50'}`}>
+                    <input type="radio" name="bureau" value="v2_json" checked={formData.bureau === 'v2_json'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-brand-blue accent-brand-blue" />
                     <span className="text-sm font-medium text-slate-700">Equifax (Dashboard)</span>
                   </label>
                   <label className={`flex items-center gap-2 p-3 border rounded-xl cursor-pointer transition-all ${formData.bureau === 'v2_pdf' ? 'border-brand-blue bg-blue-50/50' : 'border-slate-200 hover:bg-slate-50'}`}>
@@ -309,23 +348,44 @@ export function EligibilityForm() {
           const overrides = loanOverrides[acc.accountNumber] || {};
           return {
             id: acc.accountNumber,
-            type: overrides.type || (
+            originalType: acc.accountType || "Unknown",
+            type: overrides.type !== undefined ? overrides.type : (
               (acc.accountType || "").includes("Personal") ? "Personal Loan" :
                 (acc.accountType || "").includes("Credit") ? "Credit Card" :
                   (acc.accountType || "").includes("Overdraft") ? "Overdraft" : "Unknown"
             ),
-            wantsBT: overrides.wantsBT || "yes",
-            originalAmount: overrides.originalAmount || acc.highCreditAmount || 0,
-            currentOutstanding: overrides.currentOutstanding || acc.currentBalance || 0,
-            rate: overrides.rate || acc.interest_rate || 0,
-            emi: overrides.emi || acc.emiAmount || 0
+            wantsBT: overrides.wantsBT !== undefined ? overrides.wantsBT : "yes",
+            originalAmount: overrides.originalAmount !== undefined ? overrides.originalAmount : (acc.highCreditAmount || 0),
+            currentOutstanding: overrides.currentOutstanding !== undefined ? overrides.currentOutstanding : (acc.currentBalance || 0),
+            rate: overrides.rate !== undefined ? overrides.rate : (acc.interest_rate || 0),
+            emi: overrides.emi !== undefined ? overrides.emi : (acc.emiAmount || 0),
+            bankName: overrides.bankName !== undefined ? overrides.bankName : (acc.memberShortName || "Unknown Lender"),
+            dateOpened: overrides.dateOpened !== undefined ? overrides.dateOpened : (acc.dateOpened || "N/A"),
+            tenure: overrides.tenure !== undefined ? overrides.tenure : (acc.repaymentTenure || "N/A"),
+            odPlan: overrides.odPlan !== undefined ? overrides.odPlan : "2yr"
           };
         }).filter((l: any) => l.wantsBT === 'yes');
 
         const { eligibleLenders, ineligibleLenders } = analyzeLenderEligibility({ profile: engineProfile, catBLoans });
 
+        const totalActiveEMI = activeAccounts.reduce((sum: number, acc: any) => {
+          const overrides = loanOverrides[acc.accountNumber] || {};
+          const emi = overrides.emi !== undefined ? Number(overrides.emi) : (Number(acc.emiAmount) || 0);
+          return sum + emi;
+        }, 0);
 
-        const score = cibilData?.credit_score;
+        const netSalary = Number(userOverrides.netSalary) || Number(formData.monthlyIncome) || 0;
+        const maxEmiCapacity = netSalary * 0.7;
+        const unusedEmiCapacity = Math.max(0, maxEmiCapacity - totalActiveEMI);
+        const topUpTenure = Number(userOverrides.topUpTenure) || 5;
+        const topUpRoi = Number(userOverrides.topUpRoi) || 12;
+        
+        let maxFreshLoanAmount = 0;
+        if (topUpTenure > 0 && unusedEmiCapacity > 0) {
+          const r = topUpRoi / 12 / 100;
+          const n = topUpTenure * 12;
+          maxFreshLoanAmount = r > 0 ? unusedEmiCapacity * ((1 - Math.pow(1 + r, -n)) / r) : unusedEmiCapacity * n;
+        }        const score = cibilData?.credit_score;
 
         let scoreLabel = "Not Available";
         let scoreColor = "text-slate-500";
@@ -703,7 +763,17 @@ export function EligibilityForm() {
                     <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 mb-6">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                          <label className="text-xs font-semibold text-slate-600 mb-1 block">Net Monthly Salary</label>
+                          <label className="text-xs font-semibold text-slate-600 mb-1 flex justify-between items-center">
+                            <span>Net Monthly Salary</span>
+                            <div className="flex items-center gap-2 text-[10px] font-bold">
+                              <span className={`px-2 py-0.5 rounded-full ${totalActiveEMI > ((Number(userOverrides.netSalary) || Number(formData.monthlyIncome) || 0) * 0.7) ? 'bg-red-50 text-red-600' : 'bg-slate-100 text-slate-600'}`}>
+                                Used EMI: ₹{totalActiveEMI.toLocaleString('en-IN')}
+                              </span>
+                              <span className="bg-blue-50 text-brand-blue px-2 py-0.5 rounded-full">
+                                Max EMI: ₹{((Number(userOverrides.netSalary) || Number(formData.monthlyIncome) || 0) * 0.7).toLocaleString('en-IN')}
+                              </span>
+                            </div>
+                          </label>
                           <input
                             type="number"
                             value={userOverrides.netSalary || formData.monthlyIncome || ""}
@@ -712,15 +782,56 @@ export function EligibilityForm() {
                             placeholder="e.g. 50000"
                           />
                         </div>
-                        <div>
+                        <div ref={employerDropdownRef} className="relative z-10">
                           <label className="text-xs font-semibold text-slate-600 mb-1 block">Employer</label>
-                          <input
-                            type="text"
-                            value={userOverrides.employer || formData.employer || ""}
-                            onChange={e => setUserOverrides({ ...userOverrides, employer: e.target.value })}
-                            className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm focus:border-brand-blue outline-none"
-                            placeholder="e.g. TCS"
-                          />
+                          <div className="relative">
+                            <input
+                              type="text"
+                              value={employerSearch || userOverrides.employer || formData.employer || ""}
+                              onChange={e => {
+                                setEmployerSearch(e.target.value);
+                                setShowEmployerDropdown(true);
+                                setUserOverrides({ ...userOverrides, employer: e.target.value });
+                              }}
+                              onFocus={() => setShowEmployerDropdown(true)}
+                              className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm focus:border-brand-blue outline-none"
+                              placeholder="Search your company..."
+                              autoComplete="off"
+                            />
+                            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                          </div>
+                          
+                          <AnimatePresence>
+                            {showEmployerDropdown && (
+                              <motion.div
+                                initial={{ opacity: 0, y: 5 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: 5 }}
+                                transition={{ duration: 0.1 }}
+                                className="absolute top-full left-0 right-0 mt-1 max-h-60 overflow-y-auto bg-white border border-slate-200 rounded-xl shadow-lg z-50 py-1"
+                              >
+                                {isSearchingEmployer ? (
+                                  <div className="px-4 py-3 text-sm text-slate-500">Searching database...</div>
+                                ) : asyncEmployers.length > 0 ? (
+                                  asyncEmployers.map(e => (
+                                    <div
+                                      key={e}
+                                      onClick={() => {
+                                        setEmployerSearch(e);
+                                        setUserOverrides({ ...userOverrides, employer: e });
+                                        setShowEmployerDropdown(false);
+                                      }}
+                                      className="px-4 py-2 text-sm text-slate-700 cursor-pointer hover:bg-slate-50 border-b border-slate-50 last:border-0"
+                                    >
+                                      {e}
+                                    </div>
+                                  ))
+                                ) : (
+                                  <div className="px-4 py-3 text-sm text-slate-500">Type to specify company</div>
+                                )}
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
                         </div>
                         <div>
                           <label className="text-xs font-semibold text-slate-600 mb-1 block">Any EMI Bounce (6M)?</label>
@@ -733,18 +844,87 @@ export function EligibilityForm() {
                             <option value="yes">Yes</option>
                           </select>
                         </div>
-                        <div>
-                          <label className="text-xs font-semibold text-slate-600 mb-1 block">Want Top-Up Loan?</label>
-                          <select
-                            value={userOverrides.wantsTopUp || "no"}
-                            onChange={e => setUserOverrides({ ...userOverrides, wantsTopUp: e.target.value })}
-                            className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm focus:border-brand-blue outline-none"
-                          >
-                            <option value="no">No</option>
-                            <option value="yes">Yes</option>
-                          </select>
+                      </div>
+                    </div>
+
+                    {/* Fresh Loan / Top-Up Requirement */}
+                    <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 mb-6">
+                      <div className="flex justify-between items-center">
+                        <label className="text-sm font-bold text-slate-700">Do you want a Fresh Loan / Top-Up?</label>
+                        <div className="flex gap-4">
+                          <label className="flex items-center gap-1 text-sm cursor-pointer">
+                            <input
+                              type="radio"
+                              name="wantsTopUp"
+                              value="yes"
+                              checked={userOverrides.wantsTopUp === 'yes'}
+                              onChange={e => setUserOverrides({ ...userOverrides, wantsTopUp: e.target.value })}
+                              className="accent-brand-blue"
+                            /> Yes
+                          </label>
+                          <label className="flex items-center gap-1 text-sm cursor-pointer">
+                            <input
+                              type="radio"
+                              name="wantsTopUp"
+                              value="no"
+                              checked={(userOverrides.wantsTopUp || 'no') === 'no'}
+                              onChange={e => setUserOverrides({ ...userOverrides, wantsTopUp: e.target.value })}
+                              className="accent-brand-blue"
+                            /> No
+                          </label>
                         </div>
                       </div>
+
+                      {userOverrides.wantsTopUp === 'yes' && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4 pt-4 border-t border-slate-200">
+                          <div className="space-y-4">
+                            <div>
+                              <label className="text-xs font-semibold text-slate-600 mb-1 block">Expected Tenure (Years)</label>
+                              <input
+                                type="number"
+                                value={userOverrides.topUpTenure ?? 5}
+                                onChange={e => setUserOverrides({ ...userOverrides, topUpTenure: e.target.value })}
+                                className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm focus:border-brand-blue outline-none"
+                                min={1}
+                                max={30}
+                              />
+                            </div>
+                            <div>
+                              <label className="text-xs font-semibold text-slate-600 mb-1 block">Expected ROI (% p.a.)</label>
+                              <input
+                                type="number"
+                                value={userOverrides.topUpRoi ?? 12}
+                                onChange={e => setUserOverrides({ ...userOverrides, topUpRoi: e.target.value })}
+                                className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm focus:border-brand-blue outline-none"
+                                step="0.1"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-xs font-semibold text-slate-600 mb-1 block">Required Loan Amount (₹)</label>
+                              <input
+                                type="number"
+                                value={userOverrides.topUpAmount ?? ""}
+                                onChange={e => setUserOverrides({ ...userOverrides, topUpAmount: e.target.value })}
+                                className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm focus:border-brand-blue outline-none"
+                                placeholder={`Max: ₹${Math.floor(maxFreshLoanAmount).toLocaleString('en-IN')}`}
+                              />
+                            </div>
+                          </div>
+                          
+                          <div className="bg-white border border-brand-blue p-4 rounded-xl flex flex-col justify-center">
+                            <p className="text-xs text-slate-500 mb-1">Maximum Eligible Fresh Loan Amount:</p>
+                            <p className="text-2xl font-bold text-brand-blue mb-2">₹{Math.floor(maxFreshLoanAmount).toLocaleString('en-IN')}</p>
+                            <p className="text-xs text-slate-600">
+                              Based on your unused EMI capacity of <strong>₹{Math.floor(unusedEmiCapacity).toLocaleString('en-IN')} / mo</strong>.
+                            </p>
+                            {Number(userOverrides.topUpAmount) > maxFreshLoanAmount && (
+                              <p className="text-xs text-red-500 mt-2 font-semibold">
+                                Error: Required amount exceeds maximum eligible limit.
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      )}
                     </div>
 
                     <h4 className="text-lg font-bold text-[#382F2A] mb-4">Review Open Loans</h4>
@@ -755,12 +935,14 @@ export function EligibilityForm() {
                         return (
                           <div key={loan.id} className="bg-white border border-[#EBE6DD] rounded-2xl p-4 shadow-sm">
                             <div className="flex justify-between items-center mb-3 border-b border-slate-100 pb-2">
-                              <p className="font-bold text-sm text-[#382F2A]">Loan #{idx + 1} ({loan.type})</p>
+                              <div className="flex items-center gap-2">
+                                <p className="font-bold text-sm text-[#382F2A]">Loan #{idx + 1} - {loan.originalType}</p>
+                              </div>
                               <label className="text-xs font-semibold flex items-center gap-1.5 cursor-pointer text-slate-600">
                                 <input
                                   type="checkbox"
                                   checked={loan.wantsBT === 'yes'}
-                                  onChange={e => setLoanOverrides({ ...loanOverrides, [loan.id]: { ...l, wantsBT: e.target.checked ? 'yes' : 'no' } })}
+                                  onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), wantsBT: e.target.checked ? 'yes' : 'no' } }))}
                                   className="w-4 h-4 text-brand-blue accent-brand-blue rounded border-slate-300"
                                 />
                                 Consolidate This?
@@ -768,44 +950,97 @@ export function EligibilityForm() {
                             </div>
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                               <div>
-                                <label className="text-[10px] uppercase font-bold text-[#8B7C73]">EMI</label>
+                                <label className="text-[10px] uppercase font-bold text-[#8B7C73]">Bank / NBFC</label>
                                 <input
-                                  type="number"
-                                  value={loan.emi || ""}
-                                  onChange={e => setLoanOverrides({ ...loanOverrides, [loan.id]: { ...l, emi: e.target.value } })}
-                                  className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-brand-blue"
-                                />
-                              </div>
-                              <div>
-                                <label className="text-[10px] uppercase font-bold text-[#8B7C73]">Interest Rate %</label>
-                                <input
-                                  type="number"
-                                  value={loan.rate || ""}
-                                  onChange={e => setLoanOverrides({ ...loanOverrides, [loan.id]: { ...l, rate: e.target.value } })}
+                                  type="text"
+                                  value={loan.bankName ?? ""}
+                                  onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), bankName: e.target.value } }))}
                                   className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-brand-blue"
                                 />
                               </div>
                               <div>
                                 <label className="text-[10px] uppercase font-bold text-[#8B7C73]">Type</label>
                                 <select
-                                  value={loan.type || "Personal Loan"}
-                                  onChange={e => setLoanOverrides({ ...loanOverrides, [loan.id]: { ...l, type: e.target.value } })}
+                                  value={loan.type ?? "Personal Loan"}
+                                  onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), type: e.target.value } }))}
                                   className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-brand-blue"
                                 >
-                                  <option value="Personal Loan">Personal Loan</option>
-                                  <option value="Credit Card">Credit Card</option>
-                                  <option value="App Loan">App Loan</option>
-                                  <option value="Overdraft">Overdraft</option>
+                                  <optgroup label="Generally Non-Transferable (Category A)">
+                                    {['Car Loan', 'Home Loan', 'LAP', 'Gold Loan', 'Consumer Loan'].map(t => <option key={t} value={t}>{t}</option>)}
+                                  </optgroup>
+                                  <optgroup label="Potentially Transferable (Category B)">
+                                    {['Personal Loan', 'Overdraft', 'App Loan', 'Credit Card'].map(t => <option key={t} value={t}>{t}</option>)}
+                                  </optgroup>
                                   <option value="Unknown">Unknown</option>
                                 </select>
+                              </div>
+                              <div>
+                                <label className="text-[10px] uppercase font-bold text-[#8B7C73]">{loan.type === 'Overdraft' ? 'Amount Drawn' : 'Orig. Amount'}</label>
+                                <input
+                                  type="number"
+                                  value={loan.originalAmount ?? ""}
+                                  onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), originalAmount: e.target.value } }))}
+                                  disabled={loan.type === 'Credit Card' || loan.type === 'Gold Loan'}
+                                  className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-brand-blue disabled:opacity-50 disabled:cursor-not-allowed"
+                                />
                               </div>
                               <div>
                                 <label className="text-[10px] uppercase font-bold text-[#8B7C73]">Current Bal.</label>
                                 <input
                                   type="number"
-                                  value={loan.currentOutstanding || ""}
-                                  onChange={e => setLoanOverrides({ ...loanOverrides, [loan.id]: { ...l, currentOutstanding: e.target.value } })}
+                                  value={loan.currentOutstanding ?? ""}
+                                  onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), currentOutstanding: e.target.value } }))}
                                   className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-brand-blue"
+                                />
+                              </div>
+                              <div>
+                                <label className="text-[10px] uppercase font-bold text-[#8B7C73]">Date Issue</label>
+                                <input
+                                  type="text"
+                                  value={loan.dateOpened ?? ""}
+                                  onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), dateOpened: e.target.value } }))}
+                                  disabled={loan.type === 'Credit Card' || loan.type === 'Gold Loan'}
+                                  className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-brand-blue disabled:opacity-50 disabled:cursor-not-allowed"
+                                />
+                              </div>
+                              <div>
+                                <label className="text-[10px] uppercase font-bold text-[#8B7C73]">{loan.type === 'Overdraft' ? 'OD Plan' : 'Tenure (Mos)'}</label>
+                                {loan.type === 'Overdraft' ? (
+                                  <select
+                                    value={loan.odPlan ?? "2yr"}
+                                    onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), odPlan: e.target.value } }))}
+                                    className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-brand-blue"
+                                  >
+                                    <option value="2yr">2 Years</option>
+                                    <option value="3yr">3 Years</option>
+                                  </select>
+                                ) : (
+                                  <input
+                                    type="number"
+                                    value={loan.tenure ?? ""}
+                                    onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), tenure: e.target.value } }))}
+                                    disabled={loan.type === 'Credit Card' || loan.type === 'Gold Loan'}
+                                    className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-brand-blue disabled:opacity-50 disabled:cursor-not-allowed"
+                                  />
+                                )}
+                              </div>
+                              <div>
+                                <label className="text-[10px] uppercase font-bold text-[#8B7C73]">EMI</label>
+                                <input
+                                  type="number"
+                                  value={loan.emi ?? ""}
+                                  onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), emi: e.target.value } }))}
+                                  className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-brand-blue"
+                                />
+                              </div>
+                              <div>
+                                <label className="text-[10px] uppercase font-bold text-[#8B7C73]">Rate %</label>
+                                <input
+                                  type="number"
+                                  value={loan.rate ?? ""}
+                                  onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), rate: e.target.value } }))}
+                                  disabled={loan.type === 'Credit Card' || loan.type === 'Gold Loan'}
+                                  className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-brand-blue disabled:opacity-50 disabled:cursor-not-allowed"
                                 />
                               </div>
                             </div>
@@ -840,6 +1075,33 @@ export function EligibilityForm() {
                         <p className="text-sm font-medium text-amber-800">
                           Based on this initial data, standard consolidation options require deeper review.
                         </p>
+                      </div>
+                    )}
+
+                    {ineligibleLenders.length > 0 && (
+                      <div className="mt-8">
+                        <h4 className="text-sm font-bold text-[#382F2A] mb-3">Lenders Not Currently Eligible</h4>
+                        <div className="space-y-3">
+                          {ineligibleLenders.map((lender: any, i: number) => (
+                            <div key={i} className="bg-red-50/50 border border-red-100 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                              <div>
+                                <p className="text-sm font-bold text-red-900">{lender.name}</p>
+                                <p className="text-xs font-semibold text-red-700 mt-0.5">Est. Rate: {lender.headlineRate}%</p>
+                              </div>
+                              <div className="text-left sm:text-right flex-1 sm:max-w-[60%]">
+                                {lender.reasons && lender.reasons.length > 0 ? (
+                                  <ul className="text-[11px] text-red-800 list-disc list-inside sm:text-right space-y-0.5">
+                                    {lender.reasons.map((reason: string, rIdx: number) => (
+                                      <li key={rIdx} className="leading-tight">{reason}</li>
+                                    ))}
+                                  </ul>
+                                ) : (
+                                  <span className="text-[11px] text-red-800">Does not meet policy requirements</span>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     )}
                   </div>
