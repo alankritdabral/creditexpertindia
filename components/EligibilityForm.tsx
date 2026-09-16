@@ -246,16 +246,16 @@ export function EligibilityForm() {
               <div className="pt-2">
                 <p className="text-sm font-semibold text-text-main mb-3">Select Credit Bureau & Format</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <label className={`flex items-center gap-2 p-3 border rounded-xl cursor-pointer transition-all ${formData.bureau === 'v1_json' ? 'border-brand-blue bg-blue-50/50' : 'border-slate-200 hover:bg-slate-50'}`}>
-                    <input type="radio" name="bureau" value="v1_json" checked={formData.bureau === 'v1_json'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-brand-blue accent-brand-blue" />
+                  <label className={`flex items-center gap-2 p-3 border rounded-xl transition-all opacity-50 cursor-not-allowed ${formData.bureau === 'v1_json' ? 'border-brand-blue bg-blue-50/50' : 'border-slate-200'}`}>
+                    <input type="radio" name="bureau" value="v1_json" checked={formData.bureau === 'v1_json'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-brand-blue accent-brand-blue cursor-not-allowed" disabled />
                     <span className="text-sm font-medium text-slate-700">CIBIL (Dashboard)</span>
                   </label>
-                  <label className={`flex items-center gap-2 p-3 border rounded-xl cursor-pointer transition-all ${formData.bureau === 'v1_pdf' ? 'border-brand-blue bg-blue-50/50' : 'border-slate-200 hover:bg-slate-50'}`}>
-                    <input type="radio" name="bureau" value="v1_pdf" checked={formData.bureau === 'v1_pdf'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-brand-blue accent-brand-blue" />
+                  <label className={`flex items-center gap-2 p-3 border rounded-xl transition-all opacity-50 cursor-not-allowed ${formData.bureau === 'v1_pdf' ? 'border-brand-blue bg-blue-50/50' : 'border-slate-200'}`}>
+                    <input type="radio" name="bureau" value="v1_pdf" checked={formData.bureau === 'v1_pdf'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-brand-blue accent-brand-blue cursor-not-allowed" disabled />
                     <span className="text-sm font-medium text-slate-700">CIBIL (PDF Only)</span>
                   </label>
-                  <label className={`flex items-center gap-2 p-3 border rounded-xl cursor-pointer transition-all ${formData.bureau === 'v2_json' ? 'border-brand-blue bg-blue-50/50' : 'border-slate-200 hover:bg-slate-50'}`}>
-                    <input type="radio" name="bureau" value="v2_json" checked={formData.bureau === 'v2_json'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-brand-blue accent-brand-blue" />
+                  <label className={`flex items-center gap-2 p-3 border rounded-xl transition-all opacity-50 cursor-not-allowed ${formData.bureau === 'v2_json' ? 'border-brand-blue bg-blue-50/50' : 'border-slate-200'}`}>
+                    <input type="radio" name="bureau" value="v2_json" checked={formData.bureau === 'v2_json'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-brand-blue accent-brand-blue cursor-not-allowed" disabled />
                     <span className="text-sm font-medium text-slate-700">Equifax (Dashboard)</span>
                   </label>
                   <label className={`flex items-center gap-2 p-3 border rounded-xl cursor-pointer transition-all ${formData.bureau === 'v2_pdf' ? 'border-brand-blue bg-blue-50/50' : 'border-slate-200 hover:bg-slate-50'}`}>
