@@ -26,7 +26,7 @@ export function EligibilityForm() {
   const [showEmployerDropdown, setShowEmployerDropdown] = useState(false);
   const [employerSearch, setEmployerSearch] = useState("");
   const employerDropdownRef = useRef<HTMLDivElement>(null);
-  
+
   const [debouncedEmployerSearch, setDebouncedEmployerSearch] = useState(employerSearch);
   const [asyncEmployers, setAsyncEmployers] = useState(EMPLOYERS);
   const [isSearchingEmployer, setIsSearchingEmployer] = useState(false);
@@ -42,7 +42,7 @@ export function EligibilityForm() {
     const fetchEmployersFromDB = async () => {
       setIsSearchingEmployer(true);
       await new Promise(resolve => setTimeout(resolve, 400));
-      const results = EMPLOYERS.filter(e => 
+      const results = EMPLOYERS.filter(e =>
         e.toLowerCase().includes(debouncedEmployerSearch.toLowerCase()) || e.includes("Other")
       );
       setAsyncEmployers(results);
@@ -130,6 +130,8 @@ export function EligibilityForm() {
 
       // 2. Not in DB or no cache -> Fetch from Surepass
       const isV2 = formData.bureau.startsWith("v2");
+      const isExperian = formData.bureau.startsWith("experian");
+      const isCrif = formData.bureau.startsWith("crif");
       const isPdf = formData.bureau.endsWith("_pdf");
 
       let endpoint = "";
@@ -137,30 +139,50 @@ export function EligibilityForm() {
         endpoint = isPdf
           ? "https://kyc-api.surepass.app/api/v1/credit-report-v2/fetch-pdf-report"
           : "https://kyc-api.surepass.app/api/v1/credit-report-v2/fetch-report";
+      } else if (isExperian) {
+        endpoint = isPdf
+          ? "https://kyc-api.surepass.app/api/v1/credit-report-experian/fetch-report-pdf"
+          : "https://kyc-api.surepass.app/api/v1/credit-report-experian/fetch-report";
+      } else if (isCrif) {
+        endpoint = isPdf
+          ? "https://kyc-api.surepass.app/api/v1/credit-report-crif/fetch-report-pdf"
+          : "https://kyc-api.surepass.app/api/v1/credit-report-crif/fetch-report";
       } else {
         endpoint = isPdf
           ? "https://kyc-api.surepass.app/api/v1/credit-report-cibil/fetch-report-pdf"
           : "https://kyc-api.surepass.app/api/v1/credit-report-cibil/fetch-report";
       }
 
-
-
-      const bodyPayload = isV2
-        ? {
+      let bodyPayload: any = {};
+      if (isV2) {
+        bodyPayload = {
           name: formData.name || "Customer",
           id_number: formData.pan,
           id_type: "pan",
           mobile: formData.mobile,
           consent: "Y",
           gender: formData.gender
-        }
-        : {
+        };
+      } else if (isCrif) {
+        const nameParts = (formData.name || "Customer").trim().split(" ");
+        const firstName = nameParts[0];
+        const lastName = nameParts.slice(1).join(" ") || firstName;
+        bodyPayload = {
+          first_name: firstName,
+          last_name: lastName,
+          mobile: formData.mobile,
+          pan: formData.pan,
+          consent: "Y"
+        };
+      } else {
+        bodyPayload = {
           mobile: formData.mobile,
           pan: formData.pan,
           name: formData.name || "Customer",
           gender: formData.gender,
           consent: "Y"
         };
+      }
 
       // Send the request through our new Next.js API Route which talks to the VPS proxy
       const res = await fetch("/api/surepass", {
@@ -247,20 +269,36 @@ export function EligibilityForm() {
                 <p className="text-sm font-semibold text-text-main mb-3">Select Credit Bureau & Format</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <label className={`flex items-center gap-2 p-3 border rounded-xl transition-all opacity-50 cursor-not-allowed ${formData.bureau === 'v1_json' ? 'border-brand-blue bg-blue-50/50' : 'border-slate-200'}`}>
-                    <input type="radio" name="bureau" value="v1_json" checked={formData.bureau === 'v1_json'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-brand-blue accent-brand-blue cursor-not-allowed" disabled />
+                    <input type="radio" name="bureau" value="v1_json" checked={formData.bureau === 'v1_json'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} disabled className="w-4 h-4 text-brand-blue accent-brand-blue" />
                     <span className="text-sm font-medium text-slate-700">CIBIL (Dashboard)</span>
                   </label>
                   <label className={`flex items-center gap-2 p-3 border rounded-xl transition-all opacity-50 cursor-not-allowed ${formData.bureau === 'v1_pdf' ? 'border-brand-blue bg-blue-50/50' : 'border-slate-200'}`}>
-                    <input type="radio" name="bureau" value="v1_pdf" checked={formData.bureau === 'v1_pdf'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-brand-blue accent-brand-blue cursor-not-allowed" disabled />
-                    <span className="text-sm font-medium text-slate-700">CIBIL (PDF Only)</span>
+                    <input type="radio" name="bureau" value="v1_pdf" checked={formData.bureau === 'v1_pdf'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} disabled className="w-4 h-4 text-brand-blue accent-brand-blue" />
+                    <span className="text-sm font-medium text-slate-700">CIBIL (PDF)</span>
                   </label>
                   <label className={`flex items-center gap-2 p-3 border rounded-xl transition-all opacity-50 cursor-not-allowed ${formData.bureau === 'v2_json' ? 'border-brand-blue bg-blue-50/50' : 'border-slate-200'}`}>
-                    <input type="radio" name="bureau" value="v2_json" checked={formData.bureau === 'v2_json'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-brand-blue accent-brand-blue cursor-not-allowed" disabled />
+                    <input type="radio" name="bureau" value="v2_json" checked={formData.bureau === 'v2_json'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} disabled className="w-4 h-4 text-brand-blue accent-brand-blue" />
                     <span className="text-sm font-medium text-slate-700">Equifax (Dashboard)</span>
                   </label>
                   <label className={`flex items-center gap-2 p-3 border rounded-xl cursor-pointer transition-all ${formData.bureau === 'v2_pdf' ? 'border-brand-blue bg-blue-50/50' : 'border-slate-200 hover:bg-slate-50'}`}>
                     <input type="radio" name="bureau" value="v2_pdf" checked={formData.bureau === 'v2_pdf'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-brand-blue accent-brand-blue" />
-                    <span className="text-sm font-medium text-slate-700">Equifax (PDF Only)</span>
+                    <span className="text-sm font-medium text-slate-700">Equifax (PDF)</span>
+                  </label>
+                  <label className={`flex items-center gap-2 p-3 border rounded-xl transition-all opacity-50 cursor-not-allowed ${formData.bureau === 'experian_json' ? 'border-brand-blue bg-blue-50/50' : 'border-slate-200'}`}>
+                    <input type="radio" name="bureau" value="experian_json" checked={formData.bureau === 'experian_json'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} disabled className="w-4 h-4 text-brand-blue accent-brand-blue" />
+                    <span className="text-sm font-medium text-slate-700">Experian (Dashboard)</span>
+                  </label>
+                  <label className={`flex items-center gap-2 p-3 border rounded-xl cursor-pointer transition-all ${formData.bureau === 'experian_pdf' ? 'border-brand-blue bg-blue-50/50' : 'border-slate-200 hover:bg-slate-50'}`}>
+                    <input type="radio" name="bureau" value="experian_pdf" checked={formData.bureau === 'experian_pdf'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-brand-blue accent-brand-blue" />
+                    <span className="text-sm font-medium text-slate-700">Experian (PDF)</span>
+                  </label>
+                  <label className={`flex items-center gap-2 p-3 border rounded-xl transition-all opacity-50 cursor-not-allowed ${formData.bureau === 'crif_json' ? 'border-brand-blue bg-blue-50/50' : 'border-slate-200'}`}>
+                    <input type="radio" name="bureau" value="crif_json" checked={formData.bureau === 'crif_json'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} disabled className="w-4 h-4 text-brand-blue accent-brand-blue" />
+                    <span className="text-sm font-medium text-slate-700">CRIF (Dashboard)</span>
+                  </label>
+                  <label className={`flex items-center gap-2 p-3 border rounded-xl cursor-pointer transition-all ${formData.bureau === 'crif_pdf' ? 'border-brand-blue bg-blue-50/50' : 'border-slate-200 hover:bg-slate-50'}`}>
+                    <input type="radio" name="bureau" value="crif_pdf" checked={formData.bureau === 'crif_pdf'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-brand-blue accent-brand-blue" />
+                    <span className="text-sm font-medium text-slate-700">CRIF (PDF)</span>
                   </label>
                 </div>
               </div>
@@ -306,14 +344,10 @@ export function EligibilityForm() {
         let enquiries = null;
         let equifaxPersonalInfo = null;
 
-        if (!isEquifax) {
-          const report = cibilData?.credit_report?.[0];
-          const consumerSummary = report?.response?.consumerSummaryresp;
-          accountSummary = consumerSummary?.accountSummary;
-          inquirySummary = consumerSummary?.inquirySummary;
-          accounts = report?.accounts;
-          enquiries = report?.enquiries;
-        } else {
+        const isExperian = formData.bureau.startsWith("experian");
+        const isCrif = formData.bureau.startsWith("crif");
+
+        if (isEquifax) {
           // Equifax JSON parsing
           const cirDataList = cibilData?.credit_report?.CCRResponse?.CIRReportDataLst || [];
           const firstCirData = cirDataList[0]?.CIRReportData;
@@ -323,10 +357,48 @@ export function EligibilityForm() {
             enquiries = cirDataList.map((item: any) => ({
               memberShortName: item.InquiryResponseHeader?.CustomerName || "Unknown Lender",
               enquiryDate: item.InquiryResponseHeader?.Date || "N/A",
-              enquiryAmount: 0 // Equifax JSON doesn't provide an amount here
+              enquiryAmount: 0
             }));
             inquirySummary = { totalInquiry: cirDataList.length };
           }
+        } else if (isExperian) {
+          const caisAccounts = cibilData?.credit_report?.CAIS_Account?.CAIS_Account_DETAILS || [];
+          accounts = caisAccounts.map((acc: any) => ({
+            accountNumber: acc.Account_Number,
+            accountType: acc.Account_Type,
+            currentBalance: acc.Current_Balance,
+            highCreditAmount: acc.Highest_Credit_or_Original_Loan_Amount,
+            memberShortName: acc.Subscriber_Name,
+            dateOpened: acc.Open_Date,
+            dateReported: acc.Date_Reported,
+            emiAmount: acc.Scheduled_Monthly_Payment_Amount || 0,
+            interest_rate: acc.Rate_of_Interest || 0
+          }));
+          const summary = cibilData?.credit_report?.CAIS_Account?.CAIS_Summary?.Credit_Account;
+          const outstanding = cibilData?.credit_report?.CAIS_Account?.CAIS_Summary?.Total_Outstanding_Balance;
+          accountSummary = {
+            totalAccounts: summary?.CreditAccountTotal || 0,
+            currentBalance: outstanding?.Outstanding_Balance_All || 0,
+            highCreditAmount: 0,
+            overdueBalance: 0,
+            overdueAccounts: summary?.CreditAccountDefault || 0,
+            zeroBalanceAccounts: summary?.CreditAccountClosed || 0
+          };
+          inquirySummary = {
+            totalInquiry: cibilData?.credit_report?.Current_Application?.Current_Application_Details?.Enquiry_Reason || 0,
+          };
+        } else if (isCrif) {
+          // Simple fallback for CRIF
+          accounts = [];
+          enquiries = [];
+        } else {
+          // CIBIL JSON Parsing
+          const report = cibilData?.credit_report?.[0];
+          const consumerSummary = report?.response?.consumerSummaryresp;
+          accountSummary = consumerSummary?.accountSummary;
+          inquirySummary = consumerSummary?.inquirySummary;
+          accounts = report?.accounts;
+          enquiries = report?.enquiries;
         }
 
         const safeAccounts = accounts || [];
@@ -379,13 +451,14 @@ export function EligibilityForm() {
         const unusedEmiCapacity = Math.max(0, maxEmiCapacity - totalActiveEMI);
         const topUpTenure = Number(userOverrides.topUpTenure) || 5;
         const topUpRoi = Number(userOverrides.topUpRoi) || 12;
-        
+
         let maxFreshLoanAmount = 0;
         if (topUpTenure > 0 && unusedEmiCapacity > 0) {
           const r = topUpRoi / 12 / 100;
           const n = topUpTenure * 12;
           maxFreshLoanAmount = r > 0 ? unusedEmiCapacity * ((1 - Math.pow(1 + r, -n)) / r) : unusedEmiCapacity * n;
-        }        const score = cibilData?.credit_score;
+        }
+        const score = cibilData?.credit_score;
 
         let scoreLabel = "Not Available";
         let scoreColor = "text-slate-500";
@@ -730,9 +803,9 @@ export function EligibilityForm() {
               {dashboardTab === 'eligibility' && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                   {/* Equifax Personal Info (Fallback) */}
-                  {isEquifax && (
+                  {(isEquifax || isCrif) && (
                     <div className="bg-[#FAF8F5] border border-[#EBE6DD] rounded-3xl p-5 mb-6">
-                      <h4 className="text-sm font-extrabold text-[#382F2A] mb-4">Equifax Profile Data</h4>
+                      <h4 className="text-sm font-extrabold text-[#382F2A] mb-4">{isEquifax ? 'Equifax' : 'CRIF'} Profile Data</h4>
                       {equifaxPersonalInfo && (
                         <div className="grid grid-cols-2 gap-4 mb-4">
                           <div>
@@ -747,8 +820,8 @@ export function EligibilityForm() {
                       )}
                       <div className="p-3 bg-white border border-[#EBE6DD] rounded-xl text-center">
                         <p className="text-xs text-[#8B7C73] leading-relaxed">
-                          Equifax does not return detailed credit accounts in their JSON response.
-                          <br />Please use the <strong>Equifax (PDF Only)</strong> option to view full account details.
+                          {isEquifax ? 'Equifax' : 'CRIF'} does not return detailed credit accounts in their JSON response.
+                          <br />Please use the <strong>{isEquifax ? 'Equifax' : 'CRIF'} (PDF)</strong> option to view full account details.
                         </p>
                       </div>
                     </div>
@@ -800,7 +873,7 @@ export function EligibilityForm() {
                             />
                             <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
                           </div>
-                          
+
                           <AnimatePresence>
                             {showEmployerDropdown && (
                               <motion.div
@@ -910,7 +983,7 @@ export function EligibilityForm() {
                               />
                             </div>
                           </div>
-                          
+
                           <div className="bg-white border border-brand-blue p-4 rounded-xl flex flex-col justify-center">
                             <p className="text-xs text-slate-500 mb-1">Maximum Eligible Fresh Loan Amount:</p>
                             <p className="text-2xl font-bold text-brand-blue mb-2">₹{Math.floor(maxFreshLoanAmount).toLocaleString('en-IN')}</p>
