@@ -14,7 +14,7 @@ export function EligibilityForm() {
     name: "", mobile: "", email: "", city: "", employmentType: "Salaried",
     monthlyIncome: "", employer: "", salaryMode: "Bank Transfer",
     requirement: "",
-    pan: "", gender: "male", consent: false, bureau: "v2_pdf"
+    pan: "", gender: "male", consent: false, bureau: "v2_json"
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -23,6 +23,7 @@ export function EligibilityForm() {
   const [dashboardTab, setDashboardTab] = useState<"enquiries" | "ongoing" | "closed" | "eligibility">("enquiries");
   const [userOverrides, setUserOverrides] = useState<any>({});
   const [loanOverrides, setLoanOverrides] = useState<any>({});
+  const [manualLoans, setManualLoans] = useState<any[]>([]);
 
   const [showEmployerDropdown, setShowEmployerDropdown] = useState(false);
   const [employerSearch, setEmployerSearch] = useState("");
@@ -281,24 +282,24 @@ export function EligibilityForm() {
                     <input type="radio" name="bureau" value="v2_json" checked={formData.bureau === 'v2_json'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-brand-blue accent-brand-blue" />
                     <span className="text-sm font-medium text-slate-700">Equifax (Dashboard)</span>
                   </label>
-                  <label className={`flex items-center gap-2 p-3 border rounded-xl cursor-pointer transition-all ${formData.bureau === 'v2_pdf' ? 'border-brand-blue bg-blue-50/50' : 'border-slate-200 hover:bg-slate-50'}`}>
-                    <input type="radio" name="bureau" value="v2_pdf" checked={formData.bureau === 'v2_pdf'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-brand-blue accent-brand-blue" />
+                  <label className="flex items-center gap-2 p-3 border rounded-xl cursor-not-allowed transition-all border-slate-200 bg-slate-50 opacity-50">
+                    <input type="radio" name="bureau" value="v2_pdf" disabled checked={formData.bureau === 'v2_pdf'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-brand-blue accent-brand-blue cursor-not-allowed" />
                     <span className="text-sm font-medium text-slate-700">Equifax (PDF)</span>
                   </label>
-                  <label className={`flex items-center gap-2 p-3 border rounded-xl cursor-pointer transition-all ${formData.bureau === 'experian_json' ? 'border-brand-blue bg-blue-50/50' : 'border-slate-200 hover:bg-slate-50'}`}>
-                    <input type="radio" name="bureau" value="experian_json" checked={formData.bureau === 'experian_json'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-brand-blue accent-brand-blue" />
+                  <label className="flex items-center gap-2 p-3 border rounded-xl cursor-not-allowed transition-all border-slate-200 bg-slate-50 opacity-50">
+                    <input type="radio" name="bureau" value="experian_json" disabled checked={formData.bureau === 'experian_json'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-brand-blue accent-brand-blue cursor-not-allowed" />
                     <span className="text-sm font-medium text-slate-700">Experian (Dashboard)</span>
                   </label>
-                  <label className={`flex items-center gap-2 p-3 border rounded-xl cursor-pointer transition-all ${formData.bureau === 'experian_pdf' ? 'border-brand-blue bg-blue-50/50' : 'border-slate-200 hover:bg-slate-50'}`}>
-                    <input type="radio" name="bureau" value="experian_pdf" checked={formData.bureau === 'experian_pdf'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-brand-blue accent-brand-blue" />
+                  <label className="flex items-center gap-2 p-3 border rounded-xl cursor-not-allowed transition-all border-slate-200 bg-slate-50 opacity-50">
+                    <input type="radio" name="bureau" value="experian_pdf" disabled checked={formData.bureau === 'experian_pdf'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-brand-blue accent-brand-blue cursor-not-allowed" />
                     <span className="text-sm font-medium text-slate-700">Experian (PDF)</span>
                   </label>
-                  <label className={`flex items-center gap-2 p-3 border rounded-xl cursor-pointer transition-all ${formData.bureau === 'crif_json' ? 'border-brand-blue bg-blue-50/50' : 'border-slate-200 hover:bg-slate-50'}`}>
-                    <input type="radio" name="bureau" value="crif_json" checked={formData.bureau === 'crif_json'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-brand-blue accent-brand-blue" />
+                  <label className="flex items-center gap-2 p-3 border rounded-xl cursor-not-allowed transition-all border-slate-200 bg-slate-50 opacity-50">
+                    <input type="radio" name="bureau" value="crif_json" disabled checked={formData.bureau === 'crif_json'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-brand-blue accent-brand-blue cursor-not-allowed" />
                     <span className="text-sm font-medium text-slate-700">CRIF (Dashboard)</span>
                   </label>
-                  <label className={`flex items-center gap-2 p-3 border rounded-xl cursor-pointer transition-all ${formData.bureau === 'crif_pdf' ? 'border-brand-blue bg-blue-50/50' : 'border-slate-200 hover:bg-slate-50'}`}>
-                    <input type="radio" name="bureau" value="crif_pdf" checked={formData.bureau === 'crif_pdf'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-brand-blue accent-brand-blue" />
+                  <label className="flex items-center gap-2 p-3 border rounded-xl cursor-not-allowed transition-all border-slate-200 bg-slate-50 opacity-50">
+                    <input type="radio" name="bureau" value="crif_pdf" disabled checked={formData.bureau === 'crif_pdf'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-brand-blue accent-brand-blue cursor-not-allowed" />
                     <span className="text-sm font-medium text-slate-700">CRIF (PDF)</span>
                   </label>
                 </div>
@@ -347,7 +348,7 @@ export function EligibilityForm() {
         const safeAccounts = accounts || [];
         // A closed loan is exactly one that has 0 or less balance left
         const closedAccounts = safeAccounts.filter((a: any) => Number(a.currentBalance) <= 0);
-        const activeAccounts = safeAccounts.filter((a: any) => !closedAccounts.includes(a));
+        const activeAccounts = [...safeAccounts.filter((a: any) => !closedAccounts.includes(a)), ...manualLoans];
 
         // Call Eligibility Engine
         const baseMonthly = Number(userOverrides.netSalary) || Number(formData.monthlyIncome) || 50000;
@@ -1104,6 +1105,13 @@ export function EligibilityForm() {
                           </div>
                         )
                       })}
+                      
+                      <button 
+                        onClick={() => setManualLoans([...manualLoans, { accountNumber: 'manual_' + Date.now(), accountType: 'Personal Loan', currentBalance: 0, highCreditAmount: 0, memberShortName: '', interest_rate: 0, emiAmount: 0 }])}
+                        className="mt-4 flex items-center justify-center gap-2 w-full py-3 border-2 border-dashed border-slate-300 rounded-xl text-slate-500 font-semibold hover:border-brand-blue hover:text-brand-blue transition-colors"
+                      >
+                        <Plus className="w-4 h-4" /> Add Missing Loan
+                      </button>
                     </div>
                   </div>
 
