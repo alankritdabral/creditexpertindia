@@ -11,8 +11,62 @@ import iciciLogo from '@/public/logos/icici.png';
 import axisLogo from '@/public/logos/axis.png';
 import kotakLogo from '@/public/logos/kotak.png';
 
+function OdometerDigit({ char }: { char: string }) {
+  if (isNaN(Number(char)) || char.trim() === "") {
+    return (
+      <span className="flex h-[1em] items-center justify-center">
+        {char}
+      </span>
+    );
+  }
+  return (
+    <span className="relative flex h-[1em] w-[1ch] overflow-hidden">
+      <motion.span
+        initial={false}
+        animate={{ y: `-${Number(char) * 10}%` }}
+        transition={{ type: "tween", ease: [0.22, 1, 0.36, 1], duration: 0.8 }}
+        className="absolute top-0 left-0 flex flex-col w-full"
+      >
+        {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
+          <span key={num} className="flex h-[1em] items-center justify-center">
+            {num}
+          </span>
+        ))}
+      </motion.span>
+    </span>
+  );
+}
+
+function AnimatedCurrency({ amount, isMounted }: { amount: number, isMounted: boolean }) {
+  const formattedAmount = isMounted
+    ? new Intl.NumberFormat('en-IN', {
+        style: 'currency',
+        currency: 'INR',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }).format(amount)
+    : '₹15,43,29,805.12';
+
+  const chars = formattedAmount.split("");
+  const len = chars.length;
+  
+  return (
+    <span className="inline-flex items-center text-emerald-600 font-mono tracking-tight" style={{ lineHeight: 1 }}>
+      {chars.map((char, i) => (
+        <OdometerDigit key={len - i - 1} char={char} />
+      ))}
+    </span>
+  );
+}
+
 export function HeroGridBlock() {
-  const [savedAmount, setSavedAmount] = React.useState(154329805.12);
+  const BASE_AMOUNT = 154329805.12;
+  // Fixed anchor timestamp so the number continuously grows over time instead of resetting on redeploys
+  const BASELINE_TIMESTAMP = 1789640000000; 
+  const INCREMENT_PER_SECOND = 12.45;
+
+  const [displayAmount, setDisplayAmount] = React.useState(BASE_AMOUNT);
+  
   const [isMounted, setIsMounted] = React.useState(false);
   const words = [
     { text: "reduce", color: "#2563EB" },
@@ -25,16 +79,33 @@ export function HeroGridBlock() {
   React.useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsMounted(true);
-    let lastTime = performance.now();
     let animationFrameId: number;
+    const startTime = performance.now();
+    const ANIMATION_DURATION = 3000; // 3 seconds to smoothly count up
+    
+    let lastTickTime = 0;
+    let nextTickDelay = 2500;
 
     const updateCounter = (currentTime: number) => {
-      const deltaTime = currentTime - lastTime;
-      // Increase by roughly ₹5.3 every second (just an arbitrary fast-moving number)
-      const increment = (deltaTime / 1000) * 12.45;
+      const elapsedTime = currentTime - startTime;
       
-      setSavedAmount(prev => prev + increment);
-      lastTime = currentTime;
+      const elapsedSecondsTotal = (Date.now() - BASELINE_TIMESTAMP) / 1000;
+      const trueAmount = BASE_AMOUNT + Math.max(0, elapsedSecondsTotal) * INCREMENT_PER_SECOND;
+
+      if (elapsedTime < ANIMATION_DURATION) {
+        // Smooth ease-out cubic animation to catch up to the true accrued amount
+        const progress = elapsedTime / ANIMATION_DURATION;
+        const easeOutProgress = 1 - Math.pow(1 - progress, 3);
+        setDisplayAmount(BASE_AMOUNT + (trueAmount - BASE_AMOUNT) * easeOutProgress);
+      } else {
+        // After initial animation, tick every 2-3 seconds to create a more deliberate slot-machine effect
+        if (currentTime - lastTickTime > nextTickDelay) {
+          setDisplayAmount(trueAmount);
+          lastTickTime = currentTime;
+          nextTickDelay = 2000 + Math.random() * 1000; // Randomize next tick between 2s and 3s
+        }
+      }
+      
       animationFrameId = requestAnimationFrame(updateCounter);
     };
 
@@ -49,16 +120,6 @@ export function HeroGridBlock() {
     return () => clearInterval(interval);
   }, [words.length]);
 
-  // Format currency with Indian numbering system and 2 decimal places
-  const formattedAmount = isMounted 
-    ? new Intl.NumberFormat('en-IN', {
-        style: 'currency',
-        currency: 'INR',
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      }).format(savedAmount)
-    : '₹15,43,29,805.12';
-
   return (
     <div className="flex flex-col justify-between h-full p-8 md:p-12">
       <div>
@@ -68,7 +129,7 @@ export function HeroGridBlock() {
             <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
           </span>
           <span className="opacity-80">Interest Saved for Customers:</span>
-          <span className="text-emerald-600 font-mono tracking-tight">{formattedAmount}</span>
+          <AnimatedCurrency amount={displayAmount} isMounted={isMounted} />
         </div>
 
         <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-text-main mb-6 leading-[1.1]">
