@@ -250,8 +250,8 @@ const LENDERS = [
 ];
 
 export function analyzeLenderEligibility({ profile, catBLoans }: { profile: any, catBLoans: any[] }) {
-  const { netSalary, employer, hasBounce, hasLatePayment, hasActiveOverdue, wantsTopUp } = profile;
-  const employerTier = getEmployerTier(employer);
+  const { netSalary, employer, employerTier: manualTier, hasBounce, hasLatePayment, hasActiveOverdue, wantsTopUp } = profile;
+  const employerTier = manualTier || getEmployerTier(employer);
 
   // Characterize the liabilities
   const plCount = catBLoans.filter((l: any) => l.type === 'Personal Loan').length;

@@ -7,6 +7,7 @@ import { collection, doc, getDoc, setDoc, serverTimestamp } from "firebase/fires
 import { db } from "@/lib/firebaseClient";
 import { analyzeLenderEligibility } from "@/lib/lenderEngine";
 import { EMPLOYERS } from "@/lib/employers";
+import { parseBureauData } from "@/lib/bureauParsers";
 export function EligibilityForm() {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
@@ -268,32 +269,32 @@ export function EligibilityForm() {
               <div className="pt-2">
                 <p className="text-sm font-semibold text-text-main mb-3">Select Credit Bureau & Format</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <label className={`flex items-center gap-2 p-3 border rounded-xl transition-all opacity-50 cursor-not-allowed ${formData.bureau === 'v1_json' ? 'border-brand-blue bg-blue-50/50' : 'border-slate-200'}`}>
-                    <input type="radio" name="bureau" value="v1_json" checked={formData.bureau === 'v1_json'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} disabled className="w-4 h-4 text-brand-blue accent-brand-blue" />
+                  <label className="flex items-center gap-2 p-3 border rounded-xl cursor-not-allowed transition-all border-slate-200 bg-slate-50 opacity-50">
+                    <input type="radio" name="bureau" value="v1_json" checked={formData.bureau === 'v1_json'} disabled onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-brand-blue accent-brand-blue cursor-not-allowed" />
                     <span className="text-sm font-medium text-slate-700">CIBIL (Dashboard)</span>
                   </label>
-                  <label className={`flex items-center gap-2 p-3 border rounded-xl transition-all opacity-50 cursor-not-allowed ${formData.bureau === 'v1_pdf' ? 'border-brand-blue bg-blue-50/50' : 'border-slate-200'}`}>
-                    <input type="radio" name="bureau" value="v1_pdf" checked={formData.bureau === 'v1_pdf'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} disabled className="w-4 h-4 text-brand-blue accent-brand-blue" />
+                  <label className="flex items-center gap-2 p-3 border rounded-xl cursor-not-allowed transition-all border-slate-200 bg-slate-50 opacity-50">
+                    <input type="radio" name="bureau" value="v1_pdf" checked={formData.bureau === 'v1_pdf'} disabled onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-brand-blue accent-brand-blue cursor-not-allowed" />
                     <span className="text-sm font-medium text-slate-700">CIBIL (PDF)</span>
                   </label>
-                  <label className={`flex items-center gap-2 p-3 border rounded-xl transition-all opacity-50 cursor-not-allowed ${formData.bureau === 'v2_json' ? 'border-brand-blue bg-blue-50/50' : 'border-slate-200'}`}>
-                    <input type="radio" name="bureau" value="v2_json" checked={formData.bureau === 'v2_json'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} disabled className="w-4 h-4 text-brand-blue accent-brand-blue" />
+                  <label className={`flex items-center gap-2 p-3 border rounded-xl cursor-pointer transition-all ${formData.bureau === 'v2_json' ? 'border-brand-blue bg-blue-50/50' : 'border-slate-200 hover:bg-slate-50'}`}>
+                    <input type="radio" name="bureau" value="v2_json" checked={formData.bureau === 'v2_json'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-brand-blue accent-brand-blue" />
                     <span className="text-sm font-medium text-slate-700">Equifax (Dashboard)</span>
                   </label>
                   <label className={`flex items-center gap-2 p-3 border rounded-xl cursor-pointer transition-all ${formData.bureau === 'v2_pdf' ? 'border-brand-blue bg-blue-50/50' : 'border-slate-200 hover:bg-slate-50'}`}>
                     <input type="radio" name="bureau" value="v2_pdf" checked={formData.bureau === 'v2_pdf'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-brand-blue accent-brand-blue" />
                     <span className="text-sm font-medium text-slate-700">Equifax (PDF)</span>
                   </label>
-                  <label className={`flex items-center gap-2 p-3 border rounded-xl transition-all opacity-50 cursor-not-allowed ${formData.bureau === 'experian_json' ? 'border-brand-blue bg-blue-50/50' : 'border-slate-200'}`}>
-                    <input type="radio" name="bureau" value="experian_json" checked={formData.bureau === 'experian_json'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} disabled className="w-4 h-4 text-brand-blue accent-brand-blue" />
+                  <label className={`flex items-center gap-2 p-3 border rounded-xl cursor-pointer transition-all ${formData.bureau === 'experian_json' ? 'border-brand-blue bg-blue-50/50' : 'border-slate-200 hover:bg-slate-50'}`}>
+                    <input type="radio" name="bureau" value="experian_json" checked={formData.bureau === 'experian_json'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-brand-blue accent-brand-blue" />
                     <span className="text-sm font-medium text-slate-700">Experian (Dashboard)</span>
                   </label>
                   <label className={`flex items-center gap-2 p-3 border rounded-xl cursor-pointer transition-all ${formData.bureau === 'experian_pdf' ? 'border-brand-blue bg-blue-50/50' : 'border-slate-200 hover:bg-slate-50'}`}>
                     <input type="radio" name="bureau" value="experian_pdf" checked={formData.bureau === 'experian_pdf'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-brand-blue accent-brand-blue" />
                     <span className="text-sm font-medium text-slate-700">Experian (PDF)</span>
                   </label>
-                  <label className={`flex items-center gap-2 p-3 border rounded-xl transition-all opacity-50 cursor-not-allowed ${formData.bureau === 'crif_json' ? 'border-brand-blue bg-blue-50/50' : 'border-slate-200'}`}>
-                    <input type="radio" name="bureau" value="crif_json" checked={formData.bureau === 'crif_json'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} disabled className="w-4 h-4 text-brand-blue accent-brand-blue" />
+                  <label className={`flex items-center gap-2 p-3 border rounded-xl cursor-pointer transition-all ${formData.bureau === 'crif_json' ? 'border-brand-blue bg-blue-50/50' : 'border-slate-200 hover:bg-slate-50'}`}>
+                    <input type="radio" name="bureau" value="crif_json" checked={formData.bureau === 'crif_json'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-brand-blue accent-brand-blue" />
                     <span className="text-sm font-medium text-slate-700">CRIF (Dashboard)</span>
                   </label>
                   <label className={`flex items-center gap-2 p-3 border rounded-xl cursor-pointer transition-all ${formData.bureau === 'crif_pdf' ? 'border-brand-blue bg-blue-50/50' : 'border-slate-200 hover:bg-slate-50'}`}>
@@ -337,69 +338,11 @@ export function EligibilityForm() {
 
       case 6:
         const isEquifax = formData.bureau.startsWith("v2");
-
-        let accountSummary = null;
-        let inquirySummary = null;
-        let accounts = null;
-        let enquiries = null;
-        let equifaxPersonalInfo = null;
-
-        const isExperian = formData.bureau.startsWith("experian");
         const isCrif = formData.bureau.startsWith("crif");
+        const isExperian = formData.bureau.startsWith("experian");
 
-        if (isEquifax) {
-          // Equifax JSON parsing
-          const cirDataList = cibilData?.credit_report?.CCRResponse?.CIRReportDataLst || [];
-          const firstCirData = cirDataList[0]?.CIRReportData;
-          equifaxPersonalInfo = firstCirData?.IDAndContactInfo?.PersonalInfo;
-
-          if (cirDataList.length > 0) {
-            enquiries = cirDataList.map((item: any) => ({
-              memberShortName: item.InquiryResponseHeader?.CustomerName || "Unknown Lender",
-              enquiryDate: item.InquiryResponseHeader?.Date || "N/A",
-              enquiryAmount: 0
-            }));
-            inquirySummary = { totalInquiry: cirDataList.length };
-          }
-        } else if (isExperian) {
-          const caisAccounts = cibilData?.credit_report?.CAIS_Account?.CAIS_Account_DETAILS || [];
-          accounts = caisAccounts.map((acc: any) => ({
-            accountNumber: acc.Account_Number,
-            accountType: acc.Account_Type,
-            currentBalance: acc.Current_Balance,
-            highCreditAmount: acc.Highest_Credit_or_Original_Loan_Amount,
-            memberShortName: acc.Subscriber_Name,
-            dateOpened: acc.Open_Date,
-            dateReported: acc.Date_Reported,
-            emiAmount: acc.Scheduled_Monthly_Payment_Amount || 0,
-            interest_rate: acc.Rate_of_Interest || 0
-          }));
-          const summary = cibilData?.credit_report?.CAIS_Account?.CAIS_Summary?.Credit_Account;
-          const outstanding = cibilData?.credit_report?.CAIS_Account?.CAIS_Summary?.Total_Outstanding_Balance;
-          accountSummary = {
-            totalAccounts: summary?.CreditAccountTotal || 0,
-            currentBalance: outstanding?.Outstanding_Balance_All || 0,
-            highCreditAmount: 0,
-            overdueBalance: 0,
-            overdueAccounts: summary?.CreditAccountDefault || 0,
-            zeroBalanceAccounts: summary?.CreditAccountClosed || 0
-          };
-          inquirySummary = {
-            totalInquiry: cibilData?.credit_report?.Current_Application?.Current_Application_Details?.Enquiry_Reason || 0,
-          };
-        } else if (isCrif) {
-          // Simple fallback for CRIF
-          accounts = [];
-          enquiries = [];
-        } else {
-          // CIBIL JSON Parsing
-          const report = cibilData?.credit_report?.[0];
-          const consumerSummary = report?.response?.consumerSummaryresp;
-          accountSummary = consumerSummary?.accountSummary;
-          inquirySummary = consumerSummary?.inquirySummary;
-          accounts = report?.accounts;
-          enquiries = report?.enquiries;
-        }
+        const parsed = parseBureauData(formData.bureau, cibilData);
+        let { accountSummary, inquirySummary, accounts, enquiries, personalInfo: equifaxPersonalInfo } = parsed;
 
         const safeAccounts = accounts || [];
         // A closed loan is exactly one that has 0 balance left
@@ -410,13 +353,14 @@ export function EligibilityForm() {
         const engineProfile = {
           netSalary: Number(userOverrides.netSalary) || Number(formData.monthlyIncome) || 50000,
           employer: userOverrides.employer || formData.employer || "Unknown",
+          employerTier: userOverrides.companyCategory || null,
           hasBounce: userOverrides.hasBounce || "no",
           hasLatePayment: userOverrides.hasLatePayment || "no",
           hasActiveOverdue: userOverrides.hasActiveOverdue || ((accountSummary?.overdueAccounts || 0) > 0 ? "yes" : "no"),
           wantsTopUp: userOverrides.wantsTopUp || "no"
         };
 
-        const catBLoans = activeAccounts.map((acc: any) => {
+        const mappedAccounts = activeAccounts.map((acc: any) => {
           const overrides = loanOverrides[acc.accountNumber] || {};
           return {
             id: acc.accountNumber,
@@ -426,7 +370,8 @@ export function EligibilityForm() {
                 (acc.accountType || "").includes("Credit") ? "Credit Card" :
                   (acc.accountType || "").includes("Overdraft") ? "Overdraft" : "Unknown"
             ),
-            wantsBT: overrides.wantsBT !== undefined ? overrides.wantsBT : "yes",
+            wantsBT: overrides.wantsBT !== undefined ? overrides.wantsBT : "no",
+            userPaysEmi: overrides.userPaysEmi !== undefined ? overrides.userPaysEmi : true,
             originalAmount: overrides.originalAmount !== undefined ? overrides.originalAmount : (acc.highCreditAmount || 0),
             currentOutstanding: overrides.currentOutstanding !== undefined ? overrides.currentOutstanding : (acc.currentBalance || 0),
             rate: overrides.rate !== undefined ? overrides.rate : (acc.interest_rate || 0),
@@ -436,12 +381,21 @@ export function EligibilityForm() {
             tenure: overrides.tenure !== undefined ? overrides.tenure : (acc.repaymentTenure || "N/A"),
             odPlan: overrides.odPlan !== undefined ? overrides.odPlan : "2yr"
           };
-        }).filter((l: any) => l.wantsBT === 'yes');
+        });
+
+        const catBLoans = mappedAccounts.filter((l: any) => l.wantsBT === 'yes');
 
         const { eligibleLenders, ineligibleLenders } = analyzeLenderEligibility({ profile: engineProfile, catBLoans });
 
         const totalActiveEMI = activeAccounts.reduce((sum: number, acc: any) => {
           const overrides = loanOverrides[acc.accountNumber] || {};
+          const wantsBT = overrides.wantsBT !== undefined ? overrides.wantsBT : "no";
+          const userPaysEmi = overrides.userPaysEmi !== undefined ? overrides.userPaysEmi : true;
+
+          if (!userPaysEmi || wantsBT === 'yes') {
+            return sum;
+          }
+
           const emi = overrides.emi !== undefined ? Number(overrides.emi) : (Number(acc.emiAmount) || 0);
           return sum + emi;
         }, 0);
@@ -529,11 +483,11 @@ export function EligibilityForm() {
                   <div className="grid grid-cols-2 gap-3 mb-6">
                     {[
                       { label: "Total Accounts", value: accountSummary?.totalAccounts || 0 },
-                      { label: "Current Balance", value: accountSummary?.currentBalance ? `₹${Number(accountSummary.currentBalance).toLocaleString('en-IN')}` : '₹0' },
-                      { label: "High Credit", value: accountSummary?.highCreditAmount ? `₹${Number(accountSummary.highCreditAmount).toLocaleString('en-IN')}` : '₹0' },
+                      { label: "Outstanding Balance", value: accountSummary?.currentBalance ? `₹${Number(accountSummary.currentBalance).toLocaleString('en-IN')}` : '₹0' },
+                      { label: "Total Loans Taken Till Date", value: accountSummary?.highCreditAmount ? `₹${Number(accountSummary.highCreditAmount).toLocaleString('en-IN')}` : '₹0' },
                       { label: "Overdue", value: accountSummary?.overdueBalance ? `₹${Number(accountSummary.overdueBalance).toLocaleString('en-IN')}` : '₹0' },
                       { label: "Overdue Accounts", value: accountSummary?.overdueAccounts || 0 },
-                      { label: "Zero Balance", value: accountSummary?.zeroBalanceAccounts || 0 }
+                      { label: "Closed Accounts", value: accountSummary?.zeroBalanceAccounts || 0 }
                     ].map((stat, i) => (
                       <div key={i} className="bg-[#FAF8F5] border border-[#EBE6DD] rounded-2xl p-4">
                         <p className="text-[#8B7C73] text-xs font-semibold mb-1">{stat.label}</p>
@@ -649,10 +603,7 @@ export function EligibilityForm() {
                           const isExpanded = expandedAccount === acc.accountNumber;
                           return (
                             <div key={i} className="bg-white border border-[#EBE6DD] rounded-2xl overflow-hidden transition-all shadow-sm">
-                              <button
-                                onClick={() => setExpandedAccount(isExpanded ? null : acc.accountNumber)}
-                                className="w-full flex items-center justify-between p-4 hover:bg-[#FAF8F5] transition-colors"
-                              >
+                              <div className="w-full flex items-center justify-between p-4 bg-[#FAF8F5] border-b border-[#EBE6DD]">
                                 <div className="text-left">
                                   <p className="text-sm font-bold text-[#382F2A]">{acc.memberShortName || 'Unknown Lender'}</p>
                                   <p className="text-xs font-semibold text-[#8B7C73] mt-0.5">{acc.accountType || 'Unknown Type'}</p>
@@ -662,47 +613,35 @@ export function EligibilityForm() {
                                     <p className="text-sm font-bold text-[#382F2A]">₹{Number(acc.currentBalance || 0).toLocaleString('en-IN')}</p>
                                     <p className="text-[10px] font-semibold text-[#8B7C73] uppercase tracking-wider mt-0.5">Balance</p>
                                   </div>
-                                  {isExpanded ? <ChevronUp className="w-4 h-4 text-[#8B7C73]" /> : <ChevronDown className="w-4 h-4 text-[#8B7C73]" />}
                                 </div>
-                              </button>
+                              </div>
 
-                              <AnimatePresence>
-                                {isExpanded && (
-                                  <motion.div
-                                    initial={{ height: 0, opacity: 0 }}
-                                    animate={{ height: "auto", opacity: 1 }}
-                                    exit={{ height: 0, opacity: 0 }}
-                                    className="border-t border-[#EBE6DD]"
-                                  >
-                                    <div className="p-4 grid grid-cols-2 gap-y-4 gap-x-2 bg-[#FAF8F5]">
-                                      <div>
-                                        <p className="text-[10px] font-bold text-[#8B7C73] uppercase">Account Number</p>
-                                        <p className="text-sm font-semibold text-[#382F2A]">{acc.accountNumber || 'N/A'}</p>
-                                      </div>
-                                      <div>
-                                        <p className="text-[10px] font-bold text-[#8B7C73] uppercase">High Credit</p>
-                                        <p className="text-sm font-semibold text-[#382F2A]">₹{Number(acc.highCreditAmount || 0).toLocaleString('en-IN')}</p>
-                                      </div>
-                                      <div>
-                                        <p className="text-[10px] font-bold text-[#8B7C73] uppercase">EMI</p>
-                                        <p className="text-sm font-semibold text-[#382F2A]">{acc.emiAmount ? `₹${Number(acc.emiAmount).toLocaleString('en-IN')}` : 'N/A'}</p>
-                                      </div>
-                                      <div>
-                                        <p className="text-[10px] font-bold text-[#8B7C73] uppercase">Interest Rate</p>
-                                        <p className="text-sm font-semibold text-[#382F2A]">{acc.interest_rate ? `${acc.interest_rate}%` : 'N/A'}</p>
-                                      </div>
-                                      <div>
-                                        <p className="text-[10px] font-bold text-[#8B7C73] uppercase">Date Opened</p>
-                                        <p className="text-sm font-semibold text-[#382F2A]">{acc.dateOpened || 'N/A'}</p>
-                                      </div>
-                                      <div>
-                                        <p className="text-[10px] font-bold text-[#8B7C73] uppercase">Date Reported</p>
-                                        <p className="text-sm font-semibold text-[#382F2A]">{acc.dateReported || 'N/A'}</p>
-                                      </div>
-                                    </div>
-                                  </motion.div>
-                                )}
-                              </AnimatePresence>
+                              <div className="p-4 grid grid-cols-2 gap-y-4 gap-x-2 bg-white">
+                                <div>
+                                  <p className="text-[10px] font-bold text-[#8B7C73] uppercase">Account Number</p>
+                                  <p className="text-sm font-semibold text-[#382F2A]">{acc.accountNumber || 'N/A'}</p>
+                                </div>
+                                <div>
+                                  <p className="text-[10px] font-bold text-[#8B7C73] uppercase">High Credit</p>
+                                  <p className="text-sm font-semibold text-[#382F2A]">₹{Number(acc.highCreditAmount || 0).toLocaleString('en-IN')}</p>
+                                </div>
+                                <div>
+                                  <p className="text-[10px] font-bold text-[#8B7C73] uppercase">EMI</p>
+                                  <p className="text-sm font-semibold text-[#382F2A]">{acc.emiAmount ? `₹${Number(acc.emiAmount).toLocaleString('en-IN')}` : 'N/A'}</p>
+                                </div>
+                                <div>
+                                  <p className="text-[10px] font-bold text-[#8B7C73] uppercase">Interest Rate</p>
+                                  <p className="text-sm font-semibold text-[#382F2A]">{acc.interest_rate ? `${acc.interest_rate}%` : 'N/A'}</p>
+                                </div>
+                                <div>
+                                  <p className="text-[10px] font-bold text-[#8B7C73] uppercase">Date Opened</p>
+                                  <p className="text-sm font-semibold text-[#382F2A]">{acc.dateOpened || 'N/A'}</p>
+                                </div>
+                                <div>
+                                  <p className="text-[10px] font-bold text-[#8B7C73] uppercase">Date Reported</p>
+                                  <p className="text-sm font-semibold text-[#382F2A]">{acc.dateReported || 'N/A'}</p>
+                                </div>
+                              </div>
                             </div>
                           );
                         })}
@@ -855,6 +794,22 @@ export function EligibilityForm() {
                             placeholder="e.g. 50000"
                           />
                         </div>
+                        <div>
+                          <label className="text-xs font-semibold text-slate-600 mb-1 block">Company Category</label>
+                          <select
+                            value={userOverrides.companyCategory || ""}
+                            onChange={e => setUserOverrides({ ...userOverrides, companyCategory: e.target.value })}
+                            className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm focus:border-brand-blue outline-none"
+                          >
+                            <option value="">Auto-detect from Name</option>
+                            <option value="A+">Super Cat A (A+)</option>
+                            <option value="A">Cat A (A)</option>
+                            <option value="B">Cat B (B)</option>
+                            <option value="C">Cat C (C)</option>
+                            <option value="D">Cat D (D)</option>
+                            <option value="E">Cat E (E)</option>
+                          </select>
+                        </div>
                         <div ref={employerDropdownRef} className="relative z-10">
                           <label className="text-xs font-semibold text-slate-600 mb-1 block">Employer</label>
                           <div className="relative">
@@ -1002,8 +957,8 @@ export function EligibilityForm() {
 
                     <h4 className="text-lg font-bold text-[#382F2A] mb-4">Review Open Loans</h4>
                     <div className="space-y-4 mb-8">
-                      {catBLoans.length === 0 && <p className="text-sm text-slate-500">No active loans found to evaluate.</p>}
-                      {catBLoans.map((loan: any, idx: number) => {
+                      {mappedAccounts.length === 0 && <p className="text-sm text-slate-500">No active loans found to evaluate.</p>}
+                      {mappedAccounts.map((loan: any, idx: number) => {
                         const l = loanOverrides[loan.id] || {};
                         return (
                           <div key={loan.id} className="bg-white border border-[#EBE6DD] rounded-2xl p-4 shadow-sm">
@@ -1011,15 +966,26 @@ export function EligibilityForm() {
                               <div className="flex items-center gap-2">
                                 <p className="font-bold text-sm text-[#382F2A]">Loan #{idx + 1} - {loan.originalType}</p>
                               </div>
-                              <label className="text-xs font-semibold flex items-center gap-1.5 cursor-pointer text-slate-600">
-                                <input
-                                  type="checkbox"
-                                  checked={loan.wantsBT === 'yes'}
-                                  onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), wantsBT: e.target.checked ? 'yes' : 'no' } }))}
-                                  className="w-4 h-4 text-brand-blue accent-brand-blue rounded border-slate-300"
-                                />
-                                Consolidate This?
-                              </label>
+                              <div className="flex items-center gap-4">
+                                <label className="text-xs font-semibold flex items-center gap-1.5 cursor-pointer text-slate-600">
+                                  <input
+                                    type="checkbox"
+                                    checked={loan.wantsBT === 'yes'}
+                                    onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), wantsBT: e.target.checked ? 'yes' : 'no' } }))}
+                                    className="w-4 h-4 text-brand-blue accent-brand-blue rounded border-slate-300"
+                                  />
+                                  Consolidate?
+                                </label>
+                                <label className="text-xs font-semibold flex items-center gap-1.5 cursor-pointer text-slate-600">
+                                  <input
+                                    type="checkbox"
+                                    checked={loan.userPaysEmi !== false}
+                                    onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), userPaysEmi: e.target.checked } }))}
+                                    className="w-4 h-4 text-brand-blue accent-brand-blue rounded border-slate-300"
+                                  />
+                                  I pay this EMI
+                                </label>
+                              </div>
                             </div>
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                               <div>
@@ -1128,7 +1094,66 @@ export function EligibilityForm() {
                   <div className="mb-6">
                     <h4 className="text-lg font-bold text-[#382F2A] mb-4">Eligible Consolidation Options</h4>
                     {eligibleLenders.length > 0 ? (
-                      <div className="space-y-3">
+                      <div className="space-y-4">
+                        {(() => {
+                          const bestLender = eligibleLenders[0];
+                          const consolidationAmount = catBLoans.reduce((sum: number, l: any) => sum + Number(l.currentOutstanding || 0), 0);
+                          const currentEmiToConsolidate = catBLoans.reduce((sum: number, l: any) => sum + Number(l.emi || 0), 0);
+                          const totalNewLoan = consolidationAmount + (userOverrides.wantsTopUp === 'yes' ? Number(userOverrides.topUpAmount || 0) : 0);
+
+                          const ratePerMonth = (bestLender.headlineRate || 12) / 12 / 100;
+                          const tenureMonths = bestLender.maxTenure || 60;
+                          const newEmi = Math.round(
+                            (totalNewLoan * ratePerMonth * Math.pow(1 + ratePerMonth, tenureMonths)) /
+                            (Math.pow(1 + ratePerMonth, tenureMonths) - 1)
+                          ) || 0;
+
+                          const emiSavings = currentEmiToConsolidate - newEmi;
+
+                          if (totalNewLoan === 0) {
+                            return (
+                              <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 mb-2 shadow-sm text-center">
+                                <p className="text-sm font-medium text-slate-600">
+                                  Select at least one loan to consolidate from the &quot;Review Open Loans&quot; section above, or request a fresh loan, to see your estimated savings.
+                                </p>
+                              </div>
+                            );
+                          }
+                          return (
+                            <div className="bg-[#FAF8F5] border border-[#EBE6DD] rounded-2xl p-5 mb-2 shadow-sm">
+                              <h4 className="text-sm font-extrabold text-[#382F2A] mb-4 flex items-center justify-between">
+                                <span>Consolidation Estimate (Best Option: {bestLender.name})</span>
+                                <span className="text-xs font-semibold text-brand-blue bg-blue-50 px-2 py-1 rounded-md">{bestLender.headlineRate}% p.a.</span>
+                              </h4>
+                              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div className="bg-white border border-slate-100 p-3 rounded-xl">
+                                  <p className="text-[10px] uppercase tracking-wider font-bold text-slate-500">Total New Loan</p>
+                                  <p className="text-xl font-black text-[#382F2A] mt-1">₹{totalNewLoan.toLocaleString('en-IN')}</p>
+                                  {userOverrides.wantsTopUp === 'yes' && Number(userOverrides.topUpAmount || 0) > 0 && (
+                                    <p className="text-[10px] text-slate-500 mt-1">Includes ₹{Number(userOverrides.topUpAmount).toLocaleString('en-IN')} Top-up</p>
+                                  )}
+                                </div>
+                                <div className="bg-white border border-slate-100 p-3 rounded-xl">
+                                  <p className="text-[10px] uppercase tracking-wider font-bold text-slate-500">Est. New EMI</p>
+                                  <p className="text-xl font-black text-[#382F2A] mt-1">₹{newEmi.toLocaleString('en-IN')}</p>
+                                  <p className="text-[10px] text-slate-500 mt-1">For {tenureMonths} months</p>
+                                </div>
+                                <div className={`border p-3 rounded-xl ${emiSavings >= 0 ? 'bg-emerald-50 border-emerald-100' : 'bg-red-50 border-red-100'}`}>
+                                  <p className={`text-[10px] uppercase tracking-wider font-bold ${emiSavings >= 0 ? 'text-emerald-700' : 'text-red-700'}`}>
+                                    {emiSavings >= 0 ? 'EMI Savings' : 'Extra EMI'}
+                                  </p>
+                                  <p className={`text-xl font-black mt-1 ${emiSavings >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+                                    {emiSavings >= 0 ? '↓' : '↑'} ₹{Math.abs(emiSavings).toLocaleString('en-IN')}
+                                  </p>
+                                  <p className={`text-[10px] mt-1 ${emiSavings >= 0 ? 'text-emerald-600/80' : 'text-red-600/80'}`}>
+                                    vs current consolidated EMI
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })()}
+
                         {eligibleLenders.map((lender: any, i: number) => (
                           <div key={i} className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex items-center justify-between">
                             <div>
