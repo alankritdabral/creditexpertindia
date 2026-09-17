@@ -12,6 +12,20 @@ export function SmartCalculator() {
   const [newRate, setNewRate] = useState(12); // Expected rate
   const [newTenure, setNewTenure] = useState(60); // New tenure months
 
+  React.useEffect(() => {
+    const currentMonthlyRate = (currentRate / 12) / 100;
+    const calculatedEMI = currentRate === 0 
+      ? Math.round(outstanding / currentTenure)
+      : Math.round(
+          outstanding * currentMonthlyRate * Math.pow(1 + currentMonthlyRate, currentTenure) / 
+          (Math.pow(1 + currentMonthlyRate, currentTenure) - 1)
+        );
+    
+    if (!isNaN(calculatedEMI) && isFinite(calculatedEMI) && calculatedEMI > 0) {
+      setCurrentEMI(calculatedEMI);
+    }
+  }, [outstanding, currentRate, currentTenure]);
+
   // Calculate current estimated remaining interest roughly
   // This is a simplified calculation for illustrative purposes
   const currentTotalPayment = currentEMI * currentTenure;
@@ -48,9 +62,17 @@ export function SmartCalculator() {
           
           <div className="space-y-6">
             <div>
-              <div className="flex justify-between mb-2">
+              <div className="flex justify-between items-center mb-3">
                 <label className="text-sm font-semibold text-text-muted">Total Outstanding</label>
-                <span className="font-bold text-brand-blue">₹{outstanding.toLocaleString('en-IN')}</span>
+                <div className="relative flex items-center shadow-sm">
+                  <span className="absolute left-3 font-bold text-slate-400">₹</span>
+                  <input 
+                    type="number" 
+                    value={outstanding}
+                    onChange={(e) => setOutstanding(Number(e.target.value))}
+                    className="w-[140px] bg-white border border-slate-200 rounded-lg py-1.5 pl-7 pr-3 font-bold text-brand-blue focus:ring-2 focus:ring-brand-blue outline-none transition-shadow text-right [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  />
+                </div>
               </div>
               <input 
                 type="range" min="50000" max="2500000" step="50000"
@@ -60,9 +82,17 @@ export function SmartCalculator() {
             </div>
 
             <div>
-              <div className="flex justify-between mb-2">
+              <div className="flex justify-between items-center mb-3">
                 <label className="text-sm font-semibold text-text-muted">Current Total EMI</label>
-                <span className="font-bold text-brand-blue">₹{currentEMI.toLocaleString('en-IN')}</span>
+                <div className="relative flex items-center shadow-sm">
+                  <span className="absolute left-3 font-bold text-slate-400">₹</span>
+                  <input 
+                    type="number" 
+                    value={currentEMI}
+                    onChange={(e) => setCurrentEMI(Number(e.target.value))}
+                    className="w-[140px] bg-white border border-slate-200 rounded-lg py-1.5 pl-7 pr-3 font-bold text-brand-blue focus:ring-2 focus:ring-brand-blue outline-none transition-shadow text-right [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  />
+                </div>
               </div>
               <input 
                 type="range" min="5000" max="100000" step="1000"
@@ -77,7 +107,7 @@ export function SmartCalculator() {
                 <div className="relative">
                   <input 
                     type="number" value={currentRate} onChange={(e) => setCurrentRate(Number(e.target.value))}
-                    className="w-full bg-white border border-slate-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-brand-blue outline-none transition-shadow"
+                    className="w-full bg-white border border-slate-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-brand-blue outline-none transition-shadow [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                   <span className="absolute right-4 top-2.5 text-text-muted">%</span>
                 </div>
@@ -87,7 +117,7 @@ export function SmartCalculator() {
                 <div className="relative">
                   <input 
                     type="number" value={currentTenure} onChange={(e) => setCurrentTenure(Number(e.target.value))}
-                    className="w-full bg-white border border-slate-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-brand-blue outline-none transition-shadow"
+                    className="w-full bg-white border border-slate-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-brand-blue outline-none transition-shadow [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                   <span className="absolute right-4 top-2.5 text-text-muted">mo</span>
                 </div>
@@ -103,7 +133,7 @@ export function SmartCalculator() {
                 <div className="relative">
                   <input 
                     type="number" value={newRate} onChange={(e) => setNewRate(Number(e.target.value))}
-                    className="w-full bg-white border border-slate-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-emerald-500 outline-none transition-shadow"
+                    className="w-full bg-white border border-slate-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-emerald-500 outline-none transition-shadow [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                   <span className="absolute right-4 top-2.5 text-text-muted">%</span>
                 </div>
@@ -113,7 +143,7 @@ export function SmartCalculator() {
                 <div className="relative">
                   <input 
                     type="number" value={newTenure} onChange={(e) => setNewTenure(Number(e.target.value))}
-                    className="w-full bg-white border border-slate-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-emerald-500 outline-none transition-shadow"
+                    className="w-full bg-white border border-slate-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-emerald-500 outline-none transition-shadow [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                   <span className="absolute right-4 top-2.5 text-text-muted">mo</span>
                 </div>
