@@ -345,13 +345,17 @@ export function EligibilityForm() {
         let { accountSummary, inquirySummary, accounts, enquiries, personalInfo: equifaxPersonalInfo } = parsed;
 
         const safeAccounts = accounts || [];
-        // A closed loan is exactly one that has 0 balance left
-        const closedAccounts = safeAccounts.filter((a: any) => Number(a.currentBalance) === 0);
+        // A closed loan is exactly one that has 0 or less balance left
+        const closedAccounts = safeAccounts.filter((a: any) => Number(a.currentBalance) <= 0);
         const activeAccounts = safeAccounts.filter((a: any) => !closedAccounts.includes(a));
 
         // Call Eligibility Engine
+        const baseMonthly = Number(userOverrides.netSalary) || Number(formData.monthlyIncome) || 50000;
+        const avgYearlyBonus = Number(userOverrides.yearlyBonus) || 0;
+        const effectiveNetSalary = baseMonthly + (avgYearlyBonus / 12);
+
         const engineProfile = {
-          netSalary: Number(userOverrides.netSalary) || Number(formData.monthlyIncome) || 50000,
+          netSalary: effectiveNetSalary,
           employer: userOverrides.employer || formData.employer || "Unknown",
           employerTier: userOverrides.companyCategory || null,
           hasBounce: userOverrides.hasBounce || "no",
@@ -383,7 +387,7 @@ export function EligibilityForm() {
           };
         });
 
-        const catBLoans = mappedAccounts.filter((l: any) => l.wantsBT === 'yes');
+        const catBLoans = mappedAccounts.filter((l: any) => l.wantsBT === 'yes' && Number(l.currentOutstanding) > 0);
 
         const { eligibleLenders, ineligibleLenders } = analyzeLenderEligibility({ profile: engineProfile, catBLoans });
 
@@ -391,8 +395,10 @@ export function EligibilityForm() {
           const overrides = loanOverrides[acc.accountNumber] || {};
           const wantsBT = overrides.wantsBT !== undefined ? overrides.wantsBT : "no";
           const userPaysEmi = overrides.userPaysEmi !== undefined ? overrides.userPaysEmi : true;
+          const currentOutstanding = overrides.currentOutstanding !== undefined ? overrides.currentOutstanding : (acc.currentBalance || 0);
 
-          if (!userPaysEmi || wantsBT === 'yes') {
+          // If balance is 0 or less, assume not used/completed, don't count EMI
+          if (Number(currentOutstanding) <= 0 || !userPaysEmi || wantsBT === 'yes') {
             return sum;
           }
 
@@ -400,7 +406,7 @@ export function EligibilityForm() {
           return sum + emi;
         }, 0);
 
-        const netSalary = Number(userOverrides.netSalary) || Number(formData.monthlyIncome) || 0;
+        const netSalary = (Number(userOverrides.netSalary) || Number(formData.monthlyIncome) || 0) + ((Number(userOverrides.yearlyBonus) || 0) / 12);
         const maxEmiCapacity = netSalary * 0.7;
         const unusedEmiCapacity = Math.max(0, maxEmiCapacity - totalActiveEMI);
         const topUpTenure = Number(userOverrides.topUpTenure) || 5;
@@ -773,16 +779,16 @@ export function EligibilityForm() {
                     <h4 className="text-lg font-bold text-[#382F2A] mb-4">Complete Profile for Accurate Eligibility</h4>
 
                     <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 mb-6">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
                           <label className="text-xs font-semibold text-slate-600 mb-1 flex justify-between items-center">
                             <span>Net Monthly Salary</span>
                             <div className="flex items-center gap-2 text-[10px] font-bold">
-                              <span className={`px-2 py-0.5 rounded-full ${totalActiveEMI > ((Number(userOverrides.netSalary) || Number(formData.monthlyIncome) || 0) * 0.7) ? 'bg-red-50 text-red-600' : 'bg-slate-100 text-slate-600'}`}>
+                              <span className={`px-2 py-0.5 rounded-full ${totalActiveEMI > maxEmiCapacity ? 'bg-red-50 text-red-600' : 'bg-slate-100 text-slate-600'}`}>
                                 Used EMI: ₹{totalActiveEMI.toLocaleString('en-IN')}
                               </span>
                               <span className="bg-blue-50 text-brand-blue px-2 py-0.5 rounded-full">
-                                Max EMI: ₹{((Number(userOverrides.netSalary) || Number(formData.monthlyIncome) || 0) * 0.7).toLocaleString('en-IN')}
+                                Max EMI: ₹{maxEmiCapacity.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
                               </span>
                             </div>
                           </label>
@@ -792,6 +798,18 @@ export function EligibilityForm() {
                             onChange={e => setUserOverrides({ ...userOverrides, netSalary: e.target.value })}
                             className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm focus:border-brand-blue outline-none"
                             placeholder="e.g. 50000"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs font-semibold text-slate-600 mb-1 block">
+                            Average Yearly Bonus
+                          </label>
+                          <input
+                            type="number"
+                            value={userOverrides.yearlyBonus || ""}
+                            onChange={e => setUserOverrides({ ...userOverrides, yearlyBonus: e.target.value })}
+                            className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm focus:border-brand-blue outline-none"
+                            placeholder="e.g. 100000"
                           />
                         </div>
                         <div>
