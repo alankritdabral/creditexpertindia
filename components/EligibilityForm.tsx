@@ -1097,8 +1097,7 @@ export function EligibilityForm() {
                                   type="number"
                                   value={loan.originalAmount ?? ""}
                                   onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), originalAmount: e.target.value } }))}
-                                  disabled={loan.type === 'Credit Card' || loan.type === 'Gold Loan'}
-                                  className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-brand-blue disabled:opacity-50 disabled:cursor-not-allowed"
+                                  className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-brand-blue"
                                 />
                               </div>
                               <div>
@@ -1116,8 +1115,7 @@ export function EligibilityForm() {
                                   type="text"
                                   value={loan.dateOpened ?? ""}
                                   onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), dateOpened: e.target.value } }))}
-                                  disabled={loan.type === 'Credit Card' || loan.type === 'Gold Loan'}
-                                  className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-brand-blue disabled:opacity-50 disabled:cursor-not-allowed"
+                                  className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-brand-blue"
                                 />
                               </div>
                               <div>
@@ -1136,8 +1134,7 @@ export function EligibilityForm() {
                                     type="number"
                                     value={loan.tenure ?? ""}
                                     onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), tenure: e.target.value } }))}
-                                    disabled={loan.type === 'Credit Card' || loan.type === 'Gold Loan'}
-                                    className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-brand-blue disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-brand-blue"
                                   />
                                 )}
                               </div>
@@ -1156,8 +1153,7 @@ export function EligibilityForm() {
                                   type="number"
                                   value={loan.rate ?? ""}
                                   onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), rate: e.target.value } }))}
-                                  disabled={loan.type === 'Credit Card' || loan.type === 'Gold Loan'}
-                                  className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-brand-blue disabled:opacity-50 disabled:cursor-not-allowed"
+                                  className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-brand-blue"
                                 />
                               </div>
                             </div>
