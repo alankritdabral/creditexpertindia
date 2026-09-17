@@ -2,13 +2,40 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, Check, Plus, Trash2, User, Phone, Mail, MapPin, Briefcase, Building2, Shield, CreditCard, Loader2, AlertCircle, ChevronDown, ChevronUp } from "lucide-react";
+import { ArrowRight, Check, Plus, Trash2, User, Phone, Mail, MapPin, Briefcase, Building2, Shield, CreditCard, Loader2, AlertCircle, ChevronDown, ChevronUp, Download } from "lucide-react";
 import { collection, doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebaseClient";
 import { analyzeLenderEligibility } from "@/lib/lenderEngine";
 import { EMPLOYERS } from "@/lib/employers";
 import { parseBureauData } from "@/lib/bureauParsers";
 export function EligibilityForm() {
+  const captureRef = useRef<HTMLDivElement>(null);
+  const [isDownloadingImage, setIsDownloadingImage] = useState(false);
+
+  const handleDownloadImage = async () => {
+    if (!captureRef.current) {
+      alert("Error: Capture area not found.");
+      return;
+    }
+    setIsDownloadingImage(true);
+    try {
+      const htmlToImage = await import('html-to-image');
+      const dataUrl = await htmlToImage.toPng(captureRef.current, {
+        pixelRatio: 2,
+        backgroundColor: '#ffffff'
+      });
+      const link = document.createElement('a');
+      link.download = `CEI_Eligibility_${formData.name || 'Report'}.png`;
+      link.href = dataUrl;
+      link.click();
+    } catch (e) {
+      console.error("Failed to capture image", e);
+      alert("Failed to download image. See console for details.");
+    } finally {
+      setIsDownloadingImage(false);
+    }
+  };
+
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     name: "", mobile: "", email: "", city: "", employmentType: "Salaried",
@@ -466,7 +493,7 @@ export function EligibilityForm() {
 
         return (
           <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="py-2">
-
+            <div ref={captureRef} className="bg-white">
             {/* CIBIL Dashboard */}
             <div className="mb-10">
               <div className="flex items-center justify-between mb-6">
@@ -477,6 +504,10 @@ export function EligibilityForm() {
                       Download PDF
                     </a>
                   )}
+                  <button onClick={handleDownloadImage} disabled={isDownloadingImage} className="text-xs font-bold px-4 py-1.5 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition-colors shadow-sm flex items-center gap-1 disabled:opacity-50">
+                    {isDownloadingImage ? <Loader2 className="w-3 h-3 animate-spin" /> : <Download className="w-3 h-3" />}
+                    Save Image
+                  </button>
                   <span className="text-xs font-semibold px-3 py-1.5 bg-[#F1EFE7] text-[#4A3D36] rounded-full">Updated: {new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
                 </div>
               </div>
@@ -1310,6 +1341,7 @@ export function EligibilityForm() {
             <p className="text-[10px] text-slate-400 text-center mt-4 leading-tight">
               *These figures are indicative estimates. Final eligibility, rate, amount, tenure and approval are determined by the lender.
             </p>
+            </div>
           </motion.div>
         );
     }
