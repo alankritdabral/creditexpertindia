@@ -367,20 +367,36 @@ export function EligibilityForm() {
 
         const mappedAccounts = activeAccounts.map((acc: any) => {
           const overrides = loanOverrides[acc.accountNumber] || {};
+          
+          const currentOutstanding = overrides.currentOutstanding !== undefined ? overrides.currentOutstanding : (acc.currentBalance || 0);
+          const type = overrides.type !== undefined ? overrides.type : (
+              (acc.accountType || "").includes("Personal") ? "Personal Loan" :
+                (acc.accountType || "").includes("Credit") ? "Credit Card" :
+                  (acc.accountType || "").includes("Education") ? "Education Loan" :
+                    (acc.accountType || "").includes("Gold") ? "Gold Loan" :
+                      (acc.accountType || "").includes("Overdraft") ? "Overdraft" : "Unknown"
+            );
+            
+          let emi = overrides.emi !== undefined ? Number(overrides.emi) : (Number(acc.emiAmount) || 0);
+          if (type === 'Credit Card' && overrides.emi === undefined) {
+             emi = currentOutstanding * 0.05;
+          }
+
+          let rate = overrides.rate !== undefined ? overrides.rate : (acc.interest_rate || 0);
+          if (type === 'Gold Loan' && overrides.rate === undefined && !rate) {
+             rate = 10;
+          }
+
           return {
             id: acc.accountNumber,
             originalType: acc.accountType || "Unknown",
-            type: overrides.type !== undefined ? overrides.type : (
-              (acc.accountType || "").includes("Personal") ? "Personal Loan" :
-                (acc.accountType || "").includes("Credit") ? "Credit Card" :
-                  (acc.accountType || "").includes("Overdraft") ? "Overdraft" : "Unknown"
-            ),
+            type,
             wantsBT: overrides.wantsBT !== undefined ? overrides.wantsBT : "no",
             userPaysEmi: overrides.userPaysEmi !== undefined ? overrides.userPaysEmi : true,
             originalAmount: overrides.originalAmount !== undefined ? overrides.originalAmount : (acc.highCreditAmount || 0),
-            currentOutstanding: overrides.currentOutstanding !== undefined ? overrides.currentOutstanding : (acc.currentBalance || 0),
-            rate: overrides.rate !== undefined ? overrides.rate : (acc.interest_rate || 0),
-            emi: overrides.emi !== undefined ? overrides.emi : (acc.emiAmount || 0),
+            currentOutstanding,
+            rate,
+            emi,
             bankName: overrides.bankName !== undefined ? overrides.bankName : (acc.memberShortName || "Unknown Lender"),
             dateOpened: overrides.dateOpened !== undefined ? overrides.dateOpened : (acc.dateOpened || "N/A"),
             tenure: overrides.tenure !== undefined ? overrides.tenure : (acc.repaymentTenure || "N/A"),
@@ -392,24 +408,36 @@ export function EligibilityForm() {
 
         const { eligibleLenders, ineligibleLenders } = analyzeLenderEligibility({ profile: engineProfile, catBLoans });
 
-        const totalActiveEMI = activeAccounts.reduce((sum: number, acc: any) => {
-          const overrides = loanOverrides[acc.accountNumber] || {};
-          const wantsBT = overrides.wantsBT !== undefined ? overrides.wantsBT : "no";
-          const userPaysEmi = overrides.userPaysEmi !== undefined ? overrides.userPaysEmi : true;
-          const currentOutstanding = overrides.currentOutstanding !== undefined ? overrides.currentOutstanding : (acc.currentBalance || 0);
-
-          // If balance is 0 or less, assume not used/completed, don't count EMI
-          if (Number(currentOutstanding) <= 0 || !userPaysEmi || wantsBT === 'yes') {
+        const totalCurrentEMI = mappedAccounts.reduce((sum: number, loan: any) => {
+          if (Number(loan.currentOutstanding) <= 0 || !loan.userPaysEmi) {
             return sum;
           }
+          return sum + Number(loan.emi || 0);
+        }, 0);
 
-          const emi = overrides.emi !== undefined ? Number(overrides.emi) : (Number(acc.emiAmount) || 0);
-          return sum + emi;
+        const totalActiveEMI = mappedAccounts.reduce((sum: number, loan: any) => {
+          if (Number(loan.currentOutstanding) <= 0 || !loan.userPaysEmi || loan.wantsBT === 'yes') {
+            return sum;
+          }
+          return sum + Number(loan.emi || 0);
         }, 0);
 
         const netSalary = (Number(userOverrides.netSalary) || Number(formData.monthlyIncome) || 0) + ((Number(userOverrides.yearlyBonus) || 0) / 12);
         const maxEmiCapacity = netSalary * 0.7;
-        const unusedEmiCapacity = Math.max(0, maxEmiCapacity - totalActiveEMI);
+
+        const bestLenderForCapacity = eligibleLenders.length > 0 ? eligibleLenders[0] : null;
+        let newConsolidationEmiForCapacity = 0;
+        const consolidationAmountForCapacity = catBLoans.reduce((sum: number, l: any) => sum + Number(l.currentOutstanding || 0), 0);
+        if (bestLenderForCapacity && consolidationAmountForCapacity > 0) {
+          const ratePerMonth = (bestLenderForCapacity.headlineRate || 12) / 12 / 100;
+          const tenureMonths = Number(userOverrides.consolidationTenure) || bestLenderForCapacity.maxTenure || 60;
+          newConsolidationEmiForCapacity = Math.round(
+            (consolidationAmountForCapacity * ratePerMonth * Math.pow(1 + ratePerMonth, tenureMonths)) /
+            (Math.pow(1 + ratePerMonth, tenureMonths) - 1)
+          ) || 0;
+        }
+
+        const unusedEmiCapacity = Math.max(0, maxEmiCapacity - totalActiveEMI - newConsolidationEmiForCapacity);
         const topUpTenure = Number(userOverrides.topUpTenure) || 5;
         const topUpRoi = Number(userOverrides.topUpRoi) || 12;
 
@@ -785,8 +813,8 @@ export function EligibilityForm() {
                           <label className="text-xs font-semibold text-slate-600 mb-1 flex justify-between items-center">
                             <span>Net Monthly Salary</span>
                             <div className="flex items-center gap-2 text-[10px] font-bold">
-                              <span className={`px-2 py-0.5 rounded-full ${totalActiveEMI > maxEmiCapacity ? 'bg-red-50 text-red-600' : 'bg-slate-100 text-slate-600'}`}>
-                                Used EMI: ₹{totalActiveEMI.toLocaleString('en-IN')}
+                              <span className={`px-2 py-0.5 rounded-full ${totalCurrentEMI > maxEmiCapacity ? 'bg-red-50 text-red-600' : 'bg-slate-100 text-slate-600'}`}>
+                                Used EMI: ₹{totalCurrentEMI.toLocaleString('en-IN')}
                               </span>
                               <span className="bg-blue-50 text-brand-blue px-2 py-0.5 rounded-full">
                                 Max EMI: ₹{maxEmiCapacity.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
@@ -1024,7 +1052,7 @@ export function EligibilityForm() {
                                   className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-brand-blue"
                                 >
                                   <optgroup label="Generally Non-Transferable (Category A)">
-                                    {['Car Loan', 'Home Loan', 'LAP', 'Gold Loan', 'Consumer Loan'].map(t => <option key={t} value={t}>{t}</option>)}
+                                    {['Car Loan', 'Home Loan', 'LAP', 'Gold Loan', 'Consumer Loan', 'Education Loan'].map(t => <option key={t} value={t}>{t}</option>)}
                                   </optgroup>
                                   <optgroup label="Potentially Transferable (Category B)">
                                     {['Personal Loan', 'Overdraft', 'App Loan', 'Credit Card'].map(t => <option key={t} value={t}>{t}</option>)}
@@ -1128,7 +1156,8 @@ export function EligibilityForm() {
                           const totalNewLoan = consolidationAmount + (userOverrides.wantsTopUp === 'yes' ? Number(userOverrides.topUpAmount || 0) : 0);
 
                           const ratePerMonth = (bestLender.headlineRate || 12) / 12 / 100;
-                          const tenureMonths = bestLender.maxTenure || 60;
+                          const maxLenderTenure = bestLender.maxTenure || 60;
+                          const tenureMonths = Number(userOverrides.consolidationTenure) || maxLenderTenure;
                           const newEmi = Math.round(
                             (totalNewLoan * ratePerMonth * Math.pow(1 + ratePerMonth, tenureMonths)) /
                             (Math.pow(1 + ratePerMonth, tenureMonths) - 1)
@@ -1151,6 +1180,35 @@ export function EligibilityForm() {
                                 <span>Consolidation Estimate (Best Option: {bestLender.name})</span>
                                 <span className="text-xs font-semibold text-brand-blue bg-blue-50 px-2 py-1 rounded-md">{bestLender.headlineRate}% p.a.</span>
                               </h4>
+                              
+                              {/* Details of consolidating loans */}
+                              {catBLoans.length > 0 && (
+                                <div className="mb-5 bg-white border border-slate-200 rounded-xl p-3 shadow-sm">
+                                  <p className="text-[10px] uppercase font-bold text-slate-500 mb-2">Loans Being Consolidated</p>
+                                  <div className="space-y-2 mb-3">
+                                    {catBLoans.map((l: any, idx: number) => (
+                                      <div key={idx} className="flex justify-between items-center text-xs">
+                                        <div className="flex items-center gap-2">
+                                          <span className="font-semibold text-[#382F2A]">{l.bankName || 'Lender'}</span>
+                                          <span className="text-slate-400">({l.type})</span>
+                                        </div>
+                                        <div className="text-right">
+                                          <span className="font-semibold text-[#382F2A]">₹{Number(l.currentOutstanding || 0).toLocaleString('en-IN')}</span>
+                                          <span className="text-slate-400 ml-2">EMI: ₹{Number(l.emi || 0).toLocaleString('en-IN')}</span>
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                  <div className="flex justify-between items-center pt-2 border-t border-slate-100">
+                                    <span className="text-xs font-bold text-slate-700">Total</span>
+                                    <div className="text-right text-xs">
+                                      <span className="font-bold text-[#382F2A]">₹{consolidationAmount.toLocaleString('en-IN')}</span>
+                                      <span className="font-bold text-brand-blue ml-2">EMI: ₹{currentEmiToConsolidate.toLocaleString('en-IN')}</span>
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+
                               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div className="bg-white border border-slate-100 p-3 rounded-xl">
                                   <p className="text-[10px] uppercase tracking-wider font-bold text-slate-500">Total New Loan</p>
@@ -1162,7 +1220,18 @@ export function EligibilityForm() {
                                 <div className="bg-white border border-slate-100 p-3 rounded-xl">
                                   <p className="text-[10px] uppercase tracking-wider font-bold text-slate-500">Est. New EMI</p>
                                   <p className="text-xl font-black text-[#382F2A] mt-1">₹{newEmi.toLocaleString('en-IN')}</p>
-                                  <p className="text-[10px] text-slate-500 mt-1">For {tenureMonths} months</p>
+                                  <div className="mt-2 flex items-center gap-2">
+                                    <label className="text-[10px] text-slate-500 font-semibold whitespace-nowrap">Tenure (Mos):</label>
+                                    <select 
+                                      value={tenureMonths}
+                                      onChange={(e) => setUserOverrides({ ...userOverrides, consolidationTenure: e.target.value })}
+                                      className="bg-slate-50 border border-slate-200 rounded px-1 py-0.5 text-xs outline-none"
+                                    >
+                                      {[12, 24, 36, 48, 60, 72, 84].filter(t => t <= maxLenderTenure).map(t => (
+                                        <option key={t} value={t}>{t}</option>
+                                      ))}
+                                    </select>
+                                  </div>
                                 </div>
                                 <div className={`border p-3 rounded-xl ${emiSavings >= 0 ? 'bg-emerald-50 border-emerald-100' : 'bg-red-50 border-red-100'}`}>
                                   <p className={`text-[10px] uppercase tracking-wider font-bold ${emiSavings >= 0 ? 'text-emerald-700' : 'text-red-700'}`}>
