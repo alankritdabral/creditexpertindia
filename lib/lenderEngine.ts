@@ -28,7 +28,7 @@ const LENDERS = [
       "Multiple PLs": "CONFIRMED",
       "Credit Card": "CONFIRMED",
       "App Loan": "CONFIRMED",
-      "Overdraft": "CONFIRMED",
+      "Overdraft": "NOT_SUPPORTED",
       "Top Up": "CONFIRMED"
     },
     credit_policy: { active_overdue: "POLICY_CHECK", recent_bounce: "POLICY_CHECK" }
@@ -243,6 +243,27 @@ const LENDERS = [
       "Credit Card": "NOT_SUPPORTED",
       "App Loan": "NOT_SUPPORTED",
       "Overdraft": "CONFIRMED",
+      "Top Up": "CONFIRMED"
+    },
+    credit_policy: { active_overdue: "POLICY_CHECK", recent_bounce: "POLICY_CHECK" }
+  },
+  {
+    id: "icici",
+    name: "ICICI Bank",
+    type: "Private Bank",
+    headlineRate: 9.99,
+    maxTenure: 84,
+    eligibility: {
+      min_salary: 25000,
+      eligible_employer_tiers: ["A+", "A", "B", "C"],
+      unknown_employer_policy: "POLICY_CHECK"
+    },
+    takeover_policy: {
+      "Personal Loan": "CONFIRMED",
+      "Multiple PLs": "CONFIRMED",
+      "Credit Card": "POLICY_CHECK",
+      "App Loan": "NOT_SUPPORTED",
+      "Overdraft": "NOT_SUPPORTED",
       "Top Up": "CONFIRMED"
     },
     credit_policy: { active_overdue: "POLICY_CHECK", recent_bounce: "POLICY_CHECK" }
