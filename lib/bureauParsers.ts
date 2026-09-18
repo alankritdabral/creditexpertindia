@@ -117,9 +117,9 @@ export function parseBureauData(bureau: string, data: any): ParsedBureauData {
     // Experian JSON parsing
     const caisAccounts = data?.credit_report?.CAIS_Account?.CAIS_Account_DETAILS || [];
     accounts = caisAccounts.map((acc: any) => {
-      let emiStr = (acc.Scheduled_Monthly_Payment_Amount || "0").toString().replace(/,/g, '');
-      let currBal = (acc.Current_Balance || "0").toString().replace(/,/g, '');
-      let highCred = (acc.Highest_Credit_or_Original_Loan_Amount || "0").toString().replace(/,/g, '');
+      const emiStr = (acc.Scheduled_Monthly_Payment_Amount || "0").toString().replace(/,/g, '');
+      const currBal = (acc.Current_Balance || "0").toString().replace(/,/g, '');
+      const highCred = (acc.Highest_Credit_or_Original_Loan_Amount || "0").toString().replace(/,/g, '');
       
       return {
         accountNumber: acc.Account_Number || "N/A",
@@ -188,8 +188,8 @@ export function parseBureauData(bureau: string, data: any): ParsedBureauData {
       let emiStr = loan["INSTALLMENT-AMT"] || "0";
       emiStr = emiStr.split('/')[0].replace(/,/g, '');
       
-      let currBal = (loan["CURRENT-BAL"] || "0").replace(/,/g, '');
-      let highCred = (loan["DISBURSED-AMT"] || loan["CREDIT-LIMIT"] || "0").replace(/,/g, '');
+      const currBal = (loan["CURRENT-BAL"] || "0").replace(/,/g, '');
+      const highCred = (loan["DISBURSED-AMT"] || loan["CREDIT-LIMIT"] || "0").replace(/,/g, '');
       
       return {
         accountNumber: loan["ACCT-NUMBER"] || "N/A",

@@ -302,7 +302,7 @@ export function analyzeLenderEligibility({ profile, catBLoans }: { profile: any,
     let isEligible = true;
     let matchScore = 100; // Base score out of 100
     const rejectionReasons = [];
-    let customOutput: any = {};
+    const customOutput: any = {};
     
     // Bank specific NTH calculation
     let nth = Number(netSalary) || 0;

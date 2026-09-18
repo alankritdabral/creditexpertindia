@@ -370,7 +370,7 @@ export function EligibilityForm() {
         const isExperian = formData.bureau.startsWith("experian");
 
         const parsed = parseBureauData(formData.bureau, cibilData);
-        let { accountSummary, inquirySummary, accounts, enquiries, personalInfo: equifaxPersonalInfo } = parsed;
+        const { accountSummary, inquirySummary, accounts, enquiries, personalInfo: equifaxPersonalInfo } = parsed;
 
         const safeAccounts = accounts || [];
         // A closed loan is exactly one that has 0 or less balance left

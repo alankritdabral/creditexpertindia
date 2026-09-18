@@ -12,7 +12,10 @@ export function SmartCalculator() {
   const [newRate, setNewRate] = useState(12); // Expected rate
   const [newTenure, setNewTenure] = useState(60); // New tenure months
 
-  React.useEffect(() => {
+  const [prevInputs, setPrevInputs] = useState({ outstanding: 500000, rate: 18, tenure: 48 });
+
+  if (outstanding !== prevInputs.outstanding || currentRate !== prevInputs.rate || currentTenure !== prevInputs.tenure) {
+    setPrevInputs({ outstanding, rate: currentRate, tenure: currentTenure });
     const currentMonthlyRate = (currentRate / 12) / 100;
     const calculatedEMI = currentRate === 0 
       ? Math.round(outstanding / currentTenure)
@@ -24,7 +27,7 @@ export function SmartCalculator() {
     if (!isNaN(calculatedEMI) && isFinite(calculatedEMI) && calculatedEMI > 0) {
       setCurrentEMI(calculatedEMI);
     }
-  }, [outstanding, currentRate, currentTenure]);
+  }
 
   // Calculate current estimated remaining interest roughly
   // This is a simplified calculation for illustrative purposes
