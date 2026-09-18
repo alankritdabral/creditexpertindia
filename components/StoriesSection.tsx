@@ -101,10 +101,10 @@ export function StoriesSection() {
     <div className="w-full flex flex-col">
       {/* Header */}
       <div className="mb-12 text-center max-w-3xl mx-auto px-6">
-        <h2 className="text-3xl md:text-5xl font-extrabold tracking-tight text-text-main mb-4 leading-tight">
+        <h2 className="text-3xl md:text-5xl font-extrabold tracking-tight text-brand-black mb-4 leading-tight">
           Bring Your Eligible Loans Together
         </h2>
-        <p className="text-lg text-text-muted">
+        <p className="text-lg text-brand-black/70">
           Different debts. Different stories. One smarter way forward.
         </p>
       </div>
@@ -119,7 +119,7 @@ export function StoriesSection() {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-50px" }}
-            className={`relative group rounded-[24px] overflow-hidden flex flex-col justify-end min-h-[400px] md:min-h-[480px] shadow-lg hover:-translate-y-1 hover:shadow-xl hover:border hover:border-brand-blue/30 transition-all duration-300 ${story.colSpan}`}
+            className={`relative group rounded-[24px] overflow-hidden flex flex-col justify-end min-h-[400px] md:min-h-[480px] shadow-lg hover:-translate-y-1 hover:shadow-xl hover:border hover:border-blue-energy/30 transition-all duration-300 ${story.colSpan}`}
           >
             {/* Background Image */}
             <Image

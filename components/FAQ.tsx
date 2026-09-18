@@ -37,10 +37,10 @@ export function FAQ() {
   return (
     <div id="faq" className="w-full h-full flex flex-col">
       <div className="mb-10 text-center">
-        <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-text-main mb-2">
+        <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-brand-black mb-2">
           Questions, answered.
         </h2>
-        <p className="text-sm text-text-muted">Common questions about loan consolidation and how we help.</p>
+        <p className="text-sm text-brand-black/70">Common questions about loan consolidation and how we help.</p>
       </div>
 
       <div className="divide-y divide-slate-100">
@@ -49,13 +49,13 @@ export function FAQ() {
             {({ open }: { open: boolean }) => (
               <>
                 <dt>
-                  <Disclosure.Button className="flex w-full items-center justify-between text-text-main group">
+                  <Disclosure.Button className="flex w-full items-center justify-between text-brand-black group">
                     <div className="flex-1 px-4 text-center">
-                      <span className="text-base font-bold leading-7 group-hover:text-brand-blue transition-colors">{faq.question}</span>
+                      <span className="text-base font-bold leading-7 group-hover:text-blue-energy transition-colors">{faq.question}</span>
                     </div>
                     <span className="flex h-7 items-center shrink-0">
                       <ChevronDownIcon
-                        className={`${open ? '-rotate-180 text-brand-blue' : 'rotate-0 text-slate-400'} h-5 w-5 transform transition duration-200 ease-in-out`}
+                        className={`${open ? '-rotate-180 text-blue-energy' : 'rotate-0 text-slate-400'} h-5 w-5 transform transition duration-200 ease-in-out`}
                         aria-hidden="true"
                       />
                     </span>
@@ -70,7 +70,7 @@ export function FAQ() {
                   leaveTo="transform scale-95 opacity-0"
                 >
                   <Disclosure.Panel as="dd" className="mt-4 text-center px-8">
-                    <p className="text-sm leading-relaxed text-text-muted font-medium py-1 max-w-2xl mx-auto bg-slate-50 rounded-lg p-4">{faq.answer}</p>
+                    <p className="text-sm leading-relaxed text-brand-black/70 font-medium py-1 max-w-2xl mx-auto bg-slate-50 rounded-lg p-4">{faq.answer}</p>
                   </Disclosure.Panel>
                 </Transition>
               </>

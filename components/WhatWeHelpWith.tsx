@@ -3,7 +3,7 @@ export function WhatWeHelpWith() {
     <section className="py-24 sm:py-32 bg-canvas-soft">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-2xl lg:text-center">
-          <p className="text-[10px] font-normal tracking-[0.1px] leading-[1.15] text-primary-deep uppercase">
+          <p className="text-[10px] font-normal tracking-[0.1px] leading-[1.15] text-navy-electric-deep uppercase">
             HOW WE CAN HELP
           </p>
           <h2 className="mt-2 text-[48px] leading-[1.15] font-light tracking-[-0.96px] text-ink sm:text-[56px] sm:leading-[1.03] sm:tracking-[-1.4px]">
@@ -29,22 +29,22 @@ export function WhatWeHelpWith() {
                 <p className="mb-4 text-ink font-light text-[15px]">We help you review:</p>
                 <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-ink-mute text-[15px] font-light">
                   <li className="flex gap-x-3 items-center">
-                    <div className="h-1.5 w-1.5 rounded-full bg-primary" /> High-interest loans
+                    <div className="h-1.5 w-1.5 rounded-full bg-navy-electric" /> High-interest loans
                   </li>
                   <li className="flex gap-x-3 items-center">
-                    <div className="h-1.5 w-1.5 rounded-full bg-primary" /> Multiple EMIs
+                    <div className="h-1.5 w-1.5 rounded-full bg-navy-electric" /> Multiple EMIs
                   </li>
                   <li className="flex gap-x-3 items-center">
-                    <div className="h-1.5 w-1.5 rounded-full bg-primary" /> Credit-card dues
+                    <div className="h-1.5 w-1.5 rounded-full bg-navy-electric" /> Credit-card dues
                   </li>
                   <li className="flex gap-x-3 items-center">
-                    <div className="h-1.5 w-1.5 rounded-full bg-primary" /> App / fintech loans
+                    <div className="h-1.5 w-1.5 rounded-full bg-navy-electric" /> App / fintech loans
                   </li>
                   <li className="flex gap-x-3 items-center">
-                    <div className="h-1.5 w-1.5 rounded-full bg-primary" /> Debt consolidation possibilities
+                    <div className="h-1.5 w-1.5 rounded-full bg-navy-electric" /> Debt consolidation possibilities
                   </li>
                   <li className="flex gap-x-3 items-center">
-                    <div className="h-1.5 w-1.5 rounded-full bg-primary" /> Balance-transfer possibilities
+                    <div className="h-1.5 w-1.5 rounded-full bg-navy-electric" /> Balance-transfer possibilities
                   </li>
                 </ul>
               </div>
@@ -78,22 +78,22 @@ export function WhatWeHelpWith() {
                 <p className="mb-4 text-ink font-light text-[15px]">Depending on your situation, we may help you evaluate:</p>
                 <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-ink-mute text-[15px] font-light">
                   <li className="flex gap-x-3 items-center">
-                    <div className="h-1.5 w-1.5 rounded-full bg-primary" /> Consolidation
+                    <div className="h-1.5 w-1.5 rounded-full bg-navy-electric" /> Consolidation
                   </li>
                   <li className="flex gap-x-3 items-center">
-                    <div className="h-1.5 w-1.5 rounded-full bg-primary" /> Balance transfer
+                    <div className="h-1.5 w-1.5 rounded-full bg-navy-electric" /> Balance transfer
                   </li>
                   <li className="flex gap-x-3 items-center">
-                    <div className="h-1.5 w-1.5 rounded-full bg-primary" /> Refinancing
+                    <div className="h-1.5 w-1.5 rounded-full bg-navy-electric" /> Refinancing
                   </li>
                   <li className="flex gap-x-3 items-center">
-                    <div className="h-1.5 w-1.5 rounded-full bg-primary" /> Targeted repayment
+                    <div className="h-1.5 w-1.5 rounded-full bg-navy-electric" /> Targeted repayment
                   </li>
                   <li className="flex gap-x-3 items-center">
-                    <div className="h-1.5 w-1.5 rounded-full bg-primary" /> Improving loan eligibility
+                    <div className="h-1.5 w-1.5 rounded-full bg-navy-electric" /> Improving loan eligibility
                   </li>
                   <li className="flex gap-x-3 items-center">
-                    <div className="h-1.5 w-1.5 rounded-full bg-primary" /> Continuing your existing repayment plan
+                    <div className="h-1.5 w-1.5 rounded-full bg-navy-electric" /> Continuing your existing repayment plan
                   </li>
                 </ul>
               </div>

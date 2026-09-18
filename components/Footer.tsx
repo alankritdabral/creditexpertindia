@@ -6,10 +6,10 @@ import { ArrowRight, MessageCircle } from 'lucide-react';
 
 export function Footer() {
   return (
-    <footer className="bg-slate-50 border-t border-slate-200 pb-[72px] lg:pb-0">
+    <footer className="bg-slate-50 border-t border-icy-blue pb-[72px] lg:pb-0">
       {/* CTA Banner */}
       <div className="bg-[#0A2540] relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-brand-blue/20 via-transparent to-brand-blue/10 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-energy/20 via-transparent to-blue-energy/10 pointer-events-none" />
         <div className="mx-auto max-w-[1280px] px-4 py-12 sm:px-6 lg:px-8 relative z-10">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div>
@@ -23,7 +23,7 @@ export function Footer() {
             <div className="flex items-center gap-3">
               <a
                 href="#check-eligibility"
-                className="flex items-center gap-2 rounded-full bg-white px-6 py-3 text-[14px] font-bold text-slate-900 hover:bg-slate-100 transition-colors whitespace-nowrap"
+                className="flex items-center gap-2 rounded-full bg-white px-6 py-3 text-[14px] font-bold text-brand-black hover:bg-slate-100 transition-colors whitespace-nowrap"
               >
                 Get Free Assessment
                 <ArrowRight className="w-4 h-4" />
@@ -55,27 +55,27 @@ export function Footer() {
                 className="h-10 w-auto object-contain"
               />
             </Link>
-            <p className="text-[15px] leading-relaxed text-slate-500 font-medium">
+            <p className="text-[15px] leading-relaxed text-brand-black/70 font-medium">
               We're not a bank. We're your credit-side guide to help you find clearer financial options.
             </p>
           </div>
 
           <div className="mt-16 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 xl:col-span-3 xl:mt-0">
             <div>
-              <h3 className="text-[15px] font-bold leading-6 text-slate-900 mb-6">Services</h3>
+              <h3 className="text-[15px] font-bold leading-6 text-brand-black mb-6">Services</h3>
               <ul role="list" className="space-y-4">
                 <li>
-                  <Link href="/debt-consolidation" className="text-[15px] text-slate-600 hover:text-slate-900 transition-colors font-medium">
+                  <Link href="/debt-consolidation" className="text-[15px] text-brand-black/80 hover:text-brand-black transition-colors font-medium">
                     Debt Consolidation
                   </Link>
                 </li>
                 <li>
-                  <Link href="/personal-loan" className="text-[15px] text-slate-600 hover:text-slate-900 transition-colors font-medium">
+                  <Link href="/personal-loan" className="text-[15px] text-brand-black/80 hover:text-brand-black transition-colors font-medium">
                     Personal Loans
                   </Link>
                 </li>
                 <li>
-                  <Link href="/faq" className="text-[15px] text-slate-600 hover:text-slate-900 transition-colors font-medium">
+                  <Link href="/faq" className="text-[15px] text-brand-black/80 hover:text-brand-black transition-colors font-medium">
                     FAQ
                   </Link>
                 </li>
@@ -83,35 +83,35 @@ export function Footer() {
             </div>
             
             <div>
-              <h3 className="text-[15px] font-bold leading-6 text-slate-900 mb-6">Contact</h3>
+              <h3 className="text-[15px] font-bold leading-6 text-brand-black mb-6">Contact</h3>
               <ul role="list" className="space-y-4">
                 <li>
-                  <span className="text-[15px] text-slate-600 font-medium">WhatsApp: {contact.whatsapp}</span>
+                  <span className="text-[15px] text-brand-black/80 font-medium">WhatsApp: {contact.whatsapp}</span>
                 </li>
                 <li>
-                  <span className="text-[15px] text-slate-600 font-medium">Email: {contact.email}</span>
+                  <span className="text-[15px] text-brand-black/80 font-medium">Email: {contact.email}</span>
                 </li>
                 <li>
-                  <span className="text-[15px] text-slate-600 font-medium">Address: {contact.address}</span>
+                  <span className="text-[15px] text-brand-black/80 font-medium">Address: {contact.address}</span>
                 </li>
               </ul>
             </div>
 
             <div>
-              <h3 className="text-[15px] font-bold leading-6 text-slate-900 mb-6">Legal</h3>
+              <h3 className="text-[15px] font-bold leading-6 text-brand-black mb-6">Legal</h3>
               <ul role="list" className="space-y-4">
                 <li>
-                  <Link href="/privacy-policy" className="text-[15px] text-slate-600 hover:text-slate-900 transition-colors font-medium">
+                  <Link href="/privacy-policy" className="text-[15px] text-brand-black/80 hover:text-brand-black transition-colors font-medium">
                     Privacy Policy
                   </Link>
                 </li>
                 <li>
-                  <Link href="/terms-and-conditions" className="text-[15px] text-slate-600 hover:text-slate-900 transition-colors font-medium">
+                  <Link href="/terms-and-conditions" className="text-[15px] text-brand-black/80 hover:text-brand-black transition-colors font-medium">
                     Terms & Conditions
                   </Link>
                 </li>
                 <li>
-                  <Link href="/partner-disclosures" className="text-[15px] text-slate-600 hover:text-slate-900 transition-colors font-medium">
+                  <Link href="/partner-disclosures" className="text-[15px] text-brand-black/80 hover:text-brand-black transition-colors font-medium">
                     Partner Disclosures
                   </Link>
                 </li>
@@ -120,16 +120,16 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-16 border-t border-slate-200 pt-8 sm:mt-20 lg:mt-24 space-y-4 flex flex-col md:flex-row justify-between items-start md:items-center">
+        <div className="mt-16 border-t border-icy-blue pt-8 sm:mt-20 lg:mt-24 space-y-4 flex flex-col md:flex-row justify-between items-start md:items-center">
           <div className="space-y-2">
-            <p className="text-[13px] leading-relaxed text-slate-500 font-medium max-w-4xl">
+            <p className="text-[13px] leading-relaxed text-brand-black/70 font-medium max-w-4xl">
               {contact.legalName}. Credit Expert India is a loan facilitator and not a bank or NBFC.
             </p>
-            <p className="text-[13px] leading-relaxed text-slate-500 font-medium max-w-4xl">
+            <p className="text-[13px] leading-relaxed text-brand-black/70 font-medium max-w-4xl">
               Final loan approval, interest rate and loan terms are determined by the respective lender based on its policies and eligibility criteria. We do not guarantee loan approval or specific rates.
             </p>
           </div>
-          <p className="text-[13px] font-medium text-slate-500 mt-4 md:mt-0">© {new Date().getFullYear()} {siteConfig.name}.</p>
+          <p className="text-[13px] font-medium text-brand-black/70 mt-4 md:mt-0">© {new Date().getFullYear()} {siteConfig.name}.</p>
         </div>
       </div>
     </footer>

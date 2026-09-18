@@ -7,18 +7,18 @@ export function ScamProtection() {
           Trust & Safety
         </div>
         
-        <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-text-main">
+        <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-navy-electric">
           Before you share documents
         </h2>
       </div>
 
-      <div className="bg-warm-bg rounded-2xl p-6 sm:p-8 border border-slate-200/60 mt-auto flex-1 flex flex-col justify-between">
-        <h3 className="text-lg font-bold mb-6 text-warning-red flex items-center gap-2">
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+      <div className="bg-icy-blue rounded-2xl p-6 sm:p-8 border border-icy-blue/60 mt-auto flex-1 flex flex-col justify-between">
+        <h3 className="text-xl font-extrabold mb-6 text-warning-red flex items-center gap-2">
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
           We will never
         </h3>
         
-        <ul className="space-y-4 text-sm text-text-main font-medium mb-8">
+        <ul className="space-y-4 text-base text-brand-black font-semibold mb-8">
           <li className="flex items-start gap-3">
             <span className="text-warning-red font-bold text-lg leading-none mt-0.5">&times;</span>
             <span>Ask you to send money to a personal UPI</span>
@@ -37,8 +37,8 @@ export function ScamProtection() {
           </li>
         </ul>
         
-        <div className="pt-6 border-t border-slate-200/60">
-          <p className="text-sm leading-relaxed text-text-main font-semibold">
+        <div className="pt-6 border-t border-icy-blue/60">
+          <p className="text-base leading-relaxed text-brand-black font-bold">
             Your final lender always makes the credit decision.
           </p>
         </div>

@@ -115,30 +115,30 @@ export function CinematicHero() {
           style={{ opacity: heroOpacity, y: heroY, scale: heroScale, pointerEvents: heroPointerEvents as any }}
         >
           <div className="max-w-4xl mx-auto">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 border border-blue-100 text-brand-blue text-sm font-medium mb-8">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 border border-blue-100 text-blue-energy text-sm font-medium mb-8">
               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-blue opacity-40"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-blue"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-energy opacity-40"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-energy"></span>
               </span>
               Smarter Debt Management
             </div>
             
-            <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-text-main mb-6 leading-[1.1]">
+            <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-brand-black mb-6 leading-[1.1]">
               Turn Multiple EMIs Into <br className="hidden md:block" />
               <span className="text-gradient">One Smarter EMI.</span>
             </h1>
             
-            <p className="text-lg md:text-xl text-text-muted mb-10 max-w-2xl mx-auto">
+            <p className="text-lg md:text-xl text-brand-black/70 mb-10 max-w-2xl mx-auto">
               Credit Expert India helps you explore loan consolidation, refinancing, top-up loans and fresh financing options designed around your financial profile.
             </p>
             
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link href="#check-eligibility" className="w-full sm:w-auto px-8 py-4 bg-brand-blue text-white rounded-xl font-medium hover:bg-blue-800 transition-colors flex items-center justify-center gap-2 group">
+              <Link href="#check-eligibility" className="w-full sm:w-auto px-8 py-4 bg-blue-energy text-white rounded-xl font-medium hover:bg-blue-800 transition-colors flex items-center justify-center gap-2 group">
                 Check My Eligibility
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Link>
-              <Link href="#calculator" className="w-full sm:w-auto px-8 py-4 bg-white text-text-main border border-slate-200 rounded-xl font-medium hover:bg-slate-50 transition-colors flex items-center justify-center gap-2">
-                <Calculator className="w-4 h-4 text-brand-blue" />
+              <Link href="#calculator" className="w-full sm:w-auto px-8 py-4 bg-white text-brand-black border border-icy-blue rounded-xl font-medium hover:bg-slate-50 transition-colors flex items-center justify-center gap-2">
+                <Calculator className="w-4 h-4 text-blue-energy" />
                 Calculate Potential Savings
               </Link>
             </div>
@@ -146,7 +146,7 @@ export function CinematicHero() {
 
           {/* Trusted Partners Ticker in Hero */}
           <div className="absolute bottom-10 left-0 right-0 mx-auto w-full overflow-hidden max-w-6xl px-4">
-            <p className="text-sm font-medium text-text-muted mb-6 tracking-wide uppercase text-center">Trusted by 10 Lac+ Customers via Banking Partners</p>
+            <p className="text-sm font-medium text-brand-black/70 mb-6 tracking-wide uppercase text-center">Trusted by 10 Lac+ Customers via Banking Partners</p>
             <div className="relative flex overflow-hidden w-full transition-all duration-500 [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
               <motion.div 
                 className="flex items-center gap-12 md:gap-20 whitespace-nowrap w-max"
@@ -175,8 +175,8 @@ export function CinematicHero() {
           className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center z-10 pointer-events-none"
           style={{ opacity: midTextOpacity, y: midTextY }}
         >
-          <h2 className="text-4xl md:text-5xl font-bold text-text-main mb-4">Have Multiple EMIs?</h2>
-          <p className="text-lg text-text-muted max-w-xl mx-auto">
+          <h2 className="text-4xl md:text-5xl font-bold text-brand-black mb-4">Have Multiple EMIs?</h2>
+          <p className="text-lg text-brand-black/70 max-w-xl mx-auto">
             If you're paying several EMIs across personal loans, app loans, and credit cards, consolidation may help simplify your repayments.
           </p>
         </motion.div>
@@ -185,73 +185,73 @@ export function CinematicHero() {
         <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none perspective-[1000px]">
           {/* Card 1: Personal Loan */}
           <motion.div 
-            className="absolute glass-card rounded-2xl p-4 md:p-6 w-56 md:w-64 shadow-xl border-slate-200/60 flex flex-col gap-3"
+            className="absolute glass-card rounded-2xl p-4 md:p-6 w-56 md:w-64 shadow-xl border-icy-blue/60 flex flex-col gap-3"
             style={{ x: card1X, y: card1Y, rotate: card1Rotate, opacity: cardsOpacity }}
           >
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-50 rounded-lg text-brand-blue"><RefreshCw className="w-5 h-5" /></div>
+              <div className="p-2 bg-blue-50 rounded-lg text-blue-energy"><RefreshCw className="w-5 h-5" /></div>
               <div>
-                <p className="text-xs text-text-muted font-medium uppercase tracking-wider">Personal Loan</p>
-                <p className="text-sm font-semibold text-text-main">HDFC Bank</p>
+                <p className="text-xs text-brand-black/70 font-medium uppercase tracking-wider">Personal Loan</p>
+                <p className="text-sm font-semibold text-brand-black">HDFC Bank</p>
               </div>
             </div>
             <div>
-              <p className="text-2xl font-bold text-text-main">₹8,500<span className="text-sm text-text-muted font-normal">/mo</span></p>
+              <p className="text-2xl font-bold text-brand-black">₹8,500<span className="text-sm text-brand-black/70 font-normal">/mo</span></p>
               <p className="text-xs text-warning-red font-medium mt-1">16.5% ROI</p>
             </div>
           </motion.div>
 
           {/* Card 2: Credit Card */}
           <motion.div 
-            className="absolute glass-card rounded-2xl p-4 md:p-6 w-56 md:w-64 shadow-xl border-slate-200/60 flex flex-col gap-3"
+            className="absolute glass-card rounded-2xl p-4 md:p-6 w-56 md:w-64 shadow-xl border-icy-blue/60 flex flex-col gap-3"
             style={{ x: card2X, y: card2Y, rotate: card2Rotate, opacity: cardsOpacity }}
           >
             <div className="flex items-center gap-3">
               <div className="p-2 bg-red-50 rounded-lg text-warning-red"><CreditCard className="w-5 h-5" /></div>
               <div>
-                <p className="text-xs text-text-muted font-medium uppercase tracking-wider">Credit Card</p>
-                <p className="text-sm font-semibold text-text-main">Outstanding</p>
+                <p className="text-xs text-brand-black/70 font-medium uppercase tracking-wider">Credit Card</p>
+                <p className="text-sm font-semibold text-brand-black">Outstanding</p>
               </div>
             </div>
             <div>
-              <p className="text-2xl font-bold text-text-main">₹6,200<span className="text-sm text-text-muted font-normal">/mo</span></p>
+              <p className="text-2xl font-bold text-brand-black">₹6,200<span className="text-sm text-brand-black/70 font-normal">/mo</span></p>
               <p className="text-xs text-warning-red font-medium mt-1">36.0% ROI</p>
             </div>
           </motion.div>
 
           {/* Card 3: App Loan */}
           <motion.div 
-            className="absolute glass-card rounded-2xl p-4 md:p-6 w-56 md:w-64 shadow-xl border-slate-200/60 flex flex-col gap-3"
+            className="absolute glass-card rounded-2xl p-4 md:p-6 w-56 md:w-64 shadow-xl border-icy-blue/60 flex flex-col gap-3"
             style={{ x: card3X, y: card3Y, rotate: card3Rotate, opacity: cardsOpacity }}
           >
             <div className="flex items-center gap-3">
               <div className="p-2 bg-purple-50 rounded-lg text-purple-600"><Smartphone className="w-5 h-5" /></div>
               <div>
-                <p className="text-xs text-text-muted font-medium uppercase tracking-wider">App Loan</p>
-                <p className="text-sm font-semibold text-text-main">Instant Cash</p>
+                <p className="text-xs text-brand-black/70 font-medium uppercase tracking-wider">App Loan</p>
+                <p className="text-sm font-semibold text-brand-black">Instant Cash</p>
               </div>
             </div>
             <div>
-              <p className="text-2xl font-bold text-text-main">₹4,300<span className="text-sm text-text-muted font-normal">/mo</span></p>
+              <p className="text-2xl font-bold text-brand-black">₹4,300<span className="text-sm text-brand-black/70 font-normal">/mo</span></p>
               <p className="text-xs text-warning-red font-medium mt-1">28.0% ROI</p>
             </div>
           </motion.div>
 
           {/* Card 4: Consumer Loan */}
           <motion.div 
-            className="absolute glass-card rounded-2xl p-4 md:p-6 w-56 md:w-64 shadow-xl border-slate-200/60 flex flex-col gap-3"
+            className="absolute glass-card rounded-2xl p-4 md:p-6 w-56 md:w-64 shadow-xl border-icy-blue/60 flex flex-col gap-3"
             style={{ x: card4X, y: card4Y, rotate: card4Rotate, opacity: cardsOpacity }}
           >
             <div className="flex items-center gap-3">
               <div className="p-2 bg-orange-50 rounded-lg text-orange-500"><ShoppingBag className="w-5 h-5" /></div>
               <div>
-                <p className="text-xs text-text-muted font-medium uppercase tracking-wider">Consumer</p>
-                <p className="text-sm font-semibold text-text-main">Electronics</p>
+                <p className="text-xs text-brand-black/70 font-medium uppercase tracking-wider">Consumer</p>
+                <p className="text-sm font-semibold text-brand-black">Electronics</p>
               </div>
             </div>
             <div>
-              <p className="text-2xl font-bold text-text-main">₹3,800<span className="text-sm text-text-muted font-normal">/mo</span></p>
-              <p className="text-xs text-text-muted font-medium mt-1">0% EMI</p>
+              <p className="text-2xl font-bold text-brand-black">₹3,800<span className="text-sm text-brand-black/70 font-normal">/mo</span></p>
+              <p className="text-xs text-brand-black/70 font-medium mt-1">0% EMI</p>
             </div>
           </motion.div>
         </div>
@@ -270,8 +270,8 @@ export function CinematicHero() {
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-50 text-emerald-500 mb-4">
                 <RefreshCw className="w-8 h-8" />
               </div>
-              <p className="text-sm text-text-muted font-medium uppercase tracking-wider mb-2">Consolidated Plan</p>
-              <h3 className="text-4xl font-bold text-text-main">₹18,500<span className="text-lg text-text-muted font-normal">/mo</span></h3>
+              <p className="text-sm text-brand-black/70 font-medium uppercase tracking-wider mb-2">Consolidated Plan</p>
+              <h3 className="text-4xl font-bold text-brand-black">₹18,500<span className="text-lg text-brand-black/70 font-normal">/mo</span></h3>
               <p className="text-sm font-medium text-emerald-600 mt-2 bg-emerald-50 inline-block px-3 py-1 rounded-full">
                 Potential difference: ₹4,300/mo*
               </p>
@@ -279,16 +279,16 @@ export function CinematicHero() {
             
             <div className="space-y-3 mb-8">
               <div className="flex justify-between items-center py-2 border-b border-slate-100">
-                <span className="text-text-muted">Total Outstanding</span>
-                <span className="font-semibold text-text-main">₹6,20,000</span>
+                <span className="text-brand-black/70">Total Outstanding</span>
+                <span className="font-semibold text-brand-black">₹6,20,000</span>
               </div>
               <div className="flex justify-between items-center py-2 border-b border-slate-100">
-                <span className="text-text-muted">Estimated Rate</span>
-                <span className="font-semibold text-text-main">11.5% p.a.</span>
+                <span className="text-brand-black/70">Estimated Rate</span>
+                <span className="font-semibold text-brand-black">11.5% p.a.</span>
               </div>
               <div className="flex justify-between items-center py-2">
-                <span className="text-text-muted">Simplified To</span>
-                <span className="font-semibold text-text-main">1 Single EMI</span>
+                <span className="text-brand-black/70">Simplified To</span>
+                <span className="font-semibold text-brand-black">1 Single EMI</span>
               </div>
             </div>
 
@@ -306,8 +306,8 @@ export function CinematicHero() {
             className="mt-12 text-center"
             style={{ opacity: finalTextOpacity, y: finalTextY }}
           >
-            <h2 className="text-3xl md:text-4xl font-bold text-text-main mb-4">Your Debt. Simplified.</h2>
-            <p className="text-text-muted max-w-lg mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold text-brand-black mb-4">Your Debt. Simplified.</h2>
+            <p className="text-brand-black/70 max-w-lg mx-auto">
               Get a consolidated view of your financial options and take back control of your monthly cash flow.
             </p>
           </motion.div>

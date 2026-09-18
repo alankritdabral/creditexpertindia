@@ -30,7 +30,7 @@ export function Navbar() {
 
   return (
     <>
-      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white/90 backdrop-blur-md shadow-sm py-3' : 'bg-white py-5'} border-b border-slate-200 px-4 md:px-6 lg:px-8`}>
+      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white/90 backdrop-blur-md shadow-sm py-3' : 'bg-white py-5'} border-b border-icy-blue px-4 md:px-6 lg:px-8`}>
         <div className="mx-auto max-w-[1220px] flex items-center justify-between">
           
           {/* Brand Logo */}
@@ -54,14 +54,14 @@ export function Navbar() {
                     href={l.href}
                     className={`relative px-4 py-2 text-[14px] font-bold transition-colors rounded-full flex items-center ${
                       pathname === l.href
-                        ? 'text-brand-blue'
-                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                        ? 'text-blue-energy'
+                        : 'text-brand-black/80 hover:text-brand-black hover:bg-slate-50'
                     }`}
                   >
                     {pathname === l.href && (
                       <motion.div
                         layoutId="navbar-active"
-                        className="absolute inset-0 bg-brand-blue/10 rounded-full"
+                        className="absolute inset-0 bg-blue-energy/10 rounded-full"
                         transition={{ type: "spring", stiffness: 380, damping: 30 }}
                       />
                     )}
@@ -76,7 +76,7 @@ export function Navbar() {
           <div className="hidden lg:flex items-center justify-end gap-6 relative z-10 shrink-0">
             <a
               href="/contact"
-              className="text-[14px] font-bold text-slate-600 hover:text-slate-900 transition-colors"
+              className="text-[14px] font-bold text-brand-black/80 hover:text-brand-black transition-colors"
             >
               Contact Us
             </a>
@@ -94,7 +94,7 @@ export function Navbar() {
             type="button"
             aria-label="Toggle menu"
             onClick={() => setOpen(!open)}
-            className="inline-flex items-center justify-center text-slate-900 lg:hidden relative z-10"
+            className="inline-flex items-center justify-center text-brand-black lg:hidden relative z-10"
           >
             {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
@@ -117,7 +117,7 @@ export function Navbar() {
                     key={l.href}
                     href={l.href}
                     onClick={() => setOpen(false)}
-                    className="text-2xl font-bold text-slate-900"
+                    className="text-2xl font-bold text-brand-black"
                   >
                     {l.label}
                   </a>
@@ -134,7 +134,7 @@ export function Navbar() {
                   <a
                     href="/contact"
                     onClick={() => setOpen(false)}
-                    className="flex w-full items-center justify-center px-6 py-4 text-lg font-medium text-slate-900"
+                    className="flex w-full items-center justify-center px-6 py-4 text-lg font-medium text-brand-black"
                   >
                     Contact Us
                   </a>

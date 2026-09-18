@@ -241,7 +241,7 @@ const LENDERS = [
       "Personal Loan": "CONFIRMED",
       "Multiple PLs": "CONFIRMED",
       "Credit Card": "NOT_SUPPORTED",
-      "App Loan": "NOT_SUPPORTED",
+      "App Loan": "CONFIRMED",
       "Overdraft": "CONFIRMED",
       "Top Up": "CONFIRMED"
     },
@@ -271,13 +271,19 @@ const LENDERS = [
 ];
 
 export function analyzeLenderEligibility({ profile, catBLoans }: { profile: any, catBLoans: any[] }) {
-  const { netSalary, employer, employerTier: manualTier, hasBounce, hasLatePayment, hasActiveOverdue, wantsTopUp } = profile;
+  const { 
+    netSalary, employer, employerTier: manualTier, hasBounce, hasLatePayment, hasActiveOverdue, wantsTopUp,
+    rentalIncome, monthlyIncentive, quarterlyIncentive, halfYearlyIncentive, monthlyBonus, quarterlyBonus, yearlyBonus, lta,
+    wfhStatus, hasEPFO, hasOMID, hasHRMS, has26AS, location, coApplicant, age, cibilMinus1, jobProfile 
+  } = profile || {};
+  
   const employerTier = manualTier || getEmployerTier(employer);
 
   // Characterize the liabilities
   const plCount = catBLoans.filter((l: any) => l.type === 'Personal Loan').length;
   const hasCC = catBLoans.some((l: any) => l.type === 'Credit Card');
-  const hasApp = catBLoans.some((l: any) => l.type === 'App Loan');
+  const appLoans = catBLoans.filter((l: any) => l.type === 'App Loan');
+  const hasApp = appLoans.length > 0;
   const hasOD = catBLoans.some((l: any) => l.type === 'Overdraft');
 
   const requiresMultiPL = plCount > 1;
@@ -296,13 +302,36 @@ export function analyzeLenderEligibility({ profile, catBLoans }: { profile: any,
     let isEligible = true;
     let matchScore = 100; // Base score out of 100
     const rejectionReasons = [];
+    let customOutput: any = {};
     
+    // Bank specific NTH calculation
+    let nth = Number(netSalary) || 0;
+    if (lender.id === 'abfl') {
+      nth += (Number(rentalIncome) || 0) * 0.5;
+      nth += (Number(monthlyIncentive) || 0) + (Number(quarterlyIncentive) || 0)/3 + (Number(halfYearlyIncentive) || 0)/6;
+      nth += (Number(monthlyBonus) || 0) + (Number(quarterlyBonus) || 0)/3 + (Number(yearlyBonus) || 0)/12;
+      nth += (Number(lta) || 0)/12;
+    }
+
     // 1. Hard knockouts
-    if (Number(netSalary) < eligibility.min_salary) {
+    if (nth < eligibility.min_salary) {
       isEligible = false;
       rejectionReasons.push(`Requires minimum salary of ₹${eligibility.min_salary}`);
     }
     
+    // Bank specific profile restrictions
+    if (lender.id === 'chola') {
+      const restrictedProfiles = ['Manpower', 'Law', 'Collection', 'Police', 'Court', 'Belt Job'];
+      if (restrictedProfiles.includes(jobProfile)) {
+        isEligible = false;
+        rejectionReasons.push(`Profile ${jobProfile} is restricted`);
+      }
+      if (location === 'Delhi NCR' && (profile.cibilScore && profile.cibilScore < 700)) {
+        isEligible = false;
+        rejectionReasons.push(`Delhi NCR requires minimum CIBIL of 700`);
+      }
+    }
+
     // Credit Policy Check
     if (hasActiveOverdue === 'yes') {
       if (creditPolicy.active_overdue === 'NOT_SUPPORTED' || creditPolicy.active_overdue === 'POLICY_CHECK') {
@@ -351,9 +380,18 @@ export function analyzeLenderEligibility({ profile, catBLoans }: { profile: any,
       }
     }
     if (requiresApp) {
-      if (takeover["App Loan"] === 'NOT_SUPPORTED' || takeover["App Loan"] === 'POLICY_CHECK') {
-        isEligible = false;
-        rejectionReasons.push(`Does not take over Digital/App Loans`);
+      if (lender.id === 'ltfinance') {
+        // App loan specifics for LT Finance
+        const invalidAppLoans = appLoans.filter(l => (l.activeEMIs || 0) < 6 || (l.currentExposure || 0) < 200000);
+        if (invalidAppLoans.length > 0) {
+           isEligible = false;
+           rejectionReasons.push(`L&T Finance requires App Loans to have >= 6 active EMIs and >= 2 Lakh exposure`);
+        }
+      } else {
+        if (takeover["App Loan"] === 'NOT_SUPPORTED' || takeover["App Loan"] === 'POLICY_CHECK') {
+          isEligible = false;
+          rejectionReasons.push(`Does not take over Digital/App Loans`);
+        }
       }
     }
     if (requiresOD) {
@@ -374,9 +412,44 @@ export function analyzeLenderEligibility({ profile, catBLoans }: { profile: any,
     // We removed CIBIL score checks, so we just use a default credit fit or remove it.
     matchScore = matchScore - 20 + 20;
 
+    // Additional output logic for specific banks
+    if (lender.id === 'abfl' && isEligible) {
+      let maxLoan = 5000000;
+      if (nth >= 250000 && employerTier === 'A') maxLoan = 6500000;
+      else if (nth >= 175000 && employerTier === 'A') maxLoan = 5000000;
+      customOutput.maxLoanAmount = maxLoan;
+      customOutput.maxFOIR = "75%";
+      if (hasEPFO || hasOMID || hasHRMS || has26AS) {
+        customOutput.fiWaiver = true;
+      }
+    }
+    
+    if (lender.id === 'chola' && isEligible) {
+      if ((employerTier === 'Govt' && nth >= 100000) || (['A+', 'A', 'B'].includes(employerTier) && nth >= 150000)) {
+        customOutput.flexiOdEligible = true;
+        customOutput.flexiOdStructure = "2 years Flexi + 5 years Drop-line";
+      }
+      if (cibilMinus1) {
+        if (employerTier === 'Govt') customOutput.cibilMinus1MaxLoan = 2000000;
+        else if (['A+', 'A', 'B'].includes(employerTier) && coApplicant && age <= 30) customOutput.cibilMinus1MaxLoan = 1000000;
+        else {
+           isEligible = false; // Rejected for CIBIL -1 without meeting criteria
+           rejectionReasons.push(`Does not meet CIBIL -1 criteria for Chola`);
+        }
+      }
+    }
+    
+    if (lender.id === 'ltfinance' && isEligible) {
+      lender.maxTenure = 72;
+      customOutput.maxFOIR = "75%+";
+      customOutput.fiWaiverThreshold = 750000;
+      if (cibilMinus1) customOutput.cibilMinus1MaxLoan = 1000000;
+    }
+
     if (isEligible) {
       eligibleLenders.push({
         ...lender,
+        ...customOutput,
         matchConfidence: matchScore,
         outcome: matchScore >= 80 ? 'ELIGIBLE' : 'CONDITIONALLY_ELIGIBLE'
       });
@@ -397,3 +470,4 @@ export function analyzeLenderEligibility({ profile, catBLoans }: { profile: any,
 
   return { eligibleLenders, ineligibleLenders };
 }
+

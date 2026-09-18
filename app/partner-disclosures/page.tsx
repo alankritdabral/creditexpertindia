@@ -8,8 +8,8 @@ export const metadata: Metadata = {
 export default function PartnerDisclosuresPage() {
   return (
     <div className="min-h-screen bg-slate-50 pt-32 pb-24">
-      <div className="container-narrow bg-white p-8 sm:p-12 rounded-2xl border border-slate-200 shadow-sm">
-        <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl text-slate-900 mb-8">
+      <div className="container-narrow bg-white p-8 sm:p-12 rounded-2xl border border-icy-blue shadow-sm">
+        <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl text-brand-black mb-8">
           Partner Disclosures
         </h1>
         <div className="prose prose-slate max-w-none">

@@ -13,23 +13,23 @@ export function TrustBar() {
 
         <div className="mx-auto max-w-3xl bg-canvas-soft border border-hairline rounded-[12px] p-8 sm:p-12 text-center shadow-sm">
           <div className="flex justify-center mb-6 pb-6 border-b border-hairline">
-            <ShieldCheck className="h-10 w-10 text-primary-soft" />
+            <ShieldCheck className="h-10 w-10 text-navy-electric-soft" />
           </div>
           <p className="text-[22px] font-light tracking-[-0.22px] text-ink mb-8">
             Credit Expert India
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left max-w-xl mx-auto text-[15px] text-ink-mute font-light">
             <div className="flex items-center gap-3">
-              <div className="h-1.5 w-1.5 rounded-full bg-primary" /> Human-assisted credit guidance
+              <div className="h-1.5 w-1.5 rounded-full bg-navy-electric" /> Human-assisted credit guidance
             </div>
             <div className="flex items-center gap-3">
-              <div className="h-1.5 w-1.5 rounded-full bg-primary" /> Clear communication
+              <div className="h-1.5 w-1.5 rounded-full bg-navy-electric" /> Clear communication
             </div>
             <div className="flex items-center gap-3">
-              <div className="h-1.5 w-1.5 rounded-full bg-primary" /> Confidential handling of info
+              <div className="h-1.5 w-1.5 rounded-full bg-navy-electric" /> Confidential handling of info
             </div>
             <div className="flex items-center gap-3">
-              <div className="h-1.5 w-1.5 rounded-full bg-primary" /> Transparent loan terms
+              <div className="h-1.5 w-1.5 rounded-full bg-navy-electric" /> Transparent loan terms
             </div>
           </div>
         </div>

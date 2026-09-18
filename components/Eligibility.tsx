@@ -17,7 +17,7 @@ export function Eligibility() {
               <h2 className="mt-3 text-[30px] font-extrabold tracking-tight text-[#091328] sm:text-[38px]">
                 What Partner Lenders Typically Evaluate
               </h2>
-              <p className="mt-3 text-sm leading-7 text-slate-600">
+              <p className="mt-3 text-sm leading-7 text-brand-black/80">
                 While each banking partner maintains specific risk criteria, these general benchmarks help prepare your profile for evaluation.
               </p>
 
@@ -47,14 +47,14 @@ export function Eligibility() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="rounded-3xl border border-slate-200/90 bg-gradient-to-b from-slate-50 to-white p-7 shadow-md sm:p-8"
+            className="rounded-3xl border border-icy-blue/90 bg-gradient-to-b from-slate-50 to-white p-7 shadow-md sm:p-8"
           >
-            <div className="flex items-center gap-2 border-b border-slate-200 pb-4 mb-6">
+            <div className="flex items-center gap-2 border-b border-icy-blue pb-4 mb-6">
               <FileCheck className="h-5 w-5 text-[#059669]" />
               <h3 className="text-base font-extrabold text-[#091328]">Standard Verification Documents</h3>
             </div>
 
-            <ul className="grid gap-3 sm:grid-cols-2 text-xs font-semibold text-slate-700">
+            <ul className="grid gap-3 sm:grid-cols-2 text-xs font-semibold text-brand-black/90">
               {[
                 "PAN Card & Aadhaar",
                 "Latest Salary Slips (3 Mos)",
@@ -63,14 +63,14 @@ export function Eligibility() {
                 "Credit Card Statements",
                 "Proof of Employment",
               ].map((d) => (
-                <li key={d} className="flex items-center gap-2.5 rounded-xl bg-white p-3 border border-slate-200/60 shadow-xs">
+                <li key={d} className="flex items-center gap-2.5 rounded-xl bg-white p-3 border border-icy-blue/60 shadow-xs">
                   <div className="h-2 w-2 rounded-full bg-[#10b981]" />
                   <span>{d}</span>
                 </li>
               ))}
             </ul>
 
-            <p className="mt-6 text-[11px] leading-5 text-slate-500 font-medium border-t border-slate-100 pt-4">
+            <p className="mt-6 text-[11px] leading-5 text-brand-black/70 font-medium border-t border-slate-100 pt-4">
               🔒 Privacy First: We never collect document uploads on initial contact. You share files only when proceeding with a specific lender application.
             </p>
           </motion.div>

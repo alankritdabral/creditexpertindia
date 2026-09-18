@@ -57,7 +57,7 @@ function NotificationCard({
           >
             <Icon className="w-2.5 h-2.5" strokeWidth={2.5} />
           </div>
-          <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide leading-none">
+          <span className="text-[10px] font-semibold text-brand-black/70 uppercase tracking-wide leading-none">
             {label}
           </span>
         </div>
@@ -66,7 +66,7 @@ function NotificationCard({
       <p className="text-[12px] font-semibold text-slate-800 leading-snug">
         {title}
       </p>
-      <p className="text-[11px] text-slate-500 leading-snug">{body}</p>
+      <p className="text-[11px] text-brand-black/70 leading-snug">{body}</p>
     </div>
   );
 }
@@ -340,7 +340,7 @@ export function HeroVisualBlock() {
       <motion.div
         initial={{ opacity: 0, scale: 0.85, y: 30 }}
         animate={phoneControls}
-        className="absolute w-[270px] h-[560px] rounded-[44px] bg-brand-blue border-[8px] border-slate-900 shadow-[0_25px_60px_-12px_rgba(0,0,0,0.12),0_0_0_1px_rgba(0,0,0,0.04)] flex flex-col overflow-hidden"
+        className="absolute w-[270px] h-[560px] rounded-[44px] bg-blue-energy border-[8px] border-slate-900 shadow-[0_25px_60px_-12px_rgba(0,0,0,0.12),0_0_0_1px_rgba(0,0,0,0.04)] flex flex-col overflow-hidden"
       >
         <div className="relative flex justify-center pt-2">
           <div className="w-[90px] h-[26px] bg-black rounded-full" />
@@ -410,7 +410,7 @@ export function HeroVisualBlock() {
           transition={{ duration: 0.4, delay: 0.3 }}
           className="mt-3 flex items-center justify-center gap-3"
         >
-          <span className="text-sm font-semibold text-brand-blue bg-blue-50 px-3 py-1 rounded-full">
+          <span className="text-sm font-semibold text-blue-energy bg-blue-50 px-3 py-1 rounded-full">
             9.99% rate
           </span>
           <span className="text-sm font-semibold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full">
@@ -433,10 +433,10 @@ export function HeroVisualBlock() {
         className="absolute z-30 w-[300px] bg-white rounded-2xl border border-slate-100 overflow-hidden flex flex-col shadow-[0_20px_50px_-12px_rgba(29,78,216,0.15)]" style={{ backgroundColor: '#fff' }}
       >
         <div className="p-5 bg-gradient-to-br from-white via-white to-blue-50/40 border-b border-slate-100">
-          <p className="text-[10px] font-bold text-brand-blue uppercase tracking-widest mb-1.5">
+          <p className="text-[10px] font-bold text-blue-energy uppercase tracking-widest mb-1.5">
             Your Consolidated EMI
           </p>
-          <h3 className="text-[26px] font-extrabold text-slate-900 tracking-tight leading-none">
+          <h3 className="text-[26px] font-extrabold text-brand-black tracking-tight leading-none">
             ₹18,499{" "}
             <span className="text-sm font-medium text-slate-400">/ month</span>
           </h3>
@@ -453,7 +453,7 @@ export function HeroVisualBlock() {
             transition={{ duration: 0.4, delay: 0.3 }}
             className="flex justify-between items-center"
           >
-            <span className="text-[13px] text-slate-500">Interest Rate</span>
+            <span className="text-[13px] text-brand-black/70">Interest Rate</span>
             <span className="text-[13px] font-bold text-slate-800">9.99%</span>
           </motion.div>
 
@@ -463,7 +463,7 @@ export function HeroVisualBlock() {
             transition={{ duration: 0.4, delay: 0.5 }}
             className="flex justify-between items-center"
           >
-            <span className="text-[13px] text-slate-500">Tenure</span>
+            <span className="text-[13px] text-brand-black/70">Tenure</span>
             <span className="text-[13px] font-bold text-slate-800">60 months</span>
           </motion.div>
 
@@ -473,7 +473,7 @@ export function HeroVisualBlock() {
             transition={{ duration: 0.4, delay: 0.7 }}
             className="flex justify-between items-center pt-2.5 border-t border-slate-100"
           >
-            <span className="text-[13px] text-slate-500">Total Saved</span>
+            <span className="text-[13px] text-brand-black/70">Total Saved</span>
             <span className="text-[13px] font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-md">₹6,501/mo</span>
           </motion.div>
 

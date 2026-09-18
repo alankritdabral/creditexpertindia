@@ -259,11 +259,11 @@ export function EligibilityForm() {
       case 1:
         return (
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-            <h3 className="text-2xl font-bold text-text-main mb-6">Credit Profile & Identity</h3>
+            <h3 className="text-2xl font-bold text-brand-black mb-6">Credit Profile & Identity</h3>
             <div className="space-y-4">
               <div className="relative">
                 <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                <input type="text" placeholder="Full Name (As per PAN)" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} className="w-full bg-white border border-slate-200 rounded-xl pl-11 pr-4 py-3.5 focus:ring-2 focus:ring-brand-blue/30 focus:border-brand-blue outline-none transition-all" />
+                <input type="text" placeholder="Full Name (As per PAN)" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} className="w-full bg-white border border-icy-blue rounded-xl pl-11 pr-4 py-3.5 focus:ring-2 focus:ring-blue-energy/30 focus:border-blue-energy outline-none transition-all" />
               </div>
               <div className="relative">
                 <CreditCard className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -272,20 +272,20 @@ export function EligibilityForm() {
                   placeholder="PAN Number"
                   value={formData.pan}
                   onChange={e => setFormData({ ...formData, pan: e.target.value.toUpperCase() })}
-                  className="w-full bg-white border border-slate-200 rounded-xl pl-11 pr-4 py-3.5 focus:ring-2 focus:ring-brand-blue/30 focus:border-brand-blue outline-none transition-all uppercase"
+                  className="w-full bg-white border border-icy-blue rounded-xl pl-11 pr-4 py-3.5 focus:ring-2 focus:ring-blue-energy/30 focus:border-blue-energy outline-none transition-all uppercase"
                   maxLength={10}
                 />
               </div>
               <div className="relative">
                 <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                <input type="tel" placeholder="Mobile Number" value={formData.mobile} onChange={e => setFormData({ ...formData, mobile: e.target.value })} className="w-full bg-white border border-slate-200 rounded-xl pl-11 pr-4 py-3.5 focus:ring-2 focus:ring-brand-blue/30 focus:border-brand-blue outline-none transition-all" />
+                <input type="tel" placeholder="Mobile Number" value={formData.mobile} onChange={e => setFormData({ ...formData, mobile: e.target.value })} className="w-full bg-white border border-icy-blue rounded-xl pl-11 pr-4 py-3.5 focus:ring-2 focus:ring-blue-energy/30 focus:border-blue-energy outline-none transition-all" />
               </div>
               <div className="relative">
                 <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <select
                   value={formData.gender}
                   onChange={e => setFormData({ ...formData, gender: e.target.value })}
-                  className="w-full bg-white border border-slate-200 rounded-xl pl-11 pr-4 py-3.5 focus:ring-2 focus:ring-brand-blue/30 focus:border-brand-blue outline-none text-text-main transition-all"
+                  className="w-full bg-white border border-icy-blue rounded-xl pl-11 pr-4 py-3.5 focus:ring-2 focus:ring-blue-energy/30 focus:border-blue-energy outline-none text-brand-black transition-all"
                 >
                   <option value="male">Male</option>
                   <option value="female">Female</option>
@@ -295,51 +295,51 @@ export function EligibilityForm() {
 
               {/* Bureau Selection */}
               <div className="pt-2">
-                <p className="text-sm font-semibold text-text-main mb-3">Select Credit Bureau & Format</p>
+                <p className="text-sm font-semibold text-brand-black mb-3">Select Credit Bureau & Format</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <label className="flex items-center gap-2 p-3 border rounded-xl cursor-not-allowed transition-all border-slate-200 bg-slate-50 opacity-50">
-                    <input type="radio" name="bureau" value="v1_json" checked={formData.bureau === 'v1_json'} disabled onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-brand-blue accent-brand-blue cursor-not-allowed" />
-                    <span className="text-sm font-medium text-slate-700">CIBIL (Dashboard)</span>
+                  <label className="flex items-center gap-2 p-3 border rounded-xl cursor-not-allowed transition-all border-icy-blue bg-slate-50 opacity-50">
+                    <input type="radio" name="bureau" value="v1_json" checked={formData.bureau === 'v1_json'} disabled onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-blue-energy accent-blue-energy cursor-not-allowed" />
+                    <span className="text-sm font-medium text-brand-black/90">CIBIL (Dashboard)</span>
                   </label>
-                  <label className="flex items-center gap-2 p-3 border rounded-xl cursor-not-allowed transition-all border-slate-200 bg-slate-50 opacity-50">
-                    <input type="radio" name="bureau" value="v1_pdf" checked={formData.bureau === 'v1_pdf'} disabled onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-brand-blue accent-brand-blue cursor-not-allowed" />
-                    <span className="text-sm font-medium text-slate-700">CIBIL (PDF)</span>
+                  <label className="flex items-center gap-2 p-3 border rounded-xl cursor-not-allowed transition-all border-icy-blue bg-slate-50 opacity-50">
+                    <input type="radio" name="bureau" value="v1_pdf" checked={formData.bureau === 'v1_pdf'} disabled onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-blue-energy accent-blue-energy cursor-not-allowed" />
+                    <span className="text-sm font-medium text-brand-black/90">CIBIL (PDF)</span>
                   </label>
-                  <label className={`flex items-center gap-2 p-3 border rounded-xl cursor-pointer transition-all ${formData.bureau === 'v2_json' ? 'border-brand-blue bg-blue-50/50' : 'border-slate-200 hover:bg-slate-50'}`}>
-                    <input type="radio" name="bureau" value="v2_json" checked={formData.bureau === 'v2_json'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-brand-blue accent-brand-blue" />
-                    <span className="text-sm font-medium text-slate-700">Equifax (Dashboard)</span>
+                  <label className={`flex items-center gap-2 p-3 border rounded-xl cursor-pointer transition-all ${formData.bureau === 'v2_json' ? 'border-blue-energy bg-blue-50/50' : 'border-icy-blue hover:bg-slate-50'}`}>
+                    <input type="radio" name="bureau" value="v2_json" checked={formData.bureau === 'v2_json'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-blue-energy accent-blue-energy" />
+                    <span className="text-sm font-medium text-brand-black/90">Equifax (Dashboard)</span>
                   </label>
-                  <label className="flex items-center gap-2 p-3 border rounded-xl cursor-not-allowed transition-all border-slate-200 bg-slate-50 opacity-50">
-                    <input type="radio" name="bureau" value="v2_pdf" disabled checked={formData.bureau === 'v2_pdf'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-brand-blue accent-brand-blue cursor-not-allowed" />
-                    <span className="text-sm font-medium text-slate-700">Equifax (PDF)</span>
+                  <label className="flex items-center gap-2 p-3 border rounded-xl cursor-not-allowed transition-all border-icy-blue bg-slate-50 opacity-50">
+                    <input type="radio" name="bureau" value="v2_pdf" disabled checked={formData.bureau === 'v2_pdf'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-blue-energy accent-blue-energy cursor-not-allowed" />
+                    <span className="text-sm font-medium text-brand-black/90">Equifax (PDF)</span>
                   </label>
-                  <label className="flex items-center gap-2 p-3 border rounded-xl cursor-not-allowed transition-all border-slate-200 bg-slate-50 opacity-50">
-                    <input type="radio" name="bureau" value="experian_json" disabled checked={formData.bureau === 'experian_json'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-brand-blue accent-brand-blue cursor-not-allowed" />
-                    <span className="text-sm font-medium text-slate-700">Experian (Dashboard)</span>
+                  <label className="flex items-center gap-2 p-3 border rounded-xl cursor-not-allowed transition-all border-icy-blue bg-slate-50 opacity-50">
+                    <input type="radio" name="bureau" value="experian_json" disabled checked={formData.bureau === 'experian_json'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-blue-energy accent-blue-energy cursor-not-allowed" />
+                    <span className="text-sm font-medium text-brand-black/90">Experian (Dashboard)</span>
                   </label>
-                  <label className="flex items-center gap-2 p-3 border rounded-xl cursor-not-allowed transition-all border-slate-200 bg-slate-50 opacity-50">
-                    <input type="radio" name="bureau" value="experian_pdf" disabled checked={formData.bureau === 'experian_pdf'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-brand-blue accent-brand-blue cursor-not-allowed" />
-                    <span className="text-sm font-medium text-slate-700">Experian (PDF)</span>
+                  <label className="flex items-center gap-2 p-3 border rounded-xl cursor-not-allowed transition-all border-icy-blue bg-slate-50 opacity-50">
+                    <input type="radio" name="bureau" value="experian_pdf" disabled checked={formData.bureau === 'experian_pdf'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-blue-energy accent-blue-energy cursor-not-allowed" />
+                    <span className="text-sm font-medium text-brand-black/90">Experian (PDF)</span>
                   </label>
-                  <label className="flex items-center gap-2 p-3 border rounded-xl cursor-not-allowed transition-all border-slate-200 bg-slate-50 opacity-50">
-                    <input type="radio" name="bureau" value="crif_json" disabled checked={formData.bureau === 'crif_json'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-brand-blue accent-brand-blue cursor-not-allowed" />
-                    <span className="text-sm font-medium text-slate-700">CRIF (Dashboard)</span>
+                  <label className="flex items-center gap-2 p-3 border rounded-xl cursor-not-allowed transition-all border-icy-blue bg-slate-50 opacity-50">
+                    <input type="radio" name="bureau" value="crif_json" disabled checked={formData.bureau === 'crif_json'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-blue-energy accent-blue-energy cursor-not-allowed" />
+                    <span className="text-sm font-medium text-brand-black/90">CRIF (Dashboard)</span>
                   </label>
-                  <label className="flex items-center gap-2 p-3 border rounded-xl cursor-not-allowed transition-all border-slate-200 bg-slate-50 opacity-50">
-                    <input type="radio" name="bureau" value="crif_pdf" disabled checked={formData.bureau === 'crif_pdf'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-brand-blue accent-brand-blue cursor-not-allowed" />
-                    <span className="text-sm font-medium text-slate-700">CRIF (PDF)</span>
+                  <label className="flex items-center gap-2 p-3 border rounded-xl cursor-not-allowed transition-all border-icy-blue bg-slate-50 opacity-50">
+                    <input type="radio" name="bureau" value="crif_pdf" disabled checked={formData.bureau === 'crif_pdf'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-blue-energy accent-blue-energy cursor-not-allowed" />
+                    <span className="text-sm font-medium text-brand-black/90">CRIF (PDF)</span>
                   </label>
                 </div>
               </div>
 
-              <label className="flex items-start gap-3 p-4 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors mt-4">
+              <label className="flex items-start gap-3 p-4 border border-icy-blue rounded-xl cursor-pointer hover:bg-slate-50 transition-colors mt-4">
                 <input
                   type="checkbox"
                   checked={formData.consent}
                   onChange={e => setFormData({ ...formData, consent: e.target.checked })}
-                  className="w-5 h-5 mt-0.5 text-brand-blue accent-brand-blue shrink-0 rounded"
+                  className="w-5 h-5 mt-0.5 text-blue-energy accent-blue-energy shrink-0 rounded"
                 />
-                <span className="text-xs text-text-muted leading-relaxed">
+                <span className="text-xs text-brand-black/70 leading-relaxed">
                   <strong>Credit Report Consent</strong><br />
                   By continuing, I consent and authorize Credit Expert India to securely retrieve my credit report from the credit bureau.
                 </span>
@@ -355,7 +355,7 @@ export function EligibilityForm() {
               <button
                 onClick={handleFetchReport}
                 disabled={loading}
-                className="w-full mt-6 bg-brand-blue text-white py-4 rounded-xl font-bold shadow-lg shadow-brand-blue/20 hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
+                className="w-full mt-6 bg-blue-energy text-white py-4 rounded-xl font-bold shadow-lg shadow-blue-energy/20 hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
               >
                 {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <span>Fetch Credit Report</span>}
                 {!loading && <ArrowRight className="w-5 h-5" />}
@@ -477,7 +477,7 @@ export function EligibilityForm() {
         const score = cibilData?.credit_score;
 
         let scoreLabel = "Not Available";
-        let scoreColor = "text-slate-500";
+        let scoreColor = "text-brand-black/70";
         let ringColor = "text-slate-200";
         const scoreNum = Number(score);
         if (scoreNum) {
@@ -497,10 +497,10 @@ export function EligibilityForm() {
             {/* CIBIL Dashboard */}
             <div className="mb-10">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-2xl font-bold text-text-main">Credit Report</h3>
+                <h3 className="text-2xl font-bold text-brand-black">Credit Report</h3>
                 <div className="flex items-center gap-3">
                   {cibilData?.credit_report_link && (
-                    <a href={cibilData.credit_report_link} target="_blank" rel="noopener noreferrer" className="text-xs font-bold px-4 py-1.5 bg-brand-blue text-white rounded-full hover:bg-blue-700 transition-colors shadow-sm flex items-center gap-1">
+                    <a href={cibilData.credit_report_link} target="_blank" rel="noopener noreferrer" className="text-xs font-bold px-4 py-1.5 bg-blue-energy text-white rounded-full hover:bg-blue-700 transition-colors shadow-sm flex items-center gap-1">
                       Download PDF
                     </a>
                   )}
@@ -576,7 +576,7 @@ export function EligibilityForm() {
                   <button
                     key={tab.id}
                     onClick={() => setDashboardTab(tab.id as any)}
-                    className={`flex-1 py-2 px-3 text-xs font-bold rounded-lg whitespace-nowrap transition-all ${dashboardTab === tab.id ? 'bg-white text-brand-blue shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                    className={`flex-1 py-2 px-3 text-xs font-bold rounded-lg whitespace-nowrap transition-all ${dashboardTab === tab.id ? 'bg-white text-blue-energy shadow-sm' : 'text-brand-black/70 hover:text-brand-black/90'}`}
                   >
                     {tab.label}
                   </button>
@@ -717,8 +717,8 @@ export function EligibilityForm() {
 
 
                   {(!activeAccounts || activeAccounts.length === 0) && (
-                    <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 text-center">
-                      <p className="text-sm font-medium text-slate-500">No ongoing loans found.</p>
+                    <div className="bg-slate-50 border border-icy-blue rounded-2xl p-4 text-center">
+                      <p className="text-sm font-medium text-brand-black/70">No ongoing loans found.</p>
                     </div>
                   )}
                 </motion.div>
@@ -798,8 +798,8 @@ export function EligibilityForm() {
 
 
                   {(!closedAccounts || closedAccounts.length === 0) && (
-                    <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 text-center">
-                      <p className="text-sm font-medium text-slate-500">No closed loans found.</p>
+                    <div className="bg-slate-50 border border-icy-blue rounded-2xl p-4 text-center">
+                      <p className="text-sm font-medium text-brand-black/70">No closed loans found.</p>
                     </div>
                   )}
                 </motion.div>
@@ -838,16 +838,16 @@ export function EligibilityForm() {
                   <div className="mb-6">
                     <h4 className="text-lg font-bold text-[#382F2A] mb-4">Complete Profile for Accurate Eligibility</h4>
 
-                    <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 mb-6">
+                    <div className="bg-slate-50 border border-icy-blue rounded-2xl p-5 mb-6">
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
-                          <label className="text-xs font-semibold text-slate-600 mb-1 flex justify-between items-center">
+                          <label className="text-xs font-semibold text-brand-black/80 mb-1 flex justify-between items-center">
                             <span>Net Monthly Salary</span>
                             <div className="flex items-center gap-2 text-[10px] font-bold">
-                              <span className={`px-2 py-0.5 rounded-full ${totalCurrentEMI > maxEmiCapacity ? 'bg-red-50 text-red-600' : 'bg-slate-100 text-slate-600'}`}>
+                              <span className={`px-2 py-0.5 rounded-full ${totalCurrentEMI > maxEmiCapacity ? 'bg-red-50 text-red-600' : 'bg-slate-100 text-brand-black/80'}`}>
                                 Used EMI: ₹{totalCurrentEMI.toLocaleString('en-IN')}
                               </span>
-                              <span className="bg-blue-50 text-brand-blue px-2 py-0.5 rounded-full">
+                              <span className="bg-blue-50 text-blue-energy px-2 py-0.5 rounded-full">
                                 Max EMI: ₹{maxEmiCapacity.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
                               </span>
                             </div>
@@ -856,28 +856,28 @@ export function EligibilityForm() {
                             type="number"
                             value={userOverrides.netSalary || formData.monthlyIncome || ""}
                             onChange={e => setUserOverrides({ ...userOverrides, netSalary: e.target.value })}
-                            className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm focus:border-brand-blue outline-none"
+                            className="w-full bg-white border border-icy-blue rounded-xl px-3 py-2 text-sm focus:border-blue-energy outline-none"
                             placeholder="e.g. 50000"
                           />
                         </div>
                         <div>
-                          <label className="text-xs font-semibold text-slate-600 mb-1 block">
+                          <label className="text-xs font-semibold text-brand-black/80 mb-1 block">
                             Average Yearly Bonus
                           </label>
                           <input
                             type="number"
                             value={userOverrides.yearlyBonus || ""}
                             onChange={e => setUserOverrides({ ...userOverrides, yearlyBonus: e.target.value })}
-                            className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm focus:border-brand-blue outline-none"
+                            className="w-full bg-white border border-icy-blue rounded-xl px-3 py-2 text-sm focus:border-blue-energy outline-none"
                             placeholder="e.g. 100000"
                           />
                         </div>
                         <div>
-                          <label className="text-xs font-semibold text-slate-600 mb-1 block">Company Category</label>
+                          <label className="text-xs font-semibold text-brand-black/80 mb-1 block">Company Category</label>
                           <select
                             value={userOverrides.companyCategory || ""}
                             onChange={e => setUserOverrides({ ...userOverrides, companyCategory: e.target.value })}
-                            className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm focus:border-brand-blue outline-none"
+                            className="w-full bg-white border border-icy-blue rounded-xl px-3 py-2 text-sm focus:border-blue-energy outline-none"
                           >
                             <option value="">Auto-detect from Name</option>
                             <option value="A+">Super Cat A (A+)</option>
@@ -889,7 +889,7 @@ export function EligibilityForm() {
                           </select>
                         </div>
                         <div ref={employerDropdownRef} className="relative z-10">
-                          <label className="text-xs font-semibold text-slate-600 mb-1 block">Employer</label>
+                          <label className="text-xs font-semibold text-brand-black/80 mb-1 block">Employer</label>
                           <div className="relative">
                             <input
                               type="text"
@@ -900,7 +900,7 @@ export function EligibilityForm() {
                                 setUserOverrides({ ...userOverrides, employer: e.target.value });
                               }}
                               onFocus={() => setShowEmployerDropdown(true)}
-                              className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm focus:border-brand-blue outline-none"
+                              className="w-full bg-white border border-icy-blue rounded-xl px-3 py-2 text-sm focus:border-blue-energy outline-none"
                               placeholder="Search your company..."
                               autoComplete="off"
                             />
@@ -914,10 +914,10 @@ export function EligibilityForm() {
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: 5 }}
                                 transition={{ duration: 0.1 }}
-                                className="absolute top-full left-0 right-0 mt-1 max-h-60 overflow-y-auto bg-white border border-slate-200 rounded-xl shadow-lg z-50 py-1"
+                                className="absolute top-full left-0 right-0 mt-1 max-h-60 overflow-y-auto bg-white border border-icy-blue rounded-xl shadow-lg z-50 py-1"
                               >
                                 {isSearchingEmployer ? (
-                                  <div className="px-4 py-3 text-sm text-slate-500">Searching database...</div>
+                                  <div className="px-4 py-3 text-sm text-brand-black/70">Searching database...</div>
                                 ) : asyncEmployers.length > 0 ? (
                                   asyncEmployers.map(e => (
                                     <div
@@ -927,24 +927,24 @@ export function EligibilityForm() {
                                         setUserOverrides({ ...userOverrides, employer: e });
                                         setShowEmployerDropdown(false);
                                       }}
-                                      className="px-4 py-2 text-sm text-slate-700 cursor-pointer hover:bg-slate-50 border-b border-slate-50 last:border-0"
+                                      className="px-4 py-2 text-sm text-brand-black/90 cursor-pointer hover:bg-slate-50 border-b border-slate-50 last:border-0"
                                     >
                                       {e}
                                     </div>
                                   ))
                                 ) : (
-                                  <div className="px-4 py-3 text-sm text-slate-500">Type to specify company</div>
+                                  <div className="px-4 py-3 text-sm text-brand-black/70">Type to specify company</div>
                                 )}
                               </motion.div>
                             )}
                           </AnimatePresence>
                         </div>
                         <div>
-                          <label className="text-xs font-semibold text-slate-600 mb-1 block">Any EMI Bounce (6M)?</label>
+                          <label className="text-xs font-semibold text-brand-black/80 mb-1 block">Any EMI Bounce (6M)?</label>
                           <select
                             value={userOverrides.hasBounce || "no"}
                             onChange={e => setUserOverrides({ ...userOverrides, hasBounce: e.target.value })}
-                            className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm focus:border-brand-blue outline-none"
+                            className="w-full bg-white border border-icy-blue rounded-xl px-3 py-2 text-sm focus:border-blue-energy outline-none"
                           >
                             <option value="no">No</option>
                             <option value="yes">Yes</option>
@@ -954,9 +954,9 @@ export function EligibilityForm() {
                     </div>
 
                     {/* Fresh Loan / Top-Up Requirement */}
-                    <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 mb-6">
+                    <div className="bg-slate-50 border border-icy-blue rounded-2xl p-5 mb-6">
                       <div className="flex justify-between items-center">
-                        <label className="text-sm font-bold text-slate-700">Do you want a Fresh Loan / Top-Up?</label>
+                        <label className="text-sm font-bold text-brand-black/90">Do you want a Fresh Loan / Top-Up?</label>
                         <div className="flex gap-4">
                           <label className="flex items-center gap-1 text-sm cursor-pointer">
                             <input
@@ -965,7 +965,7 @@ export function EligibilityForm() {
                               value="yes"
                               checked={userOverrides.wantsTopUp === 'yes'}
                               onChange={e => setUserOverrides({ ...userOverrides, wantsTopUp: e.target.value })}
-                              className="accent-brand-blue"
+                              className="accent-blue-energy"
                             /> Yes
                           </label>
                           <label className="flex items-center gap-1 text-sm cursor-pointer">
@@ -975,52 +975,52 @@ export function EligibilityForm() {
                               value="no"
                               checked={(userOverrides.wantsTopUp || 'no') === 'no'}
                               onChange={e => setUserOverrides({ ...userOverrides, wantsTopUp: e.target.value })}
-                              className="accent-brand-blue"
+                              className="accent-blue-energy"
                             /> No
                           </label>
                         </div>
                       </div>
 
                       {userOverrides.wantsTopUp === 'yes' && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4 pt-4 border-t border-slate-200">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4 pt-4 border-t border-icy-blue">
                           <div className="space-y-4">
                             <div>
-                              <label className="text-xs font-semibold text-slate-600 mb-1 block">Expected Tenure (Years)</label>
+                              <label className="text-xs font-semibold text-brand-black/80 mb-1 block">Expected Tenure (Years)</label>
                               <input
                                 type="number"
                                 value={userOverrides.topUpTenure ?? 5}
                                 onChange={e => setUserOverrides({ ...userOverrides, topUpTenure: e.target.value })}
-                                className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm focus:border-brand-blue outline-none"
+                                className="w-full bg-white border border-icy-blue rounded-xl px-3 py-2 text-sm focus:border-blue-energy outline-none"
                                 min={1}
                                 max={30}
                               />
                             </div>
                             <div>
-                              <label className="text-xs font-semibold text-slate-600 mb-1 block">Expected ROI (% p.a.)</label>
+                              <label className="text-xs font-semibold text-brand-black/80 mb-1 block">Expected ROI (% p.a.)</label>
                               <input
                                 type="number"
                                 value={userOverrides.topUpRoi ?? 12}
                                 onChange={e => setUserOverrides({ ...userOverrides, topUpRoi: e.target.value })}
-                                className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm focus:border-brand-blue outline-none"
+                                className="w-full bg-white border border-icy-blue rounded-xl px-3 py-2 text-sm focus:border-blue-energy outline-none"
                                 step="0.1"
                               />
                             </div>
                             <div>
-                              <label className="text-xs font-semibold text-slate-600 mb-1 block">Required Loan Amount (₹)</label>
+                              <label className="text-xs font-semibold text-brand-black/80 mb-1 block">Required Loan Amount (₹)</label>
                               <input
                                 type="number"
                                 value={userOverrides.topUpAmount ?? ""}
                                 onChange={e => setUserOverrides({ ...userOverrides, topUpAmount: e.target.value })}
-                                className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm focus:border-brand-blue outline-none"
+                                className="w-full bg-white border border-icy-blue rounded-xl px-3 py-2 text-sm focus:border-blue-energy outline-none"
                                 placeholder={`Max: ₹${Math.floor(maxFreshLoanAmount).toLocaleString('en-IN')}`}
                               />
                             </div>
                           </div>
 
-                          <div className="bg-white border border-brand-blue p-4 rounded-xl flex flex-col justify-center">
-                            <p className="text-xs text-slate-500 mb-1">Maximum Eligible Fresh Loan Amount:</p>
-                            <p className="text-2xl font-bold text-brand-blue mb-2">₹{Math.floor(maxFreshLoanAmount).toLocaleString('en-IN')}</p>
-                            <p className="text-xs text-slate-600">
+                          <div className="bg-white border border-blue-energy p-4 rounded-xl flex flex-col justify-center">
+                            <p className="text-xs text-brand-black/70 mb-1">Maximum Eligible Fresh Loan Amount:</p>
+                            <p className="text-2xl font-bold text-blue-energy mb-2">₹{Math.floor(maxFreshLoanAmount).toLocaleString('en-IN')}</p>
+                            <p className="text-xs text-brand-black/80">
                               Based on your unused EMI capacity of <strong>₹{Math.floor(unusedEmiCapacity).toLocaleString('en-IN')} / mo</strong>.
                             </p>
                             {Number(userOverrides.topUpAmount) > maxFreshLoanAmount && (
@@ -1035,7 +1035,7 @@ export function EligibilityForm() {
 
                     <h4 className="text-lg font-bold text-[#382F2A] mb-4">Review Open Loans</h4>
                     <div className="space-y-4 mb-8">
-                      {mappedAccounts.length === 0 && <p className="text-sm text-slate-500">No active loans found to evaluate.</p>}
+                      {mappedAccounts.length === 0 && <p className="text-sm text-brand-black/70">No active loans found to evaluate.</p>}
                       {mappedAccounts.map((loan: any, idx: number) => {
                         const l = loanOverrides[loan.id] || {};
                         return (
@@ -1045,21 +1045,21 @@ export function EligibilityForm() {
                                 <p className="font-bold text-sm text-[#382F2A]">Loan #{idx + 1} - {loan.originalType}</p>
                               </div>
                               <div className="flex items-center gap-4">
-                                <label className="text-xs font-semibold flex items-center gap-1.5 cursor-pointer text-slate-600">
+                                <label className="text-xs font-semibold flex items-center gap-1.5 cursor-pointer text-brand-black/80">
                                   <input
                                     type="checkbox"
                                     checked={loan.wantsBT === 'yes'}
                                     onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), wantsBT: e.target.checked ? 'yes' : 'no' } }))}
-                                    className="w-4 h-4 text-brand-blue accent-brand-blue rounded border-slate-300"
+                                    className="w-4 h-4 text-blue-energy accent-blue-energy rounded border-slate-300"
                                   />
                                   Consolidate?
                                 </label>
-                                <label className="text-xs font-semibold flex items-center gap-1.5 cursor-pointer text-slate-600">
+                                <label className="text-xs font-semibold flex items-center gap-1.5 cursor-pointer text-brand-black/80">
                                   <input
                                     type="checkbox"
                                     checked={loan.userPaysEmi !== false}
                                     onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), userPaysEmi: e.target.checked } }))}
-                                    className="w-4 h-4 text-brand-blue accent-brand-blue rounded border-slate-300"
+                                    className="w-4 h-4 text-blue-energy accent-blue-energy rounded border-slate-300"
                                   />
                                   I pay this EMI
                                 </label>
@@ -1072,7 +1072,7 @@ export function EligibilityForm() {
                                   type="text"
                                   value={loan.bankName ?? ""}
                                   onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), bankName: e.target.value } }))}
-                                  className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-brand-blue"
+                                  className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-energy"
                                 />
                               </div>
                               <div>
@@ -1080,7 +1080,7 @@ export function EligibilityForm() {
                                 <select
                                   value={loan.type ?? "Personal Loan"}
                                   onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), type: e.target.value } }))}
-                                  className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-brand-blue"
+                                  className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-energy"
                                 >
                                   <optgroup label="Generally Non-Transferable (Category A)">
                                     {['Car Loan', 'Home Loan', 'LAP', 'Gold Loan', 'Consumer Loan', 'Education Loan'].map(t => <option key={t} value={t}>{t}</option>)}
@@ -1097,7 +1097,7 @@ export function EligibilityForm() {
                                   type="number"
                                   value={loan.originalAmount ?? ""}
                                   onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), originalAmount: e.target.value } }))}
-                                  className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-brand-blue"
+                                  className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-energy"
                                 />
                               </div>
                               <div>
@@ -1106,7 +1106,7 @@ export function EligibilityForm() {
                                   type="number"
                                   value={loan.currentOutstanding ?? ""}
                                   onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), currentOutstanding: e.target.value } }))}
-                                  className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-brand-blue"
+                                  className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-energy"
                                 />
                               </div>
                               <div>
@@ -1115,7 +1115,7 @@ export function EligibilityForm() {
                                   type="text"
                                   value={loan.dateOpened ?? ""}
                                   onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), dateOpened: e.target.value } }))}
-                                  className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-brand-blue"
+                                  className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-energy"
                                 />
                               </div>
                               <div>
@@ -1124,7 +1124,7 @@ export function EligibilityForm() {
                                   <select
                                     value={loan.odPlan ?? "2yr"}
                                     onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), odPlan: e.target.value } }))}
-                                    className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-brand-blue"
+                                    className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-energy"
                                   >
                                     <option value="2yr">2 Years</option>
                                     <option value="3yr">3 Years</option>
@@ -1134,7 +1134,7 @@ export function EligibilityForm() {
                                     type="number"
                                     value={loan.tenure ?? ""}
                                     onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), tenure: e.target.value } }))}
-                                    className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-brand-blue"
+                                    className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-energy"
                                   />
                                 )}
                               </div>
@@ -1144,7 +1144,7 @@ export function EligibilityForm() {
                                   type="number"
                                   value={loan.emi ?? ""}
                                   onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), emi: e.target.value } }))}
-                                  className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-brand-blue"
+                                  className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-energy"
                                 />
                               </div>
                               <div>
@@ -1153,7 +1153,7 @@ export function EligibilityForm() {
                                   type="number"
                                   value={loan.rate ?? ""}
                                   onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), rate: e.target.value } }))}
-                                  className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-brand-blue"
+                                  className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-energy"
                                 />
                               </div>
                             </div>
@@ -1163,7 +1163,7 @@ export function EligibilityForm() {
                       
                       <button 
                         onClick={() => setManualLoans([...manualLoans, { accountNumber: 'manual_' + Date.now(), accountType: 'Personal Loan', currentBalance: 0, highCreditAmount: 0, memberShortName: '', interest_rate: 0, emiAmount: 0 }])}
-                        className="mt-4 flex items-center justify-center gap-2 w-full py-3 border-2 border-dashed border-slate-300 rounded-xl text-slate-500 font-semibold hover:border-brand-blue hover:text-brand-blue transition-colors"
+                        className="mt-4 flex items-center justify-center gap-2 w-full py-3 border-2 border-dashed border-slate-300 rounded-xl text-brand-black/70 font-semibold hover:border-blue-energy hover:text-blue-energy transition-colors"
                       >
                         <Plus className="w-4 h-4" /> Add Missing Loan
                       </button>
@@ -1194,8 +1194,8 @@ export function EligibilityForm() {
 
                           if (totalNewLoan === 0) {
                             return (
-                              <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 mb-2 shadow-sm text-center">
-                                <p className="text-sm font-medium text-slate-600">
+                              <div className="bg-slate-50 border border-icy-blue rounded-2xl p-4 mb-2 shadow-sm text-center">
+                                <p className="text-sm font-medium text-brand-black/80">
                                   Select at least one loan to consolidate from the &quot;Review Open Loans&quot; section above, or request a fresh loan, to see your estimated savings.
                                 </p>
                               </div>
@@ -1205,13 +1205,13 @@ export function EligibilityForm() {
                             <div className="bg-[#FAF8F5] border border-[#EBE6DD] rounded-2xl p-5 mb-2 shadow-sm">
                               <h4 className="text-sm font-extrabold text-[#382F2A] mb-4 flex items-center justify-between">
                                 <span>Consolidation Estimate (Best Option: {bestLender.name})</span>
-                                <span className="text-xs font-semibold text-brand-blue bg-blue-50 px-2 py-1 rounded-md">{bestLender.headlineRate}% p.a.</span>
+                                <span className="text-xs font-semibold text-blue-energy bg-blue-50 px-2 py-1 rounded-md">{bestLender.headlineRate}% p.a.</span>
                               </h4>
                               
                               {/* Details of consolidating loans */}
                               {catBLoans.length > 0 && (
-                                <div className="mb-5 bg-white border border-slate-200 rounded-xl p-3 shadow-sm">
-                                  <p className="text-[10px] uppercase font-bold text-slate-500 mb-2">Loans Being Consolidated</p>
+                                <div className="mb-5 bg-white border border-icy-blue rounded-xl p-3 shadow-sm">
+                                  <p className="text-[10px] uppercase font-bold text-brand-black/70 mb-2">Loans Being Consolidated</p>
                                   <div className="space-y-2 mb-3">
                                     {catBLoans.map((l: any, idx: number) => (
                                       <div key={idx} className="flex justify-between items-center text-xs">
@@ -1227,10 +1227,10 @@ export function EligibilityForm() {
                                     ))}
                                   </div>
                                   <div className="flex justify-between items-center pt-2 border-t border-slate-100">
-                                    <span className="text-xs font-bold text-slate-700">Total</span>
+                                    <span className="text-xs font-bold text-brand-black/90">Total</span>
                                     <div className="text-right text-xs">
                                       <span className="font-bold text-[#382F2A]">₹{consolidationAmount.toLocaleString('en-IN')}</span>
-                                      <span className="font-bold text-brand-blue ml-2">EMI: ₹{currentEmiToConsolidate.toLocaleString('en-IN')}</span>
+                                      <span className="font-bold text-blue-energy ml-2">EMI: ₹{currentEmiToConsolidate.toLocaleString('en-IN')}</span>
                                     </div>
                                   </div>
                                 </div>
@@ -1238,21 +1238,21 @@ export function EligibilityForm() {
 
                               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div className="bg-white border border-slate-100 p-3 rounded-xl">
-                                  <p className="text-[10px] uppercase tracking-wider font-bold text-slate-500">Total New Loan</p>
+                                  <p className="text-[10px] uppercase tracking-wider font-bold text-brand-black/70">Total New Loan</p>
                                   <p className="text-xl font-black text-[#382F2A] mt-1">₹{totalNewLoan.toLocaleString('en-IN')}</p>
                                   {userOverrides.wantsTopUp === 'yes' && Number(userOverrides.topUpAmount || 0) > 0 && (
-                                    <p className="text-[10px] text-slate-500 mt-1">Includes ₹{Number(userOverrides.topUpAmount).toLocaleString('en-IN')} Top-up</p>
+                                    <p className="text-[10px] text-brand-black/70 mt-1">Includes ₹{Number(userOverrides.topUpAmount).toLocaleString('en-IN')} Top-up</p>
                                   )}
                                 </div>
                                 <div className="bg-white border border-slate-100 p-3 rounded-xl">
-                                  <p className="text-[10px] uppercase tracking-wider font-bold text-slate-500">Est. New EMI</p>
+                                  <p className="text-[10px] uppercase tracking-wider font-bold text-brand-black/70">Est. New EMI</p>
                                   <p className="text-xl font-black text-[#382F2A] mt-1">₹{newEmi.toLocaleString('en-IN')}</p>
                                   <div className="mt-2 flex items-center gap-2">
-                                    <label className="text-[10px] text-slate-500 font-semibold whitespace-nowrap">Tenure (Mos):</label>
+                                    <label className="text-[10px] text-brand-black/70 font-semibold whitespace-nowrap">Tenure (Mos):</label>
                                     <select 
                                       value={tenureMonths}
                                       onChange={(e) => setUserOverrides({ ...userOverrides, consolidationTenure: e.target.value })}
-                                      className="bg-slate-50 border border-slate-200 rounded px-1 py-0.5 text-xs outline-none"
+                                      className="bg-slate-50 border border-icy-blue rounded px-1 py-0.5 text-xs outline-none"
                                     >
                                       {[12, 24, 36, 48, 60, 72, 84].filter(t => t <= maxLenderTenure).map(t => (
                                         <option key={t} value={t}>{t}</option>
@@ -1331,7 +1331,7 @@ export function EligibilityForm() {
               )}
 
             </div>
-            <button className="w-full py-4 bg-brand-blue text-white rounded-xl font-medium hover:bg-blue-800 transition-all duration-300 active:scale-95 shadow-sm hover:shadow-md">
+            <button className="w-full py-4 bg-blue-energy text-white rounded-xl font-medium hover:bg-blue-800 transition-all duration-300 active:scale-95 shadow-sm hover:shadow-md">
               Speak with a Consolidation Expert
             </button>
             <p className="text-[10px] text-slate-400 text-center mt-4 leading-tight">
@@ -1346,11 +1346,11 @@ export function EligibilityForm() {
   return (
     <div id="check-eligibility" className="w-full max-w-4xl mx-auto flex flex-col justify-center h-full">
       <div className="mb-10 text-center">
-        <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-text-main mb-4">See your options</h2>
-        <p className="text-lg text-text-muted">Take a minute to tell us about your situation.</p>
+        <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-brand-black mb-4">See your options</h2>
+        <p className="text-lg text-brand-black/70">Take a minute to tell us about your situation.</p>
       </div>
 
-      <div className="w-full bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-200/60 overflow-hidden">
+      <div className="w-full bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-icy-blue/60 overflow-hidden">
         <div className="p-8 md:p-12">
           <AnimatePresence mode="wait">
             {renderStep()}
