@@ -171,15 +171,15 @@ export function HeroGridBlock() {
         <div className="flex w-max animate-marquee opacity-100 transition-all duration-500">
           {[...Array(2)].map((_, i) => (
             <div key={i} className="flex items-center gap-12 pr-12">
-              <Image src={hdfcLogo} alt="HDFC" className="h-6 w-auto object-contain" />
-              <Image src={iciciLogo} alt="ICICI" className="h-6 w-auto object-contain" />
-              <Image src={axisLogo} alt="Axis" className="h-6 w-auto object-contain" />
-              <Image src={kotakLogo} alt="Kotak" className="h-6 w-auto object-contain" />
+              <Image src={hdfcLogo} alt="HDFC" priority className="h-6 w-auto object-contain" />
+              <Image src={iciciLogo} alt="ICICI" priority className="h-6 w-auto object-contain" />
+              <Image src={axisLogo} alt="Axis" priority className="h-6 w-auto object-contain" />
+              <Image src={kotakLogo} alt="Kotak" priority className="h-6 w-auto object-contain" />
               
-              <Image src={hdfcLogo} alt="HDFC" className="h-6 w-auto object-contain" />
-              <Image src={iciciLogo} alt="ICICI" className="h-6 w-auto object-contain" />
-              <Image src={axisLogo} alt="Axis" className="h-6 w-auto object-contain" />
-              <Image src={kotakLogo} alt="Kotak" className="h-6 w-auto object-contain" />
+              <Image src={hdfcLogo} alt="HDFC" priority className="h-6 w-auto object-contain" />
+              <Image src={iciciLogo} alt="ICICI" priority className="h-6 w-auto object-contain" />
+              <Image src={axisLogo} alt="Axis" priority className="h-6 w-auto object-contain" />
+              <Image src={kotakLogo} alt="Kotak" priority className="h-6 w-auto object-contain" />
             </div>
           ))}
         </div>

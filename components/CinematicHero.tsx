@@ -160,6 +160,7 @@ export function CinematicHero() {
                       alt={bank.name}
                       width={32}
                       height={32}
+                      priority
                       className="h-8 w-8 object-contain rounded-md"
                     />
                     <span className="text-lg font-bold text-slate-800 tracking-tight">{bank.name}</span>
