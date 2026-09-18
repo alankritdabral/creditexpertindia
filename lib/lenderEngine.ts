@@ -291,11 +291,12 @@ const LENDERS = [
   }
 ];
 
-export function analyzeLenderEligibility({ profile, catBLoans }: { profile: any, catBLoans: any[] }) {
+export function analyzeLenderEligibility({ profile, catBLoans, allLoans = [] }: { profile: any, catBLoans: any[], allLoans?: any[] }) {
   const { 
     netSalary, employer, employerTier: manualTier, hasBounce, hasLatePayment, hasActiveOverdue, wantsTopUp,
     rentalIncome, monthlyIncentive, quarterlyIncentive, halfYearlyIncentive, monthlyBonus, quarterlyBonus, yearlyBonus, lta,
-    wfhStatus, hasEPFO, hasOMID, hasHRMS, has26AS, location, coApplicant, age, cibilMinus1, jobProfile 
+    wfhStatus, hasEPFO, hasOMID, hasHRMS, has26AS, location, coApplicant, age, cibilMinus1, jobProfile,
+    cibilScore, axisCustomerSegment, casaVintage
   } = profile || {};
   
   const employerTier = manualTier || getEmployerTier(employer);
@@ -472,6 +473,82 @@ export function analyzeLenderEligibility({ profile, catBLoans }: { profile: any,
       if (btAmount > 0 && btAmount <= 500000) {
         isEligible = false;
         rejectionReasons.push(`BT loan amount financed must be > ₹5 Lakh`);
+      }
+    }
+
+    if (lender.id === 'axis') {
+      let axisNth = nth;
+      // Bonus Add-Back 50%
+      axisNth += ((Number(monthlyBonus) || 0) + (Number(quarterlyBonus) || 0)/3 + (Number(halfYearlyIncentive) || 0)/6 + (Number(yearlyBonus) || 0)/12) * 0.5;
+      
+      const seg = axisCustomerSegment || "NTB";
+      let nmiReq = 75000;
+      let cibilReq = 780;
+      
+      if (seg === "CSG") {
+        nmiReq = 35000;
+        if (axisNth >= 85000) cibilReq = 700;
+        else cibilReq = 740;
+      } else if (seg === "Non-CSG CASA") {
+        nmiReq = 50000;
+        cibilReq = 740;
+        if (casaVintage !== 'yes') {
+           isEligible = false;
+           rejectionReasons.push(`Axis Bank requires 90+ days CASA vintage for Non-CSG CASA segment`);
+        }
+      } else if (seg === "NTB") {
+        nmiReq = 75000;
+        if (axisNth > 100000) cibilReq = 740;
+        else cibilReq = 780;
+      } else if (seg === "Blue Collar") {
+        nmiReq = 200000;
+        cibilReq = 0; 
+      }
+      
+      if (axisNth < nmiReq) {
+        isEligible = false;
+        rejectionReasons.push(`Requires minimum salary of ₹${nmiReq} for ${seg} segment`);
+      }
+      if (cibilScore > 0 && cibilScore < cibilReq) {
+        isEligible = false;
+        rejectionReasons.push(`Requires minimum CIBIL of ${cibilReq} for ${seg} segment with NMI ₹${Math.floor(axisNth)}`);
+      }
+      
+      const restrictedProfiles = ["Government School Teacher", "Class IV Employee", "Local Municipality Staff", "Defence & Army", "State Government Employee"];
+      if (restrictedProfiles.some(p => jobProfile?.toLowerCase().includes(p.toLowerCase()))) {
+        isEligible = false;
+        rejectionReasons.push(`Profile is restricted by Axis Bank`);
+      }
+      
+      if (isEligible) {
+        // Calculate custom obligations
+        let totalAxisEmi = 0;
+        allLoans.forEach(l => {
+          if (l.type === "Credit Card") {
+             totalAxisEmi += Number(l.currentOutstanding || 0) * 0.04;
+          } else if (l.type === "Gold Loan") {
+             // 0 obligation
+          } else {
+             // Existing PL/HL < 6/12 EMIs should be 0, but we assume full since we can't reliably know remaining EMIs right now
+             totalAxisEmi += Number(l.emi || 0);
+          }
+        });
+        
+        const maxEmi = axisNth * 0.70;
+        customOutput.axisMaxEmiCapacity = Math.floor(maxEmi);
+        customOutput.axisTotalObligations = Math.floor(totalAxisEmi);
+        customOutput.axisUnusedCapacity = Math.max(0, Math.floor(maxEmi - totalAxisEmi));
+        
+        if (customOutput.axisUnusedCapacity > 0) {
+           const ratePerMonth = 10.49 / 12 / 100; 
+           const tenureMonths = 84;
+           customOutput.axisMaxLoan = Math.floor(
+             (customOutput.axisUnusedCapacity * (Math.pow(1 + ratePerMonth, tenureMonths) - 1)) /
+             (ratePerMonth * Math.pow(1 + ratePerMonth, tenureMonths))
+           );
+        } else {
+           customOutput.axisMaxLoan = 0;
+        }
       }
     }
 

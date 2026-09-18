@@ -389,7 +389,10 @@ export function EligibilityForm() {
           hasBounce: userOverrides.hasBounce || "no",
           hasLatePayment: userOverrides.hasLatePayment || "no",
           hasActiveOverdue: userOverrides.hasActiveOverdue || ((accountSummary?.overdueAccounts || 0) > 0 ? "yes" : "no"),
-          wantsTopUp: userOverrides.wantsTopUp || "no"
+          wantsTopUp: userOverrides.wantsTopUp || "no",
+          axisCustomerSegment: userOverrides.axisCustomerSegment || "NTB",
+          casaVintage: userOverrides.casaVintage || "no",
+          cibilScore: parsed.personalInfo?.score || 0
         };
 
         const mappedAccounts = activeAccounts.map((acc: any) => {
@@ -443,7 +446,7 @@ export function EligibilityForm() {
 
         const catBLoans = mappedAccounts.filter((l: any) => l.wantsBT === 'yes' && Number(l.currentOutstanding) > 0);
 
-        const { eligibleLenders, ineligibleLenders } = analyzeLenderEligibility({ profile: engineProfile, catBLoans });
+        const { eligibleLenders, ineligibleLenders } = analyzeLenderEligibility({ profile: engineProfile, catBLoans, allLoans: mappedAccounts });
 
         const totalCurrentEMI = mappedAccounts.reduce((sum: number, loan: any) => {
           if (Number(loan.currentOutstanding) <= 0 || !loan.userPaysEmi) {
@@ -971,6 +974,32 @@ export function EligibilityForm() {
                             <option value="yes">Yes</option>
                           </select>
                         </div>
+                        <div>
+                          <label className="text-xs font-semibold text-brand-black/80 mb-1 block">Axis Customer Segment</label>
+                          <select
+                            value={userOverrides.axisCustomerSegment || "NTB"}
+                            onChange={e => setUserOverrides({ ...userOverrides, axisCustomerSegment: e.target.value })}
+                            className="w-full bg-white border border-icy-blue rounded-xl px-3 py-2 text-sm focus:border-blue-energy outline-none"
+                          >
+                            <option value="CSG">CSG</option>
+                            <option value="Non-CSG CASA">Non-CSG CASA</option>
+                            <option value="NTB">NTB</option>
+                            <option value="Blue Collar">Blue Collar Staff</option>
+                          </select>
+                        </div>
+                        {userOverrides.axisCustomerSegment === "Non-CSG CASA" && (
+                          <div>
+                            <label className="text-xs font-semibold text-brand-black/80 mb-1 block">Axis CASA Vintage &gt; 90 Days?</label>
+                            <select
+                              value={userOverrides.casaVintage || "no"}
+                              onChange={e => setUserOverrides({ ...userOverrides, casaVintage: e.target.value })}
+                              className="w-full bg-white border border-icy-blue rounded-xl px-3 py-2 text-sm focus:border-blue-energy outline-none"
+                            >
+                              <option value="no">No</option>
+                              <option value="yes">Yes</option>
+                            </select>
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -1303,16 +1332,42 @@ export function EligibilityForm() {
                         })()}
 
                         {eligibleLenders.map((lender: any, i: number) => (
-                          <div key={i} className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex items-center justify-between">
-                            <div>
-                              <p className="text-sm font-bold text-emerald-900">{lender.name}</p>
-                              <p className="text-xs font-semibold text-emerald-700 mt-0.5">Est. Rate: {lender.headlineRate}%</p>
+                          <div key={i} className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 mb-3 flex flex-col gap-3">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <p className="text-sm font-bold text-emerald-900">{lender.name}</p>
+                                <p className="text-xs font-semibold text-emerald-700 mt-0.5">Est. Rate: {lender.headlineRate}%</p>
+                              </div>
+                              <div className="text-right">
+                                <span className="text-[10px] font-bold px-2 py-1 bg-emerald-100 text-emerald-800 rounded-full uppercase">
+                                  {lender.outcome === 'ELIGIBLE' ? 'High Match' : 'Conditional'}
+                                </span>
+                              </div>
                             </div>
-                            <div className="text-right">
-                              <span className="text-[10px] font-bold px-2 py-1 bg-emerald-100 text-emerald-800 rounded-full uppercase">
-                                {lender.outcome === 'ELIGIBLE' ? 'High Match' : 'Conditional'}
-                              </span>
-                            </div>
+                            
+                            {lender.id === 'axis' && lender.axisMaxLoan !== undefined && (
+                              <div className="bg-white rounded-lg p-3 border border-emerald-100 mt-1 shadow-sm">
+                                <p className="text-[11px] font-bold text-emerald-800 mb-2 border-b border-emerald-50 pb-1">Axis Specific Policy Estimate</p>
+                                <div className="grid grid-cols-2 gap-3 text-[10px]">
+                                  <div>
+                                    <p className="text-emerald-700/70 font-semibold mb-0.5 uppercase tracking-wider">Max Eligible Loan</p>
+                                    <p className="font-black text-emerald-900 text-sm">₹{lender.axisMaxLoan.toLocaleString('en-IN')}</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-emerald-700/70 font-semibold mb-0.5 uppercase tracking-wider">Max EMI Capacity</p>
+                                    <p className="font-bold text-emerald-900">₹{lender.axisMaxEmiCapacity.toLocaleString('en-IN')}</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-emerald-700/70 font-semibold mb-0.5 uppercase tracking-wider">Considered Obligations</p>
+                                    <p className="font-bold text-emerald-900">₹{lender.axisTotalObligations.toLocaleString('en-IN')}</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-emerald-700/70 font-semibold mb-0.5 uppercase tracking-wider">Unused Capacity</p>
+                                    <p className="font-bold text-emerald-900">₹{lender.axisUnusedCapacity.toLocaleString('en-IN')}</p>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
                           </div>
                         ))}
                       </div>
