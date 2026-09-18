@@ -392,7 +392,10 @@ export function EligibilityForm() {
           wantsTopUp: userOverrides.wantsTopUp || "no",
           axisCustomerSegment: userOverrides.axisCustomerSegment || "NTB",
           casaVintage: userOverrides.casaVintage || "no",
-          cibilScore: parsed.personalInfo?.score || 0
+          cibilScore: parsed.personalInfo?.score || 0,
+          residenceType: userOverrides.residenceType || "Rented",
+          cityTier: userOverrides.cityTier || "Non-Metro",
+          yearlyBonus: avgYearlyBonus
         };
 
         const mappedAccounts = activeAccounts.map((acc: any) => {
@@ -1000,6 +1003,28 @@ export function EligibilityForm() {
                             </select>
                           </div>
                         )}
+                        <div>
+                          <label className="text-xs font-semibold text-brand-black/80 mb-1 block">Residence Type</label>
+                          <select
+                            value={userOverrides.residenceType || "Rented"}
+                            onChange={e => setUserOverrides({ ...userOverrides, residenceType: e.target.value })}
+                            className="w-full bg-white border border-icy-blue rounded-xl px-3 py-2 text-sm focus:border-blue-energy outline-none"
+                          >
+                            <option value="Rented">Rented</option>
+                            <option value="Owned">Owned</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="text-xs font-semibold text-brand-black/80 mb-1 block">City Tier</label>
+                          <select
+                            value={userOverrides.cityTier || "Non-Metro"}
+                            onChange={e => setUserOverrides({ ...userOverrides, cityTier: e.target.value })}
+                            className="w-full bg-white border border-icy-blue rounded-xl px-3 py-2 text-sm focus:border-blue-energy outline-none"
+                          >
+                            <option value="Non-Metro">Non-Metro</option>
+                            <option value="Metro">Metro</option>
+                          </select>
+                        </div>
                       </div>
                     </div>
 
@@ -1364,6 +1389,94 @@ export function EligibilityForm() {
                                   <div>
                                     <p className="text-emerald-700/70 font-semibold mb-0.5 uppercase tracking-wider">Unused Capacity</p>
                                     <p className="font-bold text-emerald-900">₹{lender.axisUnusedCapacity.toLocaleString('en-IN')}</p>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                            
+                            {lender.id === 'indusind' && lender.indusindMaxLoan !== undefined && (
+                              <div className="bg-white rounded-lg p-3 border border-emerald-100 mt-1 shadow-sm">
+                                <p className="text-[11px] font-bold text-emerald-800 mb-2 border-b border-emerald-50 pb-1">IndusInd Specific Policy Estimate</p>
+                                <div className="grid grid-cols-2 gap-3 text-[10px]">
+                                  <div>
+                                    <p className="text-emerald-700/70 font-semibold mb-0.5 uppercase tracking-wider">Max Eligible Loan</p>
+                                    <p className="font-black text-emerald-900 text-sm">₹{lender.indusindMaxLoan.toLocaleString('en-IN')}</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-emerald-700/70 font-semibold mb-0.5 uppercase tracking-wider">FOIR Applied</p>
+                                    <p className="font-bold text-emerald-900">{lender.indusindFOIR}%</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-emerald-700/70 font-semibold mb-0.5 uppercase tracking-wider">Max Tenure</p>
+                                    <p className="font-bold text-emerald-900">{lender.maxTenure} Months</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-emerald-700/70 font-semibold mb-0.5 uppercase tracking-wider">Unused Capacity</p>
+                                    <p className="font-bold text-emerald-900">₹{lender.indusindUnusedCapacity.toLocaleString('en-IN')}</p>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                            
+                            {lender.id === 'kotak' && lender.kotakEffectiveNTH !== undefined && (
+                              <div className="bg-white rounded-lg p-3 border border-emerald-100 mt-1 shadow-sm">
+                                <p className="text-[11px] font-bold text-emerald-800 mb-2 border-b border-emerald-50 pb-1">Kotak OD Specific Policy Estimate</p>
+                                <div className="grid grid-cols-2 gap-3 text-[10px]">
+                                  <div>
+                                    <p className="text-emerald-700/70 font-semibold mb-0.5 uppercase tracking-wider">Effective Net Income</p>
+                                    <p className="font-black text-emerald-900 text-sm">₹{lender.kotakEffectiveNTH.toLocaleString('en-IN')}</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-emerald-700/70 font-semibold mb-0.5 uppercase tracking-wider">OD Structure</p>
+                                    <p className="font-bold text-emerald-900">2 Yr Fixed + 5 Yr Dropline</p>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+
+                            {lender.id === 'abfl' && lender.abflMaxLoan !== undefined && (
+                              <div className="bg-white rounded-lg p-3 border border-emerald-100 mt-1 shadow-sm">
+                                <p className="text-[11px] font-bold text-emerald-800 mb-2 border-b border-emerald-50 pb-1">Aditya Birla Specific Policy Estimate</p>
+                                <div className="grid grid-cols-2 gap-3 text-[10px]">
+                                  <div>
+                                    <p className="text-emerald-700/70 font-semibold mb-0.5 uppercase tracking-wider">High Limit Eligibility</p>
+                                    <p className="font-black text-emerald-900 text-sm">₹{lender.abflMaxLoan.toLocaleString('en-IN')}</p>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+
+                            {lender.id === 'poonawalla' && lender.poonawallaMaxLoan !== undefined && (
+                              <div className="bg-white rounded-lg p-3 border border-emerald-100 mt-1 shadow-sm">
+                                <p className="text-[11px] font-bold text-emerald-800 mb-2 border-b border-emerald-50 pb-1">Poonawalla Specific Policy Estimate</p>
+                                <div className="grid grid-cols-2 gap-3 text-[10px]">
+                                  <div>
+                                    <p className="text-emerald-700/70 font-semibold mb-0.5 uppercase tracking-wider">Max Eligible Loan</p>
+                                    <p className="font-black text-emerald-900 text-sm">₹{lender.poonawallaMaxLoan.toLocaleString('en-IN')}</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-emerald-700/70 font-semibold mb-0.5 uppercase tracking-wider">FOIR Applied</p>
+                                    <p className="font-bold text-emerald-900">{lender.poonawallaFOIR}%</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-emerald-700/70 font-semibold mb-0.5 uppercase tracking-wider">Unused Capacity</p>
+                                    <p className="font-bold text-emerald-900">₹{lender.poonawallaUnusedCapacity.toLocaleString('en-IN')}</p>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+
+                            {lender.id === 'chola' && lender.cholaEffectiveNTH !== undefined && (
+                              <div className="bg-white rounded-lg p-3 border border-emerald-100 mt-1 shadow-sm">
+                                <p className="text-[11px] font-bold text-emerald-800 mb-2 border-b border-emerald-50 pb-1">Chola Specific Policy Estimate</p>
+                                <div className="grid grid-cols-2 gap-3 text-[10px]">
+                                  <div>
+                                    <p className="text-emerald-700/70 font-semibold mb-0.5 uppercase tracking-wider">Effective Net Income</p>
+                                    <p className="font-black text-emerald-900 text-sm">₹{lender.cholaEffectiveNTH.toLocaleString('en-IN')}</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-emerald-700/70 font-semibold mb-0.5 uppercase tracking-wider">Max Eligible Loan</p>
+                                    <p className="font-black text-emerald-900 text-sm">₹{lender.cholaMaxLoan.toLocaleString('en-IN')}</p>
                                   </div>
                                 </div>
                               </div>
