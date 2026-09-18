@@ -40,23 +40,23 @@ export function TheProblem() {
         <div className="grid lg:grid-cols-2 gap-16 lg:gap-8 items-center">
           {/* Left Column: Text & Features */}
           <div className="max-w-xl">
-            <div className="text-[13px] font-bold tracking-wider text-brand-blue uppercase mb-4">The Challenge</div>
-            <h2 className="text-[32px] sm:text-[40px] font-bold tracking-tighter text-slate-900 mb-6 leading-[1.1]">
+            <div className="text-[13px] font-bold tracking-wider text-blue-energy uppercase mb-4">The Challenge</div>
+            <h2 className="text-[32px] sm:text-[40px] font-bold tracking-tighter text-brand-black mb-6 leading-[1.1]">
               What's eating your salary?
             </h2>
-            <p className="text-[17px] text-slate-600 font-medium mb-10 leading-relaxed">
+            <p className="text-[17px] text-brand-black/80 font-medium mb-10 leading-relaxed">
               Managing debt across multiple platforms can be overwhelming. We identify the common traps that keep you paying more than you should.
             </p>
             
             <div className="space-y-8">
               {problems.map((p, i) => (
                 <div key={i} className="flex gap-4">
-                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-900 border border-slate-200 shadow-sm">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-brand-black border border-icy-blue shadow-sm">
                     {p.icon}
                   </div>
                   <div>
-                    <h3 className="text-[17px] font-bold text-slate-900 mb-1">{p.title}</h3>
-                    <p className="text-[15px] text-slate-600 leading-relaxed">{p.desc}</p>
+                    <h3 className="text-[17px] font-bold text-brand-black mb-1">{p.title}</h3>
+                    <p className="text-[15px] text-brand-black/80 leading-relaxed">{p.desc}</p>
                   </div>
                 </div>
               ))}
@@ -64,7 +64,7 @@ export function TheProblem() {
           </div>
 
           {/* Right Column: Abstract Mockup */}
-          <div className="relative w-full aspect-[4/3] lg:aspect-square bg-slate-50 rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex items-center justify-center">
+          <div className="relative w-full aspect-[4/3] lg:aspect-square bg-slate-50 rounded-2xl border border-icy-blue shadow-sm overflow-hidden flex items-center justify-center">
             {/* Diagonal background slice */}
             <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-transparent to-red-50/50 transform -skew-y-12 scale-150 origin-top-left" />
             
@@ -95,7 +95,7 @@ export function TheProblem() {
               </div>
 
               <div className="bg-white p-4 rounded-xl shadow-[0_0_40px_-10px_rgba(231,71,71,0.3)] border-2 border-warning-red/20 flex items-center justify-between mt-4">
-                <div className="text-slate-900 font-bold">Total Monthly Outflow</div>
+                <div className="text-brand-black font-bold">Total Monthly Outflow</div>
                 <div className="text-warning-red font-bold text-xl">₹38,500</div>
               </div>
 

@@ -47,105 +47,105 @@ export function SmartCalculator() {
   return (
     <div id="calculator" className="w-full h-full flex flex-col justify-between">
       <div className="mb-10">
-        <h2 className="text-3xl md:text-4xl font-extrabold text-text-main tracking-tight mb-4">Calculate Potential Savings</h2>
-        <p className="text-lg text-text-muted max-w-2xl">
+        <h2 className="text-3xl md:text-4xl font-extrabold text-brand-black tracking-tight mb-4">Calculate Potential Savings</h2>
+        <p className="text-lg text-brand-black/70 max-w-2xl">
           See how much you could potentially save by consolidating your loans at a lower interest rate.
         </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 w-full">
         {/* Inputs */}
-        <div className="bg-warm-bg rounded-3xl p-6 md:p-8 border border-slate-200/60">
-          <h3 className="text-xl font-bold text-text-main mb-6 flex items-center gap-2">
+        <div className="bg-icy-blue rounded-3xl p-6 md:p-8 border border-icy-blue/60">
+          <h3 className="text-xl font-bold text-brand-black mb-6 flex items-center gap-2">
             Your Current Situation
           </h3>
           
           <div className="space-y-6">
             <div>
               <div className="flex justify-between items-center mb-3">
-                <label className="text-sm font-semibold text-text-muted">Total Outstanding</label>
+                <label className="text-sm font-semibold text-brand-black/70">Total Outstanding</label>
                 <div className="relative flex items-center shadow-sm">
                   <span className="absolute left-3 font-bold text-slate-400">₹</span>
                   <input 
                     type="number" 
                     value={outstanding}
                     onChange={(e) => setOutstanding(Number(e.target.value))}
-                    className="w-[140px] bg-white border border-slate-200 rounded-lg py-1.5 pl-7 pr-3 font-bold text-brand-blue focus:ring-2 focus:ring-brand-blue outline-none transition-shadow text-right [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    className="w-[140px] bg-white border border-icy-blue rounded-lg py-1.5 pl-7 pr-3 font-bold text-blue-energy focus:ring-2 focus:ring-blue-energy outline-none transition-shadow text-right [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                 </div>
               </div>
               <input 
                 type="range" min="50000" max="2500000" step="50000"
                 value={outstanding} onChange={(e) => setOutstanding(Number(e.target.value))}
-                className="w-full accent-brand-blue"
+                className="w-full accent-blue-energy"
               />
             </div>
 
             <div>
               <div className="flex justify-between items-center mb-3">
-                <label className="text-sm font-semibold text-text-muted">Current Total EMI</label>
+                <label className="text-sm font-semibold text-brand-black/70">Current Total EMI</label>
                 <div className="relative flex items-center shadow-sm">
                   <span className="absolute left-3 font-bold text-slate-400">₹</span>
                   <input 
                     type="number" 
                     value={currentEMI}
                     onChange={(e) => setCurrentEMI(Number(e.target.value))}
-                    className="w-[140px] bg-white border border-slate-200 rounded-lg py-1.5 pl-7 pr-3 font-bold text-brand-blue focus:ring-2 focus:ring-brand-blue outline-none transition-shadow text-right [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    className="w-[140px] bg-white border border-icy-blue rounded-lg py-1.5 pl-7 pr-3 font-bold text-blue-energy focus:ring-2 focus:ring-blue-energy outline-none transition-shadow text-right [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                 </div>
               </div>
               <input 
                 type="range" min="5000" max="100000" step="1000"
                 value={currentEMI} onChange={(e) => setCurrentEMI(Number(e.target.value))}
-                className="w-full accent-brand-blue"
+                className="w-full accent-blue-energy"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-semibold text-text-muted mb-2">Avg. Interest Rate</label>
+                <label className="block text-sm font-semibold text-brand-black/70 mb-2">Avg. Interest Rate</label>
                 <div className="relative">
                   <input 
                     type="number" value={currentRate} onChange={(e) => setCurrentRate(Number(e.target.value))}
-                    className="w-full bg-white border border-slate-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-brand-blue outline-none transition-shadow [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    className="w-full bg-white border border-icy-blue rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-energy outline-none transition-shadow [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
-                  <span className="absolute right-4 top-2.5 text-text-muted">%</span>
+                  <span className="absolute right-4 top-2.5 text-brand-black/70">%</span>
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-semibold text-text-muted mb-2">Remaining Tenure</label>
+                <label className="block text-sm font-semibold text-brand-black/70 mb-2">Remaining Tenure</label>
                 <div className="relative">
                   <input 
                     type="number" value={currentTenure} onChange={(e) => setCurrentTenure(Number(e.target.value))}
-                    className="w-full bg-white border border-slate-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-brand-blue outline-none transition-shadow [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    className="w-full bg-white border border-icy-blue rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-energy outline-none transition-shadow [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
-                  <span className="absolute right-4 top-2.5 text-text-muted">mo</span>
+                  <span className="absolute right-4 top-2.5 text-brand-black/70">mo</span>
                 </div>
               </div>
             </div>
 
-            <hr className="border-slate-200" />
+            <hr className="border-icy-blue" />
 
-            <h3 className="text-xl font-bold text-text-main mb-4">Proposed New Loan</h3>
+            <h3 className="text-xl font-bold text-brand-black mb-4">Proposed New Loan</h3>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-semibold text-text-muted mb-2">Expected Rate</label>
+                <label className="block text-sm font-semibold text-brand-black/70 mb-2">Expected Rate</label>
                 <div className="relative">
                   <input 
                     type="number" value={newRate} onChange={(e) => setNewRate(Number(e.target.value))}
-                    className="w-full bg-white border border-slate-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-emerald-500 outline-none transition-shadow [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    className="w-full bg-white border border-icy-blue rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-emerald-500 outline-none transition-shadow [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
-                  <span className="absolute right-4 top-2.5 text-text-muted">%</span>
+                  <span className="absolute right-4 top-2.5 text-brand-black/70">%</span>
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-semibold text-text-muted mb-2">New Tenure</label>
+                <label className="block text-sm font-semibold text-brand-black/70 mb-2">New Tenure</label>
                 <div className="relative">
                   <input 
                     type="number" value={newTenure} onChange={(e) => setNewTenure(Number(e.target.value))}
-                    className="w-full bg-white border border-slate-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-emerald-500 outline-none transition-shadow [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    className="w-full bg-white border border-icy-blue rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-emerald-500 outline-none transition-shadow [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
-                  <span className="absolute right-4 top-2.5 text-text-muted">mo</span>
+                  <span className="absolute right-4 top-2.5 text-brand-black/70">mo</span>
                 </div>
               </div>
             </div>
@@ -155,7 +155,7 @@ export function SmartCalculator() {
         {/* Outputs */}
         <div className="bg-[#0A2540] rounded-3xl p-6 md:p-8 text-white flex flex-col justify-between shadow-2xl relative overflow-hidden">
           {/* Decorative BG */}
-          <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-brand-blue/30 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/3 pointer-events-none" />
+          <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-blue-energy/30 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/3 pointer-events-none" />
           
           <div className="relative z-10">
             <h3 className="text-2xl font-bold mb-8">Potential Consolidation</h3>
@@ -192,7 +192,7 @@ export function SmartCalculator() {
           </div>
 
           <div className="relative z-10 mt-8 pt-6 border-t border-white/10">
-            <button className="w-full py-4 bg-brand-blue text-white rounded-xl font-bold hover:bg-[#524BFF] transition-colors flex items-center justify-center gap-2 group">
+            <button className="w-full py-4 bg-blue-energy text-white rounded-xl font-bold hover:bg-[#524BFF] transition-colors flex items-center justify-center gap-2 group">
               Check My Eligibility
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </button>

@@ -62,11 +62,11 @@ export function Partners() {
         <div className="w-full">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
             {stats.map((stat, i) => (
-              <div key={i} className="flex flex-col border-l border-slate-200 pl-6">
-                <div className="text-3xl sm:text-4xl font-bold text-slate-900 mb-2 tracking-tight">
+              <div key={i} className="flex flex-col border-l border-icy-blue pl-6">
+                <div className="text-3xl sm:text-4xl font-bold text-brand-black mb-2 tracking-tight">
                   {stat.value}
                 </div>
-                <div className="text-[15px] text-slate-600 font-medium">
+                <div className="text-[15px] text-brand-black/80 font-medium">
                   {stat.label}
                 </div>
               </div>
@@ -78,7 +78,7 @@ export function Partners() {
           <p className="text-[15px] text-slate-800 font-medium">
             We help you explore suitable options across our lending network.
           </p>
-          <p className="text-[13px] leading-relaxed text-slate-500">
+          <p className="text-[13px] leading-relaxed text-brand-black/70">
             Credit Expert India is not itself a bank or NBFC. Final loan approval, interest rate and loan terms are determined by the respective lender based on their policies and your credit profile. Only displaying lenders with whom we have authorized relationships.
           </p>
         </div>

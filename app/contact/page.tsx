@@ -13,48 +13,48 @@ export default function ContactPage() {
   return (
     <div className="min-h-screen bg-slate-50">
       
-      <section className="relative w-full pt-32 pb-24 lg:pt-40 lg:pb-32 bg-background overflow-hidden border-b border-slate-200">
+      <section className="relative w-full pt-32 pb-24 lg:pt-40 lg:pb-32 bg-background overflow-hidden border-b border-icy-blue">
         <div className="absolute inset-0 -z-10 h-full w-full">
           <AnimatedMeshBackground />
           <div className="absolute top-0 right-0 w-full h-full max-w-[60%] transform origin-top-right -skew-y-12 bg-gradient-to-bl from-[#E2D6CC]/40 to-transparent pointer-events-none" />
         </div>
         <div className="container-narrow text-center relative z-10">
-          <span className="text-xs font-extrabold uppercase tracking-widest text-slate-600">
+          <span className="text-xs font-extrabold uppercase tracking-widest text-brand-black/80">
             CONTACT & SUPPORT
           </span>
-          <h1 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl text-slate-900">
+          <h1 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl text-brand-black">
             Speak With a Credit Specialist
           </h1>
-          <p className="mt-3 max-w-2xl mx-auto text-sm text-slate-600 font-medium">
+          <p className="mt-3 max-w-2xl mx-auto text-sm text-brand-black/80 font-medium">
             Have questions about your debt consolidation or loan options? We are here to assist.
           </p>
         </div>
       </section>
 
-      <section className="py-12 bg-white border-b border-slate-200">
+      <section className="py-12 bg-white border-b border-icy-blue">
         <div className="container-narrow grid gap-6 sm:grid-cols-3 text-center">
-          <div className="rounded-2xl bg-slate-50 p-6 border border-slate-200">
+          <div className="rounded-2xl bg-slate-50 p-6 border border-icy-blue">
             <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600">
               <MapPin className="h-5 w-5" />
             </div>
-            <h3 className="mt-3 text-sm font-extrabold text-slate-900">Office Location</h3>
-            <p className="mt-1 text-xs text-slate-600 font-medium">{contact.address}</p>
+            <h3 className="mt-3 text-sm font-extrabold text-brand-black">Office Location</h3>
+            <p className="mt-1 text-xs text-brand-black/80 font-medium">{contact.address}</p>
           </div>
 
-          <div className="rounded-2xl bg-slate-50 p-6 border border-slate-200">
+          <div className="rounded-2xl bg-slate-50 p-6 border border-icy-blue">
             <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600">
               <Phone className="h-5 w-5" />
             </div>
-            <h3 className="mt-3 text-sm font-extrabold text-slate-900">Phone Support</h3>
-            <p className="mt-1 text-xs text-slate-600 font-medium">{contact.whatsapp}</p>
+            <h3 className="mt-3 text-sm font-extrabold text-brand-black">Phone Support</h3>
+            <p className="mt-1 text-xs text-brand-black/80 font-medium">{contact.whatsapp}</p>
           </div>
 
-          <div className="rounded-2xl bg-slate-50 p-6 border border-slate-200">
+          <div className="rounded-2xl bg-slate-50 p-6 border border-icy-blue">
             <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600">
               <Mail className="h-5 w-5" />
             </div>
-            <h3 className="mt-3 text-sm font-extrabold text-slate-900">Email Inquiry</h3>
-            <p className="mt-1 text-xs text-slate-600 font-medium">{contact.email}</p>
+            <h3 className="mt-3 text-sm font-extrabold text-brand-black">Email Inquiry</h3>
+            <p className="mt-1 text-xs text-brand-black/80 font-medium">{contact.email}</p>
           </div>
         </div>
       </section>

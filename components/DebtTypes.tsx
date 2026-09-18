@@ -9,7 +9,7 @@ const debtTypes = [
     title: "Personal Loans",
     description: "Consolidate eligible personal-loan obligations into one manageable EMI.",
     icon: Landmark,
-    color: "bg-blue-50 text-brand-blue border-blue-100",
+    color: "bg-blue-50 text-blue-energy border-blue-100",
   },
   {
     title: "Credit Cards",
@@ -62,10 +62,10 @@ export function DebtTypes() {
   return (
     <div className="w-full h-full flex flex-col">
       <div className="max-w-3xl mb-12">
-        <h2 className="text-3xl md:text-4xl font-extrabold text-text-main mb-4 tracking-tight">
+        <h2 className="text-3xl md:text-4xl font-extrabold text-brand-black mb-4 tracking-tight">
           Bring Your Eligible Loans Together
         </h2>
-        <p className="text-lg text-text-muted">
+        <p className="text-lg text-brand-black/70">
           Whether it's a high-interest credit card or multiple small app loans, 
           we help you evaluate which debts can be consolidated into a single, smarter payment.
         </p>
@@ -84,15 +84,15 @@ export function DebtTypes() {
             <motion.div 
               key={index} 
               variants={itemVariants}
-              className="bg-warm-bg rounded-2xl p-6 border border-slate-200/60 hover:shadow-md transition-shadow group flex flex-col"
+              className="bg-icy-blue rounded-2xl p-6 border border-icy-blue/60 hover:shadow-md transition-shadow group flex flex-col"
             >
               <div className={`inline-flex items-center justify-center w-12 h-12 rounded-xl border mb-5 ${type.color}`}>
                 <Icon className="w-6 h-6" />
               </div>
-              <h3 className="text-lg font-bold text-text-main mb-2 group-hover:text-brand-blue transition-colors tracking-tight">
+              <h3 className="text-lg font-bold text-brand-black mb-2 group-hover:text-blue-energy transition-colors tracking-tight">
                 {type.title}
               </h3>
-              <p className="text-sm text-text-muted leading-relaxed">
+              <p className="text-sm text-brand-black/70 leading-relaxed">
                 {type.description}
               </p>
             </motion.div>

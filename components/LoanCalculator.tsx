@@ -24,25 +24,25 @@ export function LoanCalculator() {
   const totalSavedOverTenure = Math.max(0, totalCurrent - totalNew);
 
   return (
-    <section id="calculator" className="bg-[#F8FAFC] py-16 sm:py-24 border-b border-slate-200">
+    <section id="calculator" className="bg-[#F8FAFC] py-16 sm:py-24 border-b border-icy-blue">
       <div className="container-narrow">
         <div className="mx-auto max-w-3xl text-center">
           <span className="text-xs font-bold uppercase tracking-widest text-blue-600">
             DATA-DRIVEN INSIGHTS
           </span>
-          <h2 className="mt-3 text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-slate-900">
+          <h2 className="mt-3 text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-brand-black">
             Smarter decisions start with <span className="text-blue-600">clear data.</span>
           </h2>
-          <p className="mt-4 text-sm sm:text-base text-slate-600 leading-7 max-w-2xl mx-auto font-medium">
+          <p className="mt-4 text-sm sm:text-base text-brand-black/80 leading-7 max-w-2xl mx-auto font-medium">
             Estimate your potential monthly EMI reduction and tenure savings by consolidating high-cost loans into a structured personal loan.
           </p>
         </div>
 
         <div className="mx-auto mt-12 grid max-w-5xl gap-8 lg:grid-cols-2 lg:items-start">
           {/* Controls Panel */}
-          <div className="rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm space-y-6">
+          <div className="rounded-3xl border border-icy-blue bg-white p-6 sm:p-8 shadow-sm space-y-6">
             <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-              <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
+              <h3 className="text-sm font-bold text-brand-black uppercase tracking-wider">
                 Input Your Current Obligations
               </h3>
               <span className="text-xs font-bold text-blue-700 bg-blue-50 border border-blue-200 px-3 py-1 rounded-full">
@@ -115,7 +115,7 @@ export function LoanCalculator() {
                   onChange={(e) => setIllustrativeRate(parseFloat(e.target.value))}
                   className="mt-3 w-full h-2 appearance-none rounded-full bg-slate-200 accent-blue-600 cursor-pointer"
                 />
-                <p className="mt-2 text-[11px] text-slate-500 font-medium">
+                <p className="mt-2 text-[11px] text-brand-black/70 font-medium">
                   Indicative rate based on partner bank salaried eligibility (starting from 9.95% p.a.*).
                 </p>
               </div>
@@ -124,12 +124,12 @@ export function LoanCalculator() {
 
           {/* Output Panel */}
           <div className="space-y-6">
-            <div className="rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+            <div className="rounded-3xl border border-icy-blue bg-white p-6 sm:p-8 shadow-sm">
               <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-                <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
+                <h3 className="text-sm font-bold text-brand-black uppercase tracking-wider">
                   Illustrative Savings Summary
                 </h3>
-                <span className="rounded-full bg-slate-100 px-3 py-1 text-[10px] font-bold text-slate-500">
+                <span className="rounded-full bg-slate-100 px-3 py-1 text-[10px] font-bold text-brand-black/70">
                   ESTIMATE ONLY
                 </span>
               </div>
@@ -137,8 +137,8 @@ export function LoanCalculator() {
               {/* Side by side EMI */}
               <div className="mt-6 grid grid-cols-2 gap-4">
                 <div className="rounded-2xl bg-slate-50 p-5 text-center border border-slate-100">
-                  <span className="text-[10px] font-bold text-slate-500 uppercase block">CURRENT EMI</span>
-                  <div className="mt-2 text-2xl font-black text-slate-900 line-through decoration-red-500">
+                  <span className="text-[10px] font-bold text-brand-black/70 uppercase block">CURRENT EMI</span>
+                  <div className="mt-2 text-2xl font-black text-brand-black line-through decoration-red-500">
                     {formatINR(currentEMI)}
                   </div>
                   <span className="mt-1 block text-[10px] text-slate-400 font-medium">Scattered due dates</span>
@@ -208,8 +208,8 @@ function Slider({
   return (
     <label className="block">
       <div className="flex items-center justify-between text-xs">
-        <span className="font-semibold text-slate-700">{label}</span>
-        <span className="rounded bg-slate-100 px-2 py-0.5 text-xs font-bold text-slate-900">
+        <span className="font-semibold text-brand-black/90">{label}</span>
+        <span className="rounded bg-slate-100 px-2 py-0.5 text-xs font-bold text-brand-black">
           {display}
         </span>
       </div>

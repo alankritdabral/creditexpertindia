@@ -25,10 +25,10 @@ export function HowItWorks() {
   return (
     <div id="how-it-works" className="w-full h-full flex flex-col justify-between">
       <div className="mb-10 text-center">
-        <p className="text-xs font-semibold leading-7 text-brand-blue tracking-widest uppercase">
+        <p className="text-xs font-semibold leading-7 text-blue-energy tracking-widest uppercase">
           A SIMPLE PROCESS
         </p>
-        <h2 className="mt-2 text-2xl md:text-3xl font-bold tracking-tight text-text-main">
+        <h2 className="mt-2 text-2xl md:text-3xl font-bold tracking-tight text-brand-black">
           First understand. <br />Then decide.
         </h2>
       </div>
@@ -42,18 +42,18 @@ export function HowItWorks() {
               {/* Step indicator */}
               <div className="flex flex-col items-center mb-4">
                 {/* Circle */}
-                <div className="w-12 h-12 rounded-full bg-brand-blue/10 border-2 border-brand-blue/30 flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110 group-hover:border-brand-blue group-hover:shadow-[0_0_10px_rgba(10,37,64,0.2)]">
-                  <Icon className="w-5 h-5 text-brand-blue" strokeWidth={2} />
+                <div className="w-12 h-12 rounded-full bg-blue-energy/10 border-2 border-blue-energy/30 flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110 group-hover:border-blue-energy group-hover:shadow-[0_0_10px_rgba(10,37,64,0.2)]">
+                  <Icon className="w-5 h-5 text-blue-energy" strokeWidth={2} />
                 </div>
               </div>
 
               {/* Content */}
               <div className="transition-transform duration-300 group-hover:-translate-y-0.5">
-                <p className="text-[11px] font-bold tracking-widest text-brand-blue/60 mb-2 uppercase transition-colors duration-300 group-hover:text-brand-blue">STEP {step.num}</p>
-                <h3 className="text-lg font-bold text-text-main mb-2 transition-colors duration-300 group-hover:text-brand-blue">
+                <p className="text-[11px] font-bold tracking-widest text-blue-energy/60 mb-2 uppercase transition-colors duration-300 group-hover:text-blue-energy">STEP {step.num}</p>
+                <h3 className="text-lg font-bold text-brand-black mb-2 transition-colors duration-300 group-hover:text-blue-energy">
                   {step.title}
                 </h3>
-                <p className="text-sm text-text-muted leading-relaxed max-w-sm mx-auto">
+                <p className="text-sm text-brand-black/70 leading-relaxed max-w-sm mx-auto">
                   {step.desc}
                 </p>
               </div>

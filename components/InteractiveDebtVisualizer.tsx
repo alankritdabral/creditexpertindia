@@ -53,7 +53,7 @@ export function InteractiveDebtVisualizer({ scrollYProgress }: { scrollYProgress
       style={{ maxHeight: containerMaxHeight, opacity: visualizerOpacity }} 
       className="relative w-full max-w-4xl mx-auto px-2 sm:px-4 flex items-center justify-center shrink-0 overflow-hidden h-[310px] sm:h-[420px]"
     >
-      <div className="absolute inset-0 bg-brand-blue/5 rounded-[40px] blur-3xl -z-10" />
+      <div className="absolute inset-0 bg-blue-energy/5 rounded-[40px] blur-3xl -z-10" />
 
       {/* LAYER 1: BEFORE STATE */}
       <motion.div 
@@ -70,8 +70,8 @@ export function InteractiveDebtVisualizer({ scrollYProgress }: { scrollYProgress
             style={{ x: collapseX1, y: collapseY1 }}
             className="absolute left-2 sm:left-12 top-10 sm:top-16 w-32 sm:w-48 bg-white p-3 sm:p-4 rounded-2xl shadow-lg border border-red-100 flex flex-col items-center justify-center"
           >
-            <p className="text-base sm:text-lg font-bold text-text-main">₹14,500</p>
-            <p className="text-[11px] sm:text-xs text-text-muted font-medium">Personal Loan</p>
+            <p className="text-base sm:text-lg font-bold text-brand-black">₹14,500</p>
+            <p className="text-[11px] sm:text-xs text-brand-black/70 font-medium">Personal Loan</p>
           </motion.div>
 
           {/* Card 2 */}
@@ -79,8 +79,8 @@ export function InteractiveDebtVisualizer({ scrollYProgress }: { scrollYProgress
             style={{ x: collapseX2, y: collapseY2 }}
             className="absolute right-2 sm:right-12 top-10 sm:top-16 w-32 sm:w-48 bg-white p-3 sm:p-4 rounded-2xl shadow-lg border border-red-100 flex flex-col items-center justify-center"
           >
-            <p className="text-base sm:text-lg font-bold text-text-main">₹8,500</p>
-            <p className="text-[11px] sm:text-xs text-text-muted font-medium">Credit Card</p>
+            <p className="text-base sm:text-lg font-bold text-brand-black">₹8,500</p>
+            <p className="text-[11px] sm:text-xs text-brand-black/70 font-medium">Credit Card</p>
           </motion.div>
 
           {/* Card 3 */}
@@ -88,8 +88,8 @@ export function InteractiveDebtVisualizer({ scrollYProgress }: { scrollYProgress
             style={{ x: collapseX3, y: collapseY3 }}
             className="absolute left-2 sm:left-12 bottom-10 sm:bottom-16 w-32 sm:w-48 bg-white p-3 sm:p-4 rounded-2xl shadow-lg border border-red-100 flex flex-col items-center justify-center"
           >
-            <p className="text-base sm:text-lg font-bold text-text-main">₹6,000</p>
-            <p className="text-[11px] sm:text-xs text-text-muted font-medium">App Loan</p>
+            <p className="text-base sm:text-lg font-bold text-brand-black">₹6,000</p>
+            <p className="text-[11px] sm:text-xs text-brand-black/70 font-medium">App Loan</p>
           </motion.div>
 
           {/* Card 4 */}
@@ -97,8 +97,8 @@ export function InteractiveDebtVisualizer({ scrollYProgress }: { scrollYProgress
             style={{ x: collapseX4, y: collapseY4 }}
             className="absolute right-2 sm:right-12 bottom-10 sm:bottom-16 w-32 sm:w-48 bg-white p-3 sm:p-4 rounded-2xl shadow-lg border border-red-100 flex flex-col items-center justify-center"
           >
-            <p className="text-base sm:text-lg font-bold text-text-main">₹9,500</p>
-            <p className="text-[11px] sm:text-xs text-text-muted font-medium">Personal Loan</p>
+            <p className="text-base sm:text-lg font-bold text-brand-black">₹9,500</p>
+            <p className="text-[11px] sm:text-xs text-brand-black/70 font-medium">Personal Loan</p>
           </motion.div>
           
           {/* Center Dot (Visible during collapse) */}
@@ -108,11 +108,11 @@ export function InteractiveDebtVisualizer({ scrollYProgress }: { scrollYProgress
 
           <div className="absolute inset-x-0 bottom-0 flex justify-between px-4 sm:px-24">
             <div className="text-left">
-              <p className="text-[11px] sm:text-xs text-text-muted font-medium uppercase">Monthly outflow</p>
+              <p className="text-[11px] sm:text-xs text-brand-black/70 font-medium uppercase">Monthly outflow</p>
               <p className="text-base sm:text-lg font-bold text-warning-red line-through">₹38,500</p>
             </div>
             <div className="text-right">
-              <p className="text-[11px] sm:text-xs text-text-muted font-medium uppercase">Highest rate</p>
+              <p className="text-[11px] sm:text-xs text-brand-black/70 font-medium uppercase">Highest rate</p>
               <p className="text-base sm:text-lg font-bold text-warning-red">42% p.a.</p>
             </div>
           </div>
@@ -128,17 +128,17 @@ export function InteractiveDebtVisualizer({ scrollYProgress }: { scrollYProgress
           <h3 className="text-sm font-bold tracking-wider text-savings-green mb-6 uppercase">ONE CLEAR PLAN</h3>
           
           <div className="space-y-4">
-            <div className="flex justify-between items-end border-b border-slate-200 pb-2">
-              <span className="text-text-muted font-medium text-sm">Interest Rate</span>
-              <motion.span className="text-xl font-bold text-text-main">{rateStr}</motion.span>
+            <div className="flex justify-between items-end border-b border-icy-blue pb-2">
+              <span className="text-brand-black/70 font-medium text-sm">Interest Rate</span>
+              <motion.span className="text-xl font-bold text-brand-black">{rateStr}</motion.span>
             </div>
-            <div className="flex justify-between items-end border-b border-slate-200 pb-2">
-              <span className="text-text-muted font-medium text-sm">Monthly EMI</span>
-              <motion.span className="text-xl font-bold text-text-main">{outflowStr}</motion.span>
+            <div className="flex justify-between items-end border-b border-icy-blue pb-2">
+              <span className="text-brand-black/70 font-medium text-sm">Monthly EMI</span>
+              <motion.span className="text-xl font-bold text-brand-black">{outflowStr}</motion.span>
             </div>
-            <div className="flex justify-between items-end border-b border-slate-200 pb-2">
-              <span className="text-text-muted font-medium text-sm">Total Payable</span>
-              <motion.span className="text-xl font-bold text-text-main">{totalStr}</motion.span>
+            <div className="flex justify-between items-end border-b border-icy-blue pb-2">
+              <span className="text-brand-black/70 font-medium text-sm">Total Payable</span>
+              <motion.span className="text-xl font-bold text-brand-black">{totalStr}</motion.span>
             </div>
           </div>
         </div>
@@ -155,34 +155,34 @@ export function InteractiveDebtVisualizer({ scrollYProgress }: { scrollYProgress
           <h3 className="text-sm font-bold tracking-wider text-savings-green uppercase mb-4 relative z-10">ONE CLEAR PLAN</h3>
           
           <div className="flex flex-col items-center justify-center gap-1 mb-6 relative z-10">
-            <motion.div className="text-4xl sm:text-5xl font-bold tracking-tight text-text-main">
-              ₹27,800 <span className="text-xl text-text-muted font-medium">/ month*</span>
+            <motion.div className="text-4xl sm:text-5xl font-bold tracking-tight text-brand-black">
+              ₹27,800 <span className="text-xl text-brand-black/70 font-medium">/ month*</span>
             </motion.div>
-            <p className="text-text-muted font-medium uppercase tracking-wider text-[10px] mt-1">Potential Monthly EMI</p>
+            <p className="text-brand-black/70 font-medium uppercase tracking-wider text-[10px] mt-1">Potential Monthly EMI</p>
           </div>
 
           <div className="flex items-center justify-center gap-6 mb-6 relative z-10">
             <div className="text-center px-4 border-r border-slate-100">
-              <p className="text-text-main font-bold text-lg mb-1">11% p.a.*</p>
-              <p className="text-text-muted text-[10px] font-medium uppercase tracking-wider">Potential Rate</p>
+              <p className="text-brand-black font-bold text-lg mb-1">11% p.a.*</p>
+              <p className="text-brand-black/70 text-[10px] font-medium uppercase tracking-wider">Potential Rate</p>
             </div>
             <div className="text-center px-4">
               <p className="text-savings-green font-bold text-lg mb-1">↓ ₹10,700*</p>
-              <p className="text-text-muted text-[10px] font-medium uppercase tracking-wider">Monthly Difference</p>
+              <p className="text-brand-black/70 text-[10px] font-medium uppercase tracking-wider">Monthly Difference</p>
             </div>
           </div>
           
           <div className="pt-4 border-t border-slate-100 relative z-10">
             <ul className="text-left space-y-2">
-              <li className="flex items-center text-text-main font-medium text-sm">
+              <li className="flex items-center text-brand-black font-medium text-sm">
                 <span className="flex items-center justify-center w-4 h-4 rounded-full bg-savings-green/20 text-savings-green mr-3 shrink-0 text-[10px]">✓</span>
                 One single lender
               </li>
-              <li className="flex items-center text-text-main font-medium text-sm">
+              <li className="flex items-center text-brand-black font-medium text-sm">
                 <span className="flex items-center justify-center w-4 h-4 rounded-full bg-savings-green/20 text-savings-green mr-3 shrink-0 text-[10px]">✓</span>
                 One predictable due date
               </li>
-              <li className="flex items-center text-text-main font-medium text-sm">
+              <li className="flex items-center text-brand-black font-medium text-sm">
                 <span className="flex items-center justify-center w-4 h-4 rounded-full bg-savings-green/20 text-savings-green mr-3 shrink-0 text-[10px]">✓</span>
                 Clear repayment structure
               </li>
