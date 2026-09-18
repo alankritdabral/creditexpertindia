@@ -83,7 +83,8 @@ export function parseBureauData(bureau: string, data: any): ParsedBureauData {
       dateReported: acc.DateReported || "N/A",
       emiAmount: Number(acc.InstallmentAmount || acc.EMIAmount || 0),
       interest_rate: Number(acc.InterestRate || 0),
-      repaymentTenure: acc.RepaymentTenure || "N/A"
+      repaymentTenure: acc.RepaymentTenure || "N/A",
+      pastDueAmount: Number(acc.PastDueAmount || 0)
     }));
 
     let currentBalance = 0;
@@ -131,7 +132,8 @@ export function parseBureauData(bureau: string, data: any): ParsedBureauData {
         dateReported: acc.Date_Reported || "N/A",
         emiAmount: Number(emiStr) || 0,
         interest_rate: Number(acc.Rate_of_Interest || 0),
-        repaymentTenure: acc.Repayment_Tenure || "N/A"
+        repaymentTenure: acc.Repayment_Tenure || "N/A",
+        pastDueAmount: Number((acc.Amount_Past_Due || "0").toString().replace(/,/g, '')) || 0
       };
     });
     
@@ -201,7 +203,8 @@ export function parseBureauData(bureau: string, data: any): ParsedBureauData {
         dateReported: loan["DATE-REPORTED"] || "N/A",
         emiAmount: Number(emiStr) || 0,
         interest_rate: Number(loan["INTEREST-RATE"] || 0),
-        repaymentTenure: loan["REPAYMENT-TENURE"] || "N/A"
+        repaymentTenure: loan["REPAYMENT-TENURE"] || "N/A",
+        pastDueAmount: Number((loan["OVERDUE-AMT"] || "0").replace(/,/g, '')) || 0
       };
     });
 

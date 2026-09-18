@@ -404,14 +404,23 @@ export function EligibilityForm() {
                       (acc.accountType || "").includes("Overdraft") ? "Overdraft" : "Unknown"
             );
             
+          const originalAmount = overrides.originalAmount !== undefined ? Number(overrides.originalAmount) : Number(acc.highCreditAmount || 0);
+          const tenure = overrides.tenure !== undefined ? overrides.tenure : (acc.repaymentTenure || "N/A");
+
+          let rate = overrides.rate !== undefined ? Number(overrides.rate) : Number(acc.interest_rate || 0);
+          if (type === 'Gold Loan' && overrides.rate === undefined && !rate) {
+             rate = 10;
+          }
+          
           let emi = overrides.emi !== undefined ? Number(overrides.emi) : (Number(acc.emiAmount) || 0);
           if (type === 'Credit Card' && overrides.emi === undefined) {
              emi = currentOutstanding * 0.05;
-          }
-
-          let rate = overrides.rate !== undefined ? overrides.rate : (acc.interest_rate || 0);
-          if (type === 'Gold Loan' && overrides.rate === undefined && !rate) {
-             rate = 10;
+          } else if (!emi && originalAmount > 0 && rate > 0 && !isNaN(Number(tenure))) {
+            const r = rate / 12 / 100;
+            const n = Number(tenure);
+            if (n > 0) {
+              emi = Math.round((originalAmount * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1));
+            }
           }
 
           return {
@@ -420,14 +429,15 @@ export function EligibilityForm() {
             type,
             wantsBT: overrides.wantsBT !== undefined ? overrides.wantsBT : "no",
             userPaysEmi: overrides.userPaysEmi !== undefined ? overrides.userPaysEmi : true,
-            originalAmount: overrides.originalAmount !== undefined ? overrides.originalAmount : (acc.highCreditAmount || 0),
+            originalAmount,
             currentOutstanding,
             rate,
             emi,
             bankName: overrides.bankName !== undefined ? overrides.bankName : (acc.memberShortName || "Unknown Lender"),
             dateOpened: overrides.dateOpened !== undefined ? overrides.dateOpened : (acc.dateOpened || "N/A"),
-            tenure: overrides.tenure !== undefined ? overrides.tenure : (acc.repaymentTenure || "N/A"),
-            odPlan: overrides.odPlan !== undefined ? overrides.odPlan : "2yr"
+            tenure,
+            odPlan: overrides.odPlan !== undefined ? overrides.odPlan : "2yr",
+            pastDueAmount: acc.pastDueAmount || 0
           };
         });
 
@@ -950,6 +960,17 @@ export function EligibilityForm() {
                             <option value="yes">Yes</option>
                           </select>
                         </div>
+                        <div>
+                          <label className="text-xs font-semibold text-brand-black/80 mb-1 block">Any Active Overdue?</label>
+                          <select
+                            value={userOverrides.hasActiveOverdue || ((accountSummary?.overdueAccounts || 0) > 0 ? "yes" : "no")}
+                            onChange={e => setUserOverrides({ ...userOverrides, hasActiveOverdue: e.target.value })}
+                            className="w-full bg-white border border-icy-blue rounded-xl px-3 py-2 text-sm focus:border-blue-energy outline-none"
+                          >
+                            <option value="no">No</option>
+                            <option value="yes">Yes</option>
+                          </select>
+                        </div>
                       </div>
                     </div>
 
@@ -1043,6 +1064,11 @@ export function EligibilityForm() {
                             <div className="flex justify-between items-center mb-3 border-b border-slate-100 pb-2">
                               <div className="flex items-center gap-2">
                                 <p className="font-bold text-sm text-[#382F2A]">Loan #{idx + 1} - {loan.originalType}</p>
+                                {loan.pastDueAmount > 0 && (
+                                  <span className="bg-red-100 text-red-600 px-2 py-0.5 rounded-full text-[10px] font-bold border border-red-200">
+                                    Overdue: ₹{loan.pastDueAmount.toLocaleString('en-IN')}
+                                  </span>
+                                )}
                               </div>
                               <div className="flex items-center gap-4">
                                 <label className="text-xs font-semibold flex items-center gap-1.5 cursor-pointer text-brand-black/80">

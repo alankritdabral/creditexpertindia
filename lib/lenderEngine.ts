@@ -267,6 +267,27 @@ const LENDERS = [
       "Top Up": "CONFIRMED"
     },
     credit_policy: { active_overdue: "POLICY_CHECK", recent_bounce: "POLICY_CHECK" }
+  },
+  {
+    id: "tatacapital",
+    name: "Tata Capital",
+    type: "NBFC",
+    headlineRate: 10.99,
+    maxTenure: 84,
+    eligibility: {
+      min_salary: 20000,
+      eligible_employer_tiers: ["A+", "A", "B", "C", "Govt"],
+      unknown_employer_policy: "POLICY_CHECK"
+    },
+    takeover_policy: {
+      "Personal Loan": "CONFIRMED",
+      "Multiple PLs": "CONFIRMED",
+      "Credit Card": "CONFIRMED",
+      "App Loan": "CONFIRMED",
+      "Overdraft": "NOT_SUPPORTED",
+      "Top Up": "CONFIRMED"
+    },
+    credit_policy: { active_overdue: "POLICY_CHECK", recent_bounce: "POLICY_CHECK" }
   }
 ];
 
@@ -444,6 +465,14 @@ export function analyzeLenderEligibility({ profile, catBLoans }: { profile: any,
       customOutput.maxFOIR = "75%+";
       customOutput.fiWaiverThreshold = 750000;
       if (cibilMinus1) customOutput.cibilMinus1MaxLoan = 1000000;
+    }
+    
+    if (lender.id === 'tatacapital' && isEligible) {
+      const btAmount = catBLoans.reduce((sum: number, l: any) => sum + Number(l.currentOutstanding || 0), 0);
+      if (btAmount > 0 && btAmount <= 500000) {
+        isEligible = false;
+        rejectionReasons.push(`BT loan amount financed must be > ₹5 Lakh`);
+      }
     }
 
     if (isEligible) {
