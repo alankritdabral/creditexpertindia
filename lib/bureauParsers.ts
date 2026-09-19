@@ -187,11 +187,11 @@ export function parseBureauData(bureau: string, data: any): ParsedBureauData {
     accounts = responses.map((res: any) => {
       const loan = res["LOAN-DETAILS"] || {};
       
-      let emiStr = loan["INSTALLMENT-AMT"] || "0";
+      let emiStr = String(loan["INSTALLMENT-AMT"] || "0");
       emiStr = emiStr.split('/')[0].replace(/,/g, '');
       
-      const currBal = (loan["CURRENT-BAL"] || "0").replace(/,/g, '');
-      const highCred = (loan["DISBURSED-AMT"] || loan["CREDIT-LIMIT"] || "0").replace(/,/g, '');
+      const currBal = String(loan["CURRENT-BAL"] || "0").replace(/,/g, '');
+      const highCred = String(loan["DISBURSED-AMT"] || loan["CREDIT-LIMIT"] || "0").replace(/,/g, '');
       
       return {
         accountNumber: loan["ACCT-NUMBER"] || "N/A",
@@ -204,7 +204,7 @@ export function parseBureauData(bureau: string, data: any): ParsedBureauData {
         emiAmount: Number(emiStr) || 0,
         interest_rate: Number(loan["INTEREST-RATE"] || 0),
         repaymentTenure: loan["REPAYMENT-TENURE"] || "N/A",
-        pastDueAmount: Number((loan["OVERDUE-AMT"] || "0").replace(/,/g, '')) || 0
+        pastDueAmount: Number(String(loan["OVERDUE-AMT"] || "0").replace(/,/g, '')) || 0
       };
     });
 
@@ -212,7 +212,7 @@ export function parseBureauData(bureau: string, data: any): ParsedBureauData {
     enquiries = inquiries.map((inq: any) => ({
       memberShortName: inq["MEMBER-NAME"] || "Unknown Lender",
       enquiryDate: inq["INQUIRY-DATE"] || "N/A",
-      enquiryAmount: Number((inq["AMOUNT"] || "0").replace(/,/g, '')) || 0
+      enquiryAmount: Number(String(inq["AMOUNT"] || "0").replace(/,/g, '')) || 0
     }));
     
     inquirySummary = {
@@ -235,7 +235,7 @@ export function parseBureauData(bureau: string, data: any): ParsedBureauData {
 
     responses.forEach((res: any) => {
        const loan = res["LOAN-DETAILS"] || {};
-       const od = Number((loan["OVERDUE-AMT"] || "0").replace(/,/g, '')) || 0;
+       const od = Number(String(loan["OVERDUE-AMT"] || "0").replace(/,/g, '')) || 0;
        overdueBalance += od;
        if (od > 0) overdueAccounts += 1;
     });

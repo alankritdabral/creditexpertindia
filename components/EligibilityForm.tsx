@@ -6,7 +6,7 @@ import { ArrowRight, Check, Plus, Trash2, User, Phone, Mail, MapPin, Briefcase, 
 import { collection, doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebaseClient";
 import { analyzeLenderEligibility } from "@/lib/lenderEngine";
-import { EMPLOYERS } from "@/lib/employers";
+import { searchEmployers, EmployerResult } from "@/lib/employerLookup";
 import { parseBureauData } from "@/lib/bureauParsers";
 export function EligibilityForm() {
   const captureRef = useRef<HTMLDivElement>(null);
@@ -57,7 +57,7 @@ export function EligibilityForm() {
   const employerDropdownRef = useRef<HTMLDivElement>(null);
 
   const [debouncedEmployerSearch, setDebouncedEmployerSearch] = useState(employerSearch);
-  const [asyncEmployers, setAsyncEmployers] = useState(EMPLOYERS);
+  const [asyncEmployers, setAsyncEmployers] = useState<EmployerResult[]>([]);
   const [isSearchingEmployer, setIsSearchingEmployer] = useState(false);
 
   useEffect(() => {
@@ -69,11 +69,13 @@ export function EligibilityForm() {
 
   useEffect(() => {
     const fetchEmployersFromDB = async () => {
+      if (debouncedEmployerSearch.length < 2) {
+        setAsyncEmployers([]);
+        return;
+      }
       setIsSearchingEmployer(true);
-      await new Promise(resolve => setTimeout(resolve, 400));
-      const results = EMPLOYERS.filter(e =>
-        e.toLowerCase().includes(debouncedEmployerSearch.toLowerCase()) || e.includes("Other")
-      );
+      
+      const results = await searchEmployers(debouncedEmployerSearch);
       setAsyncEmployers(results);
       setIsSearchingEmployer(false);
     };
@@ -385,17 +387,33 @@ export function EligibilityForm() {
         const engineProfile = {
           netSalary: effectiveNetSalary,
           employer: userOverrides.employer || formData.employer || "Unknown",
-          employerTier: userOverrides.companyCategory || null,
+          employerTier: userOverrides.companyCategory || null, // null = auto-detect per bank
           hasBounce: userOverrides.hasBounce || "no",
           hasLatePayment: userOverrides.hasLatePayment || "no",
           hasActiveOverdue: userOverrides.hasActiveOverdue || ((accountSummary?.overdueAccounts || 0) > 0 ? "yes" : "no"),
           wantsTopUp: userOverrides.wantsTopUp || "no",
+          btPreference: userOverrides.btPreference || "Any",
           axisCustomerSegment: userOverrides.axisCustomerSegment || "NTB",
           casaVintage: userOverrides.casaVintage || "no",
           cibilScore: parsed.personalInfo?.score || 0,
           residenceType: userOverrides.residenceType || "Rented",
           cityTier: userOverrides.cityTier || "Non-Metro",
-          yearlyBonus: avgYearlyBonus
+          location: userOverrides.location || formData.city || "",
+          yearlyBonus: avgYearlyBonus,
+          rentalIncome: Number(userOverrides.rentalIncome) || 0,
+          monthlyIncentive: Number(userOverrides.monthlyIncentive) || 0,
+          quarterlyIncentive: Number(userOverrides.quarterlyIncentive) || 0,
+          halfYearlyIncentive: Number(userOverrides.halfYearlyIncentive) || 0,
+          monthlyBonus: Number(userOverrides.monthlyBonus) || 0,
+          quarterlyBonus: Number(userOverrides.quarterlyBonus) || 0,
+          lta: Number(userOverrides.lta) || 0,
+          jobProfile: userOverrides.jobProfile || "",
+          age: Number(userOverrides.age) || 0,
+          coApplicant: userOverrides.coApplicant === "yes",
+          hasEPFO: userOverrides.hasEPFO === "yes",
+          hasOMID: userOverrides.hasOMID === "yes",
+          hasHRMS: userOverrides.hasHRMS === "yes",
+          has26AS: userOverrides.has26AS === "yes",
         };
 
         const mappedAccounts = activeAccounts.map((acc: any) => {
@@ -888,24 +906,16 @@ export function EligibilityForm() {
                             placeholder="e.g. 100000"
                           />
                         </div>
-                        <div>
-                          <label className="text-xs font-semibold text-brand-black/80 mb-1 block">Company Category</label>
-                          <select
-                            value={userOverrides.companyCategory || ""}
-                            onChange={e => setUserOverrides({ ...userOverrides, companyCategory: e.target.value })}
-                            className="w-full bg-white border border-icy-blue rounded-xl px-3 py-2 text-sm focus:border-blue-energy outline-none"
-                          >
-                            <option value="">Auto-detect from Name</option>
-                            <option value="A+">Super Cat A (A+)</option>
-                            <option value="A">Cat A (A)</option>
-                            <option value="B">Cat B (B)</option>
-                            <option value="C">Cat C (C)</option>
-                            <option value="D">Cat D (D)</option>
-                            <option value="E">Cat E (E)</option>
-                          </select>
-                        </div>
+
                         <div ref={employerDropdownRef} className="relative z-10">
-                          <label className="text-xs font-semibold text-brand-black/80 mb-1 block">Employer</label>
+                          <label className="text-xs font-semibold text-brand-black/80 mb-1 flex justify-between items-center">
+                            <span>Employer</span>
+                            {userOverrides.companyCategory && userOverrides.companyCategory !== 'Unknown' && (
+                              <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
+                                Tier: {userOverrides.companyCategory}
+                              </span>
+                            )}
+                          </label>
                           <div className="relative">
                             <input
                               type="text"
@@ -935,22 +945,65 @@ export function EligibilityForm() {
                                 {isSearchingEmployer ? (
                                   <div className="px-4 py-3 text-sm text-brand-black/70">Searching database...</div>
                                 ) : asyncEmployers.length > 0 ? (
-                                  asyncEmployers.map(e => (
+                                  <>
+                                    {asyncEmployers.map(e => (
+                                      <div
+                                        key={e.name}
+                                        onClick={() => {
+                                          setEmployerSearch(e.name);
+                                          setUserOverrides({ 
+                                            ...userOverrides, 
+                                            employer: e.name,
+                                            companyCategory: e.tier 
+                                          });
+                                          setShowEmployerDropdown(false);
+                                        }}
+                                        className="px-4 py-2 text-sm text-brand-black/90 cursor-pointer hover:bg-slate-50 border-b border-slate-50 last:border-0 flex justify-between items-center"
+                                      >
+                                        <span>{e.name}</span>
+                                        {e.tier !== 'Unknown' && (
+                                          <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
+                                            Tier: {e.tier}
+                                          </span>
+                                        )}
+                                      </div>
+                                    ))}
                                     <div
-                                      key={e}
                                       onClick={() => {
-                                        setEmployerSearch(e);
-                                        setUserOverrides({ ...userOverrides, employer: e });
+                                        setEmployerSearch(debouncedEmployerSearch || "Unlisted Company");
+                                        setUserOverrides({ 
+                                          ...userOverrides, 
+                                          employer: debouncedEmployerSearch || "Unlisted Company",
+                                          companyCategory: "Unknown" 
+                                        });
                                         setShowEmployerDropdown(false);
                                       }}
-                                      className="px-4 py-2 text-sm text-brand-black/90 cursor-pointer hover:bg-slate-50 border-b border-slate-50 last:border-0"
+                                      className="px-4 py-2 text-sm font-semibold text-blue-700 cursor-pointer hover:bg-blue-50 border-t border-slate-100 flex justify-between items-center"
                                     >
-                                      {e}
+                                      <span>Unlisted Company (Other)</span>
                                     </div>
-                                  ))
+                                  </>
                                 ) : (
-                                  <div className="px-4 py-3 text-sm text-brand-black/70">Type to specify company</div>
-                                )}
+                                <div className="px-4 py-3 text-sm text-brand-black/70 flex flex-col gap-2">
+                                  {debouncedEmployerSearch.length >= 2 ? "No exact matches found." : "Type to specify company"}
+                                  {debouncedEmployerSearch.length >= 2 && (
+                                    <button
+                                      onClick={() => {
+                                        setEmployerSearch(debouncedEmployerSearch);
+                                        setUserOverrides({ 
+                                          ...userOverrides, 
+                                          employer: debouncedEmployerSearch,
+                                          companyCategory: "Unknown" 
+                                        });
+                                        setShowEmployerDropdown(false);
+                                      }}
+                                      className="mt-1 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-left text-xs font-semibold transition-colors"
+                                    >
+                                      Use "{debouncedEmployerSearch}" as Unlisted
+                                    </button>
+                                  )}
+                                </div>
+                              )}
                               </motion.div>
                             )}
                           </AnimatePresence>
@@ -1055,6 +1108,45 @@ export function EligibilityForm() {
                           </label>
                         </div>
                       </div>
+                    </div>
+
+                    {/* Balance Transfer Preference */}
+                    <div className="bg-slate-50 border border-icy-blue rounded-2xl p-5 mb-6">
+                      <div className="flex justify-between items-center">
+                        <label className="text-sm font-bold text-brand-black/90">BT / Loan Preference</label>
+                        <div className="flex gap-4">
+                          <label className="flex items-center gap-1 text-sm cursor-pointer">
+                            <input
+                              type="radio"
+                              name="btPreference"
+                              value="Any"
+                              checked={(userOverrides.btPreference || 'Any') === 'Any'}
+                              onChange={e => setUserOverrides({ ...userOverrides, btPreference: e.target.value })}
+                              className="accent-blue-energy"
+                            /> Any
+                          </label>
+                          <label className="flex items-center gap-1 text-sm cursor-pointer">
+                            <input
+                              type="radio"
+                              name="btPreference"
+                              value="BT to PL"
+                              checked={userOverrides.btPreference === 'BT to PL'}
+                              onChange={e => setUserOverrides({ ...userOverrides, btPreference: e.target.value })}
+                              className="accent-blue-energy"
+                            /> BT to PL
+                          </label>
+                          <label className="flex items-center gap-1 text-sm cursor-pointer">
+                            <input
+                              type="radio"
+                              name="btPreference"
+                              value="BT to OD"
+                              checked={userOverrides.btPreference === 'BT to OD'}
+                              onChange={e => setUserOverrides({ ...userOverrides, btPreference: e.target.value })}
+                              className="accent-blue-energy"
+                            /> BT to OD
+                          </label>
+                        </div>
+                      </div>
 
                       {userOverrides.wantsTopUp === 'yes' && (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4 pt-4 border-t border-icy-blue">
@@ -1114,7 +1206,7 @@ export function EligibilityForm() {
                       {mappedAccounts.map((loan: any, idx: number) => {
                         const l = loanOverrides[loan.id] || {};
                         return (
-                          <div key={loan.id} className="bg-white border border-[#EBE6DD] rounded-2xl p-4 shadow-sm">
+                          <div key={`${loan.id}-${idx}`} className="bg-white border border-[#EBE6DD] rounded-2xl p-4 shadow-sm">
                             <div className="flex justify-between items-center mb-3 border-b border-slate-100 pb-2">
                               <div className="flex items-center gap-2">
                                 <p className="font-bold text-sm text-[#382F2A]">Loan #{idx + 1} - {loan.originalType}</p>
@@ -1356,8 +1448,30 @@ export function EligibilityForm() {
                           );
                         })()}
 
-                        {eligibleLenders.map((lender: any, i: number) => (
-                          <div key={i} className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 mb-3 flex flex-col gap-3">
+                        {eligibleLenders.map((lender: any, i: number) => {
+                          const isConsolidating = catBLoans && catBLoans.length > 0;
+                          const consolidationAmount = isConsolidating ? catBLoans.reduce((sum: number, l: any) => sum + Number(l.currentOutstanding || 0), 0) : 0;
+                          const currentEmiToConsolidate = isConsolidating ? catBLoans.reduce((sum: number, l: any) => sum + Number(l.emi || 0), 0) : 0;
+                          
+                          const targetAmount = isConsolidating 
+                            ? (consolidationAmount + (userOverrides.wantsTopUp === 'yes' ? Number(userOverrides.topUpAmount || 0) : 0))
+                            : (lender.universalMaxLoan || 0);
+                            
+                          const cappedNewLoan = Math.min(targetAmount, lender.universalMaxLoan || 0);
+                          
+                          const ratePerMonth = (lender.headlineRate || 12) / 12 / 100;
+                          const maxLenderTenure = lender.maxTenure || 60;
+                          const tenureMonths = Number(userOverrides.consolidationTenure) || maxLenderTenure;
+                          
+                          const newEmi = cappedNewLoan > 0 ? Math.round(
+                            (cappedNewLoan * ratePerMonth * Math.pow(1 + ratePerMonth, tenureMonths)) /
+                            (Math.pow(1 + ratePerMonth, tenureMonths) - 1)
+                          ) : 0;
+                          
+                          const emiSavings = isConsolidating ? (currentEmiToConsolidate - newEmi) : 0;
+
+                          return (
+                            <div key={i} className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 mb-3 flex flex-col gap-3">
                             <div className="flex items-center justify-between">
                               <div>
                                 <p className="text-sm font-bold text-emerald-900">{lender.name}</p>
@@ -1370,6 +1484,65 @@ export function EligibilityForm() {
                               </div>
                             </div>
                             
+                            {/* Universal Calculation Breakdown */}
+                            <div className="bg-emerald-100/50 rounded-lg p-3 mt-1">
+                              <p className="text-[11px] font-bold text-emerald-800 mb-2 border-b border-emerald-200/50 pb-1 flex items-center justify-between">
+                                Calculation Breakdown
+                                {lender.cibilMinus1MaxFunding > 0 && <span className="text-[9px] bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded uppercase">CIBIL -1 Allowed</span>}
+                              </p>
+                              <div className="grid grid-cols-2 gap-3 text-[10px]">
+                                <div>
+                                  <p className="text-emerald-700/80 font-semibold mb-0.5 uppercase tracking-wider">Bank-Specific Category</p>
+                                  <p className="font-bold text-emerald-900">{lender.employerCategory || lender.employerTier || 'Unknown'}</p>
+                                </div>
+                                <div>
+                                  <p className="text-emerald-700/80 font-semibold mb-0.5 uppercase tracking-wider">Effective NMI (Add-backs)</p>
+                                  <p className="font-bold text-emerald-900">₹{(lender.effectiveNTH || 0).toLocaleString('en-IN')}</p>
+                                </div>
+                                <div>
+                                  <p className="text-emerald-700/80 font-semibold mb-0.5 uppercase tracking-wider">Max FOIR</p>
+                                  <p className="font-bold text-emerald-900">{lender.maxFOIR || `${lender.maxFoir}%`}</p>
+                                </div>
+                                <div>
+                                  <p className="text-emerald-700/80 font-semibold mb-0.5 uppercase tracking-wider">Used EMI / Max EMI</p>
+                                  <p className="font-bold text-emerald-900">
+                                    ₹{(lender.universalUsedEmi || 0).toLocaleString('en-IN')} / ₹{(lender.universalMaxEmi || 0).toLocaleString('en-IN')}
+                                  </p>
+                                </div>
+                                <div>
+                                  <p className="text-emerald-700/80 font-semibold mb-0.5 uppercase tracking-wider">Est. Max New Loan</p>
+                                  <p className="font-black text-blue-700 text-[13px]">
+                                    ₹{(lender.universalMaxLoan || 0).toLocaleString('en-IN')}
+                                  </p>
+                                </div>
+                                <div>
+                                  <p className="text-emerald-700/80 font-semibold mb-0.5 uppercase tracking-wider">Est. New EMI</p>
+                                  <p className="font-bold text-emerald-900">
+                                    ₹{newEmi.toLocaleString('en-IN')} <span className="font-normal text-[9px]">({tenureMonths}m)</span>
+                                  </p>
+                                </div>
+                                {isConsolidating && (
+                                  <div>
+                                    <p className="text-emerald-700/80 font-semibold mb-0.5 uppercase tracking-wider">EMI Savings</p>
+                                    <p className={`font-bold ${emiSavings >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+                                      {emiSavings >= 0 ? '↓' : '↑'} ₹{Math.abs(emiSavings).toLocaleString('en-IN')}
+                                    </p>
+                                  </div>
+                                )}
+                                {(lender.axisCibilRequired || lender.minCibil) ? (
+                                  <div>
+                                    <p className="text-emerald-700/80 font-semibold mb-0.5 uppercase tracking-wider">Required CIBIL</p>
+                                    <p className="font-bold text-emerald-900">{lender.axisCibilRequired || lender.minCibil}</p>
+                                  </div>
+                                ) : (
+                                  <div>
+                                    <p className="text-emerald-700/80 font-semibold mb-0.5 uppercase tracking-wider">Required CIBIL</p>
+                                    <p className="font-bold text-emerald-900">Profile Based</p>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+
                             {lender.id === 'axis' && lender.axisMaxLoan !== undefined && (
                               <div className="bg-white rounded-lg p-3 border border-emerald-100 mt-1 shadow-sm">
                                 <p className="text-[11px] font-bold text-emerald-800 mb-2 border-b border-emerald-50 pb-1">Axis Specific Policy Estimate</p>
@@ -1482,7 +1655,8 @@ export function EligibilityForm() {
                               </div>
                             )}
                           </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     ) : (
                       <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-center">

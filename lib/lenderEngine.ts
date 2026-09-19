@@ -1,742 +1,1446 @@
-import { EMPLOYER_CATEGORIES } from './employers';
+/**
+ * Lender Eligibility Engine
+ * 
+ * Determines which lenders a customer is eligible for based on their
+ * salary, employer, CIBIL score, existing liabilities, and other profile data.
+ * 
+ * Rules are sourced from individual lender policy MD files in /lenders data/.
+ * Each lender's configuration is data-driven and can be updated independently.
+ * 
+ * Banks with their own employer Excel data use bank-specific categories.
+ * Banks without use a generic tier derived from other banks' data.
+ */
 
-// Map employer name to tier
-export function getEmployerTier(employerName: string) {
-  if (!employerName) return 'Unknown';
-  if (EMPLOYER_CATEGORIES["A+"]?.includes(employerName)) return 'A+';
-  if (EMPLOYER_CATEGORIES["A"]?.includes(employerName)) return 'A';
-  if (EMPLOYER_CATEGORIES["B"]?.includes(employerName)) return 'B';
-  if (EMPLOYER_CATEGORIES["C"]?.includes(employerName)) return 'C';
-  return 'Unknown';
+
+
+// ─── Types ──────────────────────────────────────────────────────────────────
+
+interface ObligationRules {
+  ccObligationPercent: number;      // % of CC outstanding treated as obligation
+  goldLoanObligationPercent: number;
+  plNonObligationIfEmisBelow?: number;  // PL is non-obligation if remaining EMIs < this
+  hlNonObligationIfEmisBelow?: number;  // HL is non-obligation if remaining EMIs < this
 }
 
-const LENDERS = [
-  // Group 1: App Loans + Credit Cards + OD + Multiple PL
-  {
-    id: "axisfinance",
-    name: "Axis Finance",
-    type: "NBFC",
-    headlineRate: 12.00,
-    maxTenure: 84,
-    eligibility: {
-      min_salary: 20000,
-      eligible_employer_tiers: ["A+", "A", "B", "C"],
-      unknown_employer_policy: "CONFIRMED"
-    },
-    takeover_policy: {
-      "Personal Loan": "CONFIRMED",
-      "Multiple PLs": "CONFIRMED",
-      "Credit Card": "CONFIRMED",
-      "App Loan": "CONFIRMED",
-      "Overdraft": "NOT_SUPPORTED",
-      "Top Up": "CONFIRMED"
-    },
-    credit_policy: { active_overdue: "POLICY_CHECK", recent_bounce: "POLICY_CHECK" }
-  },
-  {
-    id: "poonawalla",
-    name: "Poonawalla Fincorp",
-    type: "NBFC",
-    headlineRate: 12.00,
-    maxTenure: 84,
-    eligibility: {
-      min_salary: 30000,
-      eligible_employer_tiers: ["A+", "A", "B", "C"],
-      unknown_employer_policy: "CONFIRMED"
-    },
-    takeover_policy: {
-      "Personal Loan": "CONFIRMED",
-      "Multiple PLs": "CONFIRMED",
-      "Credit Card": "CONFIRMED",
-      "App Loan": "CONFIRMED",
-      "Overdraft": "CONFIRMED",
-      "Top Up": "CONFIRMED"
-    },
-    credit_policy: { active_overdue: "POLICY_CHECK", recent_bounce: "POLICY_CHECK" }
-  },
-  {
-    id: "fullerton",
-    name: "Fullerton",
-    type: "NBFC",
-    headlineRate: 13.00,
-    maxTenure: 84,
-    eligibility: {
-      min_salary: 20000,
-      eligible_employer_tiers: ["A+", "A", "B", "C"],
-      unknown_employer_policy: "CONFIRMED"
-    },
-    takeover_policy: {
-      "Personal Loan": "CONFIRMED",
-      "Multiple PLs": "CONFIRMED",
-      "Credit Card": "CONFIRMED",
-      "App Loan": "CONFIRMED",
-      "Overdraft": "CONFIRMED",
-      "Top Up": "CONFIRMED"
-    },
-    credit_policy: { active_overdue: "POLICY_CHECK", recent_bounce: "POLICY_CHECK" }
-  },
+interface IncomeAddBack {
+  rentalPercent: number;       // % of rental income to add
+  monthlyIncentive: boolean;
+  quarterlyIncentive: boolean;
+  halfYearlyIncentive: boolean;
+  monthlyBonus: boolean;
+  quarterlyBonus: boolean;
+  yearlyBonus: boolean;
+  bonusAddBackPercent: number; // % of bonus considered (e.g., 50% for Axis)
+  lta: boolean;
+  variableIncome: boolean;
+  pensionIncome: boolean;
+}
 
-  // Group 2: PL + Credit Card
+interface BTRules {
+  personalLoan: boolean;
+  multiplePLs: boolean;
+  maxPLBTs: number | null;         // null = unlimited
+  creditCard: boolean;
+  maxCCBTs: number | null;
+  appLoan: boolean;
+  maxAppBTs: number | null;
+  overdraft: boolean;
+  odBTRestrictions?: string[];     // Only these banks' ODs can be transferred
+  maxTotalBTs: number | null;      // null = unlimited
+  topUp: boolean;
+  minBTFinancedAmount?: number;    // e.g., Tata Capital requires >₹5L
+  minActiveEMIs?: number;          // e.g., L&T requires >= 6 active EMIs for BT
+  minExposure?: number;            // e.g., L&T requires >= ₹2L exposure
+}
+
+interface LenderConfig {
+  id: string;
+  name: string;
+  type: "Private Bank" | "NBFC";
+  headlineRate: number;
+  maxLoanAmount: number;
+  minLoanAmount: number;
+  maxTenure: number;
+  maxFoir: number;
+  
+  // Employer lookup: if bankId is set, uses bank-specific Excel data
+  employerBankId: string | null;
+  
+  // Min salary (default, may be overridden per segment)
+  minSalary: number;
+  
+  // CIBIL
+  minCibil: number | null;         // null = no specific requirement / scorecard based
+  cibilMinus1Accepted: boolean;
+  cibilMinus1MaxFunding: number;
+  
+  // BT rules
+  bt: BTRules;
+  
+  // Obligation rules  
+  obligations: ObligationRules;
+  
+  // Income add-back
+  incomeAddBack: IncomeAddBack;
+  
+  // Restrictions
+  restrictedProfiles: string[];
+  
+  // Special flags
+  wfhAccepted: boolean;
+  ownHouseRequired: boolean;
+  metroOnly: boolean;
+  geoLimitKm: number | null;
+  digitalProcess: boolean;
+  minAge: number;
+  maxAgeAtMaturity: number;
+  minExperienceMonths: number;
+  
+  // Location restriction warning
+  locationWarning: string | null;
+}
+
+// ─── Default values ─────────────────────────────────────────────────────────
+
+const DEFAULT_INCOME_ADD_BACK: IncomeAddBack = {
+  rentalPercent: 0,
+  monthlyIncentive: false,
+  quarterlyIncentive: false,
+  halfYearlyIncentive: false,
+  monthlyBonus: false,
+  quarterlyBonus: false,
+  yearlyBonus: false,
+  bonusAddBackPercent: 0,
+  lta: false,
+  variableIncome: false,
+  pensionIncome: false,
+};
+
+const DEFAULT_OBLIGATIONS: ObligationRules = {
+  ccObligationPercent: 5,
+  goldLoanObligationPercent: 1,
+};
+
+// ─── Lender Configurations (from MD files) ──────────────────────────────────
+
+const LENDERS: LenderConfig[] = [
+  // ═══════════════════════════════════════════════════════════════════════════
+  // AXIS BANK — Source: axis bank.md
+  // ═══════════════════════════════════════════════════════════════════════════
   {
     id: "axis",
     name: "Axis Bank",
     type: "Private Bank",
     headlineRate: 9.99,
+    maxLoanAmount: 4000000,
+    minLoanAmount: 100000,
     maxTenure: 84,
-    eligibility: {
-      min_salary: 25000,
-      eligible_employer_tiers: ["A+", "A", "B"],
-      unknown_employer_policy: "POLICY_CHECK"
+    maxFoir: 70,
+    employerBankId: "axisBank",
+    minSalary: 35000,  // CSG minimum; varies by segment
+    minCibil: 700,     // Minimum across all segments
+    cibilMinus1Accepted: false,
+    cibilMinus1MaxFunding: 0,
+    bt: {
+      personalLoan: true,
+      multiplePLs: true,
+      maxPLBTs: null,        // "N number of BTs can do"
+      creditCard: true,      // CC BT allowed
+      maxCCBTs: null,
+      appLoan: false,        // Not mentioned as eligible
+      maxAppBTs: 0,
+      overdraft: false,      // "Flexi OD BT cases not eligible"
+      maxTotalBTs: null,
+      topUp: true,
     },
-    takeover_policy: {
-      "Personal Loan": "CONFIRMED",
-      "Multiple PLs": "CONFIRMED",
-      "Credit Card": "CONFIRMED",
-      "App Loan": "NOT_SUPPORTED",
-      "Overdraft": "NOT_SUPPORTED",
-      "Top Up": "CONFIRMED"
+    obligations: {
+      ccObligationPercent: 4,     // 4% of CC O/S
+      goldLoanObligationPercent: 0, // Nil obligation for Gold Loan
+      plNonObligationIfEmisBelow: 6,  // PL <6 EMI remaining = non-obligation
+      hlNonObligationIfEmisBelow: 12, // HL <12 EMI remaining = non-obligation
     },
-    credit_policy: { active_overdue: "NOT_SUPPORTED", recent_bounce: "POLICY_CHECK" }
+    incomeAddBack: {
+      ...DEFAULT_INCOME_ADD_BACK,
+      quarterlyBonus: true,
+      halfYearlyIncentive: true,
+      yearlyBonus: true,
+      bonusAddBackPercent: 50,
+    },
+    restrictedProfiles: [
+      "Government School Teacher", "Class IV Employee",
+      "Local Municipality Staff", "Defence & Army",
+      "State Government Employee",
+    ],
+    wfhAccepted: false,
+    ownHouseRequired: false,
+    metroOnly: false,
+    geoLimitKm: null,
+    digitalProcess: false,
+    minAge: 21,
+    maxAgeAtMaturity: 60,
+    minExperienceMonths: 0,
+    locationWarning: null,
   },
-  {
-    id: "chola",
-    name: "Chola",
-    type: "NBFC",
-    headlineRate: 10.99,
-    maxTenure: 84,
-    eligibility: {
-      min_salary: 15000,
-      eligible_employer_tiers: ["A+", "A", "B", "C"],
-      unknown_employer_policy: "CONFIRMED"
-    },
-    takeover_policy: {
-      "Personal Loan": "CONFIRMED",
-      "Multiple PLs": "CONFIRMED",
-      "Credit Card": "CONFIRMED",
-      "App Loan": "NOT_SUPPORTED",
-      "Overdraft": "NOT_SUPPORTED",
-      "Top Up": "CONFIRMED"
-    },
-    credit_policy: { active_overdue: "POLICY_CHECK", recent_bounce: "POLICY_CHECK" }
-  },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // ADITYA BIRLA CAPITAL — Source: aditya birla.md
+  // ═══════════════════════════════════════════════════════════════════════════
   {
     id: "abfl",
     name: "Aditya Birla Finance",
     type: "NBFC",
     headlineRate: 10.99,
+    maxLoanAmount: 6500000,  // Up to ₹65L for Cat-A
+    minLoanAmount: 100000,
     maxTenure: 84,
-    eligibility: {
-      min_salary: 20000,
-      eligible_employer_tiers: ["A+", "A", "B", "C"],
-      unknown_employer_policy: "CONFIRMED"
+    maxFoir: 75,
+    employerBankId: null,    // No specific Excel data
+    minSalary: 20000,        // Tier 4 minimum
+    minCibil: null,          // Scorecard based
+    cibilMinus1Accepted: false,
+    cibilMinus1MaxFunding: 0,
+    bt: {
+      personalLoan: true,
+      multiplePLs: true,
+      maxPLBTs: 6,           // Max 6 BTs (PL + CC combined)
+      creditCard: true,
+      maxCCBTs: 5,           // Max 5 CC-only BTs
+      appLoan: false,        // Not clearly quantified
+      maxAppBTs: 0,
+      overdraft: true,       // OD BT, OD-to-OD BT available
+      maxTotalBTs: 6,        // Max 6 total
+      topUp: true,
     },
-    takeover_policy: {
-      "Personal Loan": "CONFIRMED",
-      "Multiple PLs": "CONFIRMED",
-      "Credit Card": "CONFIRMED",
-      "App Loan": "POLICY_CHECK",
-      "Overdraft": "CONFIRMED",
-      "Top Up": "CONFIRMED"
+    obligations: {
+      ...DEFAULT_OBLIGATIONS,
+      ccObligationPercent: 5,
+      goldLoanObligationPercent: 0,
     },
-    credit_policy: { active_overdue: "POLICY_CHECK", recent_bounce: "POLICY_CHECK" }
+    incomeAddBack: {
+      rentalPercent: 50,
+      monthlyIncentive: true,
+      quarterlyIncentive: true,
+      halfYearlyIncentive: true,
+      monthlyBonus: true,
+      quarterlyBonus: true,
+      yearlyBonus: true,
+      bonusAddBackPercent: 100,
+      lta: true,
+      variableIncome: true,
+      pensionIncome: false,
+    },
+    restrictedProfiles: [],
+    wfhAccepted: false,
+    ownHouseRequired: false,
+    metroOnly: false,
+    geoLimitKm: null,
+    digitalProcess: true,
+    minAge: 21,
+    maxAgeAtMaturity: 60,
+    minExperienceMonths: 0,
+    locationWarning: null,
   },
-  {
-    id: "piramal",
-    name: "Piramal Finance",
-    type: "NBFC",
-    headlineRate: 11.99,
-    maxTenure: 72,
-    eligibility: {
-      min_salary: 25000,
-      eligible_employer_tiers: ["A+", "A", "B", "C", "Govt"],
-      unknown_employer_policy: "CONFIRMED"
-    },
-    takeover_policy: {
-      "Personal Loan": "CONFIRMED",
-      "Multiple PLs": "CONFIRMED",
-      "Credit Card": "NOT_SUPPORTED",
-      "App Loan": "POLICY_CHECK",
-      "Overdraft": "NOT_SUPPORTED",
-      "Top Up": "CONFIRMED"
-    },
-    credit_policy: { active_overdue: "POLICY_CHECK", recent_bounce: "POLICY_CHECK" }
-  },
-  {
-    id: "kotak",
-    name: "Kotak Bank",
-    type: "Private Bank",
-    headlineRate: 11.75,
-    maxTenure: 84,
-    eligibility: {
-      min_salary: 150000,
-      eligible_employer_tiers: ["A+", "A", "B"],
-      unknown_employer_policy: "POLICY_CHECK"
-    },
-    takeover_policy: {
-      "Personal Loan": "CONFIRMED",
-      "Multiple PLs": "CONFIRMED",
-      "Credit Card": "NOT_SUPPORTED",
-      "App Loan": "NOT_SUPPORTED",
-      "Overdraft": "CONFIRMED",
-      "Top Up": "CONFIRMED"
-    },
-    credit_policy: { active_overdue: "POLICY_CHECK", recent_bounce: "POLICY_CHECK" }
-  },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // L&T FINANCE — Source: L&T.md, l&t finance.md
+  // ═══════════════════════════════════════════════════════════════════════════
   {
     id: "ltfinance",
     name: "L&T Finance",
     type: "NBFC",
     headlineRate: 10.99,
-    maxTenure: 84,
-    eligibility: {
-      min_salary: 175000,
-      eligible_employer_tiers: ["A+", "A", "B", "C"],
-      unknown_employer_policy: "CONFIRMED"
+    maxLoanAmount: 2000000,  // Up to ₹20L for highlighted offer
+    minLoanAmount: 100000,
+    maxTenure: 72,
+    maxFoir: 75,
+    employerBankId: "ltFinance",
+    minSalary: 175000,       // ₹1.75L+ for highlighted offer
+    minCibil: 775,           // 775 for highlighted offer
+    cibilMinus1Accepted: true,
+    cibilMinus1MaxFunding: 1000000, // Up to ₹10L
+    bt: {
+      personalLoan: true,
+      multiplePLs: true,
+      maxPLBTs: null,        // "Unlimited BT as per eligibility"
+      creditCard: true,
+      maxCCBTs: null,
+      appLoan: true,
+      maxAppBTs: 16,         // Up to 16 app loans
+      overdraft: true,
+      maxTotalBTs: null,     // Unlimited
+      topUp: true,
+      minActiveEMIs: 6,     // At least 6 EMIs must be active
+      minExposure: 200000,   // Current exposure ≥ ₹2L
     },
-    takeover_policy: {
-      "Personal Loan": "CONFIRMED",
-      "Multiple PLs": "CONFIRMED",
-      "Credit Card": "NOT_SUPPORTED",
-      "App Loan": "CONFIRMED",
-      "Overdraft": "CONFIRMED",
-      "Top Up": "CONFIRMED"
+    obligations: {
+      ...DEFAULT_OBLIGATIONS,
+      goldLoanObligationPercent: 0,
     },
-    credit_policy: { active_overdue: "POLICY_CHECK", recent_bounce: "POLICY_CHECK" }
+    incomeAddBack: {
+      rentalPercent: 100,
+      monthlyIncentive: true,
+      quarterlyIncentive: true,
+      halfYearlyIncentive: false,
+      monthlyBonus: true,
+      quarterlyBonus: true,
+      yearlyBonus: true,
+      bonusAddBackPercent: 100,
+      lta: false,
+      variableIncome: false,
+      pensionIncome: true,
+    },
+    restrictedProfiles: [],
+    wfhAccepted: true,
+    ownHouseRequired: true,  // "Owned residential property mandatory"
+    metroOnly: true,         // "Metro Cities"
+    geoLimitKm: null,
+    digitalProcess: true,
+    minAge: 21,
+    maxAgeAtMaturity: 60,
+    minExperienceMonths: 0,
+    locationWarning: null,
   },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // KOTAK MAHINDRA BANK (OD Product) — Source: kotak bank.md
+  // ═══════════════════════════════════════════════════════════════════════════
   {
-    id: "icici",
-    name: "ICICI Bank",
+    id: "kotak",
+    name: "Kotak Mahindra Bank",
     type: "Private Bank",
-    headlineRate: 9.99,
+    headlineRate: 11.75,
+    maxLoanAmount: 10000000,  // Up to ₹1Cr PL shown in poster
+    minLoanAmount: 100000,
     maxTenure: 84,
-    eligibility: {
-      min_salary: 25000,
-      eligible_employer_tiers: ["A+", "A", "B", "C"],
-      unknown_employer_policy: "POLICY_CHECK"
+    maxFoir: 70,
+    employerBankId: "kotak",
+    minSalary: 150000,        // Segment 1: ₹1.5L (excl variable)
+    minCibil: null,           // Segment/policy based
+    cibilMinus1Accepted: false,
+    cibilMinus1MaxFunding: 0,
+    bt: {
+      personalLoan: true,
+      multiplePLs: true,
+      maxPLBTs: null,
+      creditCard: false,      // Not mentioned
+      maxCCBTs: 0,
+      appLoan: false,
+      maxAppBTs: 0,
+      overdraft: true,
+      maxTotalBTs: null,
+      topUp: true,
     },
-    takeover_policy: {
-      "Personal Loan": "CONFIRMED",
-      "Multiple PLs": "CONFIRMED",
-      "Credit Card": "POLICY_CHECK",
-      "App Loan": "NOT_SUPPORTED",
-      "Overdraft": "NOT_SUPPORTED",
-      "Top Up": "CONFIRMED"
+    obligations: DEFAULT_OBLIGATIONS,
+    incomeAddBack: {
+      ...DEFAULT_INCOME_ADD_BACK,
+      // Variable income excluded per policy
     },
-    credit_policy: { active_overdue: "POLICY_CHECK", recent_bounce: "POLICY_CHECK" }
+    restrictedProfiles: [],
+    wfhAccepted: false,
+    ownHouseRequired: false,
+    metroOnly: false,
+    geoLimitKm: null,
+    digitalProcess: false,
+    minAge: 21,
+    maxAgeAtMaturity: 60,
+    minExperienceMonths: 0,
+    locationWarning: null,
   },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // CHOLA — Source: chola.md (Delhi NCR specific)
+  // ═══════════════════════════════════════════════════════════════════════════
   {
-    id: "tatacapital",
-    name: "Tata Capital",
+    id: "chola",
+    name: "Chola",
     type: "NBFC",
-    headlineRate: 10.99,
+    headlineRate: 13.50,
+    maxLoanAmount: 3000000,
+    minLoanAmount: 100000,
     maxTenure: 84,
-    eligibility: {
-      min_salary: 20000,
-      eligible_employer_tiers: ["A+", "A", "B", "C", "Govt"],
-      unknown_employer_policy: "POLICY_CHECK"
+    maxFoir: 70,               // Base; up to 60% income add-back
+    employerBankId: null,      // No specific Excel data
+    minSalary: 15000,
+    minCibil: 700,             // 700 for Delhi location
+    cibilMinus1Accepted: true,
+    cibilMinus1MaxFunding: 2000000, // Govt: ₹20L, Cat A/B: ₹10L
+    bt: {
+      personalLoan: true,
+      multiplePLs: true,
+      maxPLBTs: 6,              // 6 tracks across PL/OD/DOD/CC
+      creditCard: true,
+      maxCCBTs: 6,              // CC OS up to 8× allowed for BT
+      appLoan: false,
+      maxAppBTs: 0,
+      overdraft: false,
+      maxTotalBTs: 6,           // 6 tracks total
+      topUp: true,
     },
-    takeover_policy: {
-      "Personal Loan": "CONFIRMED",
-      "Multiple PLs": "CONFIRMED",
-      "Credit Card": "CONFIRMED",
-      "App Loan": "CONFIRMED",
-      "Overdraft": "NOT_SUPPORTED",
-      "Top Up": "CONFIRMED"
+    obligations: {
+      ccObligationPercent: 5,
+      goldLoanObligationPercent: 0,  // Zero GL/KCC obligation
     },
-    credit_policy: { active_overdue: "POLICY_CHECK", recent_bounce: "POLICY_CHECK" }
+    incomeAddBack: {
+      rentalPercent: 100,       // Rental income considered (up to 60% total add-back)
+      monthlyIncentive: true,
+      quarterlyIncentive: true,
+      halfYearlyIncentive: false,
+      monthlyBonus: false,
+      quarterlyBonus: false,
+      yearlyBonus: false,
+      bonusAddBackPercent: 0,
+      lta: false,
+      variableIncome: false,
+      pensionIncome: false,
+    },
+    restrictedProfiles: [
+      "Manpower", "Law", "Collection", "Court", "Police", "Belt Job",
+    ],
+    wfhAccepted: true,   // WFH docs not required per policy update
+    ownHouseRequired: false,  // Required only for ₹30L cases
+    metroOnly: false,
+    geoLimitKm: null,
+    digitalProcess: false,
+    minAge: 21,
+    maxAgeAtMaturity: 58,
+    minExperienceMonths: 0,
+    locationWarning: "⚠️ Chola policy data is specifically for Delhi NCR. Eligibility in other locations may differ.",
   },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // INDUSIND BANK — Source: indusind.md
+  // ═══════════════════════════════════════════════════════════════════════════
   {
     id: "indusind",
     name: "IndusInd Bank",
     type: "Private Bank",
     headlineRate: 10.49,
-    maxTenure: 84, 
-    eligibility: {
-      min_salary: 25000,
-      eligible_employer_tiers: ["A+", "A", "B", "C", "Govt"],
-      unknown_employer_policy: "POLICY_CHECK"
+    maxLoanAmount: 5000000,    // Up to ₹50L
+    minLoanAmount: 100000,
+    maxTenure: 84,
+    maxFoir: 75,
+    employerBankId: "indusind",
+    minSalary: 25000,           // ₹25K for metro / Cat A/B/Govt
+    minCibil: null,             // Flexible / -1 cases mentioned
+    cibilMinus1Accepted: true,
+    cibilMinus1MaxFunding: 0,
+    bt: {
+      personalLoan: true,
+      multiplePLs: true,
+      maxPLBTs: 5,              // Max 5 PL BTs
+      creditCard: false,        // Policy dependent
+      maxCCBTs: 0,
+      appLoan: true,            // App loans & fintech loans accepted
+      maxAppBTs: null,
+      overdraft: true,
+      odBTRestrictions: ["Bajaj", "Tata Capital", "Kotak"],
+      maxTotalBTs: 5,
+      topUp: true,
     },
-    takeover_policy: {
-      "Personal Loan": "CONFIRMED",
-      "Multiple PLs": "CONFIRMED",
-      "Credit Card": "POLICY_CHECK",
-      "App Loan": "CONFIRMED",
-      "Overdraft": "POLICY_CHECK",
-      "Top Up": "CONFIRMED"
+    obligations: DEFAULT_OBLIGATIONS,
+    incomeAddBack: {
+      ...DEFAULT_INCOME_ADD_BACK,
+      variableIncome: true,     // Variable allowance considered (lowest 3-month avg)
     },
-    credit_policy: { active_overdue: "POLICY_CHECK", recent_bounce: "POLICY_CHECK" }
-  }
+    restrictedProfiles: [],
+    wfhAccepted: false,
+    ownHouseRequired: false,
+    metroOnly: false,
+    geoLimitKm: null,
+    digitalProcess: false,
+    minAge: 21,
+    maxAgeAtMaturity: 60,
+    minExperienceMonths: 0,
+    locationWarning: null,
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // PIRAMAL FINANCE — Source: priamal finance.md
+  // ═══════════════════════════════════════════════════════════════════════════
+  {
+    id: "piramal",
+    name: "Piramal Finance",
+    type: "NBFC",
+    headlineRate: 11.99,
+    maxLoanAmount: 3000000,    // ₹30L standard; ₹50L for Elite/Cat-A
+    minLoanAmount: 100000,
+    maxTenure: 72,
+    maxFoir: 75,
+    employerBankId: null,      // No specific Excel data
+    minSalary: 25000,
+    minCibil: 750,             // 750+ standard; -1/0 may be accepted
+    cibilMinus1Accepted: true,
+    cibilMinus1MaxFunding: 0,  // Subject to policy
+    bt: {
+      personalLoan: true,
+      multiplePLs: true,
+      maxPLBTs: 3,             // Max 3 PL BTs
+      creditCard: true,
+      maxCCBTs: 6,
+      appLoan: true,
+      maxAppBTs: 3,
+      overdraft: false,
+      maxTotalBTs: 8,          // Up to 8 total in debt consolidation poster
+      topUp: true,
+    },
+    obligations: {
+      ccObligationPercent: 5,
+      goldLoanObligationPercent: 0,   // Gold loan not obligated
+    },
+    incomeAddBack: DEFAULT_INCOME_ADD_BACK,
+    restrictedProfiles: [],
+    wfhAccepted: true,
+    ownHouseRequired: false,   // "No own house mandatory"
+    metroOnly: false,
+    geoLimitKm: null,
+    digitalProcess: true,
+    minAge: 21,
+    maxAgeAtMaturity: 60,
+    minExperienceMonths: 6,    // Min 6 months total experience
+    locationWarning: null,
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // POONAWALLA FINCORP — Source: bank_comparison_credit_expert_india.md §9
+  // ═══════════════════════════════════════════════════════════════════════════
+  {
+    id: "poonawalla",
+    name: "Poonawalla Fincorp",
+    type: "NBFC",
+    headlineRate: 11.99,
+    maxLoanAmount: 6000000,    // Up to ₹60L
+    minLoanAmount: 100000,
+    maxTenure: 84,             // PL 84M; OD up to 96M
+    maxFoir: 80,
+    employerBankId: null,      // No specific Excel data
+    minSalary: 30000,
+    minCibil: 700,
+    cibilMinus1Accepted: false,
+    cibilMinus1MaxFunding: 0,
+    bt: {
+      personalLoan: true,
+      multiplePLs: true,
+      maxPLBTs: 5,             // Max 5 PL/OD BTs
+      creditCard: true,
+      maxCCBTs: 6,             // Max 6 CC BTs
+      appLoan: true,
+      maxAppBTs: 3,            // Max 3 app loan BTs
+      overdraft: true,
+      maxTotalBTs: 8,          // Max 8 total
+      topUp: true,
+    },
+    obligations: DEFAULT_OBLIGATIONS,
+    incomeAddBack: DEFAULT_INCOME_ADD_BACK,
+    restrictedProfiles: [],
+    wfhAccepted: false,
+    ownHouseRequired: false,   // "No own-house requirement"
+    metroOnly: false,          // PAN India
+    geoLimitKm: 80,            // 80km from municipal offices
+    digitalProcess: true,
+    minAge: 21,
+    maxAgeAtMaturity: 60,
+    minExperienceMonths: 0,
+    locationWarning: "Applicant must be within 80 km of a municipal office.",
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // TATA CAPITAL — Source: tata capital.md
+  // ═══════════════════════════════════════════════════════════════════════════
+  {
+    id: "tatacapital",
+    name: "Tata Capital",
+    type: "NBFC",
+    headlineRate: 10.99,
+    maxLoanAmount: 5000000,
+    minLoanAmount: 100000,
+    maxTenure: 84,
+    maxFoir: 70,
+    employerBankId: "tataCapital",
+    minSalary: 20000,          // Will be updated when full policy is available
+    minCibil: null,            // Will be updated when full policy is available
+    cibilMinus1Accepted: false,
+    cibilMinus1MaxFunding: 0,
+    bt: {
+      personalLoan: true,
+      multiplePLs: true,
+      maxPLBTs: null,
+      creditCard: true,
+      maxCCBTs: null,
+      appLoan: true,           // "Subject to eligibility"
+      maxAppBTs: null,
+      overdraft: false,
+      maxTotalBTs: null,
+      topUp: true,
+      minBTFinancedAmount: 500000, // BT loan amount must be > ₹5L
+    },
+    obligations: DEFAULT_OBLIGATIONS,
+    incomeAddBack: DEFAULT_INCOME_ADD_BACK,
+    restrictedProfiles: [],
+    wfhAccepted: false,
+    ownHouseRequired: false,
+    metroOnly: false,
+    geoLimitKm: null,
+    digitalProcess: false,
+    minAge: 21,
+    maxAgeAtMaturity: 60,
+    minExperienceMonths: 0,
+    locationWarning: null,
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // AXIS FINANCE — Source: bank_comparison data (separate from Axis Bank)
+  // ═══════════════════════════════════════════════════════════════════════════
+  {
+    id: "axisfinance",
+    name: "Axis Finance",
+    type: "NBFC",
+    headlineRate: 12.00,
+    maxLoanAmount: 5000000,
+    minLoanAmount: 100000,
+    maxTenure: 84,
+    maxFoir: 70,
+    employerBankId: "axisFinance",
+    minSalary: 20000,
+    minCibil: null,
+    cibilMinus1Accepted: false,
+    cibilMinus1MaxFunding: 0,
+    bt: {
+      personalLoan: true,
+      multiplePLs: true,
+      maxPLBTs: null,
+      creditCard: true,
+      maxCCBTs: null,
+      appLoan: true,
+      maxAppBTs: null,
+      overdraft: false,
+      maxTotalBTs: null,
+      topUp: true,
+    },
+    obligations: DEFAULT_OBLIGATIONS,
+    incomeAddBack: DEFAULT_INCOME_ADD_BACK,
+    restrictedProfiles: [],
+    wfhAccepted: false,
+    ownHouseRequired: false,
+    metroOnly: false,
+    geoLimitKm: null,
+    digitalProcess: false,
+    minAge: 21,
+    maxAgeAtMaturity: 60,
+    minExperienceMonths: 0,
+    locationWarning: null,
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // SMFG INDIA CREDIT COMPANY (formerly Fullerton) — Source: smfg.md
+  // ═══════════════════════════════════════════════════════════════════════════
+  {
+    id: "smfg",
+    name: "SMFG India Credit (Fullerton)",
+    type: "NBFC",
+    headlineRate: 14.99,
+    maxLoanAmount: 3000000,
+    minLoanAmount: 100000,
+    maxTenure: 60,
+    maxFoir: 70, // Dynamic based on salary
+    employerBankId: null,
+    minSalary: 25001,
+    minCibil: null,
+    cibilMinus1Accepted: true,
+    cibilMinus1MaxFunding: 3000000,
+    bt: {
+      personalLoan: true,
+      multiplePLs: true,
+      maxPLBTs: null,
+      creditCard: true,
+      maxCCBTs: 2,
+      appLoan: false,
+      maxAppBTs: 0,
+      overdraft: true,
+      maxTotalBTs: null,
+      topUp: true,
+    },
+    obligations: DEFAULT_OBLIGATIONS,
+    incomeAddBack: {
+      ...DEFAULT_INCOME_ADD_BACK,
+      monthlyIncentive: true,
+      quarterlyIncentive: true,
+      halfYearlyIncentive: true,
+      pensionIncome: true,
+    },
+    restrictedProfiles: [],
+    wfhAccepted: false,
+    ownHouseRequired: false,
+    metroOnly: false,
+    geoLimitKm: null,
+    digitalProcess: false,
+    minAge: 21,
+    maxAgeAtMaturity: 60,
+    minExperienceMonths: 0,
+    locationWarning: null,
+  },
 ];
 
-export function analyzeLenderEligibility({ profile, catBLoans, allLoans = [] }: { profile: any, catBLoans: any[], allLoans?: any[] }) {
-  const { 
-    netSalary, employer, employerTier: manualTier, hasBounce, hasLatePayment, hasActiveOverdue, wantsTopUp,
-    rentalIncome, monthlyIncentive, quarterlyIncentive, halfYearlyIncentive, monthlyBonus, quarterlyBonus, yearlyBonus, lta,
-    wfhStatus, hasEPFO, hasOMID, hasHRMS, has26AS, location, coApplicant, age, cibilMinus1, jobProfile,
-    cibilScore, axisCustomerSegment, casaVintage, residenceType, cityTier
-  } = profile || {};
-  
-  const employerTier = manualTier || getEmployerTier(employer);
 
-  // Characterize the liabilities
-  const plCount = catBLoans.filter((l: any) => l.type === 'Personal Loan').length;
-  const hasCC = catBLoans.some((l: any) => l.type === 'Credit Card');
-  const appLoans = catBLoans.filter((l: any) => l.type === 'App Loan');
-  const hasApp = appLoans.length > 0;
-  const hasOD = catBLoans.some((l: any) => l.type === 'Overdraft');
 
-  const requiresMultiPL = plCount > 1;
-  const requiresCC = hasCC;
-  const requiresApp = hasApp;
-  const requiresOD = hasOD;
-  
-  const eligibleLenders = [];
-  const ineligibleLenders = [];
+// ─── Obligation Calculator ──────────────────────────────────────────────────
+
+/**
+ * Calculate the effective EMI obligation for a loan based on lender-specific rules.
+ */
+function calculateObligation(
+  loan: any,
+  lender: LenderConfig
+): number {
+  const type = loan.type || "";
+  const emi = Number(loan.emi || 0);
+  const outstanding = Number(loan.currentOutstanding || 0);
+  const remainingEmis = Number(loan.emisRemaining || loan.tenure || 0);
+
+  // Credit Card: use bank-specific CC obligation %
+  if (type === "Credit Card") {
+    return outstanding * (lender.obligations.ccObligationPercent / 100);
+  }
+
+  // Gold Loan: use bank-specific GL obligation %
+  if (type === "Gold Loan") {
+    return outstanding * (lender.obligations.goldLoanObligationPercent / 100);
+  }
+
+  // PL non-obligation rule (Axis: PL <6 EMI remaining = 0)
+  if (type === "Personal Loan" && lender.obligations.plNonObligationIfEmisBelow) {
+    if (remainingEmis > 0 && remainingEmis < lender.obligations.plNonObligationIfEmisBelow) {
+      return 0;
+    }
+  }
+
+  // HL non-obligation rule (Axis: HL <12 EMI remaining = 0)
+  if (type === "Home Loan" && lender.obligations.hlNonObligationIfEmisBelow) {
+    if (remainingEmis > 0 && remainingEmis < lender.obligations.hlNonObligationIfEmisBelow) {
+      return 0;
+    }
+  }
+
+  return emi;
+}
+
+// ─── Income Calculator ──────────────────────────────────────────────────────
+
+/**
+ * Calculate effective NTH (Net Take-Home) for a lender including add-backs.
+ */
+function calculateEffectiveNTH(
+  lender: LenderConfig,
+  profile: any
+): number {
+  let nth = Number(profile.netSalary) || 0;
+  const addBack = lender.incomeAddBack;
+
+  if (addBack.rentalPercent > 0 && profile.rentalIncome) {
+    nth += Number(profile.rentalIncome) * (addBack.rentalPercent / 100);
+  }
+
+  if (addBack.monthlyIncentive && profile.monthlyIncentive) {
+    nth += Number(profile.monthlyIncentive);
+  }
+  if (addBack.quarterlyIncentive && profile.quarterlyIncentive) {
+    nth += Number(profile.quarterlyIncentive) / 3;
+  }
+  if (addBack.halfYearlyIncentive && profile.halfYearlyIncentive) {
+    nth += Number(profile.halfYearlyIncentive) / 6;
+  }
+
+  const bonusMultiplier = addBack.bonusAddBackPercent / 100;
+  if (addBack.monthlyBonus && profile.monthlyBonus) {
+    nth += Number(profile.monthlyBonus) * bonusMultiplier;
+  }
+  if (addBack.quarterlyBonus && profile.quarterlyBonus) {
+    nth += (Number(profile.quarterlyBonus) / 3) * bonusMultiplier;
+  }
+  if (addBack.yearlyBonus && profile.yearlyBonus) {
+    nth += (Number(profile.yearlyBonus) / 12) * bonusMultiplier;
+  }
+
+  if (addBack.lta && profile.lta) {
+    nth += Number(profile.lta) / 12;
+  }
+
+  if (addBack.variableIncome && profile.variableIncome) {
+    nth += Number(profile.variableIncome);
+  }
+
+  if (addBack.pensionIncome && profile.pensionIncome) {
+    nth += Number(profile.pensionIncome);
+  }
+
+  return nth;
+}
+
+// ─── Eligibility Engine ─────────────────────────────────────────────────────
+
+export function analyzeLenderEligibility({
+  profile,
+  catBLoans,
+  allLoans = [],
+}: {
+  profile: any;
+  catBLoans: any[];
+  allLoans?: any[];
+}) {
+  const companyName = profile.employer || "";
+  const cibilScore = Number(profile.cibilScore) || 0;
+  const age = Number(profile.age) || 0;
+
+  const eligibleLenders: any[] = [];
+  const ineligibleLenders: any[] = [];
+
+  // Pre-count loan types in catBLoans
+  const plCount = catBLoans.filter((l: any) => l.type === "Personal Loan").length;
+  const ccCount = catBLoans.filter((l: any) => l.type === "Credit Card").length;
+  const appLoans = catBLoans.filter((l: any) => l.type === "App Loan");
+  const appCount = appLoans.length;
+  const odLoans = catBLoans.filter((l: any) => l.type === "Overdraft");
+  const odCount = odLoans.length;
+  const totalBTCount = catBLoans.length;
 
   for (const lender of LENDERS) {
-    const eligibility = lender.eligibility;
-    const takeover = lender.takeover_policy;
-    const creditPolicy = lender.credit_policy;
-
     let isEligible = true;
-    let matchScore = 100; // Base score out of 100
-    const rejectionReasons = [];
+    let matchScore = 100;
+    const rejectionReasons: string[] = [];
+    const warnings: string[] = [];
     const customOutput: any = {};
-    
-    // Bank specific NTH calculation
-    let nth = Number(netSalary) || 0;
-    if (lender.id === 'abfl') {
-      nth += (Number(rentalIncome) || 0) * 0.5;
-      nth += (Number(monthlyIncentive) || 0) + (Number(quarterlyIncentive) || 0)/3 + (Number(halfYearlyIncentive) || 0)/6;
-      nth += (Number(monthlyBonus) || 0) + (Number(quarterlyBonus) || 0)/3 + (Number(yearlyBonus) || 0)/12;
-      nth += (Number(lta) || 0)/12;
+
+    // ─── Get employer tier for this specific lender ─────────────────────
+    const employerTier = profile.employerTier || "Unknown";
+    customOutput.employerTier = employerTier;
+    customOutput.employerCategory = employerTier;
+
+    // ─── Calculate effective NTH ────────────────────────────────────────
+    const nth = calculateEffectiveNTH(lender, profile);
+    customOutput.effectiveNTH = Math.floor(nth);
+
+    // ─── Location warning ──────────────────────────────────────────────
+    if (lender.locationWarning) {
+      warnings.push(lender.locationWarning);
     }
 
-    // 1. Hard knockouts
-    if (nth < eligibility.min_salary) {
+    // ═════════════════════════════════════════════════════════════════════
+    // HARD KNOCKOUT CHECKS
+    // ═════════════════════════════════════════════════════════════════════
+
+    // 1. Minimum salary
+    if (nth < lender.minSalary) {
       isEligible = false;
-      rejectionReasons.push(`Requires minimum salary of ₹${eligibility.min_salary}`);
-    }
-    
-    // Bank specific profile restrictions
-    if (lender.id === 'chola') {
-      const restrictedProfiles = ['Manpower', 'Law', 'Collection', 'Police', 'Court', 'Belt Job'];
-      if (restrictedProfiles.includes(jobProfile)) {
-        isEligible = false;
-        rejectionReasons.push(`Profile ${jobProfile} is restricted`);
-      }
-      if (location === 'Delhi NCR' && (profile.cibilScore && profile.cibilScore < 700)) {
-        isEligible = false;
-        rejectionReasons.push(`Delhi NCR requires minimum CIBIL of 700`);
-      }
+      rejectionReasons.push(`Requires minimum salary of ₹${lender.minSalary.toLocaleString("en-IN")}`);
     }
 
-    // Credit Policy Check
-    if (hasActiveOverdue === 'yes') {
-      if (creditPolicy.active_overdue === 'NOT_SUPPORTED' || creditPolicy.active_overdue === 'POLICY_CHECK') {
-        isEligible = false;
-        rejectionReasons.push(`Does not accept active overdue accounts`);
-      }
-    }
-    
-    if (hasBounce === 'yes' || hasLatePayment === 'yes') {
-      if (creditPolicy.recent_bounce === 'NOT_SUPPORTED' || creditPolicy.recent_bounce === 'POLICY_CHECK') {
-        isEligible = false;
-        rejectionReasons.push(`Does not accept recent EMI bounces`);
-      }
+    // 2. Employer rejection
+    if (employerTier === "REJECTED") {
+      isEligible = false;
+      rejectionReasons.push("Company is categorized as delisted/rejected by this lender");
     }
 
-    // Employer Policy
-    if (!eligibility.eligible_employer_tiers.includes(employerTier)) {
-       if (eligibility.unknown_employer_policy === 'NOT_SUPPORTED' || eligibility.unknown_employer_policy === 'POLICY_CHECK') {
-           isEligible = false;
-           rejectionReasons.push(`Does not support your employer category (${employerTier})`);
-       } else {
-           matchScore -= 10;
-       }
-    } else {
-       if (employerTier === 'A+' || employerTier === 'A') matchScore += 5;
-    }
-
-    // Takeover Policy Compatibility
-    const liabilityFit = 25;
-    if (plCount === 1 && !requiresMultiPL && !requiresCC && !requiresApp && !requiresOD) {
-      if (takeover["Personal Loan"] === 'NOT_SUPPORTED' || takeover["Personal Loan"] === 'POLICY_CHECK') {
-        isEligible = false;
-        rejectionReasons.push(`Does not take over single Personal Loans`);
-      }
-    }
-    if (requiresMultiPL) {
-      if (takeover["Multiple PLs"] === 'NOT_SUPPORTED' || takeover["Multiple PLs"] === 'POLICY_CHECK') {
-        isEligible = false;
-        rejectionReasons.push(`Does not consolidate multiple Personal Loans`);
-      }
-    }
-    if (requiresCC) {
-      if (takeover["Credit Card"] === 'NOT_SUPPORTED' || takeover["Credit Card"] === 'POLICY_CHECK') {
-        isEligible = false;
-        rejectionReasons.push(`Does not take over Credit Card debt`);
-      }
-    }
-    if (requiresApp) {
-      if (lender.id === 'ltfinance') {
-        // App loan specifics for LT Finance
-        const invalidAppLoans = appLoans.filter(l => (l.activeEMIs || 0) < 6 || (l.currentExposure || 0) < 200000);
-        if (invalidAppLoans.length > 0) {
-           isEligible = false;
-           rejectionReasons.push(`L&T Finance requires App Loans to have >= 6 active EMIs and >= 2 Lakh exposure`);
+    // 3. CIBIL check
+    if (lender.minCibil && cibilScore > 0 && cibilScore < lender.minCibil) {
+      // Check if CIBIL -1 is accepted
+      if (cibilScore === -1 && lender.cibilMinus1Accepted) {
+        // Acceptable but with funding limit
+        if (lender.cibilMinus1MaxFunding > 0) {
+          warnings.push(`CIBIL -1: Max funding ₹${(lender.cibilMinus1MaxFunding / 100000).toFixed(0)}L`);
+          customOutput.cibilMinus1MaxFunding = lender.cibilMinus1MaxFunding;
         }
       } else {
-        if (takeover["App Loan"] === 'NOT_SUPPORTED' || takeover["App Loan"] === 'POLICY_CHECK') {
+        isEligible = false;
+        rejectionReasons.push(`Requires minimum CIBIL score of ${lender.minCibil}`);
+      }
+    }
+
+    // 4. Active overdue
+    if (profile.hasActiveOverdue === "yes") {
+      isEligible = false;
+      rejectionReasons.push("Active overdue accounts detected");
+    }
+
+    // 5. Metro-only check
+    if (lender.metroOnly && profile.cityTier !== "Metro") {
+      isEligible = false;
+      rejectionReasons.push("Only available in Metro cities");
+    }
+
+    // 6. Own house required
+    if (lender.ownHouseRequired && profile.residenceType !== "Owned") {
+      isEligible = false;
+      rejectionReasons.push("Owned residential property is mandatory");
+    }
+
+    // 7. Restricted profiles
+    if (lender.restrictedProfiles.length > 0 && profile.jobProfile) {
+      const isRestricted = lender.restrictedProfiles.some(
+        (p) => profile.jobProfile.toLowerCase().includes(p.toLowerCase())
+      );
+      if (isRestricted) {
+        isEligible = false;
+        rejectionReasons.push(`Profile "${profile.jobProfile}" is restricted`);
+      }
+    }
+
+    // 8. Bounce / late payment
+    if (
+      (profile.hasBounce === "yes" || profile.hasLatePayment === "yes")
+    ) {
+      matchScore -= 15;
+      warnings.push("Recent EMI bounce/late payment may affect approval");
+    }
+
+    // ═════════════════════════════════════════════════════════════════════
+    // BT COMPATIBILITY CHECKS
+    // ═════════════════════════════════════════════════════════════════════
+
+    // BT minimum financed amount (e.g., Tata Capital > ₹5L)
+    if (lender.bt.minBTFinancedAmount && catBLoans.length > 0) {
+      const totalBTAmount = catBLoans.reduce(
+        (sum: number, l: any) => sum + Number(l.currentOutstanding || 0), 0
+      );
+      if (totalBTAmount > 0 && totalBTAmount < lender.bt.minBTFinancedAmount) {
+        isEligible = false;
+        rejectionReasons.push(
+          `BT amount must be > ₹${(lender.bt.minBTFinancedAmount / 100000).toFixed(0)} Lakh`
+        );
+      }
+    }
+
+    // PL BT check
+    if (plCount > 0 && !lender.bt.personalLoan) {
+      isEligible = false;
+      rejectionReasons.push("Does not support Personal Loan BT");
+    }
+
+    // Multiple PL check
+    if (plCount > 1) {
+      if (!lender.bt.multiplePLs) {
+        isEligible = false;
+        rejectionReasons.push("Does not consolidate multiple Personal Loans");
+      }
+      if (lender.bt.maxPLBTs && plCount > lender.bt.maxPLBTs) {
+        isEligible = false;
+        rejectionReasons.push(
+          `Maximum ${lender.bt.maxPLBTs} Personal Loan BTs allowed`
+        );
+      }
+    }
+
+    // CC BT check
+    if (ccCount > 0) {
+      if (!lender.bt.creditCard) {
+        isEligible = false;
+        rejectionReasons.push("Does not support Credit Card BT");
+      }
+      if (lender.bt.maxCCBTs !== null && ccCount > lender.bt.maxCCBTs) {
+        isEligible = false;
+        rejectionReasons.push(
+          `Maximum ${lender.bt.maxCCBTs} Credit Card BTs allowed`
+        );
+      }
+    }
+
+    // App Loan BT check
+    if (appCount > 0) {
+      if (!lender.bt.appLoan) {
+        isEligible = false;
+        rejectionReasons.push("Does not support App/Fintech Loan BT");
+      }
+      if (lender.bt.maxAppBTs !== null && appCount > lender.bt.maxAppBTs) {
+        isEligible = false;
+        rejectionReasons.push(
+          `Maximum ${lender.bt.maxAppBTs} App Loan BTs allowed`
+        );
+      }
+      // L&T specific: app loans need >= 6 active EMIs and >= ₹2L exposure
+      if (lender.bt.minActiveEMIs || lender.bt.minExposure) {
+        const invalidApps = appLoans.filter((l: any) => {
+          const emis = Number(l.activeEMIs || l.emisRemaining || 0);
+          const exposure = Number(l.currentOutstanding || 0);
+          return (
+            (lender.bt.minActiveEMIs && emis < lender.bt.minActiveEMIs) ||
+            (lender.bt.minExposure && exposure < lender.bt.minExposure)
+          );
+        });
+        if (invalidApps.length > 0) {
           isEligible = false;
-          rejectionReasons.push(`Does not take over Digital/App Loans`);
+          rejectionReasons.push(
+            `Requires App Loans to have ≥ ${lender.bt.minActiveEMIs || 0} active EMIs and ≥ ₹${((lender.bt.minExposure || 0) / 100000).toFixed(0)}L exposure`
+          );
         }
       }
     }
-    if (requiresOD) {
-      if (takeover["Overdraft"] === 'NOT_SUPPORTED' || takeover["Overdraft"] === 'POLICY_CHECK') {
-        isEligible = false;
-        rejectionReasons.push(`Does not take over Overdrafts`);
-      }
-    }
-    if (wantsTopUp === 'yes') {
-      if (takeover["Top Up"] === 'NOT_SUPPORTED' || takeover["Top Up"] === 'POLICY_CHECK') {
-        isEligible = false;
-        rejectionReasons.push(`Does not offer Top Up on transfers`);
-      }
-    }
 
-    matchScore = matchScore - 25 + liabilityFit; 
-    
-    // We removed CIBIL score checks, so we just use a default credit fit or remove it.
-    matchScore = matchScore - 20 + 20;
-
-    // Additional output logic for specific banks
-    if (lender.id === 'abfl' && isEligible) {
-      let maxLoan = 5000000;
-      if (nth >= 250000 && employerTier === 'A') maxLoan = 6500000;
-      else if (nth >= 175000 && employerTier === 'A') maxLoan = 5000000;
-      customOutput.maxLoanAmount = maxLoan;
-      customOutput.maxFOIR = "75%";
-      if (hasEPFO || hasOMID || hasHRMS || has26AS) {
-        customOutput.fiWaiver = true;
+    // OD BT check
+    if (odCount > 0) {
+      if (!lender.bt.overdraft) {
+        isEligible = false;
+        rejectionReasons.push("Does not support Overdraft BT");
       }
-    }
-    
-    if (lender.id === 'chola' && isEligible) {
-      if ((employerTier === 'Govt' && nth >= 100000) || (['A+', 'A', 'B'].includes(employerTier) && nth >= 150000)) {
-        customOutput.flexiOdEligible = true;
-        customOutput.flexiOdStructure = "2 years Flexi + 5 years Drop-line";
-      }
-      if (cibilMinus1) {
-        if (employerTier === 'Govt') customOutput.cibilMinus1MaxLoan = 2000000;
-        else if (['A+', 'A', 'B'].includes(employerTier) && coApplicant && age <= 30) customOutput.cibilMinus1MaxLoan = 1000000;
-        else {
-           isEligible = false; // Rejected for CIBIL -1 without meeting criteria
-           rejectionReasons.push(`Does not meet CIBIL -1 criteria for Chola`);
+      // IndusInd: OD BT only for specific banks
+      if (lender.bt.odBTRestrictions && lender.bt.odBTRestrictions.length > 0) {
+        const invalidODs = odLoans.filter((l: any) => {
+          const bankName = (l.bankName || "").toLowerCase();
+          return !lender.bt.odBTRestrictions!.some(
+            (r) => bankName.includes(r.toLowerCase())
+          );
+        });
+        if (invalidODs.length > 0) {
+          isEligible = false;
+          rejectionReasons.push(
+            `OD BT only allowed from: ${lender.bt.odBTRestrictions.join(", ")}`
+          );
         }
       }
     }
-    
-    if (lender.id === 'ltfinance' && isEligible) {
-      lender.maxTenure = 72;
-      customOutput.maxFOIR = "75%+";
-      customOutput.fiWaiverThreshold = 750000;
-      if (cibilMinus1) customOutput.cibilMinus1MaxLoan = 1000000;
+
+    // Total BT count check
+    if (lender.bt.maxTotalBTs && totalBTCount > lender.bt.maxTotalBTs) {
+      isEligible = false;
+      rejectionReasons.push(
+        `Maximum ${lender.bt.maxTotalBTs} total BTs allowed`
+      );
     }
-    
-    if (lender.id === 'tatacapital' && isEligible) {
-      const btAmount = catBLoans.reduce((sum: number, l: any) => sum + Number(l.currentOutstanding || 0), 0);
-      if (btAmount > 0 && btAmount <= 500000) {
+
+    // Top-up check
+    if (profile.wantsTopUp === "yes" && !lender.bt.topUp) {
+      isEligible = false;
+      rejectionReasons.push("Does not offer top-up on transfers");
+    }
+
+    // BT / Loan Preference check
+    if (profile.btPreference === "BT to OD") {
+      // Currently Kotak, Chola, and IndusInd have specific OD/Flexi rules configured
+      if (!["kotak", "chola", "indusind"].includes(lender.id)) {
         isEligible = false;
-        rejectionReasons.push(`BT loan amount financed must be > ₹5 Lakh`);
+        rejectionReasons.push("Overdraft facility not supported by this policy");
+      }
+    } else if (profile.btPreference === "BT to PL") {
+      // Kotak's configuration here is strictly OD
+      if (lender.id === "kotak") {
+        isEligible = false;
+        rejectionReasons.push("This specific policy is structured for Overdrafts only");
       }
     }
 
-    if (lender.id === 'axis') {
-      let axisNth = nth;
-      // Bonus Add-Back 50%
-      axisNth += ((Number(monthlyBonus) || 0) + (Number(quarterlyBonus) || 0)/3 + (Number(halfYearlyIncentive) || 0)/6 + (Number(yearlyBonus) || 0)/12) * 0.5;
-      
-      const seg = axisCustomerSegment || "NTB";
+    // ═════════════════════════════════════════════════════════════════════
+    // BANK-SPECIFIC RULES
+    // ═════════════════════════════════════════════════════════════════════
+
+    // ── AXIS BANK specific ──────────────────────────────────────────────
+    if (lender.id === "axis" && isEligible) {
+      const seg = profile.axisCustomerSegment || "NTB";
       let nmiReq = 75000;
       let cibilReq = 780;
-      
+
       if (seg === "CSG") {
         nmiReq = 35000;
-        if (axisNth >= 85000) cibilReq = 700;
-        else cibilReq = 740;
+        cibilReq = nth > 85000 ? 700 : 740;
       } else if (seg === "Non-CSG CASA") {
         nmiReq = 50000;
         cibilReq = 740;
-        if (casaVintage !== 'yes') {
-           isEligible = false;
-           rejectionReasons.push(`Axis Bank requires 90+ days CASA vintage for Non-CSG CASA segment`);
+        if (profile.casaVintage !== "yes") {
+          isEligible = false;
+          rejectionReasons.push("Axis Bank requires 90+ days CASA vintage for Non-CSG CASA segment");
         }
       } else if (seg === "NTB") {
         nmiReq = 75000;
-        if (axisNth > 100000) cibilReq = 740;
-        else cibilReq = 780;
+        cibilReq = nth > 100000 ? 740 : 780;
       } else if (seg === "Blue Collar") {
         nmiReq = 200000;
-        cibilReq = 0; 
+        cibilReq = 0;
       }
-      
-      if (axisNth < nmiReq) {
+
+      if (nth < nmiReq) {
         isEligible = false;
-        rejectionReasons.push(`Requires minimum salary of ₹${nmiReq} for ${seg} segment`);
+        rejectionReasons.push(
+          `Requires minimum ₹${nmiReq.toLocaleString("en-IN")} NTH for ${seg} segment`
+        );
       }
-      if (cibilScore > 0 && cibilScore < cibilReq) {
+      if (cibilReq > 0 && cibilScore > 0 && cibilScore < cibilReq) {
         isEligible = false;
-        rejectionReasons.push(`Requires minimum CIBIL of ${cibilReq} for ${seg} segment with NMI ₹${Math.floor(axisNth)}`);
+        rejectionReasons.push(
+          `Requires CIBIL ≥ ${cibilReq} for ${seg} segment`
+        );
       }
-      
-      const restrictedProfiles = ["Government School Teacher", "Class IV Employee", "Local Municipality Staff", "Defence & Army", "State Government Employee"];
-      if (restrictedProfiles.some(p => jobProfile?.toLowerCase().includes(p.toLowerCase()))) {
-        isEligible = false;
-        rejectionReasons.push(`Profile is restricted by Axis Bank`);
-      }
-      
+
+      customOutput.axisSegment = seg;
+      customOutput.axisCibilRequired = cibilReq;
+
+      // Calculate obligations using Axis-specific rules
       if (isEligible) {
-        // Calculate custom obligations
-        let totalAxisEmi = 0;
-        allLoans.forEach(l => {
-          if (l.type === "Credit Card") {
-             totalAxisEmi += Number(l.currentOutstanding || 0) * 0.04;
-          } else if (l.type === "Gold Loan") {
-             // 0 obligation
-          } else {
-             // Existing PL/HL < 6/12 EMIs should be 0, but we assume full since we can't reliably know remaining EMIs right now
-             totalAxisEmi += Number(l.emi || 0);
-          }
+        let totalAxisObligation = 0;
+        allLoans.forEach((l: any) => {
+          totalAxisObligation += calculateObligation(l, lender);
         });
-        
-        const maxEmi = axisNth * 0.70;
+
+        const maxEmi = nth * (lender.maxFoir / 100);
         customOutput.axisMaxEmiCapacity = Math.floor(maxEmi);
-        customOutput.axisTotalObligations = Math.floor(totalAxisEmi);
-        customOutput.axisUnusedCapacity = Math.max(0, Math.floor(maxEmi - totalAxisEmi));
-        
+        customOutput.axisTotalObligations = Math.floor(totalAxisObligation);
+        customOutput.axisUnusedCapacity = Math.max(0, Math.floor(maxEmi - totalAxisObligation));
+
         if (customOutput.axisUnusedCapacity > 0) {
-           const ratePerMonth = 10.49 / 12 / 100; 
-           const tenureMonths = 84;
-           customOutput.axisMaxLoan = Math.floor(
-             (customOutput.axisUnusedCapacity * (Math.pow(1 + ratePerMonth, tenureMonths) - 1)) /
-             (ratePerMonth * Math.pow(1 + ratePerMonth, tenureMonths))
-           );
+          const r = lender.headlineRate / 12 / 100;
+          const n = lender.maxTenure;
+          customOutput.axisMaxLoan = Math.floor(
+            (customOutput.axisUnusedCapacity * (Math.pow(1 + r, n) - 1)) /
+            (r * Math.pow(1 + r, n))
+          );
         } else {
-           customOutput.axisMaxLoan = 0;
+          customOutput.axisMaxLoan = 0;
         }
       }
     }
 
-    if (lender.id === 'indusind' && isEligible) {
-      if (plCount > 5) {
-        isEligible = false;
-        rejectionReasons.push(`Maximum 5 Personal Loans can be consolidated for IndusInd`);
+    // ── ADITYA BIRLA specific ───────────────────────────────────────────
+    if (lender.id === "abfl" && isEligible) {
+      // Salary tier check
+      // Tier 1: ₹40K, Tier 2: ₹35K, Tier 3: ₹25K, Tier 4: ₹20K
+      // Max loan by company category
+      let maxLoanForCategory = 5000000;
+      if (employerTier === "A+" || employerTier === "A") {
+        if (nth >= 250000) maxLoanForCategory = 6500000;
+        else if (nth >= 175000) maxLoanForCategory = 5000000;
+        else maxLoanForCategory = 4000000;
+      } else if (employerTier === "B") {
+        maxLoanForCategory = 4000000;
+      } else if (employerTier === "C") {
+        maxLoanForCategory = 3500000;
+      } else if (employerTier === "D") {
+        maxLoanForCategory = 2500000;
       }
-      
-      const odLoans = catBLoans.filter((l: any) => l.type === 'Overdraft');
-      if (odLoans.length > 0) {
-        const hasInvalidOD = odLoans.some((l: any) => {
-          const b = (l.bankName || "").toLowerCase();
-          return !b.includes("kotak") && !b.includes("bajaj");
-        });
-        if (hasInvalidOD) {
-           isEligible = false;
-           rejectionReasons.push("OD Balance Transfer is only allowed for Kotak Bank or Bajaj");
+      customOutput.abflMaxLoan = maxLoanForCategory;
+      customOutput.maxFOIR = "75%";
+
+      // FI waiver check
+      if (profile.hasEPFO || profile.hasOMID || profile.hasHRMS || profile.has26AS) {
+        customOutput.fiWaiver = true;
+      }
+
+      // BT count check
+      const totalPLCCBT = plCount + ccCount;
+      if (totalPLCCBT > 6) {
+        isEligible = false;
+        rejectionReasons.push("Maximum 6 BTs (PL + CC) allowed");
+      }
+      if (ccCount > 5) {
+        isEligible = false;
+        rejectionReasons.push("Maximum 5 Credit Card BTs allowed");
+      }
+    }
+
+    // ── L&T FINANCE specific ────────────────────────────────────────────
+    if (lender.id === "ltfinance" && isEligible) {
+      customOutput.maxFOIR = "75%+";
+      customOutput.fiWaiverThreshold = 750000;
+      if (cibilScore === -1 || cibilScore === 0) {
+        customOutput.cibilMinus1MaxLoan = 1000000;
+      }
+    }
+
+    // ── KOTAK specific ──────────────────────────────────────────────────
+    if (lender.id === "kotak" && isEligible) {
+      // Exclude variable income from NTH for Kotak
+      const kotakNth = (Number(profile.netSalary) || 0) -
+        (profile.yearlyBonus ? Number(profile.yearlyBonus) / 12 : 0);
+
+      if (kotakNth < 150000) {
+        isEligible = false;
+        rejectionReasons.push("Requires minimum ₹1.5L NTH (excluding variable income)");
+      } else if (kotakNth >= 150000 && kotakNth < 200000) {
+        // Segment 1: needs live HL > ₹10L
+        const hl = allLoans.find(
+          (l: any) =>
+            l.type === "Home Loan" && Number(l.currentOutstanding || 0) > 1000000
+        );
+        if (!hl) {
+          isEligible = false;
+          rejectionReasons.push(
+            "Segment 1 (₹1.5L–₹2L NTH) requires active Home Loan > ₹10 Lakhs"
+          );
         }
       }
-      
-      let allowedTenure = 60;
-      if (nth >= 50000 && (age >= 25 || !age)) { 
-         allowedTenure = 84;
-      }
-      lender.maxTenure = allowedTenure;
+      // Segment 2: NTH ≥ ₹2L + Green scorecard (we can't verify scorecard)
+      customOutput.kotakEffectiveNTH = Math.floor(kotakNth);
+    }
 
+    // ── CHOLA specific ──────────────────────────────────────────────────
+    if (lender.id === "chola" && isEligible) {
+      // Delhi location CIBIL requirement
+      if (profile.location === "Delhi NCR" && cibilScore > 0 && cibilScore < 700) {
+        isEligible = false;
+        rejectionReasons.push("Delhi NCR requires minimum CIBIL of 700");
+      }
+
+      // Flexi OD eligibility
+      if (
+        (employerTier === "GOVT" && nth >= 100000) ||
+        (["A+", "A", "B"].includes(employerTier) && nth >= 150000)
+      ) {
+        customOutput.flexiOdEligible = true;
+        customOutput.flexiOdStructure = "2 years Flexi + 5 years Drop-line";
+      }
+
+      // CIBIL -1 handling
+      if (cibilScore === -1 || cibilScore === 0) {
+        if (employerTier === "GOVT") {
+          customOutput.cibilMinus1MaxLoan = 2000000;
+        } else if (["A+", "A", "B"].includes(employerTier) && profile.coApplicant && age <= 30) {
+          customOutput.cibilMinus1MaxLoan = 1000000;
+        } else {
+          isEligible = false;
+          rejectionReasons.push("Does not meet CIBIL -1 criteria for Chola");
+        }
+      }
+
+      // Income add-back capped at 60%
+      const addBack = (Number(profile.monthlyIncentive) || 0) +
+        (Number(profile.quarterlyIncentive) || 0) / 3 +
+        (Number(profile.rentalIncome) || 0);
+      const maxAddBack = (Number(profile.netSalary) || 0) * 0.60;
+      const effectiveAddBack = Math.min(addBack, maxAddBack);
+      const cholaEffectiveNTH = (Number(profile.netSalary) || 0) + effectiveAddBack;
+      customOutput.cholaEffectiveNTH = Math.floor(cholaEffectiveNTH);
+
+      // Max loan by category
+      if (["A+", "A", "B"].includes(employerTier)) {
+        customOutput.cholaMaxLoan = cholaEffectiveNTH >= 125000 ? 3000000 : 1000000;
+      } else if (employerTier === "GOVT") {
+        customOutput.cholaMaxLoan = cholaEffectiveNTH >= 100000 ? 3000000 : 1000000;
+      } else {
+        customOutput.cholaMaxLoan = 1000000;
+      }
+
+      // BT tracks
+      if (totalBTCount > 6) {
+        isEligible = false;
+        rejectionReasons.push("Maximum 6 BT tracks allowed (PL/OD/DOD/CC)");
+      }
+    }
+
+    // ── INDUSIND specific ───────────────────────────────────────────────
+    if (lender.id === "indusind" && isEligible) {
+      // Loan amount by category
+      if (employerTier === "C") {
+        customOutput.indusindMaxLoan = 1000000; // CAT C Non-Listed: ₹10L
+      } else {
+        customOutput.indusindMaxLoan = 5000000; // CAT A/B: ₹50L
+      }
+
+      // Tenure rules
+      let allowedTenure = 60;
+      if (nth >= 50000 && (age >= 25 || !age)) {
+        allowedTenure = 72;
+      }
+      // 84M requires: NMI ≥₹50K, Cat A/Govt, age ≥25, loan ≥₹5L, CIBIL ≥750
+      if (nth >= 50000 && ["A+", "A", "GOVT"].includes(employerTier) &&
+          (age >= 25 || !age) && cibilScore >= 750) {
+        allowedTenure = 84;
+      }
+      customOutput.indusindMaxTenure = allowedTenure;
+
+      // FOIR
       let indusindFoir = 70;
-      if (nth >= 80000 || employerTier === 'A' || employerTier === 'A+') {
-         indusindFoir = 75;
+      if (nth >= 80000 || ["A+", "A"].includes(employerTier)) {
+        indusindFoir = 75;
       }
       customOutput.maxFOIR = `${indusindFoir}%`;
-      
+
+      // Calculate capacity
       let totalEmi = 0;
-      allLoans.forEach(l => {
-         totalEmi += Number(l.emi || 0);
+      allLoans.forEach((l: any) => {
+        totalEmi += Number(l.emi || 0);
       });
       const maxEmi = nth * (indusindFoir / 100);
       const unusedCap = Math.max(0, maxEmi - totalEmi);
-      
-      customOutput.indusindFOIR = indusindFoir;
       customOutput.indusindUnusedCapacity = Math.floor(unusedCap);
-      
+
       if (unusedCap > 0) {
-         const r = 10.49 / 12 / 100;
-         customOutput.indusindMaxLoan = Math.floor(
-           (unusedCap * (Math.pow(1 + r, allowedTenure) - 1)) / (r * Math.pow(1 + r, allowedTenure))
-         );
+        const r = lender.headlineRate / 12 / 100;
+        customOutput.indusindMaxLoanFromCapacity = Math.floor(
+          (unusedCap * (Math.pow(1 + r, allowedTenure) - 1)) /
+          (r * Math.pow(1 + r, allowedTenure))
+        );
       } else {
-         customOutput.indusindMaxLoan = 0;
+        customOutput.indusindMaxLoanFromCapacity = 0;
       }
     }
 
-    if (lender.id === 'abfl' && isEligible) {
-       if (employerTier === 'A' || employerTier === 'A+') {
-           if (nth >= 250000) {
-               customOutput.abflMaxLoan = 6500000;
-           } else if (nth >= 175000) {
-               customOutput.abflMaxLoan = 5000000;
-           }
-       }
-    }
-    
-    if (lender.id === 'piramal' && isEligible) {
-       if (cibilScore && cibilScore !== -1 && cibilScore !== 0 && cibilScore < 750) {
-           isEligible = false;
-           rejectionReasons.push("Piramal requires CIBIL 750+ (or -1/0)");
-       }
-       if (plCount > 3) {
-           isEligible = false;
-           rejectionReasons.push("Maximum 3 Personal Loans allowed for BT");
-       }
-    }
-    
-    if (lender.id === 'ltfinance' && isEligible) {
-       if (cibilScore && cibilScore < 775) {
-           isEligible = false;
-           rejectionReasons.push("L&T Finance requires minimum CIBIL 775");
-       }
-       if (cityTier !== "Metro") {
-           isEligible = false;
-           rejectionReasons.push("L&T Finance is only applicable in Metro cities");
-       }
-       if (residenceType !== "Owned") {
-           isEligible = false;
-           rejectionReasons.push("L&T Finance requires owned residential property");
-       }
-    }
-    
-    if (lender.id === 'kotak' && isEligible) {
-       const kotakNth = nth - (yearlyBonus ? yearlyBonus / 12 : 0);
-       
-       if (kotakNth < 150000) {
-           isEligible = false;
-           rejectionReasons.push("Kotak OD requires minimum ₹1.5L NTH (excluding variable pay)");
-       } else if (kotakNth >= 150000 && kotakNth < 200000) {
-           const hl = allLoans.find((l: any) => l.type === 'Home Loan' && Number(l.currentOutstanding || 0) > 1000000);
-           if (!hl) {
-               isEligible = false;
-               rejectionReasons.push("Kotak OD segment 1 (1.5L-2L NTH) requires active Home Loan > ₹10 Lakhs");
-           }
-       }
-       customOutput.kotakEffectiveNTH = Math.floor(kotakNth);
-    }
-    
-    if (lender.id === 'poonawalla' && isEligible) {
-        if (cibilScore && cibilScore < 700) {
-           isEligible = false;
-           rejectionReasons.push("Poonawalla requires CIBIL 700+");
-        }
-        
-        const ccCount = catBLoans.filter((l: any) => l.type === 'Credit Card').length;
-        const appCount = catBLoans.filter((l: any) => l.type === 'App Loan').length;
-        const plOdCount = catBLoans.filter((l: any) => l.type === 'Personal Loan' || l.type === 'Overdraft').length;
-        
-        if (catBLoans.length > 8) {
-           isEligible = false;
-           rejectionReasons.push("Poonawalla allows maximum 8 BTs total");
-        }
-        if (appCount > 3) {
-           isEligible = false;
-           rejectionReasons.push("Poonawalla allows maximum 3 App Loan BTs");
-        }
-        if (plOdCount > 5) {
-           isEligible = false;
-           rejectionReasons.push("Poonawalla allows maximum 5 PL/OD BTs");
-        }
-        if (ccCount > 6) {
-           isEligible = false;
-           rejectionReasons.push("Poonawalla allows maximum 6 Credit Card BTs");
-        }
-        
-        let poonawallaFoir = 80;
-        customOutput.maxFOIR = `${poonawallaFoir}%`;
-        
-        let totalEmi = 0;
-        allLoans.forEach(l => {
-           totalEmi += Number(l.emi || 0);
-        });
-        const maxEmi = nth * (poonawallaFoir / 100);
-        const unusedCap = Math.max(0, maxEmi - totalEmi);
-        
-        customOutput.poonawallaFOIR = poonawallaFoir;
-        customOutput.poonawallaUnusedCapacity = Math.floor(unusedCap);
-        
-        if (unusedCap > 0) {
-           const r = 12.00 / 12 / 100;
-           customOutput.poonawallaMaxLoan = Math.floor(
-             (unusedCap * (Math.pow(1 + r, lender.maxTenure) - 1)) / (r * Math.pow(1 + r, lender.maxTenure))
-           );
-        } else {
-           customOutput.poonawallaMaxLoan = 0;
-        }
-        
-        if (isEligible) {
-           rejectionReasons.push("Note: Poonawalla requires applicant to be within 80km of municipal office");
-           if (matchScore >= 80) matchScore = 79; // Make it conditional due to geo limit
-        }
+    // ── PIRAMAL specific ────────────────────────────────────────────────
+    if (lender.id === "piramal" && isEligible) {
+      // Elite/Cat-A offer: up to ₹50L with CIBIL 750+, salary ₹2L+
+      if (["A+", "A"].includes(employerTier) && nth >= 200000 && cibilScore >= 750) {
+        customOutput.piramalMaxLoan = 5000000;
+        customOutput.eliteEligible = true;
+      } else {
+        customOutput.piramalMaxLoan = 3000000;
+      }
     }
 
-    if (lender.id === 'chola' && isEligible) {
-        if (cibilScore && cibilScore < 700) {
-           isEligible = false;
-           rejectionReasons.push("Chola requires CIBIL 700+");
-        }
-        
-        if (catBLoans.length > 6) {
-           isEligible = false;
-           rejectionReasons.push("Chola allows maximum 6 BT tracks across PL/OD/CC");
-        }
-        
-        let addBack = 0;
-        addBack += (Number(monthlyIncentive) || 0) + (Number(quarterlyIncentive) || 0)/3 + (Number(rentalIncome) || 0);
-        const maxAddBack = nth * 0.60;
-        const effectiveAddBack = Math.min(addBack, maxAddBack);
-        const cholaEffectiveNTH = nth + effectiveAddBack;
-        
-        customOutput.cholaEffectiveNTH = Math.floor(cholaEffectiveNTH);
-        
-        if (employerTier === 'A' || employerTier === 'A+' || employerTier === 'B') {
-           if (cholaEffectiveNTH >= 125000) {
-               customOutput.cholaMaxLoan = 3000000;
-           } else {
-               customOutput.cholaMaxLoan = 1000000; 
-           }
-        } else if (employerTier === 'Govt') {
-           if (cholaEffectiveNTH >= 100000) {
-               customOutput.cholaMaxLoan = 3000000;
-           } else {
-               customOutput.cholaMaxLoan = 1000000;
-           }
-        } else {
-           customOutput.cholaMaxLoan = 1000000;
-        }
+    // ── POONAWALLA specific ─────────────────────────────────────────────
+    if (lender.id === "poonawalla" && isEligible) {
+      // Validate specific BT counts
+      const plOdCount = catBLoans.filter(
+        (l: any) => l.type === "Personal Loan" || l.type === "Overdraft"
+      ).length;
+
+      if (appCount > 3) {
+        isEligible = false;
+        rejectionReasons.push("Maximum 3 App Loan BTs allowed");
+      }
+      if (plOdCount > 5) {
+        isEligible = false;
+        rejectionReasons.push("Maximum 5 PL/OD BTs allowed");
+      }
+      if (ccCount > 6) {
+        isEligible = false;
+        rejectionReasons.push("Maximum 6 Credit Card BTs allowed");
+      }
+      if (totalBTCount > 8) {
+        isEligible = false;
+        rejectionReasons.push("Maximum 8 total BTs allowed");
+      }
+
+      // FOIR & capacity
+      const poonawallaFoir = 80;
+      customOutput.maxFOIR = `${poonawallaFoir}%`;
+
+      let totalEmi = 0;
+      allLoans.forEach((l: any) => {
+        totalEmi += Number(l.emi || 0);
+      });
+      const maxEmi = nth * (poonawallaFoir / 100);
+      const unusedCap = Math.max(0, maxEmi - totalEmi);
+      customOutput.poonawallaUnusedCapacity = Math.floor(unusedCap);
+
+      if (unusedCap > 0) {
+        const r = lender.headlineRate / 12 / 100;
+        customOutput.poonawallaMaxLoan = Math.floor(
+          (unusedCap * (Math.pow(1 + r, lender.maxTenure) - 1)) /
+          (r * Math.pow(1 + r, lender.maxTenure))
+        );
+      } else {
+        customOutput.poonawallaMaxLoan = 0;
+      }
+
+      // Geo limit warning
+      if (isEligible) {
+        warnings.push("Applicant must be within 80 km of a municipal office");
+      }
     }
 
+    // ── TATA CAPITAL specific ───────────────────────────────────────────
+    if (lender.id === "tatacapital" && isEligible) {
+      // Already handled by minBTFinancedAmount in BT checks above
+    }
+
+    // ── SMFG specific ───────────────────────────────────────────────────
+    if (lender.id === "smfg" && isEligible) {
+      // FOIR Criteria based on salary
+      let smfgFoir = 60;
+      if (nth >= 25000 && nth <= 32000) {
+        smfgFoir = 60;
+      } else if (nth > 32000 && nth <= 45000) {
+        smfgFoir = 65;
+      } else if (nth > 45000) {
+        smfgFoir = 70;
+      }
+      
+      customOutput.maxFOIR = `${smfgFoir}%`;
+    }
+
+    // ═════════════════════════════════════════════════════════════════════
+    // UNIVERSAL CAPACITY CALCULATION
+    // ═════════════════════════════════════════════════════════════════════
+    if (isEligible) {
+      let foir = lender.maxFoir;
+      if (customOutput.maxFOIR) {
+        foir = parseInt(customOutput.maxFOIR.replace('%','')) || lender.maxFoir;
+      }
+      
+      let maxEmiCapacity = nth * (foir / 100);
+      
+      let totalObligations = 0;
+      allLoans.forEach((l: any) => {
+        totalObligations += calculateObligation(l, lender);
+      });
+      
+      let unusedCapacity = Math.max(0, maxEmiCapacity - totalObligations);
+      
+      let maxLoan = 0;
+      if (unusedCapacity > 0) {
+        const r = lender.headlineRate / 12 / 100;
+        const n = customOutput.indusindMaxTenure || lender.maxTenure;
+        maxLoan = (unusedCapacity * (Math.pow(1 + r, n) - 1)) / (r * Math.pow(1 + r, n));
+      }
+
+      customOutput.universalMaxEmi = Math.floor(maxEmiCapacity);
+      customOutput.universalUsedEmi = Math.floor(totalObligations);
+      customOutput.universalUnusedEmi = Math.floor(unusedCapacity);
+      
+      customOutput.universalMaxLoan = Math.floor(maxLoan);
+      
+      // Override with bank specific if available
+      if (lender.id === 'axis' && customOutput.axisMaxLoan !== undefined) customOutput.universalMaxLoan = customOutput.axisMaxLoan;
+      if (lender.id === 'abfl' && customOutput.abflMaxLoan !== undefined) customOutput.universalMaxLoan = customOutput.abflMaxLoan;
+      if (lender.id === 'chola' && customOutput.cholaMaxLoan !== undefined) customOutput.universalMaxLoan = customOutput.cholaMaxLoan;
+      if (lender.id === 'indusind' && customOutput.indusindMaxLoan !== undefined) customOutput.universalMaxLoan = customOutput.indusindMaxLoan;
+      if (lender.id === 'poonawalla' && customOutput.poonawallaMaxLoan !== undefined) customOutput.universalMaxLoan = customOutput.poonawallaMaxLoan;
+      if (customOutput.cibilMinus1MaxLoan !== undefined) customOutput.universalMaxLoan = customOutput.cibilMinus1MaxLoan;
+      
+      // Apply cap
+      if (customOutput.universalMaxLoan > lender.maxLoanAmount) {
+        customOutput.universalMaxLoan = lender.maxLoanAmount;
+      }
+    }
+
+    // ═════════════════════════════════════════════════════════════════════
+    // EMPLOYER TIER SCORING
+    // ═════════════════════════════════════════════════════════════════════
+    if (employerTier === "A+" || employerTier === "A") {
+      matchScore += 5;
+    } else if (employerTier === "GOVT") {
+      matchScore += 3;
+    } else if (employerTier === "B") {
+      matchScore += 0;
+    } else if (employerTier === "C" || employerTier === "D") {
+      matchScore -= 5;
+    } else if (employerTier === "Unknown") {
+      matchScore -= 10;
+    }
+
+    // ═════════════════════════════════════════════════════════════════════
+    // FINAL RESULT
+    // ═════════════════════════════════════════════════════════════════════
     if (isEligible) {
       eligibleLenders.push({
-        ...lender,
+        id: lender.id,
+        name: lender.name,
+        type: lender.type,
+        headlineRate: lender.headlineRate,
+        maxTenure: customOutput.indusindMaxTenure || lender.maxTenure,
+        maxLoanAmount: lender.maxLoanAmount,
+        maxFoir: lender.maxFoir,
         ...customOutput,
+        warnings,
         matchConfidence: matchScore,
-        outcome: matchScore >= 80 ? 'ELIGIBLE' : 'CONDITIONALLY_ELIGIBLE'
+        outcome: matchScore >= 80 ? "ELIGIBLE" : "CONDITIONALLY_ELIGIBLE",
       });
     } else {
       ineligibleLenders.push({
-        ...lender,
-        reasons: rejectionReasons
+        id: lender.id,
+        name: lender.name,
+        type: lender.type,
+        headlineRate: lender.headlineRate,
+        reasons: rejectionReasons,
+        warnings,
       });
     }
   }
 
+  // Sort: highest confidence first, then lowest rate
   eligibleLenders.sort((a, b) => {
     if (b.matchConfidence !== a.matchConfidence) {
       return b.matchConfidence - a.matchConfidence;
@@ -746,4 +1450,6 @@ export function analyzeLenderEligibility({ profile, catBLoans, allLoans = [] }: 
 
   return { eligibleLenders, ineligibleLenders };
 }
+
+// Re-export for backward compatibility
 
