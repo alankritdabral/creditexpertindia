@@ -888,7 +888,7 @@ export function EligibilityForm() {
                           </label>
                           <input
                             type="number"
-                            value={userOverrides.netSalary || formData.monthlyIncome || ""}
+                            value={userOverrides.netSalary !== undefined ? userOverrides.netSalary : (formData.monthlyIncome || "")}
                             onChange={e => setUserOverrides({ ...userOverrides, netSalary: e.target.value })}
                             className="w-full bg-white border border-icy-blue rounded-xl px-3 py-2 text-sm focus:border-blue-energy outline-none"
                             placeholder="e.g. 50000"
@@ -900,7 +900,7 @@ export function EligibilityForm() {
                           </label>
                           <input
                             type="number"
-                            value={userOverrides.yearlyBonus || ""}
+                            value={userOverrides.yearlyBonus !== undefined ? userOverrides.yearlyBonus : ""}
                             onChange={e => setUserOverrides({ ...userOverrides, yearlyBonus: e.target.value })}
                             className="w-full bg-white border border-icy-blue rounded-xl px-3 py-2 text-sm focus:border-blue-energy outline-none"
                             placeholder="e.g. 100000"
@@ -1242,7 +1242,7 @@ export function EligibilityForm() {
                                 <label className="text-[10px] uppercase font-bold text-[#8B7C73]">Bank / NBFC</label>
                                 <input
                                   type="text"
-                                  value={loan.bankName ?? ""}
+                                  value={l.bankName !== undefined ? l.bankName : (loan.bankName || "")}
                                   onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), bankName: e.target.value } }))}
                                   className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-energy"
                                 />
@@ -1250,7 +1250,7 @@ export function EligibilityForm() {
                               <div>
                                 <label className="text-[10px] uppercase font-bold text-[#8B7C73]">Type</label>
                                 <select
-                                  value={loan.type ?? "Personal Loan"}
+                                  value={l.type !== undefined ? l.type : (loan.type || "Personal Loan")}
                                   onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), type: e.target.value } }))}
                                   className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-energy"
                                 >
@@ -1267,7 +1267,7 @@ export function EligibilityForm() {
                                 <label className="text-[10px] uppercase font-bold text-[#8B7C73]">{loan.type === 'Overdraft' ? 'Amount Drawn' : 'Orig. Amount'}</label>
                                 <input
                                   type="number"
-                                  value={loan.originalAmount ?? ""}
+                                  value={l.originalAmount !== undefined ? l.originalAmount : (loan.originalAmount || "")}
                                   onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), originalAmount: e.target.value } }))}
                                   className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-energy"
                                 />
@@ -1276,7 +1276,7 @@ export function EligibilityForm() {
                                 <label className="text-[10px] uppercase font-bold text-[#8B7C73]">Current Bal.</label>
                                 <input
                                   type="number"
-                                  value={loan.currentOutstanding ?? ""}
+                                  value={l.currentOutstanding !== undefined ? l.currentOutstanding : (loan.currentOutstanding || "")}
                                   onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), currentOutstanding: e.target.value } }))}
                                   className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-energy"
                                 />
@@ -1285,7 +1285,7 @@ export function EligibilityForm() {
                                 <label className="text-[10px] uppercase font-bold text-[#8B7C73]">Date Issue</label>
                                 <input
                                   type="text"
-                                  value={loan.dateOpened ?? ""}
+                                  value={l.dateOpened !== undefined ? l.dateOpened : (loan.dateOpened || "")}
                                   onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), dateOpened: e.target.value } }))}
                                   className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-energy"
                                 />
@@ -1294,7 +1294,7 @@ export function EligibilityForm() {
                                 <label className="text-[10px] uppercase font-bold text-[#8B7C73]">{loan.type === 'Overdraft' ? 'OD Plan' : 'Tenure (Mos)'}</label>
                                 {loan.type === 'Overdraft' ? (
                                   <select
-                                    value={loan.odPlan ?? "2yr"}
+                                    value={l.odPlan !== undefined ? l.odPlan : (loan.odPlan || "2yr")}
                                     onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), odPlan: e.target.value } }))}
                                     className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-energy"
                                   >
@@ -1304,7 +1304,7 @@ export function EligibilityForm() {
                                 ) : (
                                   <input
                                     type="number"
-                                    value={loan.tenure ?? ""}
+                                    value={l.tenure !== undefined ? l.tenure : (loan.tenure || "")}
                                     onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), tenure: e.target.value } }))}
                                     className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-energy"
                                   />
@@ -1314,7 +1314,7 @@ export function EligibilityForm() {
                                 <label className="text-[10px] uppercase font-bold text-[#8B7C73]">EMI</label>
                                 <input
                                   type="number"
-                                  value={loan.emi ?? ""}
+                                  value={l.emi !== undefined ? l.emi : (loan.emi || "")}
                                   onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), emi: e.target.value } }))}
                                   className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-energy"
                                 />
@@ -1323,7 +1323,7 @@ export function EligibilityForm() {
                                 <label className="text-[10px] uppercase font-bold text-[#8B7C73]">Rate %</label>
                                 <input
                                   type="number"
-                                  value={loan.rate ?? ""}
+                                  value={l.rate !== undefined ? l.rate : (loan.rate || "")}
                                   onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), rate: e.target.value } }))}
                                   className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-energy"
                                 />
@@ -1356,13 +1356,43 @@ export function EligibilityForm() {
 
                           const ratePerMonth = (bestLender.headlineRate || 12) / 12 / 100;
                           const maxLenderTenure = bestLender.maxTenure || 60;
-                          const tenureMonths = Number(userOverrides.consolidationTenure) || maxLenderTenure;
-                          const newEmi = Math.round(
-                            (totalNewLoan * ratePerMonth * Math.pow(1 + ratePerMonth, tenureMonths)) /
+                          const selectedTenure = Number(userOverrides.consolidationTenure);
+                          const tenureMonths = selectedTenure ? Math.min(selectedTenure, maxLenderTenure) : maxLenderTenure;
+                          
+                          let dynamicMaxLoan = bestLender.universalMaxLoan || 0;
+                          if (catBLoans.length > 0) {
+                            const maxEmi = bestLender.universalMaxEmi || 0;
+                            const usedEmi = bestLender.universalUsedEmi || 0;
+                            const dynamicUnusedEmi = Math.max(0, maxEmi - (usedEmi - currentEmiToConsolidate));
+                            if (dynamicUnusedEmi > 0) {
+                              dynamicMaxLoan = Math.floor(
+                                (dynamicUnusedEmi * (Math.pow(1 + ratePerMonth, maxLenderTenure) - 1)) /
+                                (ratePerMonth * Math.pow(1 + ratePerMonth, maxLenderTenure))
+                              );
+                              if (bestLender.maxLoanAmount && dynamicMaxLoan > bestLender.maxLoanAmount) {
+                                dynamicMaxLoan = bestLender.maxLoanAmount;
+                              }
+                            } else {
+                              dynamicMaxLoan = 0;
+                            }
+                          }
+                          
+                          const amountForEmi = Math.min(totalNewLoan, dynamicMaxLoan);
+                          const isCapped = amountForEmi < totalNewLoan;
+                          
+                          const newEmi = amountForEmi > 0 ? Math.round(
+                            (amountForEmi * ratePerMonth * Math.pow(1 + ratePerMonth, tenureMonths)) /
                             (Math.pow(1 + ratePerMonth, tenureMonths) - 1)
-                          ) || 0;
+                          ) : 0;
+                          
+                          const hasTopUp = userOverrides.wantsTopUp === 'yes' && Number(userOverrides.topUpAmount || 0) > 0;
+                          const canFullyConsolidate = dynamicMaxLoan >= consolidationAmount;
+                          const consolidationOnlyEmi = (consolidationAmount > 0 && canFullyConsolidate) ? Math.round(
+                            (consolidationAmount * ratePerMonth * Math.pow(1 + ratePerMonth, tenureMonths)) /
+                            (Math.pow(1 + ratePerMonth, tenureMonths) - 1)
+                          ) : 0;
 
-                          const emiSavings = currentEmiToConsolidate - newEmi;
+                          const emiSavings = isCapped ? 0 : (currentEmiToConsolidate - newEmi);
 
                           if (totalNewLoan === 0) {
                             return (
@@ -1409,16 +1439,26 @@ export function EligibilityForm() {
                               )}
 
                               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div className="bg-white border border-slate-100 p-3 rounded-xl">
+                                <div className="bg-white border border-slate-100 p-3 rounded-xl relative">
                                   <p className="text-[10px] uppercase tracking-wider font-bold text-brand-black/70">Total New Loan</p>
-                                  <p className="text-xl font-black text-[#382F2A] mt-1">₹{totalNewLoan.toLocaleString('en-IN')}</p>
-                                  {userOverrides.wantsTopUp === 'yes' && Number(userOverrides.topUpAmount || 0) > 0 && (
+                                  <p className="text-xl font-black text-[#382F2A] mt-1">
+                                    ₹{amountForEmi.toLocaleString('en-IN')}
+                                  </p>
+                                  {isCapped && (
+                                    <p className="text-[9px] text-amber-600 mt-1 font-semibold">Capped by lender policy</p>
+                                  )}
+                                  {userOverrides.wantsTopUp === 'yes' && Number(userOverrides.topUpAmount || 0) > 0 && !isCapped && (
                                     <p className="text-[10px] text-brand-black/70 mt-1">Includes ₹{Number(userOverrides.topUpAmount).toLocaleString('en-IN')} Top-up</p>
                                   )}
                                 </div>
                                 <div className="bg-white border border-slate-100 p-3 rounded-xl">
                                   <p className="text-[10px] uppercase tracking-wider font-bold text-brand-black/70">Est. New EMI</p>
                                   <p className="text-xl font-black text-[#382F2A] mt-1">₹{newEmi.toLocaleString('en-IN')}</p>
+                                  {hasTopUp && consolidationAmount > 0 && canFullyConsolidate && (
+                                    <p className="text-[10px] text-brand-black/70 mt-1 font-semibold">
+                                      Consolidation only: ₹{consolidationOnlyEmi.toLocaleString('en-IN')} ({tenureMonths}m)
+                                    </p>
+                                  )}
                                   <div className="mt-2 flex items-center gap-2">
                                     <label className="text-[10px] text-brand-black/70 font-semibold whitespace-nowrap">Tenure (Mos):</label>
                                     <select 
@@ -1453,22 +1493,47 @@ export function EligibilityForm() {
                           const consolidationAmount = isConsolidating ? catBLoans.reduce((sum: number, l: any) => sum + Number(l.currentOutstanding || 0), 0) : 0;
                           const currentEmiToConsolidate = isConsolidating ? catBLoans.reduce((sum: number, l: any) => sum + Number(l.emi || 0), 0) : 0;
                           
-                          const targetAmount = isConsolidating 
-                            ? (consolidationAmount + (userOverrides.wantsTopUp === 'yes' ? Number(userOverrides.topUpAmount || 0) : 0))
-                            : (lender.universalMaxLoan || 0);
-                            
-                          const cappedNewLoan = Math.min(targetAmount, lender.universalMaxLoan || 0);
+                          const totalNewLoanReq = consolidationAmount + (userOverrides.wantsTopUp === 'yes' ? Number(userOverrides.topUpAmount || 0) : 0);
                           
                           const ratePerMonth = (lender.headlineRate || 12) / 12 / 100;
                           const maxLenderTenure = lender.maxTenure || 60;
-                          const tenureMonths = Number(userOverrides.consolidationTenure) || maxLenderTenure;
+                          const selectedTenure = Number(userOverrides.consolidationTenure);
+                          const tenureMonths = selectedTenure ? Math.min(selectedTenure, maxLenderTenure) : maxLenderTenure;
                           
-                          const newEmi = cappedNewLoan > 0 ? Math.round(
-                            (cappedNewLoan * ratePerMonth * Math.pow(1 + ratePerMonth, tenureMonths)) /
+                          let dynamicMaxLoan = lender.universalMaxLoan || 0;
+                          if (isConsolidating) {
+                            const maxEmi = lender.universalMaxEmi || 0;
+                            const usedEmi = lender.universalUsedEmi || 0;
+                            const dynamicUnusedEmi = Math.max(0, maxEmi - (usedEmi - currentEmiToConsolidate));
+                            if (dynamicUnusedEmi > 0) {
+                              dynamicMaxLoan = Math.floor(
+                                (dynamicUnusedEmi * (Math.pow(1 + ratePerMonth, maxLenderTenure) - 1)) /
+                                (ratePerMonth * Math.pow(1 + ratePerMonth, maxLenderTenure))
+                              );
+                              if (lender.maxLoanAmount && dynamicMaxLoan > lender.maxLoanAmount) {
+                                dynamicMaxLoan = lender.maxLoanAmount;
+                              }
+                            } else {
+                              dynamicMaxLoan = 0;
+                            }
+                          }
+                          
+                          const amountForEmi = totalNewLoanReq > 0 ? Math.min(totalNewLoanReq, dynamicMaxLoan) : dynamicMaxLoan;
+                          const isCapped = totalNewLoanReq > 0 && amountForEmi < totalNewLoanReq;
+                          
+                          const newEmi = amountForEmi > 0 ? Math.round(
+                            (amountForEmi * ratePerMonth * Math.pow(1 + ratePerMonth, tenureMonths)) /
                             (Math.pow(1 + ratePerMonth, tenureMonths) - 1)
                           ) : 0;
                           
-                          const emiSavings = isConsolidating ? (currentEmiToConsolidate - newEmi) : 0;
+                          const hasTopUp = userOverrides.wantsTopUp === 'yes' && Number(userOverrides.topUpAmount || 0) > 0;
+                          const canFullyConsolidate = dynamicMaxLoan >= consolidationAmount;
+                          const consolidationOnlyEmi = (consolidationAmount > 0 && canFullyConsolidate) ? Math.round(
+                            (consolidationAmount * ratePerMonth * Math.pow(1 + ratePerMonth, tenureMonths)) /
+                            (Math.pow(1 + ratePerMonth, tenureMonths) - 1)
+                          ) : 0;
+                          
+                          const emiSavings = (isConsolidating && totalNewLoanReq > 0 && !isCapped) ? (currentEmiToConsolidate - newEmi) : 0;
 
                           return (
                             <div key={i} className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 mb-3 flex flex-col gap-3">
@@ -1512,14 +1577,31 @@ export function EligibilityForm() {
                                 <div>
                                   <p className="text-emerald-700/80 font-semibold mb-0.5 uppercase tracking-wider">Est. Max New Loan</p>
                                   <p className="font-black text-blue-700 text-[13px]">
-                                    ₹{(lender.universalMaxLoan || 0).toLocaleString('en-IN')}
+                                    ₹{dynamicMaxLoan.toLocaleString('en-IN')}
                                   </p>
                                 </div>
                                 <div>
                                   <p className="text-emerald-700/80 font-semibold mb-0.5 uppercase tracking-wider">Est. New EMI</p>
                                   <p className="font-bold text-emerald-900">
-                                    ₹{newEmi.toLocaleString('en-IN')} <span className="font-normal text-[9px]">({tenureMonths}m)</span>
+                                    ₹{newEmi.toLocaleString('en-IN')} <span className="font-normal text-[9px]">({tenureMonths}m{isCapped ? ' on partial loan' : ''})</span>
                                   </p>
+                                  {hasTopUp && consolidationAmount > 0 && canFullyConsolidate && (
+                                    <p className="text-[9px] text-emerald-700 mt-0.5 font-semibold">
+                                      Consolidation only: ₹{consolidationOnlyEmi.toLocaleString('en-IN')} ({tenureMonths}m)
+                                    </p>
+                                  )}
+                                  <div className="mt-1.5 flex items-center gap-1.5">
+                                    <label className="text-[9px] text-emerald-700/80 font-semibold">Tenure (Mos):</label>
+                                    <select 
+                                      value={tenureMonths}
+                                      onChange={(e) => setUserOverrides({ ...userOverrides, consolidationTenure: e.target.value })}
+                                      className="bg-emerald-50/50 border border-emerald-200/50 rounded px-1 py-0.5 text-[9px] outline-none text-emerald-900 font-medium"
+                                    >
+                                      {[12, 24, 36, 48, 60, 72, 84].filter(t => t <= maxLenderTenure).map(t => (
+                                        <option key={t} value={t}>{t}</option>
+                                      ))}
+                                    </select>
+                                  </div>
                                 </div>
                                 {isConsolidating && (
                                   <div>
