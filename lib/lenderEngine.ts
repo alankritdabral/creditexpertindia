@@ -874,9 +874,22 @@ export function analyzeLenderEligibility({
 
     // 7. Restricted profiles
     if (lender.restrictedProfiles.length > 0 && profile.jobProfile) {
-      const isRestricted = lender.restrictedProfiles.some(
+      let isRestricted = lender.restrictedProfiles.some(
         (p) => profile.jobProfile.toLowerCase().includes(p.toLowerCase())
       );
+
+      // --- Lender Specific Restricted Profile Bypasses ---
+      if (isRestricted && lender.id === "axis") {
+        // Special September 2026 State Police Offer bypass for specific states
+        const jobLower = profile.jobProfile.toLowerCase();
+        if (jobLower.includes("police") || jobLower.includes("state government")) {
+          const state = (profile.state || "").toLowerCase();
+          if (["maharashtra", "karnataka", "tamil nadu", "andhra pradesh"].some(s => state.includes(s))) {
+            isRestricted = false;
+          }
+        }
+      }
+
       if (isRestricted) {
         isEligible = false;
         rejectionReasons.push(`Profile "${profile.jobProfile}" is restricted`);
@@ -1096,6 +1109,42 @@ export function analyzeLenderEligibility({
           );
         } else {
           customOutput.axisMaxLoan = 0;
+        }
+
+        // --- Axis Bank September Special Offers 2026 ---
+        const specialOffers = [];
+        const isCibil750 = cibilScore >= 750;
+        
+        if (employerTier === "GOVT" && nth >= 50000 && isCibil750) {
+          specialOffers.push("Govt Employee Offer (ROI 10.90%, PF ₹4,999)");
+        }
+        
+        if (seg === "CSG" && ["A+", "A", "B", "C", "GOVT"].includes(employerTier)) {
+          if (isCibil750) {
+            specialOffers.push("Select Corporates Offer (ROI 10.29%-11.99%, PF ₹2,999+GST)");
+          } else if (cibilScore > 0) {
+            specialOffers.push("Select Corporates Offer (1% higher ROI for CIBIL < 750)");
+          }
+        }
+        
+        if (profile.jobProfile && profile.jobProfile.toLowerCase().includes("police")) {
+          const state = (profile.state || "").toLowerCase();
+          if (["maharashtra", "karnataka", "tamil nadu", "andhra pradesh"].some(s => state.includes(s))) {
+             if (isCibil750) {
+               specialOffers.push("State Police Offer (ROI 10.49%-11.49%, PF ₹999)");
+             } else if (cibilScore > 0) {
+               specialOffers.push("State Police Offer (1% higher ROI for CIBIL < 750)");
+             }
+          }
+        }
+
+        if (isCibil750 && seg !== "Blue Collar" && specialOffers.length === 0) {
+          specialOffers.push("September Special Offer (ROI from 9.99%)");
+        }
+
+        if (specialOffers.length > 0) {
+          customOutput.axisSpecialOffers = specialOffers;
+          warnings.push(`Special Offers Available: ${specialOffers.join(" | ")}`);
         }
       }
     }
