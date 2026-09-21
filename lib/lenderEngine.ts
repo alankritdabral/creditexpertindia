@@ -314,7 +314,7 @@ const LENDERS: LenderConfig[] = [
     maxTenure: 84,
     maxFoir: 70,
     employerBankId: "kotak",
-    minSalary: 150000,        // Segment 1: ₹1.5L (excl variable)
+    minSalary: 75000,         // Minimum based on Green Scorecard
     minCibil: null,           // Segment/policy based
     cibilMinus1Accepted: false,
     cibilMinus1MaxFunding: 0,
@@ -1287,23 +1287,58 @@ export function analyzeLenderEligibility({
       const kotakNth = (Number(profile.netSalary) || 0) -
         (profile.yearlyBonus ? Number(profile.yearlyBonus) / 12 : 0);
 
-      if (kotakNth < 150000) {
-        isEligible = false;
-        rejectionReasons.push("Requires minimum ₹1.5L NTH (excluding variable income)");
-      } else if (kotakNth >= 150000 && kotakNth < 200000) {
-        // Segment 1: needs live HL > ₹10L
-        const hl = allLoans.find(
-          (l: any) =>
-            l.type === "Home Loan" && Number(l.currentOutstanding || 0) > 1000000
-        );
-        if (!hl) {
-          isEligible = false;
-          rejectionReasons.push(
-            "Segment 1 (₹1.5L–₹2L NTH) requires active Home Loan > ₹10 Lakhs"
-          );
-        }
+      const scorecard = (profile.kotakScorecard || "").toLowerCase();
+      
+      // Employer Category check
+      if (employerTier === "C") {
+         const isItCompany = profile.industry === "IT" || profile.industry === "Information Technology" || (profile.employer || "").toLowerCase().includes("it");
+         if (!isItCompany) {
+            isEligible = false;
+            rejectionReasons.push("Cat C employer must be an IT company for Kotak OD");
+         }
+         if (kotakNth < 100000) {
+            isEligible = false;
+            rejectionReasons.push("Cat C (IT) requires minimum ₹1 Lakh+ NTH");
+         }
+         if (scorecard && scorecard !== "green") {
+            isEligible = false;
+            rejectionReasons.push("Cat C (IT) requires a 'Green' credit score");
+         } else if (!scorecard) {
+            warnings.push("Cat C (IT) requires a 'Green' credit score.");
+         }
+      } else if (!["A+", "A", "B", "GOVT"].includes(employerTier)) {
+         isEligible = false;
+         rejectionReasons.push(`Employer category '${employerTier}' is not eligible for Kotak OD. Allowed: Cat A, B, Govt, or Cat C (IT).`);
       }
-      // Segment 2: NTH ≥ ₹2L + Green scorecard (we can't verify scorecard)
+      
+      // Salary & Scorecard logic for general (Cat A, B, Govt)
+      if (isEligible && ["A+", "A", "B", "GOVT"].includes(employerTier)) {
+         let minRequiredNth = 100000; // Default to Yellow requirement
+         if (scorecard === "green") minRequiredNth = 75000;
+         
+         if (kotakNth < minRequiredNth) {
+           if (kotakNth >= 75000 && !scorecard) {
+             warnings.push("Kotak OD requires a 'Green' credit score for salaries between ₹75K and ₹1L.");
+           } else {
+             isEligible = false;
+             rejectionReasons.push(
+               `Requires minimum ₹${(minRequiredNth / 1000).toFixed(0)}K NTH (excluding variable income) based on scorecard`
+             );
+           }
+         }
+      }
+      
+      // FOIR check
+      let kotakFoir = 60;
+      const hasRunningHL = allLoans.some((l: any) => l.type === "Home Loan" && Number(l.currentOutstanding || 0) > 0);
+      if (hasRunningHL) {
+         kotakFoir = 70;
+      }
+      customOutput.maxFOIR = `${kotakFoir}%`;
+      
+      // Tenure output
+      customOutput.kotakOdTenure = "2+5 years or 2+6 years";
+      
       customOutput.kotakEffectiveNTH = Math.floor(kotakNth);
     }
 
