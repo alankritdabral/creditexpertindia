@@ -62,30 +62,30 @@ interface LenderConfig {
   minLoanAmount: number;
   maxTenure: number;
   maxFoir: number;
-  
+
   // Employer lookup: if bankId is set, uses bank-specific Excel data
   employerBankId: string | null;
-  
+
   // Min salary (default, may be overridden per segment)
   minSalary: number;
-  
+
   // CIBIL
   minCibil: number | null;         // null = no specific requirement / scorecard based
   cibilMinus1Accepted: boolean;
   cibilMinus1MaxFunding: number;
-  
+
   // BT rules
   bt: BTRules;
-  
+
   // Obligation rules  
   obligations: ObligationRules;
-  
+
   // Income add-back
   incomeAddBack: IncomeAddBack;
-  
+
   // Restrictions
   restrictedProfiles: string[];
-  
+
   // Special flags
   wfhAccepted: boolean;
   ownHouseRequired: boolean;
@@ -95,7 +95,7 @@ interface LenderConfig {
   minAge: number;
   maxAgeAtMaturity: number;
   minExperienceMonths: number;
-  
+
   // Location restriction warning
   locationWarning: string | null;
 }
@@ -1031,6 +1031,12 @@ export function analyzeLenderEligibility({
 
     // ── AXIS BANK specific ──────────────────────────────────────────────
     if (lender.id === "axis" && isEligible) {
+      const allowedAxisTiers = ["A+", "A", "B", "C", "GOVT"];
+      if (!allowedAxisTiers.includes(employerTier)) {
+        isEligible = false;
+        rejectionReasons.push(`Employer category '${employerTier}' is not eligible (Only A+, A, B, C, and Govt allowed)`);
+      }
+
       const seg = profile.axisCustomerSegment || "NTB";
       let nmiReq = 75000;
       let cibilReq = 780;
@@ -1236,7 +1242,7 @@ export function analyzeLenderEligibility({
       }
       // 84M requires: NMI ≥₹50K, Cat A/Govt, age ≥25, loan ≥₹5L, CIBIL ≥750
       if (nth >= 50000 && ["A+", "A", "GOVT"].includes(employerTier) &&
-          (age >= 25 || !age) && cibilScore >= 750) {
+        (age >= 25 || !age) && cibilScore >= 750) {
         allowedTenure = 84;
       }
       customOutput.indusindMaxTenure = allowedTenure;
@@ -1347,7 +1353,7 @@ export function analyzeLenderEligibility({
       } else if (nth > 45000) {
         smfgFoir = 70;
       }
-      
+
       customOutput.maxFOIR = `${smfgFoir}%`;
     }
 
@@ -1357,18 +1363,18 @@ export function analyzeLenderEligibility({
     if (isEligible) {
       let foir = lender.maxFoir;
       if (customOutput.maxFOIR) {
-        foir = parseInt(customOutput.maxFOIR.replace('%','')) || lender.maxFoir;
+        foir = parseInt(customOutput.maxFOIR.replace('%', '')) || lender.maxFoir;
       }
-      
+
       let maxEmiCapacity = nth * (foir / 100);
-      
+
       let totalObligations = 0;
       allLoans.forEach((l: any) => {
         totalObligations += calculateObligation(l, lender);
       });
-      
+
       let unusedCapacity = Math.max(0, maxEmiCapacity - totalObligations);
-      
+
       let maxLoan = 0;
       if (unusedCapacity > 0) {
         const r = lender.headlineRate / 12 / 100;
@@ -1379,9 +1385,9 @@ export function analyzeLenderEligibility({
       customOutput.universalMaxEmi = Math.floor(maxEmiCapacity);
       customOutput.universalUsedEmi = Math.floor(totalObligations);
       customOutput.universalUnusedEmi = Math.floor(unusedCapacity);
-      
+
       customOutput.universalMaxLoan = Math.floor(maxLoan);
-      
+
       // Override with bank specific if available
       if (lender.id === 'axis' && customOutput.axisMaxLoan !== undefined) customOutput.universalMaxLoan = customOutput.axisMaxLoan;
       if (lender.id === 'abfl' && customOutput.abflMaxLoan !== undefined) customOutput.universalMaxLoan = customOutput.abflMaxLoan;
@@ -1389,7 +1395,7 @@ export function analyzeLenderEligibility({
       if (lender.id === 'indusind' && customOutput.indusindMaxLoan !== undefined) customOutput.universalMaxLoan = customOutput.indusindMaxLoan;
       if (lender.id === 'poonawalla' && customOutput.poonawallaMaxLoan !== undefined) customOutput.universalMaxLoan = customOutput.poonawallaMaxLoan;
       if (customOutput.cibilMinus1MaxLoan !== undefined) customOutput.universalMaxLoan = customOutput.cibilMinus1MaxLoan;
-      
+
       // Apply cap
       if (customOutput.universalMaxLoan > lender.maxLoanAmount) {
         customOutput.universalMaxLoan = lender.maxLoanAmount;
