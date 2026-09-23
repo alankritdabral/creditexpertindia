@@ -44,7 +44,7 @@ export function EligibilityForm() {
         backgroundColor: '#ffffff'
       });
       const link = document.createElement('a');
-      link.download = `CEI_${names[section]}_${formData.name || 'Report'}.png`;
+      link.download = `CEI_${names[section]}_${formData.firstName || 'Report'}.png`;
       link.href = dataUrl;
       link.click();
 
@@ -60,10 +60,10 @@ export function EligibilityForm() {
 
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
-    name: "", mobile: "", email: "", city: "", employmentType: "Salaried",
+    firstName: "", lastName: "", mobile: "", email: "", city: "", employmentType: "Salaried",
     monthlyIncome: "", employer: "", salaryMode: "Bank Transfer",
     requirement: "",
-    pan: "", gender: "male", consent: false, bureau: "v2_json"
+    pan: "", gender: "male", consent: false, bureau: "v1_json"
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -127,10 +127,17 @@ export function EligibilityForm() {
       setError("Please accept the credit report consent.");
       return;
     }
-    const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/i;
-    if (!panRegex.test(formData.pan)) {
-      setError("Please enter a valid 10-character PAN number.");
+    if (!formData.firstName.trim() || !formData.lastName.trim()) {
+      setError("Please enter both First Name and Last Name.");
       return;
+    }
+    const isCrifSelected = formData.bureau.startsWith("crif");
+    if (!isCrifSelected) {
+      const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/i;
+      if (!panRegex.test(formData.pan)) {
+        setError("Please enter a valid 10-character PAN number.");
+        return;
+      }
     }
     if (formData.mobile.length !== 10) {
       setError("Please enter a valid 10-digit mobile number.");
@@ -142,7 +149,8 @@ export function EligibilityForm() {
 
     try {
       // 1. Check Database First
-      const docId = `${formData.pan.toUpperCase()}_${formData.mobile}_${formData.bureau}`;
+      const safePan = formData.pan ? formData.pan.toUpperCase() : "NOPAN";
+      const docId = `${safePan}_${formData.mobile}_${formData.bureau}`;
       const docRef = doc(db, "credit_reports", docId);
 
       try {
@@ -187,81 +195,60 @@ export function EligibilityForm() {
       const isCrif = formData.bureau.startsWith("crif");
       const isPdf = formData.bureau.endsWith("_pdf");
 
-      let endpoint = "";
-      if (isV2) {
-        endpoint = isPdf
-          ? "https://kyc-api.surepass.app/api/v1/credit-report-v2/fetch-pdf-report"
-          : "https://kyc-api.surepass.app/api/v1/credit-report-v2/fetch-report";
-      } else if (isExperian) {
-        endpoint = isPdf
-          ? "https://kyc-api.surepass.app/api/v1/credit-report-experian/fetch-report-pdf"
-          : "https://kyc-api.surepass.app/api/v1/credit-report-experian/fetch-report";
-      } else if (isCrif) {
-        endpoint = isPdf
-          ? "https://kyc-api.surepass.app/api/v1/credit-report-crif/fetch-report-pdf"
-          : "https://kyc-api.surepass.app/api/v1/credit-report-crif/fetch-report";
-      } else {
-        endpoint = isPdf
-          ? "https://kyc-api.surepass.app/api/v1/credit-report-cibil/fetch-report-pdf"
-          : "https://kyc-api.surepass.app/api/v1/credit-report-cibil/fetch-report";
-      }
-
       let bodyPayload: any = {};
-      if (isV2) {
+      if (isCrif) {
         bodyPayload = {
-          name: formData.name || "Customer",
-          id_number: formData.pan,
-          id_type: "pan",
-          mobile: formData.mobile,
-          consent: "Y",
-          gender: formData.gender
-        };
-      } else if (isCrif) {
-        const nameParts = (formData.name || "Customer").trim().split(" ");
-        const firstName = nameParts[0];
-        const lastName = nameParts.slice(1).join(" ") || firstName;
-        bodyPayload = {
-          first_name: firstName,
-          last_name: lastName,
-          mobile: formData.mobile,
-          pan: formData.pan,
-          consent: "Y"
+          first_name: formData.firstName,
+          last_name: formData.lastName,
+          mobile_no: formData.mobile,
+          name_lookup: 0
         };
       } else {
         bodyPayload = {
-          mobile: formData.mobile,
-          pan: formData.pan,
-          name: formData.name || "Customer",
-          gender: formData.gender,
-          consent: "Y"
+          forename: formData.firstName,
+          surname: formData.lastName,
+          phone_number: formData.mobile,
+          gender: formData.gender === "male" ? "Male" : formData.gender === "female" ? "Female" : "Other",
+          pan_id: formData.pan
         };
       }
 
-      // Send the request through our new Next.js API Route which talks to the VPS proxy
-      const res = await fetch("/api/surepass", {
+      // Send the request through our new Next.js API Route which talks to IDSPay
+      const res = await fetch("/api/idspay", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ endpoint, bodyPayload })
+        body: JSON.stringify({ bureau: formData.bureau, bodyPayload })
       });
 
       const data = await res.json();
+      console.log("IDSPay API Response Data:", data);
 
-      if (!res.ok || !data.success) {
+      if (!res.ok || (data.status && data.status.type !== "success")) {
         setError(data.message || data.error || "Failed to fetch credit report. Please check your details.");
       } else {
         // Save to Firebase
         try {
-          const docId = `${formData.pan.toUpperCase()}_${formData.mobile}_${formData.bureau}`;
+          const safePan = formData.pan ? formData.pan.toUpperCase() : "NOPAN";
+          const docId = `${safePan}_${formData.mobile}_${formData.bureau}`;
+          
+          let extractedScore = data.data?.credit_score;
+          if (!extractedScore) {
+             const newCrifScore = data.data?.result_json?.parsed_data?.["B2C-REPORT"]?.["REPORT-DATA"]?.["STANDARD-DATA"]?.SCORE?.[0]?.VALUE;
+             if (newCrifScore) {
+               extractedScore = newCrifScore;
+             }
+          }
+
           await setDoc(doc(db, "credit_reports", docId), {
-            name: formData.name,
+            name: `${formData.firstName} ${formData.lastName}`,
             mobile: formData.mobile,
-            pan: formData.pan.toUpperCase(),
+            pan: safePan,
             gender: formData.gender,
             bureau: formData.bureau,
-            credit_score: data.data?.credit_score || null,
-            pdf_link: data.data?.credit_report_link || null,
+            credit_score: extractedScore || null,
+            pdf_link: data.data?.web_token_url || data.data?.credit_report_link || null,
             raw_api_data: data.data, // Save the full response to rebuild dashboard later
             created_at: serverTimestamp()
           });
@@ -285,73 +272,59 @@ export function EligibilityForm() {
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
             <h3 className="text-2xl font-bold text-brand-black mb-6">Credit Profile & Identity</h3>
             <div className="space-y-4">
-              <div className="relative">
-                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                <input type="text" placeholder="Full Name (As per PAN)" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} className="w-full bg-white border border-icy-blue rounded-xl pl-11 pr-4 py-3.5 focus:ring-2 focus:ring-blue-energy/30 focus:border-blue-energy outline-none transition-all" />
+              <div className="flex gap-4">
+                <div className="relative flex-1">
+                  <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <input type="text" placeholder="First Name" value={formData.firstName} onChange={e => setFormData({ ...formData, firstName: e.target.value })} className="w-full bg-white border border-icy-blue rounded-xl pl-11 pr-4 py-3.5 focus:ring-2 focus:ring-blue-energy/30 focus:border-blue-energy outline-none transition-all" />
+                </div>
+                <div className="relative flex-1">
+                  <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <input type="text" placeholder="Last Name" value={formData.lastName} onChange={e => setFormData({ ...formData, lastName: e.target.value })} className="w-full bg-white border border-icy-blue rounded-xl pl-11 pr-4 py-3.5 focus:ring-2 focus:ring-blue-energy/30 focus:border-blue-energy outline-none transition-all" />
+                </div>
               </div>
-              <div className="relative">
-                <CreditCard className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                <input
-                  type="text"
-                  placeholder="PAN Number"
-                  value={formData.pan}
-                  onChange={e => setFormData({ ...formData, pan: e.target.value.toUpperCase() })}
-                  className="w-full bg-white border border-icy-blue rounded-xl pl-11 pr-4 py-3.5 focus:ring-2 focus:ring-blue-energy/30 focus:border-blue-energy outline-none transition-all uppercase"
-                  maxLength={10}
-                />
-              </div>
+              {!formData.bureau.startsWith('crif') && (
+                <div className="relative">
+                  <CreditCard className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <input
+                    type="text"
+                    placeholder="PAN Number"
+                    value={formData.pan}
+                    onChange={e => setFormData({ ...formData, pan: e.target.value.toUpperCase() })}
+                    className="w-full bg-white border border-icy-blue rounded-xl pl-11 pr-4 py-3.5 focus:ring-2 focus:ring-blue-energy/30 focus:border-blue-energy outline-none transition-all uppercase"
+                    maxLength={10}
+                  />
+                </div>
+              )}
               <div className="relative">
                 <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <input type="tel" placeholder="Mobile Number" value={formData.mobile} onChange={e => setFormData({ ...formData, mobile: e.target.value })} className="w-full bg-white border border-icy-blue rounded-xl pl-11 pr-4 py-3.5 focus:ring-2 focus:ring-blue-energy/30 focus:border-blue-energy outline-none transition-all" />
               </div>
-              <div className="relative">
-                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                <select
-                  value={formData.gender}
-                  onChange={e => setFormData({ ...formData, gender: e.target.value })}
-                  className="w-full bg-white border border-icy-blue rounded-xl pl-11 pr-4 py-3.5 focus:ring-2 focus:ring-blue-energy/30 focus:border-blue-energy outline-none text-brand-black transition-all"
-                >
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                  <option value="other">Other</option>
-                </select>
-              </div>
+              {!formData.bureau.startsWith('crif') && (
+                <div className="relative">
+                  <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <select
+                    value={formData.gender}
+                    onChange={e => setFormData({ ...formData, gender: e.target.value })}
+                    className="w-full bg-white border border-icy-blue rounded-xl pl-11 pr-4 py-3.5 focus:ring-2 focus:ring-blue-energy/30 focus:border-blue-energy outline-none text-brand-black transition-all"
+                  >
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+              )}
 
               {/* Bureau Selection */}
               <div className="pt-2">
-                <p className="text-sm font-semibold text-brand-black mb-3">Select Credit Bureau & Format</p>
+                <p className="text-sm font-semibold text-brand-black mb-3">Select Credit Bureau</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <label className="flex items-center gap-2 p-3 border rounded-xl cursor-not-allowed transition-all border-icy-blue bg-slate-50 opacity-50">
-                    <input type="radio" name="bureau" value="v1_json" checked={formData.bureau === 'v1_json'} disabled onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-blue-energy accent-blue-energy cursor-not-allowed" />
-                    <span className="text-sm font-medium text-brand-black/90">CIBIL (Dashboard)</span>
+                  <label className={`flex items-center gap-2 p-3 border rounded-xl cursor-pointer transition-all ${formData.bureau === 'v1_json' ? 'border-blue-energy bg-blue-50/50' : 'border-icy-blue hover:bg-slate-50'}`}>
+                    <input type="radio" name="bureau" value="v1_json" checked={formData.bureau === 'v1_json'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-blue-energy accent-blue-energy" />
+                    <span className="text-sm font-medium text-brand-black/90">CIBIL</span>
                   </label>
-                  <label className="flex items-center gap-2 p-3 border rounded-xl cursor-not-allowed transition-all border-icy-blue bg-slate-50 opacity-50">
-                    <input type="radio" name="bureau" value="v1_pdf" checked={formData.bureau === 'v1_pdf'} disabled onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-blue-energy accent-blue-energy cursor-not-allowed" />
-                    <span className="text-sm font-medium text-brand-black/90">CIBIL (PDF)</span>
-                  </label>
-                  <label className={`flex items-center gap-2 p-3 border rounded-xl cursor-pointer transition-all ${formData.bureau === 'v2_json' ? 'border-blue-energy bg-blue-50/50' : 'border-icy-blue hover:bg-slate-50'}`}>
-                    <input type="radio" name="bureau" value="v2_json" checked={formData.bureau === 'v2_json'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-blue-energy accent-blue-energy" />
-                    <span className="text-sm font-medium text-brand-black/90">Equifax (Dashboard)</span>
-                  </label>
-                  <label className="flex items-center gap-2 p-3 border rounded-xl cursor-not-allowed transition-all border-icy-blue bg-slate-50 opacity-50">
-                    <input type="radio" name="bureau" value="v2_pdf" disabled checked={formData.bureau === 'v2_pdf'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-blue-energy accent-blue-energy cursor-not-allowed" />
-                    <span className="text-sm font-medium text-brand-black/90">Equifax (PDF)</span>
-                  </label>
-                  <label className="flex items-center gap-2 p-3 border rounded-xl cursor-not-allowed transition-all border-icy-blue bg-slate-50 opacity-50">
-                    <input type="radio" name="bureau" value="experian_json" disabled checked={formData.bureau === 'experian_json'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-blue-energy accent-blue-energy cursor-not-allowed" />
-                    <span className="text-sm font-medium text-brand-black/90">Experian (Dashboard)</span>
-                  </label>
-                  <label className="flex items-center gap-2 p-3 border rounded-xl cursor-not-allowed transition-all border-icy-blue bg-slate-50 opacity-50">
-                    <input type="radio" name="bureau" value="experian_pdf" disabled checked={formData.bureau === 'experian_pdf'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-blue-energy accent-blue-energy cursor-not-allowed" />
-                    <span className="text-sm font-medium text-brand-black/90">Experian (PDF)</span>
-                  </label>
-                  <label className="flex items-center gap-2 p-3 border rounded-xl cursor-not-allowed transition-all border-icy-blue bg-slate-50 opacity-50">
-                    <input type="radio" name="bureau" value="crif_json" disabled checked={formData.bureau === 'crif_json'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-blue-energy accent-blue-energy cursor-not-allowed" />
-                    <span className="text-sm font-medium text-brand-black/90">CRIF (Dashboard)</span>
-                  </label>
-                  <label className="flex items-center gap-2 p-3 border rounded-xl cursor-not-allowed transition-all border-icy-blue bg-slate-50 opacity-50">
-                    <input type="radio" name="bureau" value="crif_pdf" disabled checked={formData.bureau === 'crif_pdf'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-blue-energy accent-blue-energy cursor-not-allowed" />
-                    <span className="text-sm font-medium text-brand-black/90">CRIF (PDF)</span>
+                  <label className={`flex items-center gap-2 p-3 border rounded-xl cursor-pointer transition-all ${formData.bureau === 'crif_json' ? 'border-blue-energy bg-blue-50/50' : 'border-icy-blue hover:bg-slate-50'}`}>
+                    <input type="radio" name="bureau" value="crif_json" checked={formData.bureau === 'crif_json'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-blue-energy accent-blue-energy" />
+                    <span className="text-sm font-medium text-brand-black/90">CRIF</span>
                   </label>
                 </div>
               </div>

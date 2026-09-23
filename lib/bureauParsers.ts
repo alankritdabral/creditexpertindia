@@ -181,115 +181,262 @@ export function parseBureauData(bureau: string, data: any): ParsedBureauData {
     };
   } else if (isCrif) {
     // CRIF JSON parsing
-    const report = data?.credit_report || {};
-    const responses = report?.RESPONSES?.RESPONSE || [];
+    const report = data?.result_json?.credit_report || data?.credit_report || {};
+    const newReport = data?.result_json?.parsed_data?.["B2C-REPORT"]?.["REPORT-DATA"]?.["STANDARD-DATA"];
     
-    accounts = responses.map((res: any) => {
-      const loan = res["LOAN-DETAILS"] || {};
+    if (newReport) {
+      const tradelines = newReport.TRADELINES || [];
+      accounts = tradelines.map((loan: any) => {
+        let emiStr = String(loan["INSTALLMENT-AMT"] || "0");
+        emiStr = emiStr.split('/')[0].replace(/,/g, '');
+        
+        const currBal = String(loan["CURRENT-BAL"] || "0").replace(/,/g, '');
+        const highCred = String(loan["DISBURSED-AMT"] || loan["CREDIT-LIMIT"] || "0").replace(/,/g, '');
+        
+        return {
+          accountNumber: loan["ACCT-NUMBER"] || "N/A",
+          accountType: loan["ACCT-TYPE"] || "Unknown",
+          currentBalance: Number(currBal) || 0,
+          highCreditAmount: Number(highCred) || 0,
+          memberShortName: loan["CREDIT-GRANTOR"] || "Unknown Lender",
+          dateOpened: loan["DISBURSED-DT"] || "N/A",
+          dateReported: loan["REPORTED-DT"] || "N/A",
+          emiAmount: Number(emiStr) || 0,
+          interest_rate: Number(loan["INTEREST-RATE"] || 0),
+          repaymentTenure: loan["REPAYMENT-TENURE"] || "N/A",
+          pastDueAmount: Number(String(loan["OVERDUE-AMT"] || "0").replace(/,/g, '')) || 0
+        };
+      });
+
+      const inquiries = newReport["INQUIRY-HISTORY"] || [];
+      enquiries = inquiries.map((inq: any) => ({
+        memberShortName: inq["LENDER-NAME"] || "Unknown Lender",
+        enquiryDate: inq["INQUIRY-DT"] || "N/A",
+        enquiryAmount: Number(String(inq["AMOUNT"] || "0").replace(/,/g, '')) || 0
+      }));
       
-      let emiStr = String(loan["INSTALLMENT-AMT"] || "0");
-      emiStr = emiStr.split('/')[0].replace(/,/g, '');
-      
-      const currBal = String(loan["CURRENT-BAL"] || "0").replace(/,/g, '');
-      const highCred = String(loan["DISBURSED-AMT"] || loan["CREDIT-LIMIT"] || "0").replace(/,/g, '');
-      
-      return {
-        accountNumber: loan["ACCT-NUMBER"] || "N/A",
-        accountType: loan["ACCT-TYPE"] || "Unknown",
-        currentBalance: Number(currBal) || 0,
-        highCreditAmount: Number(highCred) || 0,
-        memberShortName: loan["CREDIT-GUARANTOR"] || "Unknown Lender",
-        dateOpened: loan["DISBURSED-DT"] || "N/A",
-        dateReported: loan["DATE-REPORTED"] || "N/A",
-        emiAmount: Number(emiStr) || 0,
-        interest_rate: Number(loan["INTEREST-RATE"] || 0),
-        repaymentTenure: loan["REPAYMENT-TENURE"] || "N/A",
-        pastDueAmount: Number(String(loan["OVERDUE-AMT"] || "0").replace(/,/g, '')) || 0
+      inquirySummary = {
+        totalInquiry: inquiries.length
       };
-    });
 
-    const inquiries = report?.["INQUIRY-HISTORY"]?.HISTORY || [];
-    enquiries = inquiries.map((inq: any) => ({
-      memberShortName: inq["MEMBER-NAME"] || "Unknown Lender",
-      enquiryDate: inq["INQUIRY-DATE"] || "N/A",
-      enquiryAmount: Number(String(inq["AMOUNT"] || "0").replace(/,/g, '')) || 0
-    }));
-    
-    inquirySummary = {
-      totalInquiry: inquiries.length
-    };
-    
-    const primarySummary = report?.["ACCOUNTS-SUMMARY"]?.["PRIMARY-ACCOUNTS-SUMMARY"] || {};
-    
-    let currentBalance = 0;
-    let highCreditAmount = 0;
-    let overdueBalance = 0;
-    let overdueAccounts = 0;
-    let zeroBalanceAccounts = 0;
+      let currentBalance = 0;
+      let highCreditAmount = 0;
+      let overdueBalance = 0;
+      let overdueAccounts = 0;
+      let zeroBalanceAccounts = 0;
 
-    accounts.forEach(acc => {
-      currentBalance += acc.currentBalance;
-      highCreditAmount += acc.highCreditAmount;
-      if (acc.currentBalance === 0) zeroBalanceAccounts += 1;
-    });
+      accounts.forEach(acc => {
+        currentBalance += acc.currentBalance;
+        highCreditAmount += acc.highCreditAmount;
+        if (acc.currentBalance <= 0) zeroBalanceAccounts += 1;
+        const pastDue = (acc as any).pastDueAmount || 0;
+        overdueBalance += pastDue;
+        if (pastDue > 0) overdueAccounts += 1;
+      });
 
-    responses.forEach((res: any) => {
-       const loan = res["LOAN-DETAILS"] || {};
-       const od = Number(String(loan["OVERDUE-AMT"] || "0").replace(/,/g, '')) || 0;
-       overdueBalance += od;
-       if (od > 0) overdueAccounts += 1;
-    });
+      accountSummary = {
+        totalAccounts: accounts.length,
+        currentBalance,
+        highCreditAmount,
+        overdueBalance,
+        overdueAccounts,
+        zeroBalanceAccounts
+      };
+      
+      const scoreData = newReport.SCORE?.[0];
+      if (scoreData) {
+        personalInfo = {
+           score: scoreData.VALUE || 0
+        };
+      }
+    } else {
+      const responses = report?.RESPONSES?.RESPONSE || [];
+      
+      accounts = responses.map((res: any) => {
+        const loan = res["LOAN-DETAILS"] || {};
+        
+        let emiStr = String(loan["INSTALLMENT-AMT"] || "0");
+        emiStr = emiStr.split('/')[0].replace(/,/g, '');
+        
+        const currBal = String(loan["CURRENT-BAL"] || "0").replace(/,/g, '');
+        const highCred = String(loan["DISBURSED-AMT"] || loan["CREDIT-LIMIT"] || "0").replace(/,/g, '');
+        
+        return {
+          accountNumber: loan["ACCT-NUMBER"] || "N/A",
+          accountType: loan["ACCT-TYPE"] || "Unknown",
+          currentBalance: Number(currBal) || 0,
+          highCreditAmount: Number(highCred) || 0,
+          memberShortName: loan["CREDIT-GUARANTOR"] || "Unknown Lender",
+          dateOpened: loan["DISBURSED-DT"] || "N/A",
+          dateReported: loan["DATE-REPORTED"] || "N/A",
+          emiAmount: Number(emiStr) || 0,
+          interest_rate: Number(loan["INTEREST-RATE"] || 0),
+          repaymentTenure: loan["REPAYMENT-TENURE"] || "N/A",
+          pastDueAmount: Number(String(loan["OVERDUE-AMT"] || "0").replace(/,/g, '')) || 0
+        };
+      });
 
-    accountSummary = {
-      totalAccounts: Number(primarySummary["PRIMARY-NUMBER-OF-ACCOUNTS"] || accounts.length),
-      currentBalance,
-      highCreditAmount,
-      overdueBalance,
-      overdueAccounts: Number(primarySummary["PRIMARY-OVERDUE-NUMBER-OF-ACCOUNTS"] || overdueAccounts),
-      zeroBalanceAccounts
-    };
+      const inquiries = report?.["INQUIRY-HISTORY"]?.HISTORY || [];
+      enquiries = inquiries.map((inq: any) => ({
+        memberShortName: inq["MEMBER-NAME"] || "Unknown Lender",
+        enquiryDate: inq["INQUIRY-DATE"] || "N/A",
+        enquiryAmount: Number(String(inq["AMOUNT"] || "0").replace(/,/g, '')) || 0
+      }));
+      
+      inquirySummary = {
+        totalInquiry: inquiries.length
+      };
+      
+      const primarySummary = report?.["ACCOUNTS-SUMMARY"]?.["PRIMARY-ACCOUNTS-SUMMARY"] || {};
+      
+      let currentBalance = 0;
+      let highCreditAmount = 0;
+      let overdueBalance = 0;
+      let overdueAccounts = 0;
+      let zeroBalanceAccounts = 0;
+
+      accounts.forEach(acc => {
+        currentBalance += acc.currentBalance;
+        highCreditAmount += acc.highCreditAmount;
+        if (acc.currentBalance === 0) zeroBalanceAccounts += 1;
+      });
+
+      responses.forEach((res: any) => {
+         const loan = res["LOAN-DETAILS"] || {};
+         const od = Number(String(loan["OVERDUE-AMT"] || "0").replace(/,/g, '')) || 0;
+         overdueBalance += od;
+         if (od > 0) overdueAccounts += 1;
+      });
+
+      accountSummary = {
+        totalAccounts: Number(primarySummary["PRIMARY-NUMBER-OF-ACCOUNTS"] || accounts.length),
+        currentBalance,
+        highCreditAmount,
+        overdueBalance,
+        overdueAccounts: Number(primarySummary["PRIMARY-OVERDUE-NUMBER-OF-ACCOUNTS"] || overdueAccounts),
+        zeroBalanceAccounts
+      };
+    }
   } else {
-    // CIBIL JSON Parsing
-    const report = data?.credit_report?.[0];
-    const consumerSummary = report?.response?.consumerSummaryresp;
-    if (consumerSummary?.accountSummary) {
+    // CIBIL (TransUnion V5 IDSPay) Parsing
+    let report: any = null;
+    let trueLinkReport: any = null;
+    
+    // Check if it's the new IDSPay format
+    if (data?.steps) {
+      const assetsStep = data.steps.find((s: any) => s.name === "GetCustomerAssets");
+      trueLinkReport = assetsStep?.response?.GetCustomerAssetsResponse?.GetCustomerAssetsSuccess?.Asset?.TrueLinkCreditReport;
+      
+      if (trueLinkReport) {
+        personalInfo = {
+            score: trueLinkReport.Borrower?.CreditScore?.riskScore || 0
+        };
+
+        const tradeLines = trueLinkReport.TradeLinePartition || [];
+        accounts = tradeLines.map((partition: any) => {
+          const tl = partition.Tradeline || {};
+          return {
+            accountNumber: tl.accountNumber || "N/A",
+            accountType: partition.accountTypeDescription || partition.accountTypeAbbreviation || tl.AccountType?.symbol || "Unknown",
+            currentBalance: Number(tl.currentBalance || 0),
+            highCreditAmount: Number(tl.highBalance || tl.CreditLimit || 0),
+            memberShortName: tl.creditorName || "Unknown Lender",
+            dateOpened: tl.dateOpened || "N/A",
+            dateReported: tl.dateReported || "N/A",
+            emiAmount: Number(tl.GrantedTrade?.EMIAmount && tl.GrantedTrade.EMIAmount !== "-1" ? tl.GrantedTrade.EMIAmount : 0),
+            interest_rate: Number(tl.GrantedTrade?.interestRate && tl.GrantedTrade.interestRate !== "-1.00" ? tl.GrantedTrade.interestRate : 0),
+            repaymentTenure: tl.termMonths && tl.termMonths !== "-1" ? tl.termMonths : "N/A",
+            pastDueAmount: Number(tl.amountPastDue || 0)
+          };
+        });
+
+        const inquiries = trueLinkReport.InquiryPartition || [];
+        enquiries = inquiries.map((partition: any) => {
+          const inq = partition.Inquiry || {};
+          return {
+            memberShortName: inq.subscriberName || "Unknown Lender",
+            enquiryDate: inq.inquiryDate || "N/A",
+            enquiryAmount: Number(inq.amount || 0)
+          };
+        });
+
+        let currentBalance = 0;
+        let highCreditAmount = 0;
+        let overdueBalance = 0;
+        let overdueAccounts = 0;
+        let zeroBalanceAccounts = 0;
+
+        accounts.forEach(acc => {
+          currentBalance += acc.currentBalance;
+          highCreditAmount += acc.highCreditAmount;
+          overdueBalance += (acc as any).pastDueAmount || 0;
+          if ((acc as any).pastDueAmount > 0) overdueAccounts += 1;
+          if (acc.currentBalance <= 0) zeroBalanceAccounts += 1;
+        });
+
         accountSummary = {
-            totalAccounts: consumerSummary.accountSummary.totalAccounts || 0,
-            currentBalance: consumerSummary.accountSummary.currentBalance || 0,
-            highCreditAmount: consumerSummary.accountSummary.highCreditAmount || 0,
-            overdueBalance: consumerSummary.accountSummary.overdueBalance || 0,
-            overdueAccounts: consumerSummary.accountSummary.overdueAccounts || 0,
-            zeroBalanceAccounts: consumerSummary.accountSummary.zeroBalanceAccounts || 0
+          totalAccounts: accounts.length,
+          currentBalance,
+          highCreditAmount,
+          overdueBalance,
+          overdueAccounts,
+          zeroBalanceAccounts
         };
-    }
-    
-    if (consumerSummary?.inquirySummary) {
+
         inquirySummary = {
-            totalInquiry: consumerSummary.inquirySummary.totalInquiry || 0,
-            inquiryPast30Days: consumerSummary.inquirySummary.inquiryPast30Days,
-            inquiryPast12Months: consumerSummary.inquirySummary.inquiryPast12Months,
-            inquiryPast24Months: consumerSummary.inquirySummary.inquiryPast24Months
+          totalInquiry: enquiries.length,
+          inquiryPast30Days: undefined,
+          inquiryPast12Months: undefined,
+          inquiryPast24Months: undefined
         };
+      }
     }
-    
-    accounts = (report?.accounts || []).map((acc: any) => ({
-      accountNumber: acc.accountNumber,
-      accountType: acc.accountType,
-      currentBalance: acc.currentBalance,
-      highCreditAmount: acc.highCreditAmount,
-      memberShortName: acc.memberShortName,
-      dateOpened: acc.dateOpened,
-      dateReported: acc.dateReported,
-      emiAmount: acc.emiAmount,
-      interest_rate: acc.interest_rate || 0,
-      repaymentTenure: acc.repaymentTenure || "N/A"
-    }));
-    
-    enquiries = (report?.enquiries || []).map((enq: any) => ({
-        memberShortName: enq.memberShortName,
-        enquiryDate: enq.enquiryDate,
-        enquiryAmount: enq.enquiryAmount
-    }));
+
+    // Fallback to old Surepass format if not IDSPay
+    if (!trueLinkReport) {
+      report = data?.credit_report?.[0];
+      if (report) {
+        const consumerSummary = report?.response?.consumerSummaryresp;
+        if (consumerSummary?.accountSummary) {
+            accountSummary = {
+                totalAccounts: consumerSummary.accountSummary.totalAccounts || 0,
+                currentBalance: consumerSummary.accountSummary.currentBalance || 0,
+                highCreditAmount: consumerSummary.accountSummary.highCreditAmount || 0,
+                overdueBalance: consumerSummary.accountSummary.overdueBalance || 0,
+                overdueAccounts: consumerSummary.accountSummary.overdueAccounts || 0,
+                zeroBalanceAccounts: consumerSummary.accountSummary.zeroBalanceAccounts || 0
+            };
+        }
+        
+        if (consumerSummary?.inquirySummary) {
+            inquirySummary = {
+                totalInquiry: consumerSummary.inquirySummary.totalInquiry || 0,
+                inquiryPast30Days: consumerSummary.inquirySummary.inquiryPast30Days,
+                inquiryPast12Months: consumerSummary.inquirySummary.inquiryPast12Months,
+                inquiryPast24Months: consumerSummary.inquirySummary.inquiryPast24Months
+            };
+        }
+        
+        accounts = (report?.accounts || []).map((acc: any) => ({
+          accountNumber: acc.accountNumber,
+          accountType: acc.accountType,
+          currentBalance: acc.currentBalance,
+          highCreditAmount: acc.highCreditAmount,
+          memberShortName: acc.memberShortName,
+          dateOpened: acc.dateOpened,
+          dateReported: acc.dateReported,
+          emiAmount: acc.emiAmount,
+          interest_rate: acc.interest_rate || 0,
+          repaymentTenure: acc.repaymentTenure || "N/A"
+        }));
+        
+        enquiries = (report?.enquiries || []).map((enq: any) => ({
+            memberShortName: enq.memberShortName,
+            enquiryDate: enq.enquiryDate,
+            enquiryAmount: enq.enquiryAmount
+        }));
+      }
+    }
   }
 
   return {
