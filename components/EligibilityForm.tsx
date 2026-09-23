@@ -223,7 +223,6 @@ export function EligibilityForm() {
       });
 
       const data = await res.json();
-      console.log("IDSPay API Response Data:", data);
 
       if (!res.ok || (data.status && data.status.type !== "success")) {
         setError(data.message || data.error || "Failed to fetch credit report. Please check your details.");
@@ -232,13 +231,13 @@ export function EligibilityForm() {
         try {
           const safePan = formData.pan ? formData.pan.toUpperCase() : "NOPAN";
           const docId = `${safePan}_${formData.mobile}_${formData.bureau}`;
-          
+
           let extractedScore = data.data?.credit_score;
           if (!extractedScore) {
-             const newCrifScore = data.data?.result_json?.parsed_data?.["B2C-REPORT"]?.["REPORT-DATA"]?.["STANDARD-DATA"]?.SCORE?.[0]?.VALUE;
-             if (newCrifScore) {
-               extractedScore = newCrifScore;
-             }
+            const newCrifScore = data.data?.result_json?.parsed_data?.["B2C-REPORT"]?.["REPORT-DATA"]?.["STANDARD-DATA"]?.SCORE?.[0]?.VALUE;
+            if (newCrifScore) {
+              extractedScore = newCrifScore;
+            }
           }
 
           await setDoc(doc(db, "credit_reports", docId), {
