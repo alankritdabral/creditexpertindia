@@ -246,7 +246,10 @@ export function parseBureauData(bureau: string, data: any): ParsedBureauData {
       const scoreData = newReport.SCORE?.[0];
       if (scoreData) {
         personalInfo = {
-           score: scoreData.VALUE || 0
+           score: scoreData.VALUE || 0,
+           factors: scoreData.FACTORS || [],
+           scoreName: scoreData.NAME || "",
+           scoreDescription: scoreData.DESCRIPTION || ""
         };
       }
     } else {

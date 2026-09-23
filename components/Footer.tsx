@@ -1,10 +1,16 @@
+"use client";
+
 import Link from 'next/link';
 import Image from 'next/image';
 import logoWithName from '@/public/img/logo_with_name.png';
 import { siteConfig, contact } from '@/lib/config';
 import { ArrowRight, MessageCircle } from 'lucide-react';
+import { usePathname } from 'next/navigation';
 
 export function Footer() {
+  const pathname = usePathname();
+  if (pathname?.startsWith('/admin') || pathname?.startsWith('/team')) return null;
+
   return (
     <footer className="bg-slate-50 border-t border-icy-blue pb-[72px] lg:pb-0">
       {/* CTA Banner */}
@@ -114,6 +120,11 @@ export function Footer() {
                 <li>
                   <Link href="/partner-disclosures" className="text-[15px] text-brand-black/80 hover:text-brand-black transition-colors font-medium">
                     Partner Disclosures
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/admin/login" className="text-[15px] text-brand-black/80 hover:text-brand-black transition-colors font-medium">
+                    Admin Login
                   </Link>
                 </li>
               </ul>
