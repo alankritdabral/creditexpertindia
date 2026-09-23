@@ -63,7 +63,7 @@ export function EligibilityForm() {
     firstName: "", lastName: "", mobile: "", email: "", city: "", employmentType: "Salaried",
     monthlyIncome: "", employer: "", salaryMode: "Bank Transfer",
     requirement: "",
-    pan: "", gender: "male", consent: false, bureau: "v1_json"
+    pan: "", gender: "male", consent: false, bureau: "crif_json"
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -318,9 +318,9 @@ export function EligibilityForm() {
               <div className="pt-2">
                 <p className="text-sm font-semibold text-brand-black mb-3">Select Credit Bureau</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <label className={`flex items-center gap-2 p-3 border rounded-xl cursor-pointer transition-all ${formData.bureau === 'v1_json' ? 'border-blue-energy bg-blue-50/50' : 'border-icy-blue hover:bg-slate-50'}`}>
-                    <input type="radio" name="bureau" value="v1_json" checked={formData.bureau === 'v1_json'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-blue-energy accent-blue-energy" />
-                    <span className="text-sm font-medium text-brand-black/90">CIBIL</span>
+                  <label className="flex items-center gap-2 p-3 border rounded-xl transition-all opacity-50 cursor-not-allowed bg-slate-50 border-icy-blue">
+                    <input type="radio" name="bureau" value="v1_json" disabled className="w-4 h-4 text-slate-400 cursor-not-allowed" />
+                    <span className="text-sm font-medium text-slate-500">CIBIL</span>
                   </label>
                   <label className={`flex items-center gap-2 p-3 border rounded-xl cursor-pointer transition-all ${formData.bureau === 'crif_json' ? 'border-blue-energy bg-blue-50/50' : 'border-icy-blue hover:bg-slate-50'}`}>
                     <input type="radio" name="bureau" value="crif_json" checked={formData.bureau === 'crif_json'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-blue-energy accent-blue-energy" />
