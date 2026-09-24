@@ -265,9 +265,20 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex">
-      {/* Sidebar */}
-      <div className="w-64 bg-[#0A2540] text-slate-300 p-6 flex flex-col hidden md:flex h-screen sticky top-0 border-r border-[#113355]">
+    <div className="h-[100dvh] bg-slate-50 flex flex-col md:flex-row overflow-hidden">
+      {/* Mobile Header */}
+      <div className="md:hidden flex items-center justify-between p-4 bg-[#0A2540] text-white shrink-0">
+        <div className="flex items-center gap-2">
+          <ShieldCheck className="w-6 h-6 text-blue-500 drop-shadow-md" />
+          <span className="text-lg font-bold tracking-tight">Admin</span>
+        </div>
+        <button onClick={() => signOut(auth)} className="text-red-400 p-2 hover:bg-white/10 rounded-lg transition-colors">
+          <LogOut className="w-5 h-5" />
+        </button>
+      </div>
+
+      {/* Desktop Sidebar */}
+      <div className="w-64 bg-[#0A2540] text-slate-300 p-6 flex-col hidden md:flex h-screen sticky top-0 border-r border-[#113355] shrink-0">
         <div className="flex items-center gap-3 text-white mb-10">
           <ShieldCheck className="w-8 h-8 text-blue-500 drop-shadow-md" />
           <span className="text-xl font-bold tracking-tight">Admin Panel</span>
@@ -291,7 +302,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 p-4 md:p-8 flex flex-col h-screen overflow-hidden">
+      <div className="flex-1 p-4 md:p-8 flex flex-col min-h-0 pb-20 md:pb-8">
         {activeTab === "codes" && (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="overflow-y-auto flex-1 pb-10">
             <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
@@ -339,11 +350,11 @@ export default function AdminDashboard() {
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="overflow-y-auto flex-1 pb-10">
             <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
               <h2 className="text-2xl font-bold text-slate-800">Branch Activity</h2>
-              <div className="flex flex-wrap items-center gap-3">
+              <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
                 <select 
                   value={activityDateFilter}
                   onChange={(e) => setActivityDateFilter(e.target.value)}
-                  className="pl-3 pr-8 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/30 outline-none"
+                  className="flex-1 md:flex-none pl-3 pr-8 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/30 outline-none"
                 >
                   <option value="today">Today</option>
                   <option value="yesterday">Yesterday</option>
@@ -354,10 +365,10 @@ export default function AdminDashboard() {
                     type="date"
                     value={activityCustomDate}
                     onChange={(e) => setActivityCustomDate(e.target.value)}
-                    className="px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/30 outline-none"
+                    className="flex-1 md:flex-none px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/30 outline-none"
                   />
                 )}
-                <button onClick={fetchActivity} className="p-2 bg-white border border-slate-200 rounded-lg text-slate-600 hover:bg-slate-50 transition-colors">
+                <button onClick={fetchActivity} className="p-2 bg-white border border-slate-200 rounded-lg text-slate-600 hover:bg-slate-50 transition-colors flex-shrink-0">
                   <RefreshCw className="w-4 h-4" />
                 </button>
               </div>
@@ -456,23 +467,23 @@ export default function AdminDashboard() {
                <h2 className="text-2xl font-bold text-slate-800">All Reports</h2>
                
                <div className="flex flex-wrap items-center gap-3">
-                 <div className="relative">
+                 <div className="relative w-full md:w-auto">
                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                    <input 
                      type="text" 
                      placeholder="Search PAN or Mobile..." 
                      value={searchQuery}
                      onChange={(e) => setSearchQuery(e.target.value.toUpperCase())}
-                     className="pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/30 outline-none w-64 uppercase placeholder:normal-case"
+                     className="pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/30 outline-none w-full md:w-64 uppercase placeholder:normal-case"
                    />
                  </div>
                  
-                 <div className="relative">
+                 <div className="relative flex-1 md:flex-none">
                    <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                    <select 
                      value={branchFilter}
                      onChange={(e) => setBranchFilter(e.target.value)}
-                     className="pl-9 pr-8 py-2 bg-white border border-slate-200 rounded-lg text-sm appearance-none focus:ring-2 focus:ring-blue-500/30 outline-none"
+                     className="w-full pl-9 pr-8 py-2 bg-white border border-slate-200 rounded-lg text-sm appearance-none focus:ring-2 focus:ring-blue-500/30 outline-none"
                    >
                      <option value="all">All Branches</option>
                      <option value="customer">Customer (Web)</option>
@@ -484,7 +495,7 @@ export default function AdminDashboard() {
                  
                  <button 
                    onClick={() => setSortOrder(prev => prev === "desc" ? "asc" : "desc")}
-                   className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
+                   className="flex-1 md:flex-none justify-center flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
                  >
                    <ArrowUpDown className="w-4 h-4" /> 
                    {sortOrder === "desc" ? "Newest First" : "Oldest First"}
@@ -542,11 +553,11 @@ export default function AdminDashboard() {
                )}
                
                {filteredReports.length > 0 && (
-                 <div className="p-4 border-t border-slate-100 flex items-center justify-between bg-slate-50 shrink-0">
-                   <p className="text-sm text-slate-500 font-medium">
+                 <div className="p-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4 bg-slate-50 shrink-0">
+                   <p className="text-sm text-slate-500 font-medium text-center sm:text-left">
                      Showing <span className="font-bold text-slate-700">{(currentPage - 1) * pageSize + 1}</span> to <span className="font-bold text-slate-700">{Math.min(currentPage * pageSize, filteredReports.length)}</span> of <span className="font-bold text-slate-700">{filteredReports.length}</span> entries
                    </p>
-                   <div className="flex items-center gap-2">
+                   <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
                      <button 
                        onClick={handlePrevPage}
                        disabled={currentPage === 1 || loadingReports}
@@ -617,6 +628,22 @@ export default function AdminDashboard() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Mobile Bottom Nav */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 flex items-center justify-around p-2 z-50 shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
+        <button onClick={() => setActiveTab("reports")} className={`flex flex-col items-center p-2 rounded-xl ${activeTab === "reports" ? "text-blue-600 font-bold" : "text-slate-500"}`}>
+          <Database className={`w-5 h-5 mb-1 ${activeTab === "reports" ? "text-blue-600" : "text-slate-500"}`} />
+          <span className="text-[10px]">Reports</span>
+        </button>
+        <button onClick={() => setActiveTab("activity")} className={`flex flex-col items-center p-2 rounded-xl ${activeTab === "activity" ? "text-blue-600 font-bold" : "text-slate-500"}`}>
+          <Activity className={`w-5 h-5 mb-1 ${activeTab === "activity" ? "text-blue-600" : "text-slate-500"}`} />
+          <span className="text-[10px]">Activity</span>
+        </button>
+        <button onClick={() => setActiveTab("codes")} className={`flex flex-col items-center p-2 rounded-xl ${activeTab === "codes" ? "text-blue-600 font-bold" : "text-slate-500"}`}>
+          <Users className={`w-5 h-5 mb-1 ${activeTab === "codes" ? "text-blue-600" : "text-slate-500"}`} />
+          <span className="text-[10px]">Codes</span>
+        </button>
+      </div>
     </div>
   );
 }
