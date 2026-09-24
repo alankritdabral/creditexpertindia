@@ -408,22 +408,22 @@ const LENDERS: LenderConfig[] = [
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // INDUSIND BANK — Source: indusind.md
+  // INDUSIND BANK — Source: IndusInd_Bank_Personal_Loan_Policy.md
   // ═══════════════════════════════════════════════════════════════════════════
   {
     id: "indusind",
     name: "IndusInd Bank",
     type: "Private Bank",
-    headlineRate: 10.49,
-    maxLoanAmount: 5000000,    // Up to ₹50L
-    minLoanAmount: 100000,
+    headlineRate: 9.99,
+    maxLoanAmount: 7500000,    // Up to ₹75L
+    minLoanAmount: 500000,     // ₹5L min for 72 months
     maxTenure: 84,
     maxFoir: 75,
     employerBankId: "indusind",
-    minSalary: 25000,           // ₹25K for metro / Cat A/B/Govt
-    minCibil: null,             // Flexible / -1 cases mentioned
+    minSalary: 50000,           // ₹50K for 72 months, ₹1L for 84 months
+    minCibil: 700,             // 700 for 72 months, 750 for 84 months
     cibilMinus1Accepted: true,
-    cibilMinus1MaxFunding: 0,
+    cibilMinus1MaxFunding: 500000, // Up to ₹5L for 0 & -1 cases
     bt: {
       personalLoan: true,
       multiplePLs: true,
@@ -433,7 +433,7 @@ const LENDERS: LenderConfig[] = [
       appLoan: true,            // App loans & fintech loans accepted
       maxAppBTs: null,
       overdraft: true,
-      odBTRestrictions: ["Bajaj", "Tata Capital", "Kotak"],
+      odBTRestrictions: ["Tata Capital", "Bajaj Finance", "Kotak", "ABFL", "Cholamandalam", "Axis Finance"],
       maxTotalBTs: 5,
       topUp: true,
     },
@@ -448,7 +448,7 @@ const LENDERS: LenderConfig[] = [
     metroOnly: false,
     geoLimitKm: null,
     digitalProcess: false,
-    minAge: 21,
+    minAge: 25,
     maxAgeAtMaturity: 60,
     minExperienceMonths: 0,
     locationWarning: null,
@@ -1402,25 +1402,46 @@ export function analyzeLenderEligibility({
       if (employerTier === "C") {
         customOutput.indusindMaxLoan = 1000000; // CAT C Non-Listed: ₹10L
       } else {
-        customOutput.indusindMaxLoan = 5000000; // CAT A/B: ₹50L
+        customOutput.indusindMaxLoan = 7500000; // CAT A/B/G: ₹75L
       }
+
+      // Income Multiplier
+      let multiplier = 21;
+      if (nth >= 125000) {
+        if (["A+", "A", "GOVT"].includes(employerTier)) multiplier = 30;
+        else if (employerTier === "B") multiplier = 25;
+      } else if (nth >= 75000) {
+        if (["A+", "A", "B", "GOVT"].includes(employerTier)) multiplier = 25;
+      }
+      const maxLoanFromMultiplier = nth * multiplier;
+      customOutput.indusindMaxLoan = Math.min(customOutput.indusindMaxLoan, maxLoanFromMultiplier);
 
       // Tenure rules
       let allowedTenure = 60;
       if (nth >= 50000 && (age >= 25 || !age)) {
         allowedTenure = 72;
       }
-      // 84M requires: NMI ≥₹50K, Cat A/Govt, age ≥25, loan ≥₹5L, CIBIL ≥750
-      if (nth >= 50000 && ["A+", "A", "GOVT"].includes(employerTier) &&
+      // 84M requires: NMI ≥₹1L, Cat A+, A, B, Govt, age ≥25, CIBIL ≥750
+      if (nth >= 100000 && ["A+", "A", "B", "GOVT"].includes(employerTier) &&
         (age >= 25 || !age) && cibilScore >= 750) {
         allowedTenure = 84;
       }
       customOutput.indusindMaxTenure = allowedTenure;
 
       // FOIR
-      let indusindFoir = 70;
-      if (nth >= 80000 || ["A+", "A"].includes(employerTier)) {
-        indusindFoir = 75;
+      let indusindFoir = 50;
+      if (nth >= 80000) {
+        if (["A+", "A", "B", "GOVT"].includes(employerTier)) indusindFoir = 75; // Using the Owned max as default upper bound, 65% for Rented. We'll be optimistic (75%).
+        else indusindFoir = 70;
+      } else if (nth >= 50000) {
+        if (["A+", "A", "B", "GOVT"].includes(employerTier)) indusindFoir = 70;
+        else indusindFoir = 70;
+      } else if (nth >= 35000) {
+        if (["A+", "A", "B", "GOVT"].includes(employerTier)) indusindFoir = 60;
+        else indusindFoir = 50;
+      } else { // 20k to 35k
+        if (["A+", "A", "B", "GOVT"].includes(employerTier)) indusindFoir = 55;
+        else indusindFoir = 50;
       }
       customOutput.maxFOIR = `${indusindFoir}%`;
 
@@ -1434,10 +1455,12 @@ export function analyzeLenderEligibility({
       customOutput.indusindUnusedCapacity = Math.floor(unusedCap);
 
       if (unusedCap > 0) {
+        // FOIR Calculation @ 72 months for 84 month policies too
+        const calcTenure = Math.min(allowedTenure, 72);
         const r = lender.headlineRate / 12 / 100;
         customOutput.indusindMaxLoanFromCapacity = Math.floor(
-          (unusedCap * (Math.pow(1 + r, allowedTenure) - 1)) /
-          (r * Math.pow(1 + r, allowedTenure))
+          (unusedCap * (Math.pow(1 + r, calcTenure) - 1)) /
+          (r * Math.pow(1 + r, calcTenure))
         );
       } else {
         customOutput.indusindMaxLoanFromCapacity = 0;
