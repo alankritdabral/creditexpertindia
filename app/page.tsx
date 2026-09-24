@@ -63,7 +63,7 @@ export default function Home() {
       </section>
 
       {/* Row 6: Eligibility Form */}
-      <section className="w-full bg-icy-blue border-b border-icy-blue">
+      <section id="lead-form" className="w-full bg-icy-blue border-b border-icy-blue">
         <div className="max-w-[1220px] mx-auto p-8 md:p-12 border-x border-icy-blue">
           <AnimatedSection>
             <EligibilityForm />

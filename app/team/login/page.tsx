@@ -27,7 +27,7 @@ export default function TeamLogin() {
     
     if (result.success) {
       // Redirect to eligibility form
-      router.push("/eligibility");
+      router.push("/#lead-form");
     } else {
       setError(result.error || "Login failed");
       setLoading(false);

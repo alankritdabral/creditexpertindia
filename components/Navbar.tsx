@@ -77,7 +77,7 @@ export function Navbar() {
           {/* Action CTAs */}
           <div className="hidden lg:flex items-center justify-end gap-6 relative z-10 shrink-0">
             <a
-              href="/team"
+              href="/admin/login"
               className="text-[14px] font-bold text-brand-black/80 hover:text-brand-black transition-colors"
             >
               Staff Login
@@ -147,7 +147,7 @@ export function Navbar() {
                     Contact Us
                   </a>
                   <a
-                    href="/team"
+                    href="/admin/login"
                     onClick={() => setOpen(false)}
                     className="flex w-full items-center justify-center px-6 py-4 text-lg font-medium text-brand-black"
                   >
