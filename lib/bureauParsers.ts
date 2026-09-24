@@ -41,6 +41,35 @@ export interface ParsedBureauData {
   personalInfo: any;
 }
 
+const EXPERIAN_ACCOUNT_TYPES: Record<string, string> = {
+  "01": "Auto Loan (Personal)",
+  "02": "Housing Loan",
+  "03": "Property Loan",
+  "04": "Loan Against Shares / Securities",
+  "05": "Personal Loan",
+  "06": "Consumer Loan",
+  "07": "Gold Loan",
+  "08": "Education Loan",
+  "09": "Loan to Professional",
+  "10": "Credit Card",
+  "11": "Leasing",
+  "12": "Overdraft",
+  "13": "Two-Wheeler Loan",
+  "14": "Non-Funded Credit Facility",
+  "15": "Loan Against Bank Deposits",
+  "16": "Fleet Card",
+  "17": "Commercial Vehicle Loan",
+  "18": "Telco - Wireless",
+  "19": "Telco - Broadband",
+  "20": "Telco - Landline",
+  "21": "Seller Financing",
+  "23": "GECL Loan - Secured",
+  "24": "GECL Loan - Unsecured",
+  "00": "Other",
+  "98": "Secured - account group",
+  "99": "Unsecured - account group"
+};
+
 export function parseBureauData(bureau: string, data: any): ParsedBureauData {
   const isEquifax = bureau.startsWith("v2");
   const isExperian = bureau.startsWith("experian");
@@ -138,7 +167,7 @@ export function parseBureauData(bureau: string, data: any): ParsedBureauData {
       
       return {
         accountNumber: acc.Account_Number || "N/A",
-        accountType: acc.Account_Type || "Unknown",
+        accountType: EXPERIAN_ACCOUNT_TYPES[acc.Account_Type] || acc.Account_Type || "Unknown",
         currentBalance: Number(currBal) || 0,
         highCreditAmount: Number(highCred) || 0,
         memberShortName: acc.Subscriber_Name || "Unknown Lender",
