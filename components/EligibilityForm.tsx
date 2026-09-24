@@ -60,10 +60,50 @@ export function EligibilityForm() {
         setFormData(prev => ({ ...prev, bureau: "experian" }));
       }
     });
+
+    // Load MSG91 OTP scripts
+    const urls = [
+      'https://verify.msg91.com/otp-provider.js',
+      'https://verify.phone91.com/otp-provider.js'
+    ];
+    let i = 0;
+    function attempt() {
+      if (typeof document === 'undefined') return;
+      const s = document.createElement('script');
+      s.src = urls[i];
+      s.async = true;
+      s.onerror = () => {
+        i++;
+        if (i < urls.length) {
+          attempt();
+        }
+      };
+      document.head.appendChild(s);
+    }
+    attempt();
   }, []);
 
   const [cibilData, setCibilData] = useState<any>(null);
   const [manualLoans, setManualLoans] = useState<any[]>([]);
+
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
+  const [historyReports, setHistoryReports] = useState<any[]>([]);
+  const [loadingHistory, setLoadingHistory] = useState(false);
+
+  const fetchBranchHistory = async () => {
+    setShowHistoryModal(true);
+    setLoadingHistory(true);
+    try {
+      const res = await fetch(`/api/admin/reports?branch=${teamBranch}`);
+      const data = await res.json();
+      if (data.success) {
+        setHistoryReports(data.reports);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+    setLoadingHistory(false);
+  };
 
 
 
@@ -88,7 +128,7 @@ export function EligibilityForm() {
     }
     const isCrifSelected = formData.bureau.startsWith("crif");
     const isExperianSelected = formData.bureau === "experian";
-    
+
     if (isExperianSelected) {
       if (!formData.dob) {
         setError("Please enter your Date of Birth.");
@@ -111,6 +151,55 @@ export function EligibilityForm() {
     setError(null);
     setLoading(true);
 
+    if (!teamBranch) {
+      launchOTPWidget();
+    } else {
+      proceedToFetchReport();
+    }
+  };
+
+  const launchOTPWidget = () => {
+    if (typeof window !== 'undefined' && (window as any).initSendOTP) {
+      const configuration = {
+        widgetId: "366978693362303433303636",
+        tokenAuth: "519332T5zz4zfdtq6ab50388P1",
+        identifier: formData.mobile,
+        exposeMethods: false,
+        success: async (data: any) => {
+          const token = data.message || data;
+          try {
+            const res = await fetch("/api/verify-msg91-otp", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ token })
+            });
+            const vData = await res.json();
+            if (vData.success) {
+              proceedToFetchReport();
+            } else {
+              setError("OTP Verification failed. " + (vData.error || ""));
+              setLoading(false);
+            }
+          } catch (e: any) {
+            console.error(e);
+            setError("OTP Verification error.");
+            setLoading(false);
+          }
+        },
+        failure: (error: any) => {
+          console.error('OTP failure:', error);
+          setError("OTP could not be sent or verified.");
+          setLoading(false);
+        },
+      };
+      (window as any).initSendOTP(configuration);
+    } else {
+      setError("OTP Service is loading or unavailable. Please try again in a few seconds.");
+      setLoading(false);
+    }
+  };
+
+  const proceedToFetchReport = async () => {
     try {
       // 1. Check Database First
       const safePan = formData.pan ? formData.pan.toUpperCase() : "NOPAN";
@@ -141,9 +230,39 @@ export function EligibilityForm() {
             } else {
               // Dashboard cache hit!
               if (data.raw_api_data) {
-                processFetchedReport(data.raw_api_data);
-                setLoading(false);
-                return;
+                const isExperianCache = formData.bureau.startsWith("experian") || data.bureau?.startsWith("experian");
+                const isExperianFailureCache = isExperianCache && !data.raw_api_data.result_json;
+
+                if (isExperianFailureCache) {
+                  console.warn("Cached Experian report is corrupted/failed. Attempting CRIF fallback.");
+                  // Try to find a CRIF report in cache
+                  const crifDocId = `${safePan}_${formData.mobile}_crif_v1`;
+                  const crifSnap = await getDoc(doc(db, "credit_reports", crifDocId));
+                  if (crifSnap.exists() && crifSnap.data().raw_api_data) {
+                    const crifData = crifSnap.data();
+                    setFormData((prev: any) => ({ 
+                      ...prev, 
+                      bureau: "crif_v1", 
+                      fallbackWarning: "Notice: Loaded cached CRIF report because Experian had previously failed."
+                    }));
+                    processFetchedReport(crifData.raw_api_data);
+                    setLoading(false);
+                    return;
+                  }
+                  // If CRIF not in cache, skip Experian live call and jump directly to CRIF live call!
+                  console.warn("CRIF not in cache. Bypassing live Experian call and directly fetching live CRIF report.");
+                  formData.bureau = "crif_v1";
+                } else {
+                  if (data.bureau && data.bureau !== formData.bureau) {
+                    setFormData((prev: any) => ({ ...prev, bureau: data.bureau }));
+                  }
+                  if (data.fallbackData) {
+                    setFormData((prev: any) => ({ ...prev, fallbackWarning: `Notice: Loaded cached CRIF report (Experian fallback: ${data.fallbackData.fallback_reason})` }));
+                  }
+                  processFetchedReport(data.raw_api_data);
+                  setLoading(false);
+                  return;
+                }
               }
             }
           }
@@ -186,7 +305,7 @@ export function EligibilityForm() {
       }
 
       // Send the request through our new Next.js API Route which talks to IDSPay
-      const res = await fetch("/api/idspay", {
+      const initialRes = await fetch("/api/idspay", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -194,9 +313,50 @@ export function EligibilityForm() {
         body: JSON.stringify({ bureau: formData.bureau, bodyPayload })
       });
 
-      const data = await res.json();
+      let res = initialRes;
+      let data = await res.json();
+      let usedBureau = formData.bureau;
+      let fallbackData: any = null;
 
-      if (!res.ok || (data.status && data.status.type !== "success")) {
+      const isExperianFailure = isExperian && (
+        !res.ok || 
+        data.status_code === 422 || 
+        data.message_code === "mobile_not_match" ||
+        (data.status?.type === "success" && !data.data?.result_json)
+      );
+
+      if (isExperianFailure) {
+        const fallbackReason = data.message || "Experian returned incomplete data or a mismatch.";
+        console.warn("Experian failed, falling back to CRIF", fallbackReason);
+        
+        const crifPayload = {
+          first_name: formData.firstName,
+          last_name: formData.lastName,
+          mobile_no: formData.mobile,
+          name_lookup: 0
+        };
+        
+        res = await fetch("/api/idspay", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ bureau: "crif_v1", bodyPayload: crifPayload })
+        });
+        
+        data = await res.json();
+        usedBureau = "crif_v1";
+        fallbackData = {
+          fallback_from_experian: true,
+          fallback_reason: fallbackReason
+        };
+        
+        setFormData((prev: any) => ({ 
+          ...prev, 
+          bureau: usedBureau,
+          fallbackWarning: `Notice: We automatically fetched your CRIF report because Experian encountered an issue (${fallbackReason})`
+        }));
+      }
+
+      if (!res.ok || (data.status && data.status.type !== "success" && !data.success)) {
         setError(data.message || data.error || "Failed to fetch credit report. Please check your details.");
       } else {
         // Save to Firebase
@@ -211,6 +371,21 @@ export function EligibilityForm() {
               extractedScore = newCrifScore;
             }
           }
+          if (!extractedScore) {
+            let rJson = data.data?.result_json;
+            console.log("[DEBUG ELIGIBILITY] Raw rJson before DB save:", rJson);
+            if (typeof rJson === 'string') {
+              try { 
+                rJson = JSON.parse(rJson); 
+                console.log("[DEBUG ELIGIBILITY] Parsed rJson before DB save:", rJson);
+              } catch(e) {}
+            }
+            const expScore = rJson?.INProfileResponse?.SCORE?.BureauScore || rJson?.INProfileResponse?.Score?.BureauScore;
+            console.log("[DEBUG ELIGIBILITY] Extracted expScore:", expScore);
+            if (expScore) {
+              extractedScore = expScore;
+            }
+          }
 
           const fullName = `${formData.firstName} ${formData.lastName}`.trim();
           await setDoc(doc(db, "credit_reports", docId), {
@@ -218,13 +393,14 @@ export function EligibilityForm() {
             mobile: formData.mobile,
             pan: safePan,
             gender: formData.gender,
-            bureau: formData.bureau,
+            bureau: usedBureau,
             credit_score: extractedScore || null,
             pdf_link: data.data?.web_token_url || data.data?.credit_report_link || null,
             raw_api_data: data.data, // Save the full response to rebuild dashboard later
             created_at: serverTimestamp(),
             branch: teamBranch || "customer",
-            search_tokens: generateSearchTokens(fullName, formData.mobile, safePan)
+            search_tokens: generateSearchTokens(fullName, formData.mobile, safePan),
+            ...(fallbackData && { fallbackData })
           });
         } catch (e) {
           console.error("Error saving to Firebase", e);
@@ -378,9 +554,18 @@ export function EligibilityForm() {
 
   return (
     <div id="check-eligibility" className="w-full max-w-4xl mx-auto flex flex-col justify-center h-full">
-      <div className="mb-10 text-center">
+      <div className="mb-10 text-center relative">
         <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-brand-black mb-4">See your options</h2>
         <p className="text-lg text-brand-black/70">Take a minute to tell us about your situation.</p>
+        {teamBranch && step === 1 && (
+          <button
+            onClick={fetchBranchHistory}
+            className="md:absolute right-0 top-0 mt-4 md:mt-2 bg-white border border-slate-200 text-slate-600 px-4 py-2 rounded-lg text-sm font-bold shadow-sm hover:bg-slate-50 transition-colors"
+          >
+            {loadingHistory ? <Loader2 className="w-4 h-4 animate-spin inline mr-2" /> : null}
+            Customer History
+          </button>
+        )}
       </div>
 
       <div className="w-full bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-icy-blue/60 overflow-hidden">
@@ -397,6 +582,75 @@ export function EligibilityForm() {
           )}
         </div>
       </div>
+
+      {showHistoryModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-4xl max-h-[85vh] flex flex-col">
+            <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50 rounded-t-2xl">
+              <h3 className="font-bold text-lg text-slate-800">Recently Accessed Reports ({teamBranch})</h3>
+              <button onClick={() => setShowHistoryModal(false)} className="p-1 hover:bg-slate-200 rounded-md text-slate-500 transition-colors">
+                <span className="text-xl leading-none">&times;</span>
+              </button>
+            </div>
+            <div className="p-4 overflow-y-auto">
+              {loadingHistory ? (
+                <div className="flex items-center justify-center p-12">
+                  <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+                </div>
+              ) : historyReports.length === 0 ? (
+                <div className="p-12 text-center text-slate-500">No reports found for this branch.</div>
+              ) : (
+                <table className="w-full text-left text-sm">
+                  <thead>
+                    <tr className="border-b border-slate-200 text-slate-500 font-bold uppercase text-xs">
+                      <th className="pb-3">Name</th>
+                      <th className="pb-3">Mobile / PAN</th>
+                      <th className="pb-3">Score</th>
+                      <th className="pb-3">Date</th>
+                      <th className="pb-3 text-right">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {historyReports.map((r, i) => (
+                      <tr key={i} className="hover:bg-slate-50 transition-colors">
+                        <td className="py-4 font-bold text-slate-800">{r.name}</td>
+                        <td className="py-4 text-slate-600">
+                          <div>{r.mobile}</div>
+                          <div className="text-xs text-slate-400">{r.pan || "No PAN"}</div>
+                        </td>
+                        <td className="py-4 font-bold text-lg">{r.credit_score || "-"}</td>
+                        <td className="py-4 text-slate-500">
+                          {r.created_at ? new Date(r.created_at.seconds * 1000).toLocaleDateString() : "-"}
+                        </td>
+                        <td className="py-4 text-right">
+                          <button
+                            onClick={async () => {
+                              setShowHistoryModal(false);
+                              try {
+                                const res = await fetch(`/api/admin/reports/${r.id}`);
+                                const apiData = await res.json();
+                                if (apiData.success) {
+                                  setFormData({ ...formData, bureau: apiData.report.bureau, pan: apiData.report.pan, mobile: apiData.report.mobile });
+                                  processFetchedReport(apiData.report.raw_api_data);
+                                }
+                              } catch (e) {
+                                console.error(e);
+                              }
+                            }}
+                            className="text-xs font-bold px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
+                          >
+                            Open Report
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

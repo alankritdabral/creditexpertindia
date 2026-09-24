@@ -116,7 +116,20 @@ export function parseBureauData(bureau: string, data: any): ParsedBureauData {
 
   } else if (isExperian) {
     // Experian JSON parsing
-    const expReport = data?.data?.result_json?.INProfileResponse || data?.result_json?.INProfileResponse || data?.credit_report;
+    console.log("[DEBUG EXPERIAN] Starting parse. Original data:", JSON.parse(JSON.stringify(data || {})));
+    let rJson = data?.result_json || data?.data?.result_json;
+    console.log("[DEBUG EXPERIAN] Raw rJson:", rJson);
+    if (typeof rJson === 'string') {
+      try { 
+        rJson = JSON.parse(rJson); 
+        console.log("[DEBUG EXPERIAN] Parsed string rJson successfully:", rJson);
+      } catch(e) {
+        console.error("[DEBUG EXPERIAN] Failed to parse string rJson:", e);
+      }
+    }
+    const expReport = rJson?.INProfileResponse || data?.credit_report;
+    console.log("[DEBUG EXPERIAN] expReport extracted:", expReport);
+    console.log("[DEBUG EXPERIAN] SCORE object inside expReport:", expReport?.SCORE || expReport?.Score);
     const caisAccounts = expReport?.CAIS_Account?.CAIS_Account_DETAILS || [];
     accounts = caisAccounts.map((acc: any) => {
       const emiStr = (acc.Scheduled_Monthly_Payment_Amount || "0").toString().replace(/,/g, '');
@@ -184,6 +197,13 @@ export function parseBureauData(bureau: string, data: any): ParsedBureauData {
     if (expReport?.SCORE) {
       personalInfo = {
         score: expReport.SCORE.BureauScore || 0,
+        factors: [],
+        scoreName: "Experian Bureau Score",
+        scoreDescription: ""
+      };
+    } else if (expReport?.Score) {
+      personalInfo = {
+        score: expReport.Score.BureauScore || 0,
         factors: [],
         scoreName: "Experian Bureau Score",
         scoreDescription: ""

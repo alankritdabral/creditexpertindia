@@ -7,8 +7,13 @@ export async function GET(request: Request) {
     const start = searchParams.get('startDate');
     const end = searchParams.get('endDate');
     const limitQuery = searchParams.get('limit');
+    const branch = searchParams.get('branch');
     
     let queryRef: any = adminDb.collection('credit_reports');
+
+    if (branch) {
+      queryRef = queryRef.where('branch', '==', branch);
+    }
 
     if (start && end) {
       // Branch Activity uses Date range
@@ -18,15 +23,20 @@ export async function GET(request: Request) {
     } else {
       // All Reports uses limit and order
       const qLimit = parseInt(limitQuery || '1000');
-      queryRef = queryRef.orderBy('created_at', 'desc').limit(qLimit);
+      // If branch is provided, Firestore requires a composite index to use orderBy. 
+      // We skip orderBy here to avoid the index error, and sort locally instead.
+      if (!branch) {
+        queryRef = queryRef.orderBy('created_at', 'desc');
+      }
+      queryRef = queryRef.limit(qLimit);
     }
 
     // Explicitly exclude the huge 'data' field by selecting only what's needed
-    queryRef = queryRef.select('name', 'mobile', 'pan', 'bureau', 'credit_score', 'created_at', 'branch', 'search_tokens');
+    queryRef = queryRef.select('name', 'mobile', 'pan', 'bureau', 'credit_score', 'created_at', 'branch', 'search_tokens', 'fallbackData');
 
     const snapshot = await queryRef.get();
     
-    const reports = snapshot.docs.map((doc: any) => {
+    let reports = snapshot.docs.map((doc: any) => {
       const docData = doc.data();
       return {
         id: doc.id,
@@ -35,6 +45,14 @@ export async function GET(request: Request) {
         created_at: docData.created_at ? { seconds: docData.created_at._seconds } : null
       };
     });
+
+    if (branch && !(start && end)) {
+      reports.sort((a: any, b: any) => {
+        const timeA = a.created_at?.seconds || 0;
+        const timeB = b.created_at?.seconds || 0;
+        return timeB - timeA;
+      });
+    }
 
     return NextResponse.json({ success: true, reports });
   } catch (error) {

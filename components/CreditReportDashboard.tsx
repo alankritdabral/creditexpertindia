@@ -6,6 +6,8 @@ import { analyzeLenderEligibility } from "@/lib/lenderEngine";
 import { parseBureauData } from "@/lib/bureauParsers";
 import { searchEmployers, EmployerResult } from "@/lib/employerLookup";
 import { useEffect } from "react";
+import { db } from "@/lib/firebaseClient";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 
 export function CreditReportDashboard({ bureau, cibilData, formData }: any) {
   const captureRef = useRef<HTMLDivElement>(null);
@@ -21,6 +23,66 @@ export function CreditReportDashboard({ bureau, cibilData, formData }: any) {
   const [expandedAccount, setExpandedAccount] = useState<string | null>(null);
   const [dashboardTab, setDashboardTab] = useState<"enquiries" | "ongoing" | "closed" | "eligibility">("enquiries");
   const [loanOverrides, setLoanOverrides] = useState<any>({});
+
+  const sessionKey = `report_session_${formData?.pan || "NOPAN"}_${formData?.mobile || "NOMOBILE"}`;
+  const safePan = formData?.pan ? formData.pan.toUpperCase() : "NOPAN";
+  const docId = `${safePan}_${formData?.mobile}_${bureau || formData?.bureau}`;
+
+  useEffect(() => {
+    // 1. Try to load from session storage for instant UX
+    try {
+      const saved = sessionStorage.getItem(sessionKey);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.userOverrides) setUserOverrides(parsed.userOverrides);
+        if (parsed.loanOverrides) setLoanOverrides(parsed.loanOverrides);
+      }
+    } catch (e) {
+      console.error("Failed to load session overrides", e);
+    }
+
+    // 2. Load from Firebase as source of truth
+    const loadFromDB = async () => {
+      try {
+        const docSnap = await getDoc(doc(db, "credit_reports", docId));
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          if (data.overrides) {
+             setUserOverrides((prev: any) => ({ ...prev, ...data.overrides.userOverrides }));
+             setLoanOverrides((prev: any) => ({ ...prev, ...data.overrides.loanOverrides }));
+          }
+        }
+      } catch (e) {
+         console.error("Failed to load overrides from DB", e);
+      }
+    };
+    loadFromDB();
+  }, [sessionKey, docId]);
+
+  useEffect(() => {
+    // Save to session storage instantly
+    try {
+      sessionStorage.setItem(sessionKey, JSON.stringify({ userOverrides, loanOverrides }));
+    } catch (e) {
+      console.error("Failed to save session overrides", e);
+    }
+    
+    // Save to Firebase (debounced)
+    const handler = setTimeout(async () => {
+      try {
+        // Only update if there are keys, to avoid writing empty data needlessly
+        if (Object.keys(userOverrides).length > 0 || Object.keys(loanOverrides).length > 0) {
+          await updateDoc(doc(db, "credit_reports", docId), {
+            overrides: { userOverrides, loanOverrides }
+          });
+        }
+      } catch (e) {
+        console.error("Failed to save overrides to DB", e);
+      }
+    }, 1500);
+    
+    return () => clearTimeout(handler);
+  }, [userOverrides, loanOverrides, sessionKey, docId]);
   
   const [showEmployerDropdown, setShowEmployerDropdown] = useState(false);
   const [employerSearch, setEmployerSearch] = useState("");
@@ -264,6 +326,12 @@ export function CreditReportDashboard({ bureau, cibilData, formData }: any) {
           <div className="mb-10">
             {isDownloadingSection === 'basic' && (
               <h3 className="text-xl font-bold bg-[#382F2A] text-white p-3 rounded-lg mb-6 uppercase tracking-wider text-center">Section 1: Basic Details</h3>
+            )}
+            {formData?.fallbackWarning && !isPreparingDownload && (
+              <div className="mb-6 p-4 rounded-xl bg-amber-50 border border-amber-200 flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+                <p className="text-sm text-amber-800">{formData.fallbackWarning}</p>
+              </div>
             )}
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-2xl font-bold text-brand-black">Credit Report</h3>
