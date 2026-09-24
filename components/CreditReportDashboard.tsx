@@ -270,8 +270,8 @@ export function CreditReportDashboard({ bureau, cibilData, formData }: any) {
               <div className="flex items-center gap-3">
                 {!isPreparingDownload && (
                   <>
-                    {cibilData?.credit_report_link && (
-                      <a href={cibilData.credit_report_link} target="_blank" rel="noopener noreferrer" className="text-xs font-bold px-4 py-1.5 bg-blue-energy text-white rounded-full hover:bg-blue-700 transition-colors shadow-sm flex items-center gap-1">
+                    {(cibilData?.credit_report_link || cibilData?.data?.pdf_url) && (
+                      <a href={cibilData?.credit_report_link || cibilData?.data?.pdf_url} target="_blank" rel="noopener noreferrer" className="text-xs font-bold px-4 py-1.5 bg-blue-energy text-white rounded-full hover:bg-blue-700 transition-colors shadow-sm flex items-center gap-1">
                         Download PDF
                       </a>
                     )}

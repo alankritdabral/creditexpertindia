@@ -131,7 +131,7 @@ export default function AdminDashboard() {
         
         if (stats[branch]) {
           stats[branch].count += 1;
-          const cost = bureau.startsWith("crif") ? 14.16 : 59;
+          const cost = bureau.startsWith("experian") ? 10.62 : bureau.startsWith("crif") ? 14.16 : 59;
           stats[branch].cost += cost;
           stats[branch].reports.push({ id: docSnap.id, ...data });
         }

@@ -36,6 +36,9 @@ export async function POST(req: NextRequest) {
     } else if (bureau.startsWith("crif")) {
       // CRIF
       endpoint = "https://javabackend.idspay.in/api/v1/prod/crif/Credit-ScoreV4";
+    } else if (bureau.startsWith("experian")) {
+      // Experian
+      endpoint = "https://javabackend.idspay.in/api/v1/prod/srv2/credit-report/experian";
     } else {
       return NextResponse.json(
         { error: "Unsupported bureau format." },

@@ -116,7 +116,8 @@ export function parseBureauData(bureau: string, data: any): ParsedBureauData {
 
   } else if (isExperian) {
     // Experian JSON parsing
-    const caisAccounts = data?.credit_report?.CAIS_Account?.CAIS_Account_DETAILS || [];
+    const expReport = data?.data?.result_json?.INProfileResponse || data?.result_json?.INProfileResponse || data?.credit_report;
+    const caisAccounts = expReport?.CAIS_Account?.CAIS_Account_DETAILS || [];
     accounts = caisAccounts.map((acc: any) => {
       const emiStr = (acc.Scheduled_Monthly_Payment_Amount || "0").toString().replace(/,/g, '');
       const currBal = (acc.Current_Balance || "0").toString().replace(/,/g, '');
@@ -156,7 +157,7 @@ export function parseBureauData(bureau: string, data: any): ParsedBureauData {
       if (bal === 0) zeroBalanceAccounts += 1;
     });
 
-    const summary = data?.credit_report?.CAIS_Account?.CAIS_Summary?.Credit_Account;
+    const summary = expReport?.CAIS_Account?.CAIS_Summary?.Credit_Account;
     
     accountSummary = {
       totalAccounts: Number(summary?.CreditAccountTotal || accounts.length),
@@ -167,18 +168,27 @@ export function parseBureauData(bureau: string, data: any): ParsedBureauData {
       zeroBalanceAccounts: Number(summary?.CreditAccountClosed || zeroBalanceAccounts)
     };
     
-    const capsDetails = data?.credit_report?.CAPS?.CAPS_Application_Details || [];
+    const capsDetails = expReport?.CAPS?.CAPS_Application_Details || [];
     enquiries = capsDetails.map((inq: any) => ({
       memberShortName: inq.Subscriber_Name || "Unknown Lender",
       enquiryDate: inq.Date_of_Request || "N/A",
       enquiryAmount: Number((inq.Amount_Financed || "0").toString().replace(/,/g, '')) || 0
     }));
 
-    const capsSummary = data?.credit_report?.CAPS?.CAPS_Summary;
+    const capsSummary = expReport?.CAPS?.CAPS_Summary;
     inquirySummary = {
       totalInquiry: Number(capsSummary?.CAPSTotal || enquiries.length),
       inquiryPast30Days: Number(capsSummary?.CAPSLast30Days || 0)
     };
+
+    if (expReport?.SCORE) {
+      personalInfo = {
+        score: expReport.SCORE.BureauScore || 0,
+        factors: [],
+        scoreName: "Experian Bureau Score",
+        scoreDescription: ""
+      };
+    }
   } else if (isCrif) {
     // CRIF JSON parsing
     const report = data?.result_json?.credit_report || data?.credit_report || {};

@@ -41,7 +41,7 @@ export function EligibilityForm() {
     firstName: "", lastName: "", mobile: "", email: "", city: "", employmentType: "Salaried",
     monthlyIncome: "", employer: "", salaryMode: "Bank Transfer",
     requirement: "",
-    pan: "", gender: "male", consent: false, bureau: "crif_json"
+    pan: "", dob: "", gender: "male", consent: false, bureau: "crif_json"
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -86,6 +86,15 @@ export function EligibilityForm() {
       return;
     }
     const isCrifSelected = formData.bureau.startsWith("crif");
+    const isExperianSelected = formData.bureau === "experian";
+    
+    if (isExperianSelected) {
+      if (!formData.dob) {
+        setError("Please enter your Date of Birth.");
+        return;
+      }
+    }
+
     if (!isCrifSelected) {
       const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/i;
       if (!panRegex.test(formData.pan)) {
@@ -156,6 +165,14 @@ export function EligibilityForm() {
           last_name: formData.lastName,
           mobile_no: formData.mobile,
           name_lookup: 0
+        };
+      } else if (isExperian) {
+        bodyPayload = {
+          first_name: formData.firstName,
+          last_name: formData.lastName,
+          mobile_no: formData.mobile,
+          pan: formData.pan,
+          dob: formData.dob
         };
       } else {
         bodyPayload = {
@@ -276,6 +293,17 @@ export function EligibilityForm() {
                 <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <input type="tel" placeholder="Mobile Number" value={formData.mobile} onChange={e => setFormData({ ...formData, mobile: e.target.value })} className="w-full bg-white border border-icy-blue rounded-xl pl-11 pr-4 py-3.5 focus:ring-2 focus:ring-blue-energy/30 focus:border-blue-energy outline-none transition-all" />
               </div>
+              {formData.bureau === 'experian' && (
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-xs">DOB</span>
+                  <input
+                    type="date"
+                    value={formData.dob}
+                    onChange={e => setFormData({ ...formData, dob: e.target.value })}
+                    className="w-full bg-white border border-icy-blue rounded-xl pl-12 pr-4 py-3.5 focus:ring-2 focus:ring-blue-energy/30 focus:border-blue-energy outline-none transition-all text-sm"
+                  />
+                </div>
+              )}
               {!formData.bureau.startsWith('crif') && (
                 <div className="relative">
                   <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -294,7 +322,7 @@ export function EligibilityForm() {
               {/* Bureau Selection */}
               <div className="pt-2">
                 <p className="text-sm font-semibold text-brand-black mb-3">Select Credit Bureau</p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <label className="flex items-center gap-2 p-3 border rounded-xl transition-all opacity-50 cursor-not-allowed bg-slate-50 border-icy-blue">
                     <input type="radio" name="bureau" value="v1_json" disabled className="w-4 h-4 text-slate-400 cursor-not-allowed" />
                     <span className="text-sm font-medium text-slate-500">CIBIL</span>
@@ -302,6 +330,10 @@ export function EligibilityForm() {
                   <label className={`flex items-center gap-2 p-3 border rounded-xl cursor-pointer transition-all ${formData.bureau === 'crif_json' ? 'border-blue-energy bg-blue-50/50' : 'border-icy-blue hover:bg-slate-50'}`}>
                     <input type="radio" name="bureau" value="crif_json" checked={formData.bureau === 'crif_json'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-blue-energy accent-blue-energy" />
                     <span className="text-sm font-medium text-brand-black/90">CRIF</span>
+                  </label>
+                  <label className={`flex items-center gap-2 p-3 border rounded-xl cursor-pointer transition-all ${formData.bureau === 'experian' ? 'border-blue-energy bg-blue-50/50' : 'border-icy-blue hover:bg-slate-50'}`}>
+                    <input type="radio" name="bureau" value="experian" checked={formData.bureau === 'experian'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-blue-energy accent-blue-energy" />
+                    <span className="text-sm font-medium text-brand-black/90">Experian</span>
                   </label>
                 </div>
               </div>
