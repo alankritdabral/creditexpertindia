@@ -426,7 +426,15 @@ export function EligibilityForm() {
       case 1:
         return (
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-            <h3 className="text-2xl font-bold text-brand-black mb-6">Credit Profile & Identity</h3>
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-2xl font-bold text-brand-black">Credit Profile & Identity</h3>
+              {teamBranch && (
+                <div className="flex items-center gap-1.5 px-3 py-1 bg-blue-50 border border-blue-100 rounded-full text-blue-600 shadow-sm" title="Logged in as">
+                  <User className="w-4 h-4" />
+                  <span className="text-xs font-bold uppercase tracking-wider">{teamBranch}</span>
+                </div>
+              )}
+            </div>
             <div className="space-y-4">
               <div className="flex gap-4">
                 <div className="relative flex-1">
