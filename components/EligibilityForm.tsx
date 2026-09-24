@@ -166,6 +166,12 @@ export function EligibilityForm() {
         identifier: formData.mobile,
         exposeMethods: false,
         success: async (data: any) => {
+          console.log("MSG91 Success callback triggered:", data);
+          if (data?.type === 'error' || String(data).includes('error') || String(data?.message).includes('error')) {
+            setError("OTP Service encountered an error. Please check your mobile number and try again.");
+            setLoading(false);
+            return;
+          }
           const token = data.message || data;
           try {
             const res = await fetch("/api/verify-msg91-otp", {
@@ -188,9 +194,9 @@ export function EligibilityForm() {
         },
         failure: (error: any) => {
           console.error('OTP failure:', error);
-          setError("OTP could not be sent or verified.");
+          setError("OTP could not be sent or verified. " + (error?.message || error || ""));
           setLoading(false);
-        },
+        }
       };
       (window as any).initSendOTP(configuration);
     } else {

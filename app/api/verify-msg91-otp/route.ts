@@ -26,6 +26,7 @@ export async function POST(req: Request) {
     if (response.ok && data.type === 'success') {
       return NextResponse.json({ success: true, data });
     } else {
+      console.error("MSG91 API rejected the token. Response:", data);
       return NextResponse.json({ success: false, error: data.message || "OTP verification failed" }, { status: 400 });
     }
   } catch (error: any) {
