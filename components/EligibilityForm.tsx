@@ -41,7 +41,7 @@ export function EligibilityForm() {
     firstName: "", lastName: "", mobile: "", email: "", city: "", employmentType: "Salaried",
     monthlyIncome: "", employer: "", salaryMode: "Bank Transfer",
     requirement: "",
-    pan: "", dob: "", gender: "male", consent: false, bureau: "crif_json"
+    pan: "", dob: "", gender: "male", consent: false, bureau: "experian"
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -418,27 +418,6 @@ export function EligibilityForm() {
   const renderStep = () => {
     switch (step) {
       case 1:
-        if (!teamBranch) {
-          return (
-            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="text-center py-12">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-100 mb-6">
-                <AlertCircle className="w-8 h-8 text-slate-400" />
-              </div>
-              <h3 className="text-2xl font-bold text-brand-black mb-4">Temporarily Unavailable</h3>
-              <p className="text-brand-black/70 max-w-sm mx-auto leading-relaxed mb-6">
-                The Credit Profile check is currently undergoing maintenance and is only accessible to authorized team members.
-              </p>
-              <Link
-                href="/team/login"
-                className="inline-flex items-center gap-2 bg-blue-energy/10 text-blue-energy hover:bg-blue-energy hover:text-white px-6 py-2.5 rounded-xl font-semibold transition-all duration-300"
-              >
-                <span>Team Login</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </motion.div>
-          );
-        }
-
         return (
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
             <h3 className="text-2xl font-bold text-brand-black mb-6">Credit Profile & Identity</h3>
@@ -497,23 +476,25 @@ export function EligibilityForm() {
               )}
 
               {/* Bureau Selection */}
-              <div className="pt-2">
-                <p className="text-sm font-semibold text-brand-black mb-3">Select Credit Bureau</p>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <label className="flex items-center gap-2 p-3 border rounded-xl transition-all opacity-50 cursor-not-allowed bg-slate-50 border-icy-blue">
-                    <input type="radio" name="bureau" value="v1_json" disabled className="w-4 h-4 text-slate-400 cursor-not-allowed" />
-                    <span className="text-sm font-medium text-slate-500">CIBIL</span>
-                  </label>
-                  <label className={`flex items-center gap-2 p-3 border rounded-xl transition-all ${teamBranch ? 'opacity-50 cursor-not-allowed bg-slate-50 border-icy-blue' : formData.bureau === 'crif_json' ? 'border-blue-energy bg-blue-50/50 cursor-pointer' : 'border-icy-blue hover:bg-slate-50 cursor-pointer'}`}>
-                    <input type="radio" name="bureau" value="crif_json" disabled={!!teamBranch} checked={formData.bureau === 'crif_json'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-blue-energy accent-blue-energy disabled:opacity-50" />
-                    <span className={`text-sm font-medium ${teamBranch ? 'text-slate-500' : 'text-brand-black/90'}`}>CRIF</span>
-                  </label>
-                  <label className={`flex items-center gap-2 p-3 border rounded-xl cursor-pointer transition-all ${formData.bureau === 'experian' ? 'border-blue-energy bg-blue-50/50' : 'border-icy-blue hover:bg-slate-50'}`}>
-                    <input type="radio" name="bureau" value="experian" checked={formData.bureau === 'experian'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-blue-energy accent-blue-energy" />
-                    <span className="text-sm font-medium text-brand-black/90">Experian</span>
-                  </label>
+              {teamBranch && (
+                <div className="pt-2">
+                  <p className="text-sm font-semibold text-brand-black mb-3">Select Credit Bureau</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <label className="flex items-center gap-2 p-3 border rounded-xl transition-all opacity-50 cursor-not-allowed bg-slate-50 border-icy-blue">
+                      <input type="radio" name="bureau" value="v1_json" disabled className="w-4 h-4 text-slate-400 cursor-not-allowed" />
+                      <span className="text-sm font-medium text-slate-500">CIBIL</span>
+                    </label>
+                    <label className={`flex items-center gap-2 p-3 border rounded-xl transition-all ${teamBranch ? 'opacity-50 cursor-not-allowed bg-slate-50 border-icy-blue' : formData.bureau === 'crif_json' ? 'border-blue-energy bg-blue-50/50 cursor-pointer' : 'border-icy-blue hover:bg-slate-50 cursor-pointer'}`}>
+                      <input type="radio" name="bureau" value="crif_json" disabled={!!teamBranch} checked={formData.bureau === 'crif_json'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-blue-energy accent-blue-energy disabled:opacity-50" />
+                      <span className={`text-sm font-medium ${teamBranch ? 'text-slate-500' : 'text-brand-black/90'}`}>CRIF</span>
+                    </label>
+                    <label className={`flex items-center gap-2 p-3 border rounded-xl cursor-pointer transition-all ${formData.bureau === 'experian' ? 'border-blue-energy bg-blue-50/50' : 'border-icy-blue hover:bg-slate-50'}`}>
+                      <input type="radio" name="bureau" value="experian" checked={formData.bureau === 'experian'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-blue-energy accent-blue-energy" />
+                      <span className="text-sm font-medium text-brand-black/90">Experian</span>
+                    </label>
+                  </div>
                 </div>
-              </div>
+              )}
 
               <label className="flex items-start gap-3 p-4 border border-icy-blue rounded-xl cursor-pointer hover:bg-slate-50 transition-colors mt-4">
                 <input
