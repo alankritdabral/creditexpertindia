@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { collection, doc, getDoc, getDocs, updateDoc, query, orderBy, limit, startAfter, getCountFromServer, where } from "firebase/firestore";
 import { auth, db } from "@/lib/firebaseClient";
-import { Loader2, LogOut, ShieldCheck, Activity, Users, Database, Search, Filter, ArrowUpDown, Eye, X, RefreshCw, Clock } from "lucide-react";
+import { Loader2, LogOut, ShieldCheck, Activity, Users, Database, Search, Filter, ArrowUpDown, Eye, X, RefreshCw, Clock, AlertCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CreditReportDashboard } from "@/components/CreditReportDashboard";
 
