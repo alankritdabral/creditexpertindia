@@ -44,6 +44,29 @@ export default function AdminDashboard() {
 
   // View Details State
   const [viewingReport, setViewingReport] = useState<any>(null);
+  const [loadingReportId, setLoadingReportId] = useState<string | null>(null);
+
+  const handleViewDetails = async (reportMeta: any) => {
+    if (reportMeta.data) {
+      setViewingReport(reportMeta);
+      return;
+    }
+    
+    setLoadingReportId(reportMeta.id);
+    try {
+      const res = await fetch(`/api/admin/reports/${reportMeta.id}`);
+      const apiData = await res.json();
+      if (apiData.success) {
+        setViewingReport(apiData.report);
+      } else {
+        alert("Failed to load details");
+      }
+    } catch (e) {
+      console.error("Error loading report details", e);
+      alert("Error loading details");
+    }
+    setLoadingReportId(null);
+  };
 
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
@@ -114,8 +137,8 @@ export default function AdminDashboard() {
         end = new Date(start.getTime() + 24 * 60 * 60 * 1000 - 1);
       }
 
-      const q = query(collection(db, "credit_reports"), where("created_at", ">=", start), where("created_at", "<=", end));
-      const snapshot = await getDocs(q);
+      const res = await fetch(`/api/admin/reports?startDate=${start.toISOString()}&endDate=${end.toISOString()}`);
+      const apiData = await res.json();
       
       const stats: any = {
         rudrapur: { count: 0, cost: 0, reports: [] },
@@ -124,18 +147,19 @@ export default function AdminDashboard() {
         customer: { count: 0, cost: 0, reports: [] }
       };
 
-      snapshot.docs.forEach(docSnap => {
-        const data = docSnap.data();
-        const branch = data.branch || "customer";
-        const bureau = data.bureau || "";
-        
-        if (stats[branch]) {
-          stats[branch].count += 1;
-          const cost = bureau.startsWith("experian") ? 10.62 : bureau.startsWith("crif") ? 14.16 : 59;
-          stats[branch].cost += cost;
-          stats[branch].reports.push({ id: docSnap.id, ...data });
-        }
-      });
+      if (apiData.success) {
+        apiData.reports.forEach((data: any) => {
+          const branch = data.branch || "customer";
+          const bureau = data.bureau || "";
+          
+          if (stats[branch]) {
+            stats[branch].count += 1;
+            const cost = bureau.startsWith("experian") ? 10.62 : bureau.startsWith("crif") ? 14.16 : 59;
+            stats[branch].cost += cost;
+            stats[branch].reports.push(data);
+          }
+        });
+      }
       
       // Sort reports locally (newest first)
       for (const key in stats) {
@@ -156,11 +180,11 @@ export default function AdminDashboard() {
   const fetchReports = async () => {
     setLoadingReports(true);
     try {
-      // Fetch a large chunk of latest reports once, handle search and pagination locally
-      const q = query(collection(db, "credit_reports"), orderBy("created_at", "desc"), limit(1000));
-      const snapshot = await getDocs(q);
-      const docs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setReports(docs);
+      const res = await fetch("/api/admin/reports?limit=1000");
+      const apiData = await res.json();
+      if (apiData.success) {
+        setReports(apiData.reports);
+      }
     } catch (e) {
       console.error("Error fetching reports:", e);
     }
@@ -349,7 +373,14 @@ export default function AdminDashboard() {
         {activeTab === "activity" && (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="overflow-y-auto flex-1 pb-10">
             <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
-              <h2 className="text-2xl font-bold text-slate-800">Branch Activity</h2>
+              <div className="flex flex-col">
+                <h2 className="text-2xl font-bold text-slate-800">Branch Activity</h2>
+                {!activityLoading && activity && (
+                  <p className="text-sm text-slate-500 font-semibold mt-1">
+                    Total Spend: <span className="text-slate-800 font-bold">₹{Object.values(activity).reduce((sum: number, branch: any) => sum + (branch.cost || 0), 0).toFixed(2)}</span>
+                  </p>
+                )}
+              </div>
               <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
                 <select 
                   value={activityDateFilter}
@@ -437,10 +468,12 @@ export default function AdminDashboard() {
                                 <td className="p-4 text-slate-500">{r.created_at ? new Date(r.created_at.seconds * 1000).toLocaleString() : "-"}</td>
                                 <td className="p-4 text-right">
                                   <button 
-                                    onClick={() => setViewingReport(r)}
-                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg text-xs font-bold transition-colors"
+                                    onClick={() => handleViewDetails(r)}
+                                    disabled={loadingReportId === r.id}
+                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg text-xs font-bold transition-colors disabled:opacity-50"
                                   >
-                                    <Eye className="w-3.5 h-3.5" /> View Details
+                                    {loadingReportId === r.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Eye className="w-3.5 h-3.5" />}
+                                    {loadingReportId === r.id ? "Loading..." : "View Details"}
                                   </button>
                                 </td>
                               </tr>
@@ -533,10 +566,12 @@ export default function AdminDashboard() {
                          <td className="p-4 text-slate-500">{r.created_at ? new Date(r.created_at.seconds * 1000).toLocaleString() : "-"}</td>
                          <td className="p-4 text-right">
                            <button 
-                             onClick={() => setViewingReport(r)}
-                             className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg text-xs font-bold transition-colors"
+                             onClick={() => handleViewDetails(r)}
+                             disabled={loadingReportId === r.id}
+                             className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg text-xs font-bold transition-colors disabled:opacity-50"
                            >
-                             <Eye className="w-3.5 h-3.5" /> View Details
+                             {loadingReportId === r.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Eye className="w-3.5 h-3.5" />}
+                             {loadingReportId === r.id ? "Loading..." : "View Details"}
                            </button>
                          </td>
                        </tr>

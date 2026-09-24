@@ -57,6 +57,7 @@ export function EligibilityForm() {
     getTeamSession().then(session => {
       if (session) {
         setTeamBranch(session);
+        setFormData(prev => ({ ...prev, bureau: "experian" }));
       }
     });
   }, []);
@@ -327,9 +328,9 @@ export function EligibilityForm() {
                     <input type="radio" name="bureau" value="v1_json" disabled className="w-4 h-4 text-slate-400 cursor-not-allowed" />
                     <span className="text-sm font-medium text-slate-500">CIBIL</span>
                   </label>
-                  <label className={`flex items-center gap-2 p-3 border rounded-xl cursor-pointer transition-all ${formData.bureau === 'crif_json' ? 'border-blue-energy bg-blue-50/50' : 'border-icy-blue hover:bg-slate-50'}`}>
-                    <input type="radio" name="bureau" value="crif_json" checked={formData.bureau === 'crif_json'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-blue-energy accent-blue-energy" />
-                    <span className="text-sm font-medium text-brand-black/90">CRIF</span>
+                  <label className={`flex items-center gap-2 p-3 border rounded-xl transition-all ${teamBranch ? 'opacity-50 cursor-not-allowed bg-slate-50 border-icy-blue' : formData.bureau === 'crif_json' ? 'border-blue-energy bg-blue-50/50 cursor-pointer' : 'border-icy-blue hover:bg-slate-50 cursor-pointer'}`}>
+                    <input type="radio" name="bureau" value="crif_json" disabled={!!teamBranch} checked={formData.bureau === 'crif_json'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-blue-energy accent-blue-energy disabled:opacity-50" />
+                    <span className={`text-sm font-medium ${teamBranch ? 'text-slate-500' : 'text-brand-black/90'}`}>CRIF</span>
                   </label>
                   <label className={`flex items-center gap-2 p-3 border rounded-xl cursor-pointer transition-all ${formData.bureau === 'experian' ? 'border-blue-energy bg-blue-50/50' : 'border-icy-blue hover:bg-slate-50'}`}>
                     <input type="radio" name="bureau" value="experian" checked={formData.bureau === 'experian'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-blue-energy accent-blue-energy" />
