@@ -79,7 +79,7 @@ export function CreditReportDashboard({ bureau, cibilData, formData }: any) {
       } catch (e) {
         console.error("Failed to save overrides to DB", e);
       }
-    }, 1500);
+    }, 5000);
     
     return () => clearTimeout(handler);
   }, [userOverrides, loanOverrides, sessionKey, docId]);
