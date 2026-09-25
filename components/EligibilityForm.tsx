@@ -599,7 +599,7 @@ export function EligibilityForm() {
                   <thead>
                     <tr className="border-b border-slate-200 text-slate-500 font-bold uppercase text-xs">
                       <th className="pb-3">Name</th>
-                      <th className="pb-3">Mobile / PAN</th>
+                      <th className="pb-3">PAN</th>
                       <th className="pb-3">Score</th>
                       <th className="pb-3">Date</th>
                       <th className="pb-3 text-right">Action</th>
@@ -610,8 +610,7 @@ export function EligibilityForm() {
                       <tr key={i} className="hover:bg-slate-50 transition-colors">
                         <td className="py-4 font-bold text-slate-800">{r.name}</td>
                         <td className="py-4 text-slate-600">
-                          <div>{r.mobile}</div>
-                          <div className="text-xs text-slate-400">{r.pan || "No PAN"}</div>
+                          <div>{r.pan || "No PAN"}</div>
                         </td>
                         <td className="py-4 font-bold text-lg">{r.credit_score || "-"}</td>
                         <td className="py-4 text-slate-500">
