@@ -159,7 +159,10 @@ export function parseBureauData(bureau: string, data: any): ParsedBureauData {
     const expReport = rJson?.INProfileResponse || data?.credit_report;
     console.log("[DEBUG EXPERIAN] expReport extracted:", expReport);
     console.log("[DEBUG EXPERIAN] SCORE object inside expReport:", expReport?.SCORE || expReport?.Score);
-    const caisAccounts = expReport?.CAIS_Account?.CAIS_Account_DETAILS || [];
+    let caisAccounts = expReport?.CAIS_Account?.CAIS_Account_DETAILS || [];
+    if (!Array.isArray(caisAccounts)) {
+      caisAccounts = [caisAccounts];
+    }
     accounts = caisAccounts.map((acc: any) => {
       const emiStr = (acc.Scheduled_Monthly_Payment_Amount || "0").toString().replace(/,/g, '');
       const currBal = (acc.Current_Balance || "0").toString().replace(/,/g, '');
@@ -210,7 +213,10 @@ export function parseBureauData(bureau: string, data: any): ParsedBureauData {
       zeroBalanceAccounts: Number(summary?.CreditAccountClosed || zeroBalanceAccounts)
     };
     
-    const capsDetails = expReport?.CAPS?.CAPS_Application_Details || [];
+    let capsDetails = expReport?.CAPS?.CAPS_Application_Details || [];
+    if (!Array.isArray(capsDetails)) {
+      capsDetails = [capsDetails];
+    }
     enquiries = capsDetails.map((inq: any) => ({
       memberShortName: inq.Subscriber_Name || "Unknown Lender",
       enquiryDate: inq.Date_of_Request || "N/A",
