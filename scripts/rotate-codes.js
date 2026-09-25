@@ -1,4 +1,5 @@
 const admin = require('firebase-admin');
+const nodemailer = require('nodemailer');
 
 // Initialize Firebase Admin
 if (!admin.apps.length) {
@@ -56,6 +57,48 @@ async function run() {
 
     await batch.commit();
     console.log("Successfully rotated codes:", newCodes);
+
+    // Send email with the new codes
+    if (process.env.EMAIL_USER && process.env.EMAIL_PASS && process.env.EMAIL_TO) {
+      console.log("Sending email with new access codes...");
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASS
+        }
+      });
+
+      const currentDate = new Date().toLocaleDateString('en-IN', { 
+        timeZone: 'Asia/Kolkata', 
+        day: '2-digit', 
+        month: 'long', 
+        year: 'numeric' 
+      });
+
+      const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: process.env.EMAIL_TO,
+        ...(process.env.EMAIL_CC && { cc: process.env.EMAIL_CC }),
+        subject: `Daily Access Codes - ${currentDate}`,
+        html: `
+          <h3>Access Codes for ${currentDate}</h3>
+          <ul>
+            ${Object.entries(newCodes).map(([branch, code]) => `<li><b>${branch.toUpperCase()}:</b> ${code}</li>`).join('')}
+          </ul>
+        `
+      };
+
+      try {
+        await transporter.sendMail(mailOptions);
+        console.log("Email sent successfully!");
+      } catch (emailError) {
+        console.error("Error sending email:", emailError);
+      }
+    } else {
+      console.log("Email credentials not found in environment (EMAIL_USER, EMAIL_PASS, EMAIL_TO). Skipping email.");
+    }
+
     process.exit(0);
   } catch (error) {
     console.error('Error rotating codes:', error);
