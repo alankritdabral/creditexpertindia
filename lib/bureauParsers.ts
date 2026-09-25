@@ -163,6 +163,7 @@ export function parseBureauData(bureau: string, data: any): ParsedBureauData {
     if (!Array.isArray(caisAccounts)) {
       caisAccounts = [caisAccounts];
     }
+    const formatExpDate = (d: string) => (d && d.length === 8) ? `${d.slice(6,8)}-${d.slice(4,6)}-${d.slice(0,4)}` : (d || "N/A");
     accounts = caisAccounts.map((acc: any) => {
       const emiStr = (acc.Scheduled_Monthly_Payment_Amount || "0").toString().replace(/,/g, '');
       const currBal = (acc.Current_Balance || "0").toString().replace(/,/g, '');
@@ -174,8 +175,8 @@ export function parseBureauData(bureau: string, data: any): ParsedBureauData {
         currentBalance: Number(currBal) || 0,
         highCreditAmount: Number(highCred) || 0,
         memberShortName: acc.Subscriber_Name || "Unknown Lender",
-        dateOpened: acc.Open_Date || "N/A",
-        dateReported: acc.Date_Reported || "N/A",
+        dateOpened: formatExpDate(acc.Open_Date),
+        dateReported: formatExpDate(acc.Date_Reported),
         emiAmount: Number(emiStr) || 0,
         interest_rate: Number(acc.Rate_of_Interest || 0),
         repaymentTenure: acc.Repayment_Tenure || "N/A",
@@ -219,7 +220,7 @@ export function parseBureauData(bureau: string, data: any): ParsedBureauData {
     }
     enquiries = capsDetails.map((inq: any) => ({
       memberShortName: inq.Subscriber_Name || "Unknown Lender",
-      enquiryDate: inq.Date_of_Request || "N/A",
+      enquiryDate: formatExpDate(inq.Date_of_Request),
       enquiryAmount: Number((inq.Amount_Financed || "0").toString().replace(/,/g, '')) || 0
     }));
 
