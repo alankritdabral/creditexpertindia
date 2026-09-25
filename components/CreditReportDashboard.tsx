@@ -1096,93 +1096,129 @@ export function CreditReportDashboard({ bureau, cibilData, formData }: any) {
                           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                             <div>
                               <label className="text-[10px] uppercase font-bold text-[#8B7C73]">Bank / NBFC</label>
-                              <input
-                                type="text"
-                                value={l.bankName !== undefined ? l.bankName : (loan.bankName || "")}
-                                onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), bankName: e.target.value } }))}
-                                className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-energy"
-                              />
-                            </div>
-                            <div>
-                              <label className="text-[10px] uppercase font-bold text-[#8B7C73]">Type</label>
-                              <select
-                                value={l.type !== undefined ? l.type : (loan.type || "Personal Loan")}
-                                onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), type: e.target.value } }))}
-                                className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-energy"
-                              >
-                                <optgroup label="Generally Non-Transferable (Category A)">
-                                  {['Car Loan', 'Home Loan', 'LAP', 'Gold Loan', 'Consumer Loan', 'Education Loan'].map(t => <option key={t} value={t}>{t}</option>)}
-                                </optgroup>
-                                <optgroup label="Potentially Transferable (Category B)">
-                                  {['Personal Loan', 'Overdraft', 'App Loan', 'Credit Card'].map(t => <option key={t} value={t}>{t}</option>)}
-                                </optgroup>
-                                <option value="Unknown">Unknown</option>
-                              </select>
-                            </div>
-                            <div>
-                              <label className="text-[10px] uppercase font-bold text-[#8B7C73]">{loan.type === 'Overdraft' ? 'Amount Drawn' : 'Orig. Amount'}</label>
-                              <input
-                                type="number"
-                                value={l.originalAmount !== undefined ? l.originalAmount : (loan.originalAmount || "")}
-                                onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), originalAmount: e.target.value } }))}
-                                className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-energy"
-                              />
-                            </div>
-                            <div>
-                              <label className="text-[10px] uppercase font-bold text-[#8B7C73]">Current Bal.</label>
-                              <input
-                                type="number"
-                                value={l.currentOutstanding !== undefined ? l.currentOutstanding : (loan.currentOutstanding || "")}
-                                onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), currentOutstanding: e.target.value } }))}
-                                className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-energy"
-                              />
-                            </div>
-                            <div>
-                              <label className="text-[10px] uppercase font-bold text-[#8B7C73]">Date Issue</label>
-                              <input
-                                type="text"
-                                value={l.dateOpened !== undefined ? l.dateOpened : (loan.dateOpened || "")}
-                                onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), dateOpened: e.target.value } }))}
-                                className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-energy"
-                              />
-                            </div>
-                            <div>
-                              <label className="text-[10px] uppercase font-bold text-[#8B7C73]">{loan.type === 'Overdraft' ? 'OD Plan' : 'Tenure (Mos)'}</label>
-                              {loan.type === 'Overdraft' ? (
-                                <select
-                                  value={l.odPlan !== undefined ? l.odPlan : (loan.odPlan || "2yr")}
-                                  onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), odPlan: e.target.value } }))}
-                                  className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-energy"
-                                >
-                                  <option value="2yr">2 Years</option>
-                                  <option value="3yr">3 Years</option>
-                                </select>
+                              {isDownloadingSection === 'loans' ? (
+                                <p className="text-sm font-semibold text-[#382F2A] px-2 py-1.5">{l.bankName !== undefined ? l.bankName : (loan.bankName || "")}</p>
                               ) : (
                                 <input
-                                  type="number"
-                                  value={l.tenure !== undefined ? l.tenure : (loan.tenure || "")}
-                                  onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), tenure: e.target.value } }))}
+                                  type="text"
+                                  value={l.bankName !== undefined ? l.bankName : (loan.bankName || "")}
+                                  onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), bankName: e.target.value } }))}
                                   className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-energy"
                                 />
                               )}
                             </div>
                             <div>
+                              <label className="text-[10px] uppercase font-bold text-[#8B7C73]">Type</label>
+                              {isDownloadingSection === 'loans' ? (
+                                <p className="text-sm font-semibold text-[#382F2A] px-2 py-1.5">{l.type !== undefined ? l.type : (loan.type || "Personal Loan")}</p>
+                              ) : (
+                                <select
+                                  value={l.type !== undefined ? l.type : (loan.type || "Personal Loan")}
+                                  onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), type: e.target.value } }))}
+                                  className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-energy"
+                                >
+                                  <optgroup label="Generally Non-Transferable (Category A)">
+                                    {['Car Loan', 'Home Loan', 'LAP', 'Gold Loan', 'Consumer Loan', 'Education Loan'].map(t => <option key={t} value={t}>{t}</option>)}
+                                  </optgroup>
+                                  <optgroup label="Potentially Transferable (Category B)">
+                                    {['Personal Loan', 'Overdraft', 'App Loan', 'Credit Card'].map(t => <option key={t} value={t}>{t}</option>)}
+                                  </optgroup>
+                                  <option value="Unknown">Unknown</option>
+                                </select>
+                              )}
+                            </div>
+                            <div>
+                              <label className="text-[10px] uppercase font-bold text-[#8B7C73]">{loan.type === 'Overdraft' ? 'Amount Drawn' : 'Orig. Amount'}</label>
+                              {isDownloadingSection === 'loans' ? (
+                                <p className="text-sm font-semibold text-[#382F2A] px-2 py-1.5">{l.originalAmount !== undefined ? l.originalAmount : (loan.originalAmount || "")}</p>
+                              ) : (
+                                <input
+                                  type="number"
+                                  value={l.originalAmount !== undefined ? l.originalAmount : (loan.originalAmount || "")}
+                                  onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), originalAmount: e.target.value } }))}
+                                  className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-energy"
+                                />
+                              )}
+                            </div>
+                            <div>
+                              <label className="text-[10px] uppercase font-bold text-[#8B7C73]">Current Bal.</label>
+                              {isDownloadingSection === 'loans' ? (
+                                <p className="text-sm font-semibold text-[#382F2A] px-2 py-1.5">{l.currentOutstanding !== undefined ? l.currentOutstanding : (loan.currentOutstanding || "")}</p>
+                              ) : (
+                                <input
+                                  type="number"
+                                  value={l.currentOutstanding !== undefined ? l.currentOutstanding : (loan.currentOutstanding || "")}
+                                  onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), currentOutstanding: e.target.value } }))}
+                                  className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-energy"
+                                />
+                              )}
+                            </div>
+                            <div>
+                              <label className="text-[10px] uppercase font-bold text-[#8B7C73]">Date Issue</label>
+                              {isDownloadingSection === 'loans' ? (
+                                <p className="text-sm font-semibold text-[#382F2A] px-2 py-1.5">{l.dateOpened !== undefined ? l.dateOpened : (loan.dateOpened || "")}</p>
+                              ) : (
+                                <input
+                                  type="text"
+                                  value={l.dateOpened !== undefined ? l.dateOpened : (loan.dateOpened || "")}
+                                  onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), dateOpened: e.target.value } }))}
+                                  className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-energy"
+                                />
+                              )}
+                            </div>
+                            <div>
+                              <label className="text-[10px] uppercase font-bold text-[#8B7C73]">{loan.type === 'Overdraft' ? 'OD Plan' : 'Tenure (Mos)'}</label>
+                              {isDownloadingSection === 'loans' ? (
+                                <p className="text-sm font-semibold text-[#382F2A] px-2 py-1.5">
+                                  {loan.type === 'Overdraft' ? 
+                                    (l.odPlan !== undefined ? l.odPlan : (loan.odPlan || "2yr")) 
+                                    : (l.tenure !== undefined ? l.tenure : (loan.tenure || ""))}
+                                </p>
+                              ) : (
+                                loan.type === 'Overdraft' ? (
+                                  <select
+                                    value={l.odPlan !== undefined ? l.odPlan : (loan.odPlan || "2yr")}
+                                    onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), odPlan: e.target.value } }))}
+                                    className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-energy"
+                                  >
+                                    <option value="2yr">2 Years</option>
+                                    <option value="3yr">3 Years</option>
+                                  </select>
+                                ) : (
+                                  <input
+                                    type="number"
+                                    value={l.tenure !== undefined ? l.tenure : (loan.tenure || "")}
+                                    onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), tenure: e.target.value } }))}
+                                    className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-energy"
+                                  />
+                                )
+                              )}
+                            </div>
+                            <div>
                               <label className="text-[10px] uppercase font-bold text-[#8B7C73]">EMI</label>
-                              <input
-                                type="number"
-                                value={l.emi !== undefined ? l.emi : (loan.emi || "")}
-                                onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), emi: e.target.value } }))}
-                                className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-energy"
-                              />
+                              {isDownloadingSection === 'loans' ? (
+                                <p className="text-sm font-semibold text-[#382F2A] px-2 py-1.5">{l.emi !== undefined ? l.emi : (loan.emi || "")}</p>
+                              ) : (
+                                <input
+                                  type="number"
+                                  value={l.emi !== undefined ? l.emi : (loan.emi || "")}
+                                  onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), emi: e.target.value } }))}
+                                  className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-energy"
+                                />
+                              )}
                             </div>
                             <div>
                               <label className="text-[10px] uppercase font-bold text-[#8B7C73]">Rate %</label>
-                              <input
-                                type="number"
-                                value={l.rate !== undefined ? l.rate : (loan.rate || "")}
-                                onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), rate: e.target.value } }))}
-                                className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-energy"
-                              />
+                              {isDownloadingSection === 'loans' ? (
+                                <p className="text-sm font-semibold text-[#382F2A] px-2 py-1.5">{l.rate !== undefined ? l.rate : (loan.rate || "")}</p>
+                              ) : (
+                                <input
+                                  type="number"
+                                  value={l.rate !== undefined ? l.rate : (loan.rate || "")}
+                                  onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), rate: e.target.value } }))}
+                                  className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-energy"
+                                />
+                              )}
                             </div>
                           </div>
                         </div>
