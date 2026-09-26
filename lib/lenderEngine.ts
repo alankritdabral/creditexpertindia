@@ -904,6 +904,11 @@ export function analyzeLenderEligibility({
     const nth = calculateEffectiveNTH(lender, profile);
     customOutput.effectiveNTH = Math.floor(nth);
 
+    // ─── Global FOIR Logic ──────────────────────────────────────────────
+    const hasRunningHL = allLoans.some((l: any) => l.type === "Home Loan" && Number(l.currentOutstanding || 0) > 0);
+    const effectiveMaxFoir = hasRunningHL ? Math.max(70, lender.maxFoir) : 70;
+    customOutput.maxFOIR = `${effectiveMaxFoir}%`;
+
     // ─── Location warning ──────────────────────────────────────────────
     if (lender.locationWarning) {
       warnings.push(lender.locationWarning);
@@ -1181,7 +1186,7 @@ export function analyzeLenderEligibility({
           totalAxisObligation += calculateObligation(l, lender);
         });
 
-        const maxEmi = nth * (lender.maxFoir / 100);
+        const maxEmi = nth * (effectiveMaxFoir / 100);
         customOutput.axisMaxEmiCapacity = Math.floor(maxEmi);
         customOutput.axisTotalObligations = Math.floor(totalAxisObligation);
         customOutput.axisUnusedCapacity = Math.max(0, Math.floor(maxEmi - totalAxisObligation));
@@ -1253,7 +1258,6 @@ export function analyzeLenderEligibility({
         maxLoanForCategory = 2500000;
       }
       customOutput.abflMaxLoan = maxLoanForCategory;
-      customOutput.maxFOIR = "75%";
 
       // FI waiver check
       if (profile.hasEPFO || profile.hasOMID || profile.hasHRMS || profile.has26AS) {
@@ -1274,7 +1278,6 @@ export function analyzeLenderEligibility({
 
     // ── L&T FINANCE specific ────────────────────────────────────────────
     if (lender.id === "ltfinance" && isEligible) {
-      customOutput.maxFOIR = "75%+";
       customOutput.fiWaiverThreshold = 750000;
       if (cibilScore === -1 || cibilScore === 0) {
         customOutput.cibilMinus1MaxLoan = 1000000;
@@ -1327,14 +1330,6 @@ export function analyzeLenderEligibility({
            }
          }
       }
-      
-      // FOIR check
-      let kotakFoir = 60;
-      const hasRunningHL = allLoans.some((l: any) => l.type === "Home Loan" && Number(l.currentOutstanding || 0) > 0);
-      if (hasRunningHL) {
-         kotakFoir = 70;
-      }
-      customOutput.maxFOIR = `${kotakFoir}%`;
       
       // Tenure output
       customOutput.kotakOdTenure = "2+5 years or 2+6 years";
@@ -1428,29 +1423,12 @@ export function analyzeLenderEligibility({
       }
       customOutput.indusindMaxTenure = allowedTenure;
 
-      // FOIR
-      let indusindFoir = 50;
-      if (nth >= 80000) {
-        if (["A+", "A", "B", "GOVT"].includes(employerTier)) indusindFoir = 75; // Using the Owned max as default upper bound, 65% for Rented. We'll be optimistic (75%).
-        else indusindFoir = 70;
-      } else if (nth >= 50000) {
-        if (["A+", "A", "B", "GOVT"].includes(employerTier)) indusindFoir = 70;
-        else indusindFoir = 70;
-      } else if (nth >= 35000) {
-        if (["A+", "A", "B", "GOVT"].includes(employerTier)) indusindFoir = 60;
-        else indusindFoir = 50;
-      } else { // 20k to 35k
-        if (["A+", "A", "B", "GOVT"].includes(employerTier)) indusindFoir = 55;
-        else indusindFoir = 50;
-      }
-      customOutput.maxFOIR = `${indusindFoir}%`;
-
       // Calculate capacity
       let totalEmi = 0;
       allLoans.forEach((l: any) => {
         totalEmi += Number(l.emi || 0);
       });
-      const maxEmi = nth * (indusindFoir / 100);
+      const maxEmi = nth * (effectiveMaxFoir / 100);
       const unusedCap = Math.max(0, maxEmi - totalEmi);
       customOutput.indusindUnusedCapacity = Math.floor(unusedCap);
 
@@ -1503,14 +1481,11 @@ export function analyzeLenderEligibility({
       }
 
       // FOIR & capacity
-      const poonawallaFoir = 80;
-      customOutput.maxFOIR = `${poonawallaFoir}%`;
-
       let totalEmi = 0;
       allLoans.forEach((l: any) => {
         totalEmi += Number(l.emi || 0);
       });
-      const maxEmi = nth * (poonawallaFoir / 100);
+      const maxEmi = nth * (effectiveMaxFoir / 100);
       const unusedCap = Math.max(0, maxEmi - totalEmi);
       customOutput.poonawallaUnusedCapacity = Math.floor(unusedCap);
 
@@ -1537,27 +1512,13 @@ export function analyzeLenderEligibility({
 
     // ── SMFG specific ───────────────────────────────────────────────────
     if (lender.id === "smfg" && isEligible) {
-      // FOIR Criteria based on salary
-      let smfgFoir = 60;
-      if (nth >= 25000 && nth <= 32000) {
-        smfgFoir = 60;
-      } else if (nth > 32000 && nth <= 45000) {
-        smfgFoir = 65;
-      } else if (nth > 45000) {
-        smfgFoir = 70;
-      }
-
-      customOutput.maxFOIR = `${smfgFoir}%`;
     }
 
     // ═════════════════════════════════════════════════════════════════════
     // UNIVERSAL CAPACITY CALCULATION
     // ═════════════════════════════════════════════════════════════════════
     if (isEligible) {
-      let foir = lender.maxFoir;
-      if (customOutput.maxFOIR) {
-        foir = parseInt(customOutput.maxFOIR.replace('%', '')) || lender.maxFoir;
-      }
+      let foir = effectiveMaxFoir;
 
       let maxEmiCapacity = nth * (foir / 100);
 
@@ -1621,7 +1582,7 @@ export function analyzeLenderEligibility({
         headlineRate: lender.headlineRate,
         maxTenure: customOutput.indusindMaxTenure || lender.maxTenure,
         maxLoanAmount: lender.maxLoanAmount,
-        maxFoir: lender.maxFoir,
+        maxFoir: effectiveMaxFoir,
         ...customOutput,
         warnings,
         matchConfidence: matchScore,
