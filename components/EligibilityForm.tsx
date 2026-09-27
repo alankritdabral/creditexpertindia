@@ -13,6 +13,7 @@ import { CreditReportDashboard } from "./CreditReportDashboard";
 import { RecaptchaVerifier, signInWithPhoneNumber, ConfirmationResult } from "firebase/auth";
 import { auth } from "@/lib/firebaseClient";
 import { getTeamSession } from "@/app/team/actions";
+import { logSystemEvent } from "@/lib/logger";
 
 const getPrefixes = (str: string) => {
   const arr = [];
@@ -213,6 +214,9 @@ export function EligibilityForm() {
   };
 
   const proceedToFetchReport = async () => {
+    const requestId = "req_" + Math.random().toString(36).substring(2, 10);
+    let startTime = 0;
+    let fallbackStartTime = 0;
     try {
       // 1. Check Database First
       const safePan = formData.pan ? formData.pan.toUpperCase() : "NOPAN";
@@ -319,6 +323,18 @@ export function EligibilityForm() {
       }
 
       // Send the request through our new Next.js API Route which talks to IDSPay
+      startTime = Date.now();
+      await logSystemEvent({
+        level: "info",
+        event: "BUREAU_REQUEST_STARTED",
+        module: "credit-profile",
+        request_id: requestId,
+        application_id: `app_${formData.mobile}`,
+        provider: { requested: formData.bureau },
+        message: "Initiating bureau request",
+        identifiers: { pan: formData.pan, mobile: formData.mobile },
+      });
+
       const initialRes = await fetch("/api/idspay", {
         method: "POST",
         headers: {
@@ -343,6 +359,23 @@ export function EligibilityForm() {
         const fallbackReason = data.message || "Experian returned incomplete data or a mismatch.";
         console.warn("Experian failed, falling back to CRIF", fallbackReason);
         
+        await logSystemEvent({
+          level: "warning",
+          event: "BUREAU_FALLBACK_TRIGGERED",
+          module: "credit-profile",
+          request_id: requestId,
+          application_id: `app_${formData.mobile}`,
+          provider: {
+            requested: "experian",
+            fallback: "crif_v1",
+            http_status: res.status,
+            error_code: data.message_code || "UNKNOWN",
+          },
+          message: fallbackReason,
+          identifiers: { pan: formData.pan, mobile: formData.mobile },
+          duration_ms: Date.now() - startTime
+        });
+        
         const crifPayload = {
           first_name: formData.firstName,
           last_name: formData.lastName,
@@ -350,6 +383,7 @@ export function EligibilityForm() {
           name_lookup: 0
         };
         
+        fallbackStartTime = Date.now();
         res = await fetch("/api/idspay", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -371,8 +405,40 @@ export function EligibilityForm() {
       }
 
       if (!res.ok || (data.status && data.status.type !== "success" && !data.success)) {
-        setError(data.message || data.error || "Failed to fetch credit report. Please check your details.");
+        const errMsg = data.message || data.error || "Failed to fetch credit report. Please check your details.";
+        setError(errMsg);
+        
+        await logSystemEvent({
+          level: "error",
+          event: fallbackData ? "ALL_BUREAUS_FAILED" : "BUREAU_REQUEST_FAILED",
+          module: "credit-profile",
+          request_id: requestId,
+          application_id: `app_${formData.mobile}`,
+          provider: {
+            requested: usedBureau,
+            http_status: res.status,
+            error_code: data.message_code || data.error_code || "UNKNOWN",
+          },
+          message: errMsg,
+          identifiers: { pan: formData.pan, mobile: formData.mobile },
+          duration_ms: fallbackData ? Date.now() - fallbackStartTime : Date.now() - startTime
+        });
       } else {
+        await logSystemEvent({
+          level: "info",
+          event: fallbackData ? "BUREAU_FALLBACK_SUCCESS" : "BUREAU_REQUEST_SUCCESS",
+          module: "credit-profile",
+          request_id: requestId,
+          application_id: `app_${formData.mobile}`,
+          provider: {
+            requested: usedBureau,
+            http_status: res.status,
+          },
+          message: "Bureau request completed successfully",
+          identifiers: { pan: formData.pan, mobile: formData.mobile },
+          duration_ms: fallbackData ? Date.now() - fallbackStartTime : Date.now() - startTime
+        });
+
         // Save to Firebase
         try {
           const safePan = formData.pan ? formData.pan.toUpperCase() : "NOPAN";
@@ -414,8 +480,19 @@ export function EligibilityForm() {
 
         processFetchedReport(data.data);
       }
-    } catch (e) {
+    } catch (e: any) {
       setError("A network error occurred. Please try again.");
+      
+      await logSystemEvent({
+        level: "critical",
+        event: "BUREAU_NETWORK_ERROR",
+        module: "credit-profile",
+        request_id: requestId,
+        application_id: `app_${formData.mobile}`,
+        message: e?.message || "A network error occurred",
+        identifiers: { pan: formData.pan, mobile: formData.mobile },
+        duration_ms: startTime > 0 ? Date.now() - startTime : undefined
+      });
     } finally {
       setLoading(false);
     }
