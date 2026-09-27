@@ -48,12 +48,12 @@ export function CreditReportDashboard({ bureau, cibilData, formData }: any) {
         if (docSnap.exists()) {
           const data = docSnap.data();
           if (data.overrides) {
-             setUserOverrides((prev: any) => ({ ...prev, ...data.overrides.userOverrides }));
-             setLoanOverrides((prev: any) => ({ ...prev, ...data.overrides.loanOverrides }));
+            setUserOverrides((prev: any) => ({ ...prev, ...data.overrides.userOverrides }));
+            setLoanOverrides((prev: any) => ({ ...prev, ...data.overrides.loanOverrides }));
           }
         }
       } catch (e) {
-         console.error("Failed to load overrides from DB", e);
+        console.error("Failed to load overrides from DB", e);
       }
     };
     loadFromDB();
@@ -66,7 +66,7 @@ export function CreditReportDashboard({ bureau, cibilData, formData }: any) {
     } catch (e) {
       console.error("Failed to save session overrides", e);
     }
-    
+
     // Save to Firebase (debounced)
     const handler = setTimeout(async () => {
       try {
@@ -80,10 +80,10 @@ export function CreditReportDashboard({ bureau, cibilData, formData }: any) {
         console.error("Failed to save overrides to DB", e);
       }
     }, 5000);
-    
+
     return () => clearTimeout(handler);
   }, [userOverrides, loanOverrides, sessionKey, docId]);
-  
+
   const [showEmployerDropdown, setShowEmployerDropdown] = useState(false);
   const [employerSearch, setEmployerSearch] = useState("");
   const [debouncedEmployerSearch, setDebouncedEmployerSearch] = useState(employerSearch);
@@ -163,6 +163,59 @@ export function CreditReportDashboard({ bureau, cibilData, formData }: any) {
   const isCrif = formData.bureau.startsWith("crif");
   const isExperian = formData.bureau.startsWith("experian");
 
+  const extractContactInfo = (bureau: string, data: any) => {
+    let latestAddress = "N/A";
+    let latestEmail = "N/A";
+    if (!data) return { latestAddress, latestEmail };
+    const strData = JSON.stringify(data);
+
+    if (bureau.startsWith("crif")) {
+      const newReport = data?.result_json?.parsed_data?.["B2C-REPORT"]?.["REPORT-DATA"]?.["STANDARD-DATA"];
+      if (newReport?.DEMOGS?.VARIATIONS) {
+        const addrVars = newReport.DEMOGS.VARIATIONS.find((v: any) => v.TYPE === "ADDRESS-VARIATIONS")?.VARIATION || [];
+        if (addrVars.length > 0) {
+          const sorted = [...addrVars].sort((a: any, b: any) => {
+            if (!a["REPORTED-DT"]) return 1; if (!b["REPORTED-DT"]) return -1;
+            const d1 = a["REPORTED-DT"].split('-').reverse().join('-');
+            const d2 = b["REPORTED-DT"].split('-').reverse().join('-');
+            return d2.localeCompare(d1);
+          });
+          latestAddress = sorted[0].VALUE || "N/A";
+        }
+        const emailVars = newReport.DEMOGS.VARIATIONS.find((v: any) => v.TYPE === "EMAIL-VARIATIONS")?.VARIATION || [];
+        if (emailVars.length > 0) {
+          const sorted = [...emailVars].sort((a: any, b: any) => {
+            if (!a["REPORTED-DT"]) return 1; if (!b["REPORTED-DT"]) return -1;
+            const d1 = a["REPORTED-DT"].split('-').reverse().join('-');
+            const d2 = b["REPORTED-DT"].split('-').reverse().join('-');
+            return d2.localeCompare(d1);
+          });
+          latestEmail = sorted[0].VALUE || "N/A";
+        }
+      }
+    } else if (bureau.startsWith("experian")) {
+      const emailMatch = strData.match(/"EMailId"\s*:\s*"([^"]+)"/i);
+      if (emailMatch && emailMatch[1]) latestEmail = emailMatch[1];
+      const addrMatch = strData.match(/"First_Line_Of_Address_non_normalized"\s*:\s*"([^"]+)"/i);
+      const addrMatch2 = strData.match(/"Second_Line_Of_Address_non_normalized"\s*:\s*"([^"]+)"/i);
+      const cityMatch = strData.match(/"City_non_normalized"\s*:\s*"([^"]+)"/i);
+      if (addrMatch && addrMatch[1]) {
+        latestAddress = addrMatch[1] + (addrMatch2 && addrMatch2[1] ? " " + addrMatch2[1] : "") + (cityMatch && cityMatch[1] ? ", " + cityMatch[1] : "");
+      }
+    } else {
+      const emailMatch = strData.match(/"EmailAddress"\s*:\s*"([^"]+)"/i);
+      if (emailMatch && emailMatch[1]) latestEmail = emailMatch[1];
+      const addrMatch = strData.match(/"StreetAddress"\s*:\s*"([^"]+)"/i);
+      const cityMatch = strData.match(/"City"\s*:\s*"([^"]+)"/i);
+      const zipMatch = strData.match(/"PostalCode"\s*:\s*"([^"]+)"/i);
+      if (addrMatch && addrMatch[1]) {
+        latestAddress = addrMatch[1] + (cityMatch && cityMatch[1] ? ", " + cityMatch[1] : "") + (zipMatch && zipMatch[1] ? " " + zipMatch[1] : "");
+      }
+    }
+    return { latestAddress, latestEmail };
+  };
+
+  const contactInfo = extractContactInfo(formData.bureau, cibilData);
   const parsed = parseBureauData(formData.bureau, cibilData);
   const { accountSummary, inquirySummary, accounts, enquiries, personalInfo: equifaxPersonalInfo } = parsed;
 
@@ -422,6 +475,21 @@ export function CreditReportDashboard({ bureau, cibilData, formData }: any) {
               </div>
             )}
 
+
+            {/* Contact Information */}
+            <div className="bg-white border border-[#EBE6DD] rounded-3xl p-5 mb-6 shadow-sm">
+              <h4 className="text-lg font-bold text-[#382F2A] mb-4">Contact Information</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-[#FAF8F5] border border-[#EBE6DD] rounded-2xl p-4">
+                  <p className="text-[#8B7C73] text-xs font-semibold mb-1 uppercase tracking-wider">Latest Email</p>
+                  <p className="text-[#382F2A] font-medium text-sm break-all">{contactInfo.latestEmail}</p>
+                </div>
+                <div className="bg-[#FAF8F5] border border-[#EBE6DD] rounded-2xl p-4">
+                  <p className="text-[#8B7C73] text-xs font-semibold mb-1 uppercase tracking-wider">Latest Address</p>
+                  <p className="text-[#382F2A] font-medium text-sm">{contactInfo.latestAddress}</p>
+                </div>
+              </div>
+            </div>
 
             {/* Credit Overview */}
             {accountSummary && (
@@ -1170,8 +1238,8 @@ export function CreditReportDashboard({ bureau, cibilData, formData }: any) {
                               <label className="text-[10px] uppercase font-bold text-[#8B7C73]">{loan.type === 'Overdraft' ? 'OD Plan' : 'Tenure (Mos)'}</label>
                               {isDownloadingSection === 'loans' ? (
                                 <p className="text-sm font-semibold text-[#382F2A] px-2 py-1.5">
-                                  {loan.type === 'Overdraft' ? 
-                                    (l.odPlan !== undefined ? l.odPlan : (loan.odPlan || "2yr")) 
+                                  {loan.type === 'Overdraft' ?
+                                    (l.odPlan !== undefined ? l.odPlan : (loan.odPlan || "2yr"))
                                     : (l.tenure !== undefined ? l.tenure : (loan.tenure || ""))}
                                 </p>
                               ) : (
