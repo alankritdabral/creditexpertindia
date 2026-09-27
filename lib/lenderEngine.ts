@@ -1518,16 +1518,16 @@ export function analyzeLenderEligibility({
     // UNIVERSAL CAPACITY CALCULATION
     // ═════════════════════════════════════════════════════════════════════
     if (isEligible) {
-      let foir = effectiveMaxFoir;
+      const foir = effectiveMaxFoir;
 
-      let maxEmiCapacity = nth * (foir / 100);
+      const maxEmiCapacity = nth * (foir / 100);
 
       let totalObligations = 0;
       allLoans.forEach((l: any) => {
         totalObligations += calculateObligation(l, lender);
       });
 
-      let unusedCapacity = Math.max(0, maxEmiCapacity - totalObligations);
+      const unusedCapacity = Math.max(0, maxEmiCapacity - totalObligations);
 
       let maxLoan = 0;
       if (unusedCapacity > 0) {

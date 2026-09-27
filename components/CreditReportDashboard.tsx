@@ -34,6 +34,7 @@ export function CreditReportDashboard({ bureau, cibilData, formData }: any) {
       const saved = sessionStorage.getItem(sessionKey);
       if (saved) {
         const parsed = JSON.parse(saved);
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         if (parsed.userOverrides) setUserOverrides(parsed.userOverrides);
         if (parsed.loanOverrides) setLoanOverrides(parsed.loanOverrides);
       }

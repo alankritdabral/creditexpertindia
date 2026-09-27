@@ -1,6 +1,7 @@
 'use client';
 import { Disclosure, Transition } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/24/outline';
+import { motion } from 'framer-motion';
 
 const faqs = [
   {
@@ -33,6 +34,28 @@ const faqs = [
   }
 ];
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1
+    }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.5,
+      ease: [0.22, 1, 0.36, 1]
+    }
+  }
+};
+
 export function FAQ() {
   return (
     <div id="faq" className="w-full h-full flex flex-col">
@@ -43,41 +66,49 @@ export function FAQ() {
         <p className="text-sm text-brand-black/70">Common questions about loan consolidation and how we help.</p>
       </div>
 
-      <div className="divide-y divide-slate-100">
+      <motion.div 
+        variants={containerVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-50px" }}
+        className="divide-y divide-slate-100"
+      >
         {faqs.map((faq, index) => (
-          <Disclosure as="div" key={index} className="py-5">
-            {({ open }: { open: boolean }) => (
-              <>
-                <dt>
-                  <Disclosure.Button className="flex w-full items-center justify-between text-brand-black group">
-                    <div className="flex-1 px-4 text-center">
-                      <span className="text-base font-bold leading-7 group-hover:text-blue-energy transition-colors">{faq.question}</span>
-                    </div>
-                    <span className="flex h-7 items-center shrink-0">
-                      <ChevronDownIcon
-                        className={`${open ? '-rotate-180 text-blue-energy' : 'rotate-0 text-slate-400'} h-5 w-5 transform transition duration-200 ease-in-out`}
-                        aria-hidden="true"
-                      />
-                    </span>
-                  </Disclosure.Button>
-                </dt>
-                <Transition
-                  enter="transition duration-100 ease-out"
-                  enterFrom="transform scale-95 opacity-0"
-                  enterTo="transform scale-100 opacity-100"
-                  leave="transition duration-75 ease-out"
-                  leaveFrom="transform scale-100 opacity-100"
-                  leaveTo="transform scale-95 opacity-0"
-                >
-                  <Disclosure.Panel as="dd" className="mt-4 text-center px-8">
-                    <p className="text-sm leading-relaxed text-brand-black/70 font-medium py-1 max-w-2xl mx-auto bg-slate-50 rounded-lg p-4">{faq.answer}</p>
-                  </Disclosure.Panel>
-                </Transition>
-              </>
-            )}
-          </Disclosure>
+          <motion.div variants={itemVariants} key={index}>
+            <Disclosure as="div" className="py-5">
+              {({ open }: { open: boolean }) => (
+                <>
+                  <dt>
+                    <Disclosure.Button className="flex w-full items-center justify-between text-brand-black group">
+                      <div className="flex-1 px-4 text-center">
+                        <span className="text-base font-bold leading-7 group-hover:text-blue-energy transition-colors">{faq.question}</span>
+                      </div>
+                      <span className="flex h-7 items-center shrink-0">
+                        <ChevronDownIcon
+                          className={`${open ? '-rotate-180 text-blue-energy' : 'rotate-0 text-slate-400'} h-5 w-5 transform transition duration-200 ease-in-out`}
+                          aria-hidden="true"
+                        />
+                      </span>
+                    </Disclosure.Button>
+                  </dt>
+                  <Transition
+                    enter="transition duration-100 ease-out"
+                    enterFrom="transform scale-95 opacity-0"
+                    enterTo="transform scale-100 opacity-100"
+                    leave="transition duration-75 ease-out"
+                    leaveFrom="transform scale-100 opacity-100"
+                    leaveTo="transform scale-95 opacity-0"
+                  >
+                    <Disclosure.Panel as="dd" className="mt-4 text-center px-8">
+                      <p className="text-sm leading-relaxed text-brand-black/70 font-medium py-1 max-w-2xl mx-auto bg-slate-50 rounded-lg p-4">{faq.answer}</p>
+                    </Disclosure.Panel>
+                  </Transition>
+                </>
+              )}
+            </Disclosure>
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
     </div>
   );
 }

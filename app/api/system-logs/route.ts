@@ -18,7 +18,7 @@ export async function POST(req: Request) {
     const body = await req.json();
 
     // 1. Sanitize Sensitive Information (PAN/Mobile)
-    let sanitizedIdentifiers: any = {};
+    const sanitizedIdentifiers: any = {};
     if (body.identifiers) {
       if (body.identifiers.pan) {
         // Hash PAN for tracking without exposing it

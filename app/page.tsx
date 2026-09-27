@@ -1,11 +1,14 @@
+import dynamic from "next/dynamic";
 import { HeroGridBlock, HeroVisualBlock } from "@/components/HeroGridBlock";
-import { SmartCalculator } from "@/components/SmartCalculator";
-import { EligibilityForm } from "@/components/EligibilityForm";
-import { HowItWorks } from "@/components/HowItWorks";
-import { StoriesSection } from "@/components/StoriesSection";
-import { ScamProtection } from "@/components/ScamProtection";
-import { FAQ } from "@/components/FAQ";
 import { AnimatedSection } from "@/components/AnimatedSection";
+
+// Lazy load below-the-fold components
+const SmartCalculator = dynamic(() => import("@/components/SmartCalculator").then(mod => mod.SmartCalculator));
+const EligibilityForm = dynamic(() => import("@/components/EligibilityForm").then(mod => mod.EligibilityForm));
+const HowItWorks = dynamic(() => import("@/components/HowItWorks").then(mod => mod.HowItWorks));
+const StoriesSection = dynamic(() => import("@/components/StoriesSection").then(mod => mod.StoriesSection));
+const ScamProtection = dynamic(() => import("@/components/ScamProtection").then(mod => mod.ScamProtection));
+const FAQ = dynamic(() => import("@/components/FAQ").then(mod => mod.FAQ));
 
 export default function Home() {
   return (

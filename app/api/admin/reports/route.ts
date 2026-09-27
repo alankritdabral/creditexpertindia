@@ -40,7 +40,7 @@ export async function GET(request: Request) {
     // Dynamically import parseBureauData just in case
     const { parseBureauData } = await import('@/lib/bureauParsers');
 
-    let reports = snapshot.docs.map((doc: any) => {
+    const reports = snapshot.docs.map((doc: any) => {
       const docData = doc.data();
       
       let score = docData.credit_score;

@@ -12,21 +12,21 @@ export function Footer() {
   if (pathname?.startsWith('/admin') || pathname?.startsWith('/team')) return null;
 
   return (
-    <footer className="bg-slate-50 border-t border-icy-blue pb-[72px] lg:pb-0">
+    <footer className="bg-slate-50 border-t border-icy-blue">
       {/* CTA Banner */}
       <div className="bg-[#0A2540] relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-blue-energy/20 via-transparent to-blue-energy/10 pointer-events-none" />
-        <div className="mx-auto max-w-[1280px] px-4 py-12 sm:px-6 lg:px-8 relative z-10">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="mx-auto max-w-[1220px] px-4 py-12 sm:px-6 lg:px-8 relative z-10">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-8 text-center md:text-left">
             <div>
               <h3 className="text-xl md:text-2xl font-bold text-white tracking-tight">
                 Still have questions? Talk to an expert.
               </h3>
-              <p className="text-slate-400 mt-1 text-sm">
+              <p className="text-slate-400 mt-2 text-sm max-w-lg">
                 Get a free, no-obligation assessment of your current loans and options.
               </p>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
               <a
                 href="#check-eligibility"
                 className="flex items-center gap-2 rounded-full bg-white px-6 py-3 text-[14px] font-bold text-brand-black hover:bg-slate-100 transition-colors whitespace-nowrap"
@@ -38,7 +38,7 @@ export function Footer() {
                 href={`https://wa.me/${contact.whatsapp.replace(/[^0-9]/g, '')}?text=Hi%2C%20I%20would%20like%20help%20with%20my%20loans.`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 rounded-full bg-[#25D366] px-5 py-3 text-[14px] font-bold text-white hover:bg-[#1DA851] transition-colors whitespace-nowrap"
+                className="flex items-center gap-2 rounded-full bg-[#25D366] px-6 py-3 text-[14px] font-bold text-white hover:bg-[#1DA851] transition-colors whitespace-nowrap"
               >
                 <MessageCircle className="w-4 h-4" />
                 WhatsApp
@@ -49,7 +49,7 @@ export function Footer() {
       </div>
 
       {/* Footer Content */}
-      <div className="mx-auto max-w-[1280px] px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+      <div className="mx-auto max-w-[1220px] px-4 py-12 sm:px-6 lg:py-16 lg:px-8">
         <div className="xl:grid xl:grid-cols-4 xl:gap-8">
           <div className="space-y-8 xl:col-span-1">
             <Link href="/" className="inline-block">

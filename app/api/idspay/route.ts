@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
     }
 
     let endpoint = "";
-    let finalPayload = {
+    const finalPayload = {
       api_id: apiId,
       api_key: apiKey,
       token_id: tokenId,

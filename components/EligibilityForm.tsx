@@ -214,6 +214,7 @@ export function EligibilityForm() {
   };
 
   const proceedToFetchReport = async () => {
+    let activeBureau: string | undefined;
     const requestId = "req_" + Math.random().toString(36).substring(2, 10);
     let startTime = 0;
     let fallbackStartTime = 0;
@@ -268,7 +269,9 @@ export function EligibilityForm() {
                   }
                   // If CRIF not in cache, skip Experian live call and jump directly to CRIF live call!
                   console.warn("CRIF not in cache. Bypassing live Experian call and directly fetching live CRIF report.");
-                  formData.bureau = "crif_v1";
+                  setFormData((prev: any) => ({ ...prev, bureau: "crif_v1" }));
+                  // Instead of mutating formData, we'll update the active bureau for the rest of the function
+                  activeBureau = "crif_v1";
                 } else {
                   if (data.bureau && data.bureau !== formData.bureau) {
                     setFormData((prev: any) => ({ ...prev, bureau: data.bureau }));
@@ -290,10 +293,11 @@ export function EligibilityForm() {
       }
 
       // 2. Not in DB or no cache -> Fetch from Surepass
-      const isV2 = formData.bureau.startsWith("v2");
-      const isExperian = formData.bureau.startsWith("experian");
-      const isCrif = formData.bureau.startsWith("crif");
-      const isPdf = formData.bureau.endsWith("_pdf");
+      const currentBureau = typeof activeBureau !== "undefined" ? activeBureau : formData.bureau;
+      const isV2 = currentBureau.startsWith("v2");
+      const isExperian = currentBureau.startsWith("experian");
+      const isCrif = currentBureau.startsWith("crif");
+      const isPdf = currentBureau.endsWith("_pdf");
 
       let bodyPayload: any = {};
       if (isCrif) {
@@ -330,7 +334,7 @@ export function EligibilityForm() {
         module: "credit-profile",
         request_id: requestId,
         application_id: `app_${formData.mobile}`,
-        provider: { requested: formData.bureau },
+        provider: { requested: typeof activeBureau !== "undefined" ? activeBureau : formData.bureau },
         message: "Initiating bureau request",
         identifiers: { pan: formData.pan, mobile: formData.mobile },
       });
@@ -340,12 +344,12 @@ export function EligibilityForm() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ bureau: formData.bureau, bodyPayload })
+        body: JSON.stringify({ bureau: typeof activeBureau !== "undefined" ? activeBureau : formData.bureau, bodyPayload })
       });
 
       let res = initialRes;
       let data = await res.json();
-      let usedBureau = formData.bureau;
+      let usedBureau = typeof activeBureau !== "undefined" ? activeBureau : formData.bureau;
       let fallbackData: any = null;
 
       const isExperianFailure = isExperian && (
@@ -442,7 +446,7 @@ export function EligibilityForm() {
         // Save to Firebase
         try {
           const safePan = formData.pan ? formData.pan.toUpperCase() : "NOPAN";
-          const docId = `${safePan}_${formData.mobile}_${formData.bureau}`;
+          const docId = `${safePan}_${formData.mobile}_${typeof activeBureau !== "undefined" ? activeBureau : formData.bureau}`;
 
           let extractedScore = data.data?.credit_score;
           let extractedEmail = "";

@@ -7,7 +7,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const limitQuery = searchParams.get('limit') || '200';
     
-    let queryRef: any = adminDb.collection('system_logs').orderBy('created_at', 'desc').limit(parseInt(limitQuery));
+    const queryRef: any = adminDb.collection('system_logs').orderBy('created_at', 'desc').limit(parseInt(limitQuery));
 
     const snapshot = await queryRef.get();
 
