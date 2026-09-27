@@ -45,6 +45,14 @@ export function EligibilityForm() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      setIsAdmin(!!user);
+    });
+    return () => unsubscribe();
+  }, []);
 
   const [teamBranch, setTeamBranch] = useState<string | null>(null);
   const [showOtpModal, setShowOtpModal] = useState(false);
@@ -151,7 +159,7 @@ export function EligibilityForm() {
     setError(null);
     setLoading(true);
 
-    if (!teamBranch) {
+    if (!teamBranch && !isAdmin) {
       launchOTPWidget();
     } else {
       proceedToFetchReport();
@@ -166,7 +174,6 @@ export function EligibilityForm() {
         identifier: formData.mobile,
         exposeMethods: false,
         success: async (data: any) => {
-          console.log("MSG91 Success callback triggered:", data);
           if (data?.type === 'error' || String(data).includes('error') || String(data?.message).includes('error')) {
             setError("OTP Service encountered an error. Please check your mobile number and try again.");
             setLoading(false);
@@ -306,7 +313,8 @@ export function EligibilityForm() {
           surname: formData.lastName,
           phone_number: formData.mobile,
           gender: formData.gender === "male" ? "Male" : formData.gender === "female" ? "Female" : "Other",
-          pan_id: formData.pan
+          pan_id: formData.pan,
+          date_of_birth: formData.dob || undefined
         };
       }
 
@@ -371,26 +379,17 @@ export function EligibilityForm() {
           const docId = `${safePan}_${formData.mobile}_${formData.bureau}`;
 
           let extractedScore = data.data?.credit_score;
-          if (!extractedScore) {
-            const newCrifScore = data.data?.result_json?.parsed_data?.["B2C-REPORT"]?.["REPORT-DATA"]?.["STANDARD-DATA"]?.SCORE?.[0]?.VALUE;
-            if (newCrifScore) {
-              extractedScore = newCrifScore;
+          let extractedEmail = "";
+          try {
+            const parsed = parseBureauData(usedBureau, data.data);
+            if (!extractedScore && parsed?.personalInfo?.score) {
+              extractedScore = parsed.personalInfo.score;
             }
-          }
-          if (!extractedScore) {
-            let rJson = data.data?.result_json;
-            console.log("[DEBUG ELIGIBILITY] Raw rJson before DB save:", rJson);
-            if (typeof rJson === 'string') {
-              try { 
-                rJson = JSON.parse(rJson); 
-                console.log("[DEBUG ELIGIBILITY] Parsed rJson before DB save:", rJson);
-              } catch(e) {}
+            if (parsed?.personalInfo?.email) {
+              extractedEmail = parsed.personalInfo.email;
             }
-            const expScore = rJson?.INProfileResponse?.SCORE?.BureauScore || rJson?.INProfileResponse?.Score?.BureauScore;
-            console.log("[DEBUG ELIGIBILITY] Extracted expScore:", expScore);
-            if (expScore) {
-              extractedScore = expScore;
-            }
+          } catch (e) {
+            console.warn("Failed to extract score/email during save", e);
           }
 
           const fullName = `${formData.firstName} ${formData.lastName}`.trim();
@@ -401,10 +400,11 @@ export function EligibilityForm() {
             gender: formData.gender,
             bureau: usedBureau,
             credit_score: extractedScore || null,
+            email: extractedEmail || null,
             pdf_link: data.data?.web_token_url || data.data?.credit_report_link || null,
             raw_api_data: data.data, // Save the full response to rebuild dashboard later
             created_at: serverTimestamp(),
-            branch: teamBranch || "customer",
+            branch: teamBranch ? teamBranch : (isAdmin ? "admin" : "customer"),
             search_tokens: generateSearchTokens(fullName, formData.mobile, safePan),
             ...(fallbackData && { fallbackData })
           });
@@ -428,12 +428,20 @@ export function EligibilityForm() {
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-2xl font-bold text-brand-black">Credit Profile & Identity</h3>
-              {teamBranch && (
-                <div className="flex items-center gap-1.5 px-3 py-1 bg-blue-50 border border-blue-100 rounded-full text-blue-600 shadow-sm" title="Logged in as">
-                  <User className="w-4 h-4" />
-                  <span className="text-xs font-bold uppercase tracking-wider">{teamBranch}</span>
-                </div>
-              )}
+              <div className="flex gap-2">
+                {isAdmin && (
+                  <div className="flex items-center gap-1.5 px-3 py-1 bg-purple-50 border border-purple-100 rounded-full text-purple-600 shadow-sm" title="Logged in as Admin">
+                    <Shield className="w-4 h-4" />
+                    <span className="text-xs font-bold uppercase tracking-wider">Admin</span>
+                  </div>
+                )}
+                {teamBranch && (
+                  <div className="flex items-center gap-1.5 px-3 py-1 bg-blue-50 border border-blue-100 rounded-full text-blue-600 shadow-sm" title="Logged in as">
+                    <User className="w-4 h-4" />
+                    <span className="text-xs font-bold uppercase tracking-wider">{teamBranch}</span>
+                  </div>
+                )}
+              </div>
             </div>
             <div className="space-y-4">
               <div className="flex gap-4">
@@ -463,7 +471,7 @@ export function EligibilityForm() {
                 <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <input type="tel" placeholder="Mobile Number" value={formData.mobile} onChange={e => setFormData({ ...formData, mobile: e.target.value })} className="w-full bg-white border border-icy-blue rounded-xl pl-11 pr-4 py-3.5 focus:ring-2 focus:ring-blue-energy/30 focus:border-blue-energy outline-none transition-all" />
               </div>
-              {formData.bureau === 'experian' && (
+              {(formData.bureau === 'experian' || formData.bureau === 'v1_json') && (
                 <div className="relative">
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-xs">DOB</span>
                   <input
@@ -490,17 +498,17 @@ export function EligibilityForm() {
               )}
 
               {/* Bureau Selection */}
-              {teamBranch && (
+              {(teamBranch || isAdmin) && (
                 <div className="pt-2">
                   <p className="text-sm font-semibold text-brand-black mb-3">Select Credit Bureau</p>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <label className="flex items-center gap-2 p-3 border rounded-xl transition-all opacity-50 cursor-not-allowed bg-slate-50 border-icy-blue">
-                      <input type="radio" name="bureau" value="v1_json" disabled className="w-4 h-4 text-slate-400 cursor-not-allowed" />
-                      <span className="text-sm font-medium text-slate-500">CIBIL</span>
+                    <label className={`flex items-center gap-2 p-3 border rounded-xl transition-all ${!isAdmin ? 'opacity-50 cursor-not-allowed bg-slate-50 border-icy-blue' : formData.bureau === 'v1_json' ? 'border-blue-energy bg-blue-50/50 cursor-pointer' : 'border-icy-blue hover:bg-slate-50 cursor-pointer'}`}>
+                      <input type="radio" name="bureau" value="v1_json" disabled={!isAdmin} checked={formData.bureau === 'v1_json'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className={`w-4 h-4 ${!isAdmin ? 'text-slate-400 cursor-not-allowed' : 'text-blue-energy accent-blue-energy'}`} />
+                      <span className={`text-sm font-medium ${!isAdmin ? 'text-slate-500' : 'text-brand-black/90'}`}>CIBIL</span>
                     </label>
-                    <label className={`flex items-center gap-2 p-3 border rounded-xl transition-all ${teamBranch ? 'opacity-50 cursor-not-allowed bg-slate-50 border-icy-blue' : formData.bureau === 'crif_json' ? 'border-blue-energy bg-blue-50/50 cursor-pointer' : 'border-icy-blue hover:bg-slate-50 cursor-pointer'}`}>
-                      <input type="radio" name="bureau" value="crif_json" disabled={!!teamBranch} checked={formData.bureau === 'crif_json'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-blue-energy accent-blue-energy disabled:opacity-50" />
-                      <span className={`text-sm font-medium ${teamBranch ? 'text-slate-500' : 'text-brand-black/90'}`}>CRIF</span>
+                    <label className={`flex items-center gap-2 p-3 border rounded-xl transition-all ${!isAdmin ? 'opacity-50 cursor-not-allowed bg-slate-50 border-icy-blue' : formData.bureau === 'crif_json' ? 'border-blue-energy bg-blue-50/50 cursor-pointer' : 'border-icy-blue hover:bg-slate-50 cursor-pointer'}`}>
+                      <input type="radio" name="bureau" value="crif_json" disabled={!isAdmin} checked={formData.bureau === 'crif_json'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className={`w-4 h-4 ${!isAdmin ? 'disabled:opacity-50' : ''} text-blue-energy accent-blue-energy`} />
+                      <span className={`text-sm font-medium ${!isAdmin ? 'text-slate-500' : 'text-brand-black/90'}`}>CRIF</span>
                     </label>
                     <label className={`flex items-center gap-2 p-3 border rounded-xl cursor-pointer transition-all ${formData.bureau === 'experian' ? 'border-blue-energy bg-blue-50/50' : 'border-icy-blue hover:bg-slate-50'}`}>
                       <input type="radio" name="bureau" value="experian" checked={formData.bureau === 'experian'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-blue-energy accent-blue-energy" />

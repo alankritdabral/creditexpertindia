@@ -25,6 +25,16 @@ export default function AdminDashboard() {
     }
   };
 
+  const getDisplayEmail = (r: any) => {
+    try {
+      const parsed = parseBureauData(r.bureau, r.raw_api_data);
+      if (parsed?.personalInfo?.email) {
+        return parsed.personalInfo.email;
+      }
+    } catch(e) {}
+    return "No Email Found";
+  };
+
   // Codes State
   const [codes, setCodes] = useState({ rudrapur: "", delhi: "", dehradun: "" });
   const [savingCodes, setSavingCodes] = useState(false);
@@ -498,11 +508,14 @@ export default function AdminDashboard() {
                                 <td className="p-4 font-semibold text-slate-400">{i + 1}</td>
                                 <td className="p-4">
                                   <div className="font-bold text-slate-900">{r.name}</div>
-                                  <div className="text-xs text-slate-500 mt-1">{r.mobile} • {r.pan || "No PAN"}</div>
+                                  <div className="text-xs text-slate-500 mt-1 flex flex-col gap-0.5">
+                                    <span>{r.mobile} • {r.pan || "No PAN"}</span>
+                                    <span className="text-[10px] text-slate-400">{getDisplayEmail(r)}</span>
+                                  </div>
                                 </td>
                                 <td className="p-4">
                                   <div className="flex flex-col gap-1 items-start">
-                                    <span className="px-2 py-1 bg-slate-100 rounded font-medium text-xs border border-slate-200">{r.bureau}</span>
+                                    <span className="px-2 py-1 bg-slate-100 rounded font-medium text-xs border border-slate-200">{r.bureau === 'v1_json' ? 'CIBIL' : r.bureau === 'crif_json' ? 'CRIF' : r.bureau}</span>
                                     {r.fallbackData?.fallback_from_experian && (
                                       <span title={`Experian failed: ${r.fallbackData.fallback_reason}`} className="text-amber-600 flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 bg-amber-50 border border-amber-200 rounded cursor-help">
                                         <AlertCircle className="w-3 h-3" /> Fallback
@@ -604,7 +617,7 @@ export default function AdminDashboard() {
                          </td>
                          <td className="p-4">
                            <div className="flex flex-col gap-1 items-start">
-                             <span className="px-2 py-1 bg-slate-100 rounded font-medium text-xs border border-slate-200">{r.bureau}</span>
+                             <span className="px-2 py-1 bg-slate-100 rounded font-medium text-xs border border-slate-200">{r.bureau === 'v1_json' ? 'CIBIL' : r.bureau === 'crif_json' ? 'CRIF' : r.bureau}</span>
                              {r.fallbackData?.fallback_from_experian && (
                                <span title={`Experian failed: ${r.fallbackData.fallback_reason}`} className="text-amber-600 flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 bg-amber-50 border border-amber-200 rounded cursor-help">
                                  <AlertCircle className="w-3 h-3" /> Fallback

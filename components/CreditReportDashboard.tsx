@@ -354,7 +354,6 @@ export function CreditReportDashboard({ bureau, cibilData, formData }: any) {
     maxFreshLoanAmount = r > 0 ? unusedEmiCapacity * ((1 - Math.pow(1 + r, -n)) / r) : unusedEmiCapacity * n;
   }
   const score = cibilData?.credit_score || parsed.personalInfo?.score;
-  console.log("DEBUG SCORE:", { score, cibilDataScore: cibilData?.credit_score, parsedScore: parsed.personalInfo?.score, personalInfo: parsed.personalInfo, newReportFallback: cibilData?.result_json?.parsed_data?.["B2C-REPORT"]?.["REPORT-DATA"]?.["STANDARD-DATA"]?.SCORE });
 
   let scoreLabel = "Not Available";
   let scoreColor = "text-brand-black/70";

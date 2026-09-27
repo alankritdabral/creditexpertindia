@@ -57,6 +57,7 @@ export default function AdminLogin() {
     const result = await verifyTeamCode(branch, code);
     
     if (result.success) {
+      try { await auth.signOut(); } catch (e) {} // Log out admin when logging in as branch
       router.push("/#lead-form");
     } else {
       setTeamError(result.error || "Login failed");

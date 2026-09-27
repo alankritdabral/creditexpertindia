@@ -41,11 +41,12 @@ export interface ParsedBureauData {
   personalInfo: any;
 }
 
-const EXPERIAN_ACCOUNT_TYPES: Record<string, string> = {
+const ACCOUNT_TYPES: Record<string, string> = {
+  "00": "Other",
   "01": "Auto Loan (Personal)",
   "02": "Housing Loan",
   "03": "Property Loan",
-  "04": "Loan Against Shares / Securities",
+  "04": "Loan Against Shares/Securities",
   "05": "Personal Loan",
   "06": "Consumer Loan",
   "07": "Gold Loan",
@@ -54,21 +55,67 @@ const EXPERIAN_ACCOUNT_TYPES: Record<string, string> = {
   "10": "Credit Card",
   "11": "Leasing",
   "12": "Overdraft",
-  "13": "Two-Wheeler Loan",
-  "14": "Non-Funded Credit Facility",
-  "15": "Loan Against Bank Deposits",
+  "13": "Two-wheeler Loan",
+  "14": "Non-Funded Credit Facility (NFCF)",
+  "15": "Loan Against Bank Deposits (LABD)",
   "16": "Fleet Card",
   "17": "Commercial Vehicle Loan",
   "18": "Telco - Wireless",
   "19": "Telco - Broadband",
   "20": "Telco - Landline",
   "21": "Seller Financing",
+  "22": "Seller Financing Soft",
   "23": "GECL Loan - Secured",
   "24": "GECL Loan - Unsecured",
-  "00": "Other",
-  "98": "Secured - account group",
-  "99": "Unsecured - account group"
+  "31": "Secured Credit Card",
+  "32": "Used Car Loan",
+  "33": "Construction Equipment Loan",
+  "34": "Tractor Loan",
+  "35": "Corporate Credit Card",
+  "36": "Kisan Credit Card",
+  "37": "Loan on Credit Card",
+  "38": "PM Jan Dhan Yojana - Overdraft",
+  "39": "Mudra Loan - Shishu/Kishor/Tarun",
+  "40": "Microfinance - Business Loan",
+  "41": "Microfinance - Personal Loan",
+  "42": "Microfinance - Housing Loan",
+  "43": "Microfinance - Other",
+  "44": "PMAY - Credit Linked Subsidy Scheme (CLSS)",
+  "45": "P2P Personal Loan",
+  "46": "P2P Auto Loan",
+  "47": "P2P Education Loan",
+  "50": "Business Loan - Secured",
+  "51": "Business Loan - General",
+  "52": "Business Loan - Priority Sector - Small Business",
+  "53": "Business Loan - Priority Sector - Agriculture",
+  "54": "Business Loan - Priority Sector - Others",
+  "55": "Business Non-Funded Credit Facility - General",
+  "56": "Business NFCF - Priority Sector - Small Business",
+  "57": "Business NFCF - Priority Sector - Agriculture",
+  "58": "Business NFCF - Priority Sector - Others",
+  "59": "Business Loan Against Bank Deposits",
+  "61": "Business Loan - Unsecured",
+  "64": "Insurance",
+  "80": "Microfinance Detailed Report",
+  "81": "Summary Report",
+  "88": "Locate Plus for Insurance",
+  "90": "Account Review",
+  "91": "Retro Enquiry",
+  "92": "Locate Plus",
+  "97": "Adviser Liability",
+  "98": "Secured - Account Group for Portfolio Review",
+  "99": "Unsecured - Account Group for Portfolio Review"
 };
+
+function getAccountTypeString(code: string | undefined | null, fallback: string | undefined | null = ""): string {
+  if (!code) return fallback || "Unknown";
+  const strCode = String(code).trim();
+  const mapped = ACCOUNT_TYPES[strCode];
+  if (mapped) {
+    return `${strCode} - ${mapped}`;
+  }
+  return fallback || strCode || "Unknown";
+}
 
 export function parseBureauData(bureau: string, data: any): ParsedBureauData {
   const isEquifax = bureau.startsWith("v2");
@@ -104,7 +151,7 @@ export function parseBureauData(bureau: string, data: any): ParsedBureauData {
     
     accounts = retailAccounts.map((acc: any) => ({
       accountNumber: acc.AccountNumber || "N/A",
-      accountType: acc.AccountType || "Unknown",
+      accountType: getAccountTypeString(acc.AccountType, acc.AccountType),
       currentBalance: Number(acc.Balance || 0),
       highCreditAmount: Number(acc.SanctionAmount || 0),
       memberShortName: acc.Institution || "Unknown Lender",
@@ -171,7 +218,7 @@ export function parseBureauData(bureau: string, data: any): ParsedBureauData {
       
       return {
         accountNumber: acc.Account_Number || "N/A",
-        accountType: EXPERIAN_ACCOUNT_TYPES[acc.Account_Type] || acc.Account_Type || "Unknown",
+        accountType: getAccountTypeString(acc.Account_Type, acc.Account_Type),
         currentBalance: Number(currBal) || 0,
         highCreditAmount: Number(highCred) || 0,
         memberShortName: acc.Subscriber_Name || "Unknown Lender",
@@ -233,6 +280,7 @@ export function parseBureauData(bureau: string, data: any): ParsedBureauData {
     if (expReport?.SCORE) {
       personalInfo = {
         score: expReport.SCORE.BureauScore || 0,
+        email: expReport?.Current_Application?.Current_Application_Details?.Email_Address || "",
         factors: [],
         scoreName: "Experian Bureau Score",
         scoreDescription: ""
@@ -240,6 +288,7 @@ export function parseBureauData(bureau: string, data: any): ParsedBureauData {
     } else if (expReport?.Score) {
       personalInfo = {
         score: expReport.Score.BureauScore || 0,
+        email: expReport?.Current_Application?.Current_Application_Details?.Email_Address || "",
         factors: [],
         scoreName: "Experian Bureau Score",
         scoreDescription: ""
@@ -261,7 +310,7 @@ export function parseBureauData(bureau: string, data: any): ParsedBureauData {
         
         return {
           accountNumber: loan["ACCT-NUMBER"] || "N/A",
-          accountType: loan["ACCT-TYPE"] || "Unknown",
+          accountType: getAccountTypeString(loan["ACCT-TYPE"], loan["ACCT-TYPE"]),
           currentBalance: Number(currBal) || 0,
           highCreditAmount: Number(highCred) || 0,
           memberShortName: loan["CREDIT-GRANTOR"] || "Unknown Lender",
@@ -310,12 +359,18 @@ export function parseBureauData(bureau: string, data: any): ParsedBureauData {
       };
       
       const scoreData = newReport.SCORE?.[0];
-      if (scoreData) {
+      let crifEmail = "";
+      const addresses = newReport["ADDRESSES"] || [];
+      const pInfo = newReport["PERSONAL-INFO"] || [];
+      if (pInfo.length > 0 && pInfo[0]["EMAIL-ID"]) crifEmail = pInfo[0]["EMAIL-ID"];
+      
+      if (scoreData || crifEmail) {
         personalInfo = {
-           score: scoreData.VALUE || 0,
-           factors: scoreData.FACTORS || [],
-           scoreName: scoreData.NAME || "",
-           scoreDescription: scoreData.DESCRIPTION || ""
+           score: scoreData?.VALUE || 0,
+           email: crifEmail,
+           factors: scoreData?.FACTORS || [],
+           scoreName: scoreData?.NAME || "",
+           scoreDescription: scoreData?.DESCRIPTION || ""
         };
       }
     } else {
@@ -332,7 +387,7 @@ export function parseBureauData(bureau: string, data: any): ParsedBureauData {
         
         return {
           accountNumber: loan["ACCT-NUMBER"] || "N/A",
-          accountType: loan["ACCT-TYPE"] || "Unknown",
+          accountType: getAccountTypeString(loan["ACCT-TYPE"], loan["ACCT-TYPE"]),
           currentBalance: Number(currBal) || 0,
           highCreditAmount: Number(highCred) || 0,
           memberShortName: loan["CREDIT-GUARANTOR"] || "Unknown Lender",
@@ -397,8 +452,20 @@ export function parseBureauData(bureau: string, data: any): ParsedBureauData {
       trueLinkReport = assetsStep?.response?.GetCustomerAssetsResponse?.GetCustomerAssetsSuccess?.Asset?.TrueLinkCreditReport;
       
       if (trueLinkReport) {
+        let cScore = trueLinkReport.Borrower?.CreditScore;
+        if (Array.isArray(cScore)) cScore = cScore[0];
+        
+        let cEmail = "";
+        const emailArr = trueLinkReport.Borrower?.EmailAddress;
+        if (Array.isArray(emailArr) && emailArr.length > 0) {
+          cEmail = emailArr[0].Email || "";
+        } else if (emailArr?.Email) {
+          cEmail = emailArr.Email;
+        }
+
         personalInfo = {
-            score: trueLinkReport.Borrower?.CreditScore?.riskScore || 0
+            score: cScore?.riskScore || 0,
+            email: cEmail
         };
 
         const tradeLines = trueLinkReport.TradeLinePartition || [];
@@ -406,7 +473,7 @@ export function parseBureauData(bureau: string, data: any): ParsedBureauData {
           const tl = partition.Tradeline || {};
           return {
             accountNumber: tl.accountNumber || "N/A",
-            accountType: partition.accountTypeDescription || partition.accountTypeAbbreviation || tl.AccountType?.symbol || "Unknown",
+            accountType: getAccountTypeString(tl.AccountType?.symbol, partition.accountTypeDescription || partition.accountTypeAbbreviation || tl.AccountType?.symbol),
             currentBalance: Number(tl.currentBalance || 0),
             highCreditAmount: Number(tl.highBalance || tl.CreditLimit || 0),
             memberShortName: tl.creditorName || "Unknown Lender",
@@ -488,7 +555,7 @@ export function parseBureauData(bureau: string, data: any): ParsedBureauData {
         
         accounts = (report?.accounts || []).map((acc: any) => ({
           accountNumber: acc.accountNumber,
-          accountType: acc.accountType,
+          accountType: getAccountTypeString(acc.accountType, acc.accountType),
           currentBalance: acc.currentBalance,
           highCreditAmount: acc.highCreditAmount,
           memberShortName: acc.memberShortName,

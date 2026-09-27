@@ -49,7 +49,6 @@ export async function GET(request: Request) {
           const parsed = parseBureauData(docData.bureau, docData.raw_api_data);
           score = parsed?.personalInfo?.score || null;
           if (!score) {
-            console.log("parseBureauData returned null score for", doc.id, "bureau:", docData.bureau);
             // Fallback parsing strategy in case bureauParsers missed something
             if (docData.bureau.startsWith('crif')) {
               let rJson = docData.raw_api_data.result_json;
