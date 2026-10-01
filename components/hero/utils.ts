@@ -35,10 +35,8 @@ export const connections = [
 ];
 
 export const transactions = [
-  { city: "Delhi", amount: "₹8,50,000", time: "2m ago" },
-  { city: "Maharashtra", amount: "₹5,20,000", time: "4m ago" },
-  { city: "Karnataka", amount: "₹6,40,000", time: "5m ago" },
-  { city: "Gujarat", amount: "₹4,80,000", time: "7m ago" },
-  { city: "Tamil Nadu", amount: "₹4,10,000", time: "9m ago" },
-  { city: "West Bengal", amount: "₹3,75,000", time: "12m ago" },
+  { city: "Tamil Nadu", amount: "₹4,10,000", time: "9m ago", status: "Loan Disbursed" },
+  { city: "Maharashtra", amount: "₹7,50,000", time: "12m ago", status: "Loan Disbursed" },
+  { city: "Karnataka", amount: "₹5,25,000", time: "16m ago", status: "Loan Disbursed" },
+  { city: "Delhi", amount: "₹3,80,000", time: "21m ago", status: "Loan Disbursed" }
 ];

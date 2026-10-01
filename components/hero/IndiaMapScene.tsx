@@ -35,7 +35,7 @@ function SceneContent({ activeCity, highlightedCity, isReducedMotion }: { active
       
       <Center>
         {/* We tilt the map to give an isometric/3D feel */}
-        <group rotation={[-Math.PI / 4, 0, 0]} position={[0, 0, 0]}>
+        <group rotation={[-Math.PI / 10, 0, 0]} position={[0, 0, 0]}>
           <IndiaMap activeCity={activeCity} highlightedCity={highlightedCity} />
           <CityNodes activeCity={activeCity} />
           {!isReducedMotion && <LoanConnections activeCity={activeCity} />}

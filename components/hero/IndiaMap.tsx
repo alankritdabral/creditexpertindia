@@ -20,26 +20,31 @@ function StateShape({ shape, id, isActive, isHighlighted, isPrimary }: { shape: 
   const materialRef = React.useRef<THREE.MeshStandardMaterial>(null);
   const lineMaterialRef = React.useRef<THREE.LineBasicMaterial>(null);
 
-  const centroid = useMemo(() => {
+  const anchorPoint = useMemo(() => {
     const pts = shape.getPoints();
     if (pts.length === 0) return [0, 0, 0.2] as [number, number, number];
+    let maxY = -Infinity;
+    for (const p of pts) {
+      if (p.y > maxY) {
+        maxY = p.y;
+      }
+    }
     const cx = pts.reduce((sum, p) => sum + p.x, 0) / pts.length;
-    const cy = pts.reduce((sum, p) => sum + p.y, 0) / pts.length;
-    return [cx, cy, 0.2] as [number, number, number];
+    return [cx, maxY, 0.2] as [number, number, number];
   }, [shape]);
 
   const transaction = useMemo(() => transactions.find(t => t.city === id), [id]);
 
   useFrame((state, delta) => {
     if (materialRef.current) {
-      const targetColor = new THREE.Color(isHighlighted ? "#243F91" : "#172A5A");
-      const targetEmissive = new THREE.Color(isHighlighted ? "#3157C7" : "#172A5A");
+      const targetColor = new THREE.Color(isHighlighted ? "#3B82F6" : "#172A5A"); // Brighter blue for fill
+      const targetEmissive = new THREE.Color(isHighlighted ? "#2563EB" : "#172A5A"); // Stronger emissive for glow
       materialRef.current.color.lerp(targetColor, delta * 5);
       materialRef.current.emissive.lerp(targetEmissive, delta * 5);
-      materialRef.current.emissiveIntensity = THREE.MathUtils.lerp(materialRef.current.emissiveIntensity, isHighlighted ? 0.4 : 0.2, delta * 5);
+      materialRef.current.emissiveIntensity = THREE.MathUtils.lerp(materialRef.current.emissiveIntensity, isHighlighted ? 0.6 : 0.2, delta * 5);
     }
     if (lineMaterialRef.current) {
-      const targetColor = new THREE.Color(isHighlighted ? "#6C63FF" : "#3157C7");
+      const targetColor = new THREE.Color(isHighlighted ? "#60A5FA" : "#3157C7"); // Bright border
       lineMaterialRef.current.color.lerp(targetColor, delta * 5);
       lineMaterialRef.current.opacity = THREE.MathUtils.lerp(lineMaterialRef.current.opacity, isHighlighted ? 0.9 : 0.4, delta * 5);
     }
@@ -74,7 +79,7 @@ function StateShape({ shape, id, isActive, isHighlighted, isPrimary }: { shape: 
       </line>
       {/* ALWAYS render the Html wrapper if this state has a transaction, to allow AnimatePresence to work */}
       {isPrimary && transaction && (
-        <Html position={centroid} center zIndexRange={[100, 0]}>
+        <Html position={anchorPoint} center zIndexRange={[100, 0]}>
           <AnimatePresence>
             {isActive && <LoanNotification transaction={transaction} />}
           </AnimatePresence>

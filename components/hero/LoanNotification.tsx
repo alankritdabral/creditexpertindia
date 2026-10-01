@@ -1,10 +1,12 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { Building, ChevronRight } from 'lucide-react';
 
 export interface Transaction {
   city: string;
   amount: string;
   time: string;
+  status?: string;
 }
 
 interface LoanNotificationProps {
@@ -15,76 +17,96 @@ export function LoanNotification({ transaction }: LoanNotificationProps) {
   if (!transaction) return null;
 
   return (
-    <motion.div
-      key={transaction.city} // Re-animate when city changes
-      initial={{ opacity: 0, scale: 0.92, y: 15 }}
-      animate={{ opacity: 1, scale: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.96, y: -10 }}
-      transition={{ duration: 0.45, ease: "easeOut" }}
-      className="pointer-events-none hidden md:block"
-      style={{
-        width: '240px',
-        background: 'rgba(250, 252, 255, 0.75)', // subtle blue tint, ~75% opacity
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
-        border: '1px solid rgba(255,255,255,0.65)',
-        boxShadow: 'inset 1px 1px 1px rgba(255, 255, 255, 0.6), 0 20px 40px rgba(10, 30, 70, 0.08)',
-        borderRadius: '18px',
-        padding: '16px',
-        transform: 'translate(-50%, -100%)',
-        marginTop: '-10px',
-      }}
-    >
-      <div className="flex justify-between items-center mb-2">
-        <span className="font-semibold text-[#0A2540] text-sm flex items-center gap-2">
-          {transaction.city}
-        </span>
-        <span className="text-[#0A2540]/60 text-xs font-medium">{transaction.time}</span>
-      </div>
-      <div className="text-2xl font-bold text-[#0A2540] mb-3 tracking-tight">
-        {transaction.amount}
-      </div>
-      <div className="flex items-center gap-2 text-sm font-medium text-[#0A2540]/80">
-        <span className="w-2 h-2 rounded-full bg-[#10B981]"></span>
-        Loan Disbursed
-      </div>
-    </motion.div>
-  );
-}
+    <div className="pointer-events-none relative z-50">
+      
+      {/* Marker - Animated */}
+      <motion.div
+        key={`marker-${transaction.city}`}
+        initial={{ opacity: 0, scale: 0 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0 }}
+        transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+        className="absolute flex items-center justify-center"
+        style={{ left: 0, top: 0, transform: 'translate(-50%, -50%)' }}
+      >
+        <div className="absolute w-[22px] h-[22px] rounded-full border border-blue-400/60 animate-[ping_2s_ease-out_infinite]"></div>
+        <div className="absolute w-[14px] h-[14px] rounded-full bg-blue-500/40"></div>
+        <div className="relative w-[6px] h-[6px] rounded-full bg-white shadow-[0_0_8px_2px_rgba(59,130,246,0.8)]"></div>
+      </motion.div>
 
-export function MobileLoanNotification({ transaction }: LoanNotificationProps) {
-  if (!transaction) return null;
+      {/* Connector Line - Animated */}
+      <motion.svg
+        key={`line-${transaction.city}`}
+        className="absolute overflow-visible"
+        style={{ left: 0, top: '-40px', width: '40px', height: '40px' }}
+      >
+        <motion.path
+          d="M 0 40 L 40 0" 
+          stroke="url(#connectorGradient)"
+          strokeWidth="1.5"
+          fill="none"
+          initial={{ pathLength: 0, opacity: 0 }}
+          animate={{ pathLength: 1, opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.35, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
+          className="drop-shadow-[0_0_3px_rgba(59,130,246,0.6)]"
+        />
+        <defs>
+          <linearGradient id="connectorGradient" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="rgba(59,130,246,0)" />
+            <stop offset="100%" stopColor="rgba(59,130,246,1)" />
+          </linearGradient>
+        </defs>
+      </motion.svg>
 
-  return (
-    <motion.div
-      key={transaction.city}
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -10 }}
-      transition={{ duration: 0.4 }}
-      className="absolute bottom-4 left-1/2 -translate-x-1/2 z-50 pointer-events-none md:hidden w-[90%] max-w-[320px]"
-      style={{
-        background: 'rgba(250, 252, 255, 0.75)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
-        border: '1px solid rgba(255,255,255,0.65)',
-        boxShadow: 'inset 1px 1px 1px rgba(255, 255, 255, 0.6), 0 15px 35px rgba(10, 30, 70, 0.08)',
-        borderRadius: '18px',
-        padding: '12px 16px',
-      }}
-    >
-      <div className="flex justify-between items-center mb-1">
-        <span className="font-semibold text-[#0A2540] text-sm">
-          {transaction.city}
-        </span>
-        <span className="text-2xl font-bold text-[#0A2540] tracking-tight">
-          {transaction.amount}
-        </span>
-      </div>
-      <div className="flex items-center gap-1.5 text-xs font-medium text-[#0A2540]/80 mt-1">
-        <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]"></span>
-        Loan Disbursed
-      </div>
-    </motion.div>
+      {/* Notification Card */}
+      <motion.div
+        key={`card-${transaction.city}`}
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        transition={{ duration: 0.45, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        className="absolute flex items-center p-3 sm:p-3.5 md:p-4 gap-3 sm:gap-3.5 md:gap-4"
+        style={{
+          left: '40px',
+          bottom: '40px', // Places the bottom-left corner at (40, -40) relative to origin
+          width: 'max-content',
+          minWidth: '210px',
+          height: 'auto',
+          background: 'rgba(255, 255, 255, 0.65)',
+          backdropFilter: 'blur(18px)',
+          WebkitBackdropFilter: 'blur(18px)',
+          border: '1px solid rgba(255,255,255,0.5)',
+          boxShadow: '0 8px 32px rgba(36, 63, 145, 0.15), 0 0 15px rgba(59, 130, 246, 0.1), inset 0 0 0 1px rgba(255,255,255,0.5)',
+          borderRadius: '20px',
+          transformOrigin: 'bottom left'
+        }}
+      >
+        {/* Left Icon */}
+        <div className="shrink-0 flex items-center justify-center w-[42px] h-[42px] md:w-[48px] md:h-[48px] rounded-full bg-gradient-to-br from-[#1E3A8A] to-[#3B82F6] shadow-[0_0_15px_rgba(59,130,246,0.4)]">
+          <Building className="w-5 h-5 md:w-6 md:h-6 text-white" />
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 flex flex-col justify-center min-w-[120px]">
+          <div className="flex justify-between items-center mb-0.5">
+            <span className="font-semibold text-[#0A2540] text-[14px] sm:text-[15px] md:text-[16px] truncate max-w-[120px]">{transaction.city}</span>
+            <span className="text-[#506480] text-[11px] md:text-[12px] whitespace-nowrap ml-2">{transaction.time}</span>
+          </div>
+          <div className="text-[20px] sm:text-[24px] md:text-[26px] font-bold text-[#0A2540] leading-none mb-1 md:mb-1.5 tracking-tight">
+            {transaction.amount}
+          </div>
+          <div className="flex items-center gap-1.5 text-[12px] md:text-[13px] text-[#506480] font-medium whitespace-nowrap">
+            <span className="w-2 h-2 rounded-full bg-[#10B981] shadow-[0_0_6px_rgba(16,185,129,0.5)]"></span>
+            {transaction.status || 'Loan Disbursed'}
+          </div>
+        </div>
+
+        {/* Right Arrow */}
+        <div className="shrink-0 pl-1">
+          <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-[#0A2540]/40" />
+        </div>
+      </motion.div>
+    </div>
   );
 }

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { AnimatePresence } from 'framer-motion';
-import { LoanNotification, MobileLoanNotification, Transaction } from './LoanNotification';
+import { Transaction } from './LoanNotification';
 import { transactions } from './utils';
 
 interface Props {
@@ -41,14 +40,14 @@ export function LoanNotificationManager({ onActiveCityChange, onHighlightCityCha
         onActiveCityChange(currentCity);
         if (onHighlightCityChange) onHighlightCityChange(currentCity);
         
-        await new Promise(r => setTimeout(r, 2500)); // Visible duration for highlight (2.5s)
+        await new Promise(r => setTimeout(r, 2500)); // Visible duration for highlight
         
         if (!isMounted) break;
 
-        // Turn off highlight 0.5s before notification disappears
+        // Turn off highlight slightly before notification disappears
         if (onHighlightCityChange) onHighlightCityChange(null);
 
-        await new Promise(r => setTimeout(r, 500)); // Remaining duration for notification (total 3s)
+        await new Promise(r => setTimeout(r, 500)); // Total ~3s visibility
         
         if (!isMounted) break;
 
@@ -56,7 +55,7 @@ export function LoanNotificationManager({ onActiveCityChange, onHighlightCityCha
         setIsVisible(false);
         onActiveCityChange(null);
 
-        await new Promise(r => setTimeout(r, 1200)); // Gap before next state starts (increased for smoothness)
+        await new Promise(r => setTimeout(r, 1000)); // Gap before next state
 
         if (!isMounted) break;
 
@@ -72,13 +71,6 @@ export function LoanNotificationManager({ onActiveCityChange, onHighlightCityCha
     };
   }, [isReducedMotion, onActiveCityChange, onHighlightCityChange]);
 
-  const activeTransaction = isVisible ? transactions[currentIndex] : null;
-
-  return (
-    <>
-      <AnimatePresence>
-        {activeTransaction && <MobileLoanNotification transaction={activeTransaction} />}
-      </AnimatePresence>
-    </>
-  );
+  // The manager just controls state/rotation. Rendering happens in IndiaMap.tsx
+  return null;
 }
