@@ -16,7 +16,7 @@ const extrudeSettings = {
 
 import { useFrame } from '@react-three/fiber';
 
-function StateShape({ shape, id, isActive, isHighlighted, isPrimary }: { shape: THREE.Shape; id: string; isActive: boolean; isHighlighted: boolean; isPrimary: boolean }) {
+function StateShape({ shape, id, isActive, isHighlighted, isPrimary, splitX, splitY }: { shape: THREE.Shape; id: string; isActive: boolean; isHighlighted: boolean; isPrimary: boolean; splitX: number; splitY: number }) {
   const materialRef = React.useRef<THREE.MeshStandardMaterial>(null);
   const lineMaterialRef = React.useRef<THREE.LineBasicMaterial>(null);
 
@@ -81,7 +81,7 @@ function StateShape({ shape, id, isActive, isHighlighted, isPrimary }: { shape: 
       {isPrimary && transaction && (
         <Html position={anchorPoint} center zIndexRange={[100, 0]}>
           <AnimatePresence>
-            {isActive && <LoanNotification transaction={transaction} />}
+            {isActive && <LoanNotification transaction={transaction} align={anchorPoint[0] > splitX ? 'left' : 'right'} vAlign={anchorPoint[1] > splitY ? 'bottom' : 'top'} />}
           </AnimatePresence>
         </Html>
       )}
@@ -99,8 +99,8 @@ export function IndiaMap({ activeCity, highlightedCity }: { activeCity?: string 
       .catch(e => console.error("Failed to load geojson", e));
   }, []);
   
-  const shapesData = useMemo(() => {
-    if (!data) return [];
+  const { shapesData, splitX, splitY } = useMemo(() => {
+    if (!data) return { shapesData: [], splitX: 0, splitY: 0 };
 
     const shapesByState: Record<string, { id: string; shape: THREE.Shape; isPrimary: boolean }[]> = {};
 
@@ -152,12 +152,23 @@ export function IndiaMap({ activeCity, highlightedCity }: { activeCity?: string 
     });
 
     const result: { id: string; shape: THREE.Shape; isPrimary: boolean }[] = [];
+    let minX = Infinity;
+    let maxX = -Infinity;
+    let minY = Infinity;
+    let maxY = -Infinity;
+
     Object.values(shapesByState).forEach(shapes => {
       // Find the shape with the maximum number of points in its first ring to mark as primary
       let maxPoints = -1;
       let primaryIndex = 0;
       shapes.forEach((s, i) => {
         const pts = s.shape.getPoints();
+        for (const p of pts) {
+          if (p.x < minX) minX = p.x;
+          if (p.x > maxX) maxX = p.x;
+          if (p.y < minY) minY = p.y;
+          if (p.y > maxY) maxY = p.y;
+        }
         if (pts.length > maxPoints) {
           maxPoints = pts.length;
           primaryIndex = i;
@@ -169,13 +180,17 @@ export function IndiaMap({ activeCity, highlightedCity }: { activeCity?: string 
       result.push(...shapes);
     });
 
-    return result;
+    return { 
+      shapesData: result, 
+      splitX: minX + (maxX - minX) * 0.35,
+      splitY: minY + (maxY - minY) * 0.50
+    };
   }, [data]);
 
   return (
     <group>
       {shapesData.map((data, i) => (
-        <StateShape key={i} shape={data.shape} id={data.id} isActive={activeCity === data.id} isHighlighted={highlightedCity === data.id} isPrimary={data.isPrimary} />
+        <StateShape key={i} shape={data.shape} id={data.id} isActive={activeCity === data.id} isHighlighted={highlightedCity === data.id} isPrimary={data.isPrimary} splitX={splitX} splitY={splitY} />
       ))}
     </group>
   );

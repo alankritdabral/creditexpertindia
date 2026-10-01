@@ -15,21 +15,6 @@ export function LoanNotificationManager({ onActiveCityChange, onHighlightCityCha
   useEffect(() => {
     let isMounted = true;
 
-    if (isReducedMotion) {
-      const timer = setTimeout(() => {
-        if (isMounted) {
-          setCurrentIndex(0);
-          setIsVisible(true);
-          onActiveCityChange(transactions[0].city);
-          if (onHighlightCityChange) onHighlightCityChange(transactions[0].city);
-        }
-      }, 0);
-      return () => {
-        isMounted = false;
-        clearTimeout(timer);
-      };
-    }
-
     const runLoop = async () => {
       let i = 0;
       while (isMounted) {

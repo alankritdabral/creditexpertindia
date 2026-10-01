@@ -11,23 +11,48 @@ export interface Transaction {
 
 interface LoanNotificationProps {
   transaction: Transaction | null;
+  align?: 'left' | 'right';
+  vAlign?: 'top' | 'bottom';
 }
 
-export function LoanNotification({ transaction }: LoanNotificationProps) {
+export function LoanNotification({ transaction, align = 'right', vAlign = 'top' }: LoanNotificationProps) {
   if (!transaction) return null;
 
+  const isLeft = align === 'left';
+  const isTop = vAlign === 'top';
+
+  let d = "";
+  if (isTop) {
+    d = isLeft ? "M 40 40 L 0 0" : "M 0 40 L 40 0";
+  } else {
+    d = isLeft ? "M 40 0 L 0 40" : "M 0 0 L 40 40";
+  }
+
+  const gradientCoords = {
+    x1: isLeft ? "100%" : "0%",
+    y1: isTop ? "100%" : "0%",
+    x2: isLeft ? "0%" : "100%",
+    y2: isTop ? "0%" : "100%"
+  };
+
   return (
-    <div className="pointer-events-none relative z-50">
+    <motion.div 
+      key={`container-${transaction.city}`}
+      initial={{ opacity: 1 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="pointer-events-none relative z-50"
+    >
       
       {/* Marker - Animated */}
       <motion.div
         key={`marker-${transaction.city}`}
-        initial={{ opacity: 0, scale: 0 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0 }}
+        initial={{ opacity: 0, scale: 0, x: "-50%", y: "-50%" }}
+        animate={{ opacity: 1, scale: 1, x: "-50%", y: "-50%" }}
+        exit={{ opacity: 0, scale: 0, x: "-50%", y: "-50%" }}
         transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
         className="absolute flex items-center justify-center"
-        style={{ left: 0, top: 0, transform: 'translate(-50%, -50%)' }}
+        style={{ left: 0, top: 0 }}
       >
         <div className="absolute w-[22px] h-[22px] rounded-full border border-blue-400/60 animate-[ping_2s_ease-out_infinite]"></div>
         <div className="absolute w-[14px] h-[14px] rounded-full bg-blue-500/40"></div>
@@ -38,10 +63,15 @@ export function LoanNotification({ transaction }: LoanNotificationProps) {
       <motion.svg
         key={`line-${transaction.city}`}
         className="absolute overflow-visible"
-        style={{ left: 0, top: '-40px', width: '40px', height: '40px' }}
+        style={{ 
+          left: isLeft ? '-40px' : '0', 
+          top: isTop ? '-40px' : '0', 
+          width: '40px', 
+          height: '40px' 
+        }}
       >
         <motion.path
-          d="M 0 40 L 40 0" 
+          d={d}
           stroke="url(#connectorGradient)"
           strokeWidth="1.5"
           fill="none"
@@ -52,7 +82,7 @@ export function LoanNotification({ transaction }: LoanNotificationProps) {
           className="drop-shadow-[0_0_3px_rgba(59,130,246,0.6)]"
         />
         <defs>
-          <linearGradient id="connectorGradient" x1="0%" y1="100%" x2="100%" y2="0%">
+          <linearGradient id="connectorGradient" {...gradientCoords}>
             <stop offset="0%" stopColor="rgba(59,130,246,0)" />
             <stop offset="100%" stopColor="rgba(59,130,246,1)" />
           </linearGradient>
@@ -68,8 +98,10 @@ export function LoanNotification({ transaction }: LoanNotificationProps) {
         transition={{ duration: 0.45, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
         className="absolute flex items-center p-3 sm:p-3.5 md:p-4 gap-3 sm:gap-3.5 md:gap-4"
         style={{
-          left: '40px',
-          bottom: '40px', // Places the bottom-left corner at (40, -40) relative to origin
+          left: isLeft ? 'auto' : '40px',
+          right: isLeft ? '40px' : 'auto',
+          top: isTop ? 'auto' : '40px',
+          bottom: isTop ? '40px' : 'auto',
           width: 'max-content',
           minWidth: '210px',
           height: 'auto',
@@ -79,7 +111,7 @@ export function LoanNotification({ transaction }: LoanNotificationProps) {
           border: '1px solid rgba(255,255,255,0.5)',
           boxShadow: '0 8px 32px rgba(36, 63, 145, 0.15), 0 0 15px rgba(59, 130, 246, 0.1), inset 0 0 0 1px rgba(255,255,255,0.5)',
           borderRadius: '20px',
-          transformOrigin: 'bottom left'
+          transformOrigin: `${isTop ? 'bottom' : 'top'} ${isLeft ? 'right' : 'left'}`
         }}
       >
         {/* Left Icon */}
@@ -107,6 +139,6 @@ export function LoanNotification({ transaction }: LoanNotificationProps) {
           <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-[#0A2540]/40" />
         </div>
       </motion.div>
-    </div>
+    </motion.div>
   );
 }

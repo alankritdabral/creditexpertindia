@@ -38,5 +38,11 @@ export const transactions = [
   { city: "Tamil Nadu", amount: "₹4,10,000", time: "9m ago", status: "Loan Disbursed" },
   { city: "Maharashtra", amount: "₹7,50,000", time: "12m ago", status: "Loan Disbursed" },
   { city: "Karnataka", amount: "₹5,25,000", time: "16m ago", status: "Loan Disbursed" },
-  { city: "Delhi", amount: "₹3,80,000", time: "21m ago", status: "Loan Disbursed" }
+  { city: "Delhi", amount: "₹3,80,000", time: "21m ago", status: "Loan Disbursed" },
+  { city: "West Bengal", amount: "₹2,10,000", time: "25m ago", status: "Loan Disbursed" },
+  { city: "Gujarat", amount: "₹6,40,000", time: "28m ago", status: "Loan Disbursed" },
+  { city: "Uttar Pradesh", amount: "₹8,90,000", time: "32m ago", status: "Loan Disbursed" },
+  { city: "Assam", amount: "₹1,75,000", time: "38m ago", status: "Loan Disbursed" },
+  { city: "Rajasthan", amount: "₹5,60,000", time: "42m ago", status: "Loan Disbursed" },
+  { city: "Bihar", amount: "₹3,20,000", time: "45m ago", status: "Loan Disbursed" }
 ];
