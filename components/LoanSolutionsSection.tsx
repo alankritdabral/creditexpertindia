@@ -4,6 +4,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, Smartphone, CreditCard, Banknote, Landmark, Check } from "lucide-react";
 import Image from "next/image";
+import { AnimatedPhoneMockup } from "./ui/AnimatedPhoneMockup";
 
 const AnimatedCard = ({ children, className, bgStyle }: { children: React.ReactNode; className?: string, bgStyle?: string }) => {
   return (
@@ -94,62 +95,8 @@ export const LoanSolutionsSection = () => {
             </div>
 
             {/* Phone Mockup Area */}
-            <div className="relative z-10 flex-1 w-full flex flex-col items-center justify-center mt-4">
-              
-              {/* Phone Container */}
-              <div className="relative w-[300px] h-[600px] rounded-[3rem] border-[8px] border-slate-800 bg-[#f8fafc] shadow-2xl overflow-hidden transform rotate-[-2deg] group-hover:rotate-0 transition-transform duration-500 z-20 flex flex-col">
-                
-                {/* Dynamic Notch */}
-                <div className="absolute top-0 inset-x-0 h-7 flex justify-center z-30">
-                  <div className="w-24 h-6 bg-slate-800 rounded-b-xl" />
-                </div>
-
-                <div className="flex-1 flex flex-col p-5 pt-12 overflow-y-auto">
-                  <div className="flex justify-between items-center mb-6">
-                    <div className="flex items-center space-x-2">
-                       <Smartphone className="w-4 h-4 text-blue-600" />
-                       <span className="font-semibold text-slate-800 text-sm">Personal Loan</span>
-                    </div>
-                  </div>
-
-                  <p className="text-xs text-slate-500 mb-1">Current EMI</p>
-                  <div className="flex items-end space-x-3 mb-6">
-                    <p className="text-3xl font-bold text-slate-900">₹25,000</p>
-                    <div className="bg-red-50 text-red-600 px-2 py-1 rounded text-xs font-semibold mb-1">
-                      16.5%
-                    </div>
-                  </div>
-                  <p className="text-[10px] text-slate-400 mb-4 -mt-4">per month &nbsp;&nbsp;&nbsp;&nbsp; Interest rate</p>
-
-                  <div className="flex justify-center mb-4">
-                     <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-500">
-                       <ArrowRight className="w-4 h-4 rotate-90" />
-                     </div>
-                  </div>
-
-                  <p className="text-xs text-blue-600 font-medium mb-1">With Consolidation</p>
-                  <div className="flex items-end space-x-3 mb-6">
-                    <p className="text-3xl font-bold text-blue-600">₹18,499</p>
-                    <div className="bg-emerald-50 text-emerald-600 px-2 py-1 rounded text-xs font-semibold mb-1">
-                      10.99%
-                    </div>
-                  </div>
-                  <p className="text-[10px] text-slate-400 mb-6 -mt-4">per month &nbsp;&nbsp;&nbsp;&nbsp; Potential rate*</p>
-
-                  <div className="mt-auto bg-emerald-50/80 rounded-2xl p-4 flex items-center space-x-3">
-                    <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 flex-shrink-0">
-                      <Check className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <p className="text-[10px] text-slate-500">You could save</p>
-                      <p className="text-sm font-bold text-emerald-700">₹6,501 every month</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Shadow behind phone */}
-              <div className="absolute top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-[280px] h-[580px] bg-blue-900/10 blur-2xl z-10 transform rotate-[-2deg]" />
+            <div className="relative z-10 flex-1 w-full flex flex-col items-center justify-center mt-4 mb-4">
+              <AnimatedPhoneMockup />
             </div>
 
             {/* Bottom Section (CTA + Avatars) */}
