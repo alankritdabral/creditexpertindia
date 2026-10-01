@@ -20,6 +20,11 @@ export function LoanNotification({ transaction, align = 'right', vAlign = 'top' 
 
   const isLeft = align === 'left';
   const isTop = vAlign === 'top';
+  
+  // Scale down Uttar Pradesh specifically to prevent clipping on the edge
+  const isUP = transaction.city === "Uttar Pradesh";
+  const scaleTarget = isUP ? 0.85 : 1;
+  const scaleInitial = isUP ? 0.80 : 0.95;
 
   let d = "";
   if (isTop) {
@@ -92,9 +97,9 @@ export function LoanNotification({ transaction, align = 'right', vAlign = 'top' 
       {/* Notification Card */}
       <motion.div
         key={`card-${transaction.city}`}
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.95 }}
+        initial={{ opacity: 0, scale: scaleInitial }}
+        animate={{ opacity: 1, scale: scaleTarget }}
+        exit={{ opacity: 0, scale: scaleInitial }}
         transition={{ duration: 0.45, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
         className="absolute flex items-center p-3 sm:p-3.5 md:p-4 gap-3 sm:gap-3.5 md:gap-4"
         style={{

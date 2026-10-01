@@ -23,14 +23,9 @@ function StateShape({ shape, id, isActive, isHighlighted, isPrimary, splitX, spl
   const anchorPoint = useMemo(() => {
     const pts = shape.getPoints();
     if (pts.length === 0) return [0, 0, 0.2] as [number, number, number];
-    let maxY = -Infinity;
-    for (const p of pts) {
-      if (p.y > maxY) {
-        maxY = p.y;
-      }
-    }
     const cx = pts.reduce((sum, p) => sum + p.x, 0) / pts.length;
-    return [cx, maxY, 0.2] as [number, number, number];
+    const cy = pts.reduce((sum, p) => sum + p.y, 0) / pts.length;
+    return [cx, cy, 0.2] as [number, number, number];
   }, [shape]);
 
   const transaction = useMemo(() => transactions.find(t => t.city === id), [id]);
@@ -182,7 +177,7 @@ export function IndiaMap({ activeCity, highlightedCity }: { activeCity?: string 
 
     return { 
       shapesData: result, 
-      splitX: minX + (maxX - minX) * 0.35,
+      splitX: minX + (maxX - minX) * 0.50,
       splitY: minY + (maxY - minY) * 0.50
     };
   }, [data]);
