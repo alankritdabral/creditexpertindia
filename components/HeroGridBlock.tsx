@@ -6,10 +6,17 @@ import { ArrowRight, Calculator, CheckCircle2 } from "lucide-react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import Image from "next/image";
 
-import hdfcLogo from '@/public/logos/hdfc.png';
-import iciciLogo from '@/public/logos/icici.png';
-import axisLogo from '@/public/logos/axis.png';
-import kotakLogo from '@/public/logos/kotak.png';
+import axisFinanceLogo from '@/public/logos/AXISFINANCE.svg';
+import idfcLogo from '@/public/logos/IDFC.svg';
+import bajajFinservLogo from '@/public/logos/BAJAJFINSERV.svg';
+import yesBankLogo from '@/public/logos/YESBANK.svg';
+import tataLogo from '@/public/logos/TATA.svg';
+import ltFinanceLogo from '@/public/logos/L&T.svg';
+import creditSaisonLogo from '@/public/logos/CREDITSAISON.svg';
+import shriramLogo from '@/public/logos/SHRIRAM.svg';
+import smfgLogo from '@/public/logos/SMFG.svg';
+import kotakBankLogo from '@/public/logos/KOTAK_BANK.png';
+import iciciBankLogo from '@/public/logos/ICICI.png';
 
 function OdometerDigit({ char }: { char: string }) {
   if (isNaN(Number(char)) || char.trim() === "") {
@@ -40,16 +47,16 @@ function OdometerDigit({ char }: { char: string }) {
 function AnimatedCurrency({ amount, isMounted }: { amount: number, isMounted: boolean }) {
   const formattedAmount = isMounted
     ? new Intl.NumberFormat('en-IN', {
-        style: 'currency',
-        currency: 'INR',
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      }).format(amount)
+      style: 'currency',
+      currency: 'INR',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(amount)
     : '₹15,43,29,805.12';
 
   const chars = formattedAmount.split("");
   const len = chars.length;
-  
+
   return (
     <span className="inline-flex items-center text-emerald-600 font-mono tracking-tight" style={{ lineHeight: 1 }}>
       {chars.map((char, i) => (
@@ -62,11 +69,11 @@ function AnimatedCurrency({ amount, isMounted }: { amount: number, isMounted: bo
 export function HeroGridBlock() {
   const BASE_AMOUNT = 154329805.12;
   // Fixed anchor timestamp so the number continuously grows over time instead of resetting on redeploys
-  const BASELINE_TIMESTAMP = 1789640000000; 
+  const BASELINE_TIMESTAMP = 1789640000000;
   const INCREMENT_PER_SECOND = 12.45;
 
   const [displayAmount, setDisplayAmount] = React.useState(BASE_AMOUNT);
-  
+
   const [isMounted, setIsMounted] = React.useState(false);
   const words = [
     { text: "reduce", color: "#2563EB" },
@@ -82,13 +89,13 @@ export function HeroGridBlock() {
     let animationFrameId: number;
     const startTime = performance.now();
     const ANIMATION_DURATION = 3000; // 3 seconds to smoothly count up
-    
+
     let lastTickTime = 0;
     let nextTickDelay = 2500;
 
     const updateCounter = (currentTime: number) => {
       const elapsedTime = currentTime - startTime;
-      
+
       const elapsedSecondsTotal = (Date.now() - BASELINE_TIMESTAMP) / 1000;
       const trueAmount = BASE_AMOUNT + Math.max(0, elapsedSecondsTotal) * INCREMENT_PER_SECOND;
 
@@ -105,7 +112,7 @@ export function HeroGridBlock() {
           nextTickDelay = 2000 + Math.random() * 1000; // Randomize next tick between 2s and 3s
         }
       }
-      
+
       animationFrameId = requestAnimationFrame(updateCounter);
     };
 
@@ -121,7 +128,7 @@ export function HeroGridBlock() {
   }, [words.length]);
 
   return (
-    <div className="flex flex-col justify-between h-full p-8 md:p-12">
+    <div className="flex flex-col justify-center h-full min-h-[500px] lg:min-h-[700px] p-8 md:px-12 lg:py-24">
       <div>
         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-50 border border-icy-blue text-brand-black/90 text-[11px] font-bold uppercase tracking-wider mb-8 shadow-sm">
           <span className="relative flex h-1.5 w-1.5">
@@ -132,60 +139,77 @@ export function HeroGridBlock() {
           <AnimatedCurrency amount={displayAmount} isMounted={isMounted} />
         </div>
 
-        <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-brand-black mb-6 leading-[1.1]">
+        <h1 className="hero-title text-brand-black mb-6">
           A smarter way to <br className="hidden md:block" />
-          <span className="inline-flex items-center">
-            <span 
-              className="inline-block whitespace-nowrap mr-2 lg:mr-3 text-left"
-              style={{ color: words[wordIndex].color }}
-            >
-              {words[wordIndex].text}
-            </span>
-            <span className="text-brand-black">your debt.</span>
+          <span className="inline-flex items-center flex-nowrap whitespace-nowrap">
+            <motion.span layout transition={{ type: "spring", stiffness: 400, damping: 30 }} className="relative inline-flex items-center overflow-hidden h-[1.2em] mr-2 lg:mr-3 pb-1">
+              <AnimatePresence mode="popLayout">
+                <motion.span
+                  key={words[wordIndex].text}
+                  initial={{ y: "100%", opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  exit={{ y: "-100%", opacity: 0, position: "absolute" }}
+                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                  className="inline-block text-left"
+                  style={{ color: words[wordIndex].color }}
+                >
+                  {words[wordIndex].text}
+                </motion.span>
+              </AnimatePresence>
+            </motion.span>
+            <motion.span layout transition={{ type: "spring", stiffness: 400, damping: 30 }} className="text-brand-black">your debt.</motion.span>
           </span>
         </h1>
 
-        <p className="text-lg text-brand-black/70 mb-10 max-w-xl">
-          Credit Expert India helps you explore loan consolidation, refinancing, top-up loans and fresh financing options designed around your financial profile.
+        <p className="hero-description text-brand-black/70 mb-10">
+          Combine multiple EMIs into one. Explore lower-rate financing options designed around your profile.
         </p>
 
-        <div className="flex flex-col sm:flex-row items-center gap-4">
+        <div className="flex flex-col sm:flex-row items-center gap-4 mb-10">
           <Link href="#check-eligibility" className="w-full sm:w-auto px-6 py-3.5 bg-blue-energy text-white rounded-xl font-medium hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 group">
             Check My Eligibility
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </Link>
           <Link href="#calculator" className="w-full sm:w-auto px-6 py-3.5 bg-white text-brand-black border border-icy-blue hover:border-slate-300 rounded-xl font-medium hover:bg-slate-50 transition-colors flex items-center justify-center gap-2">
             <Calculator className="w-4 h-4 text-blue-energy" />
-            Potential Savings
+            See Potential Savings
           </Link>
         </div>
+
+
       </div>
 
-      <div className="mt-16 pt-8 border-t border-slate-100 overflow-hidden relative">
-        {/* Gradient fades for smooth edges */}
-        <div className="absolute left-0 bottom-0 top-16 w-16 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
-        <div className="absolute right-0 bottom-0 top-16 w-16 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
-        
-        <p className="text-xs font-semibold text-brand-black/70 uppercase tracking-wider mb-6">Trusted by 10 Lac+ Customers via Banking Partners</p>
-        
-        <div className="flex w-max animate-marquee opacity-100 transition-all duration-500">
-          {[...Array(2)].map((_, i) => (
-            <div key={i} className="flex items-center gap-12 pr-12">
-              <Image src={hdfcLogo} alt="HDFC" priority className="h-6 w-auto object-contain" />
-              <Image src={iciciLogo} alt="ICICI" priority className="h-6 w-auto object-contain" />
-              <Image src={axisLogo} alt="Axis" priority className="h-6 w-auto object-contain" />
-              <Image src={kotakLogo} alt="Kotak" priority className="h-6 w-auto object-contain" />
-              
-              <Image src={hdfcLogo} alt="HDFC" priority className="h-6 w-auto object-contain" />
-              <Image src={iciciLogo} alt="ICICI" priority className="h-6 w-auto object-contain" />
-              <Image src={axisLogo} alt="Axis" priority className="h-6 w-auto object-contain" />
-              <Image src={kotakLogo} alt="Kotak" priority className="h-6 w-auto object-contain" />
-            </div>
-          ))}
+    </div>
+  );
+}
+
+export function HeroLogos() {
+  return (
+    <div className="w-full bg-white/50 backdrop-blur-sm relative z-20">
+      <div className="max-w-[1220px] mx-auto flex flex-col xl:flex-row xl:items-center py-6 border-t border-x border-slate-300 overflow-hidden">
+
+        <div className="flex-1 flex items-center min-w-0">
+          <div className="flex w-max animate-marquee opacity-100 transition-all duration-500 items-center">
+            {[...Array(2)].map((_, i) => (
+              <div key={i} className="flex shrink-0 items-center gap-14 pr-14">
+                <Image src={axisFinanceLogo} alt="Axis Finance" priority className="shrink-0 h-10 w-32 object-contain opacity-80 hover:opacity-100 transition-opacity mix-blend-multiply" />
+                <Image src={idfcLogo} alt="IDFC FIRST Bank" priority className="shrink-0 h-10 w-32 object-contain opacity-80 hover:opacity-100 transition-opacity mix-blend-multiply" />
+                <Image src={bajajFinservLogo} alt="Bajaj Finserv" priority className="shrink-0 h-10 w-32 object-contain opacity-80 hover:opacity-100 transition-opacity mix-blend-multiply" />
+                <Image src={yesBankLogo} alt="YES Bank" priority className="shrink-0 h-10 w-32 object-contain opacity-80 hover:opacity-100 transition-opacity mix-blend-multiply" />
+                <Image src={tataLogo} alt="TATA Capital" priority className="shrink-0 h-10 w-32 object-contain opacity-80 hover:opacity-100 transition-opacity mix-blend-multiply" />
+                <Image src={ltFinanceLogo} alt="L&T Finance" priority className="shrink-0 h-10 w-32 object-contain opacity-80 hover:opacity-100 transition-opacity mix-blend-multiply" />
+                <Image src={creditSaisonLogo} alt="Credit Saison" priority className="shrink-0 h-10 w-32 object-contain opacity-80 hover:opacity-100 transition-opacity mix-blend-multiply" />
+                <Image src={shriramLogo} alt="Shriram" priority className="shrink-0 h-10 w-32 object-contain opacity-80 hover:opacity-100 transition-opacity mix-blend-multiply" />
+                <Image src={smfgLogo} alt="SMFG" priority className="shrink-0 h-10 w-32 object-contain opacity-80 hover:opacity-100 transition-opacity mix-blend-multiply" />
+                <Image src={kotakBankLogo} alt="Kotak Mahindra Bank" priority className="shrink-0 h-10 w-32 object-contain opacity-80 hover:opacity-100 transition-opacity mix-blend-multiply" />
+                <Image src={iciciBankLogo} alt="ICICI Bank" priority className="shrink-0 h-10 w-32 object-contain opacity-80 hover:opacity-100 transition-opacity mix-blend-multiply" />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
   );
 }
 
-export { HeroVisualBlock } from "./HeroAnimation";
+export { HeroVisualBlock } from "./hero/HeroVisualBlock";

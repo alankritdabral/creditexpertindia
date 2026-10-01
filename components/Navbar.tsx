@@ -32,7 +32,7 @@ export function Navbar() {
 
   return (
     <>
-      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white/90 backdrop-blur-md shadow-sm py-3' : 'bg-white py-5'} border-b border-icy-blue px-4 md:px-6 lg:px-8`}>
+      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? '-translate-y-full opacity-0 pointer-events-none' : 'translate-y-0 opacity-100 bg-white py-5'} border-b border-icy-blue px-4 md:px-6 lg:px-8`}>
         <div className="mx-auto max-w-[1220px] flex items-center justify-between">
           
           {/* Brand Logo */}
@@ -54,7 +54,7 @@ export function Navbar() {
                 <li key={l.href}>
                   <Link
                     href={l.href}
-                    className={`relative px-4 py-2 text-[14px] font-bold transition-colors rounded-full flex items-center ${
+                    className={`relative px-4 py-2 nav-link transition-colors rounded-full flex items-center ${
                       pathname === l.href
                         ? 'text-blue-energy'
                         : 'text-brand-black/80 hover:text-brand-black hover:bg-slate-50'
@@ -78,19 +78,19 @@ export function Navbar() {
           <div className="hidden lg:flex items-center justify-end gap-6 relative z-10 shrink-0">
             <a
               href="/admin/login"
-              className="text-[14px] font-bold text-brand-black/80 hover:text-brand-black transition-colors"
+              className="nav-link text-brand-black/80 hover:text-brand-black transition-colors"
             >
               Staff Login
             </a>
             <a
               href="/contact"
-              className="text-[14px] font-bold text-brand-black/80 hover:text-brand-black transition-colors"
+              className="nav-link text-brand-black/80 hover:text-brand-black transition-colors"
             >
               Contact Us
             </a>
             <a
               href="#lead-form"
-              className="group flex items-center justify-center rounded-full bg-[#0A2540] px-4 py-2 text-[14px] font-bold text-white transition-all duration-300 hover:bg-[#113355] hover:shadow-[0_0_15px_rgba(10,37,64,0.3)] active:scale-95"
+              className="group flex items-center justify-center rounded-full bg-[#0A2540] px-4 py-2 nav-button text-white transition-all duration-300 hover:bg-[#113355] hover:shadow-[0_0_15px_rgba(10,37,64,0.3)] active:scale-95"
             >
               Get Free Assessment
               <ArrowRight className="ml-1.5 h-4 w-4 transition-transform group-hover:translate-x-1" />
