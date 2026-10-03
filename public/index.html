@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- India State Map  -->
+  <title>India Map</title>
+
+  <!--  Styles  -->
+  <link type="text/css" rel="stylesheet" href="zcolorbrewer.css" />
+  <style type="text/css">
+    body {
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    }
+
+    svg {
+      background: #f7f7f7;
+    }
+
+    #india {
+      /*    fill: #00BCD4;
+      opacity: .7; */
+      stroke: #101010;
+      stroke-width: .6;
+    }
+
+    div.tooltip {
+      position: absolute;
+      text-align: center;
+      padding: 0.5em;
+      font-size: 10px;
+      color: #222;
+      background: #FFF;
+      border-radius: 2px;
+      pointer-events: none;
+      box-shadow: 0px 0px 2px 0px #a6a6a6;
+    }
+
+    .key path {
+        display: none;
+    }
+
+    .key line {
+        stroke: #000;
+        shape-rendering: crispEdges;
+    }
+
+    .key text {
+        font-size: 10px;
+    }
+
+    .key rect{
+      stroke-width: .4;
+    }
+
+  </style>
+</head>
+
+<body>
+  <div id="chart"></div>
+
+  <script src="d3.min.js"></script>
+  <script type="text/javascript" src="d3.geo.min.js"></script>
+  
+  <script type="text/javascript">
+    var w = 650;
+    var h = 650;
+    var proj = d3.geo.mercator();
+    var path = d3.geo.path().projection(proj);
+    var t = proj.translate(); // the projection's default translation
+    var s = proj.scale() // the projection's default scale
+
+    var buckets = 9,
+      colors = ["#ffffd9", "#edf8b1", "#c7e9b4", "#7fcdbb", "#41b6c4", "#1d91c0", "#225ea8", "#253494", "#081d58"]; // alternatively colorbrewer.YlGnBu[9]
+
+    var map = d3.select("#chart").append("svg:svg")
+      .attr("width", w)
+      .attr("height", h)
+      //.call(d3.behavior.zoom().on("zoom", redraw))
+      .call(initialize);
+
+    var india = map.append("svg:g")
+      .attr("id", "india");
+
+    var div = d3.select("body").append("div")
+      .attr("class", "tooltip")
+      .style("opacity", 0);
+
+    // Load india.geojson for the exact India map outline
+    d3.json("india.geojson", function (indiaJson) {
+      india.selectAll("path.country")
+        .data(indiaJson.features)
+        .enter().append("path")
+        .attr("class", "country")
+        .attr("d", path)
+        .style("fill", "none")
+        .style("stroke", "#101010")
+        .style("stroke-width", "1.5");
+
+      // Load states.json for the states data
+      d3.json("states.json", function (json) {
+
+        var maxTotal = d3.max(json.features, function (d) { return d.total });
+
+        var colorScale = d3.scale.quantile()
+          .domain(d3.range(buckets).map(function (d) { return (d / buckets) * maxTotal }))
+          .range(colors);
+
+        var y = d3.scale.sqrt()
+          .domain([0, 10000])
+          .range([0,300]);
+
+        var yAxis = d3.svg.axis()
+            .scale(y)
+            .tickValues(colorScale.domain())
+            .orient("right");
+
+        india.selectAll("path.state")
+          .data(json.features)
+          .enter().append("path")
+          .attr("class", "state")
+          .attr("d", path)
+          .style("fill", colors[0])
+          .style("opacity", 0.8)
+          .style("stroke", "#101010")
+          .style("stroke-width", "0.5")
+
+          .on('click', function (d, i) {
+            d3.select(this).transition().duration(300).style("opacity", 1);
+            div.transition().duration(300)
+              .style("opacity", 1)
+            div.text(d.id + " : " + d.total)
+              .style("left", (d3.event.pageX) + "px")
+              .style("top", (d3.event.pageY - 30) + "px");
+          })
+
+          .on('mouseleave', function (d, i) {
+            d3.select(this).transition().duration(300)
+              .style("opacity", 0.8);
+            div.transition().duration(300)
+              .style("opacity", 0);
+          })
+          .on('mouseenter', function (d, i) {
+            d3.select(this).transition().duration(300)
+              .style("opacity", 0.5);
+            div.transition().duration(300)
+              .style("opacity", 0);
+
+          });
+
+        india.selectAll("path.state").transition().duration(1000)
+          .style("fill", function (d) { return colorScale(d.total); });
+
+        //Adding legend for our Choropleth
+
+        var g = india.append("g")
+                  .attr("class", "key")
+                  .attr("transform", "translate(445, 305)")
+                  .call(yAxis);
+
+              g.selectAll("rect")
+                  .data(colorScale.range().map(function(d, i) {
+                      return {
+                          y0: i ? y(colorScale.domain()[i - 1]) : y.range()[0],
+                          y1: i < colorScale.domain().length ? y(colorScale.domain()[i]) : y.range()[1],
+                          z: d
+                      };
+                  }))
+                  .enter().append("rect")
+                      .attr("width", 7)
+                      .attr("y", function(d) { return d.y0; })
+                      .attr("height", function(d) { return d.y1 - d.y0; })
+                      .style("fill", function(d) { return d.z; });
+
+        // Add state names
+        india.selectAll("text.state-label")
+          .data(json.features)
+          .enter().append("text")
+          .attr("class", "state-label")
+          .attr("transform", function(d) {
+            var centroid = path.centroid(d);
+            // Some features might not compute a valid centroid, default to [0,0] if so
+            if(!centroid || isNaN(centroid[0]) || isNaN(centroid[1])) return "translate(0,0)";
+            return "translate(" + centroid[0] + "," + centroid[1] + ")";
+          })
+          .attr("dy", ".35em")
+          .style("text-anchor", "middle")
+          .text(function(d) { return d.id; })
+          .style("font-size", "8px")
+          .style("font-weight", "bold")
+          .style("fill", "#222")
+          .style("pointer-events", "none"); // Let mouse events pass through to the state paths
+
+        // Notification Simulation Container
+        var notifContainer = d3.select("body").append("div")
+          .attr("id", "notif-container")
+          .style("position", "absolute")
+          .style("top", "20px")
+          .style("right", "20px")
+          .style("display", "flex")
+          .style("flex-direction", "column")
+          .style("gap", "10px")
+          .style("font-family", "sans-serif")
+          .style("z-index", 1000);
+
+        function triggerNotification() {
+          if (!json.features || json.features.length === 0) return;
+          var randomState = json.features[Math.floor(Math.random() * json.features.length)];
+          
+          // 1. Highlight the state on the map
+          india.selectAll("path.state")
+            .filter(function(d) { return d.id === randomState.id; })
+            .transition().duration(300)
+            .style("fill", "#ff3b30") // Highlight color (red/orange)
+            .style("opacity", 1)
+            .style("stroke", "#fff")
+            .style("stroke-width", "1.5px")
+            .transition().duration(2500) // fade back after 2.5s
+            .style("fill", function(d) { return colorScale(d.total); })
+            .style("opacity", 0.8)
+            .style("stroke", "#101010")
+            .style("stroke-width", "0.5px");
+            
+          // 2. Show a toast notification
+          var notif = notifContainer.append("div")
+            .style("background", "rgba(30, 30, 30, 0.9)")
+            .style("color", "#fff")
+            .style("padding", "12px 18px")
+            .style("border-radius", "6px")
+            .style("box-shadow", "0 4px 12px rgba(0,0,0,0.15)")
+            .style("font-size", "14px")
+            .style("opacity", 0)
+            .style("transform", "translateX(50px)")
+            .text("🔔 New alert from " + randomState.id + " (" + randomState.total + ")");
+            
+          notif.transition().duration(400)
+            .style("opacity", 1)
+            .style("transform", "translateX(0px)");
+            
+          // Remove notification after 3.5 seconds
+          setTimeout(function() {
+            notif.transition().duration(400)
+              .style("opacity", 0)
+              .style("transform", "translateX(50px)")
+              .remove();
+          }, 3500);
+        }
+
+        // Trigger a fake notification every 4 seconds
+        setInterval(triggerNotification, 4000);
+
+      });
+    });
+
+    function initialize() {
+      proj.scale(6700);
+      proj.translate([-1240, 720]);
+    }
+
+
+  </script>
+</body>
+
+</html>

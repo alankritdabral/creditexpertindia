@@ -123,7 +123,7 @@ export function CinematicHero() {
               Smarter Debt Management
             </div>
             
-            <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-brand-black mb-6 leading-[1.1]">
+            <h1 className="hero-title text-brand-black mb-6">
               Turn Multiple EMIs Into <br className="hidden md:block" />
               <span className="text-gradient">One Smarter EMI.</span>
             </h1>
