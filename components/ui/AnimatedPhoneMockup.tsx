@@ -33,25 +33,15 @@ const INJECTED_STYLES = `
   
   /* Gradient UI Elements */
   .ambient-gradient {
-      background:
-          radial-gradient(circle at 20% 10%, rgba(80, 120, 255, 0.55), transparent 35%),
-          radial-gradient(circle at 90% 35%, rgba(170, 90, 255, 0.45), transparent 35%),
-          radial-gradient(circle at 70% 90%, rgba(0, 220, 190, 0.45), transparent 40%),
-          linear-gradient(145deg, #315FEA 0%, #273BBA 42%, #6A3DDB 70%, #12CFC0 115%);
-      background-size: 200% 200%;
-      animation: gradientMove 12s ease-in-out infinite;
-  }
-
-  @keyframes gradientMove {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
+      background: 
+          radial-gradient(circle at 70% 25%, rgba(91, 73, 220, 0.20), transparent 45%),
+          linear-gradient(180deg, #08152F 0%, #0A1740 55%, #10184A 100%);
   }
 
   .phone-screen {
       box-shadow:
-          inset 0 0 0 1px rgba(255,255,255,0.28),
-          inset 0 0 50px rgba(255,255,255,0.08);
+          inset 0 0 0 1px rgba(255,255,255,0.1),
+          inset 0 0 50px rgba(255,255,255,0.05);
   }
 
   .phone-screen::before {
@@ -61,7 +51,7 @@ const INJECTED_STYLES = `
       background: linear-gradient(
           135deg,
           transparent 35%,
-          rgba(255,255,255,0.08) 48%,
+          rgba(255,255,255,0.04) 48%,
           transparent 60%
       );
       transform: rotate(-8deg);
@@ -70,23 +60,27 @@ const INJECTED_STYLES = `
   }
 
   .glass-card {
-      background: rgba(255,255,255,0.12);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      border: 1px solid rgba(255,255,255,0.24);
-      border-radius: 26px;
+      background: rgba(255,255,255,0.055);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 24px;
   }
 
   .savings-card {
-      background: linear-gradient(135deg, rgba(0, 255, 200, 0.30), rgba(50, 120, 255, 0.24));
-      border: 1px solid rgba(120,255,220,0.45);
-      box-shadow: 0 15px 45px rgba(0, 220, 190, 0.18), inset 0 1px 0 rgba(255,255,255,0.20);
-      border-radius: 26px;
+      background: linear-gradient(135deg, rgba(25, 215, 190, 0.22), rgba(67, 95, 255, 0.25));
+      border: 1px solid rgba(70, 220, 210, 0.45);
+      border-radius: 24px;
   }
 
   .glass-arrow {
-      background: rgba(255,255,255,0.85);
-      box-shadow: 0 8px 30px rgba(30,40,180,0.25), 0 0 30px rgba(120,150,255,0.25);
+      background: rgba(75, 110, 255, 0.22);
+      border: 1px solid rgba(120, 150, 255, 0.35);
+  }
+  
+  .savings-icon-container {
+      background: rgba(65, 220, 190, 0.18);
+      border: 1px solid rgba(100,230,210,0.40);
   }
   
   .hide-scrollbar::-webkit-scrollbar {
@@ -173,7 +167,7 @@ export function AnimatedPhoneMockup({ className }: { className?: string }) {
             onUpdate: () => {
               if (currentRef.current) currentRef.current.innerText = "₹" + Math.floor(counters.current).toLocaleString("en-IN");
               if (newRef.current) newRef.current.innerText = "₹" + Math.floor(counters.next).toLocaleString("en-IN");
-              if (savingsRef.current) savingsRef.current.innerText = "₹" + Math.floor(counters.savings).toLocaleString("en-IN") + " every month";
+              if (savingsRef.current) savingsRef.current.innerText = "₹" + Math.floor(counters.savings).toLocaleString("en-IN");
             }
           });
         }
@@ -186,7 +180,7 @@ export function AnimatedPhoneMockup({ className }: { className?: string }) {
   return (
     <div
       ref={containerRef}
-      className={cn("relative w-full h-[450px] md:h-[600px] flex items-center justify-center", className)}
+      className={cn("relative w-full h-[550px] md:h-[650px] flex items-center justify-center", className)}
       style={{ perspective: "1000px" }}
     >
       <style dangerouslySetInnerHTML={{ __html: INJECTED_STYLES }} />
@@ -194,13 +188,13 @@ export function AnimatedPhoneMockup({ className }: { className?: string }) {
       {/* The iPhone Bezel */}
       <div
         ref={mockupRef}
-        className="relative w-[280px] h-[580px] rounded-[3rem] iphone-bezel flex flex-col will-change-transform transform-style-3d shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)]"
+        className="relative w-[300px] h-[600px] rounded-[3rem] iphone-bezel flex flex-col will-change-transform transform-style-3d shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)]"
       >
         {/* Physical Hardware Buttons */}
         <div className="absolute top-[120px] -left-[3px] w-[3px] h-[25px] hardware-btn rounded-l-md z-0" aria-hidden="true" />
-        <div className="absolute top-[160px] -left-[3px] w-[3px] h-[45px] hardware-btn rounded-l-md z-0" aria-hidden="true" />
-        <div className="absolute top-[220px] -left-[3px] w-[3px] h-[45px] hardware-btn rounded-l-md z-0" aria-hidden="true" />
-        <div className="absolute top-[170px] -right-[3px] w-[3px] h-[70px] hardware-btn rounded-r-md z-0 scale-x-[-1]" aria-hidden="true" />
+        <div className="absolute top-[170px] -left-[3px] w-[3px] h-[45px] hardware-btn rounded-l-md z-0" aria-hidden="true" />
+        <div className="absolute top-[230px] -left-[3px] w-[3px] h-[45px] hardware-btn rounded-l-md z-0" aria-hidden="true" />
+        <div className="absolute top-[180px] -right-[3px] w-[3px] h-[70px] hardware-btn rounded-r-md z-0 scale-x-[-1]" aria-hidden="true" />
 
         {/* Inner Screen Container */}
         <div className="absolute inset-[7px] rounded-[2.5rem] overflow-hidden phone-screen ambient-gradient text-white z-10 flex flex-col">
@@ -210,68 +204,89 @@ export function AnimatedPhoneMockup({ className }: { className?: string }) {
           </div>
 
           {/* App Interface */}
-          <div className="relative w-full h-full pt-14 px-5 pb-8 flex flex-col overflow-y-auto z-10 hide-scrollbar">
+          <div className="relative w-full h-full pt-12 px-4 pb-6 flex flex-col overflow-y-auto z-10 hide-scrollbar">
             {/* Header */}
-            <div className="ui-fade-up flex justify-between items-center mb-6">
-              <div className="flex items-center space-x-3">
-                <div className="w-[42px] h-[42px] rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center">
-                  <Smartphone className="w-5 h-5 text-white" />
+            <div className="ui-fade-up flex justify-between items-center mb-4 relative z-10">
+              <div className="flex items-center space-x-2">
+                <div className="w-[32px] h-[32px] rounded-[10px] bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center">
+                  <Smartphone className="w-4 h-4 text-white" />
                 </div>
                 <div className="flex flex-col">
                   <span className="font-semibold text-white text-[18px] leading-tight">Personal Loan</span>
-                  <span className="text-[12px] text-white/70 font-medium leading-tight mt-0.5">HDFC Bank</span>
+                  <span className="text-[12px] text-white/[0.65] font-normal leading-tight mt-0.5">HDFC Bank</span>
                 </div>
               </div>
-              <div className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center cursor-pointer">
-                <span className="text-white text-xl leading-none -mt-1">&times;</span>
+              <div className="w-[32px] h-[32px] rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center cursor-pointer">
+                <span className="text-white text-lg leading-none -mt-1">&times;</span>
               </div>
             </div>
 
             {/* Current EMI Glass Card */}
-            <div className="ui-fade-up glass-card p-5 pb-6">
-              <p className="ui-fade-up text-[14px] text-white font-medium mb-1">Current EMI</p>
-              <div className="flex items-center justify-between mt-2">
-                <div className="flex flex-col">
-                  <p ref={currentRef} className="ui-slide-right text-[36px] font-bold text-white leading-none">₹0</p>
-                  <p className="ui-fade-up text-[13px] text-white/70 font-medium mt-1">per month</p>
+            <div className="ui-fade-up glass-card p-4 relative z-10">
+              <div className="flex items-center mb-2.5">
+                <div className="w-[16px] h-[16px] rounded flex items-center justify-center mr-2 opacity-70">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-white">
+                    <rect x="2" y="5" width="20" height="14" rx="2"></rect>
+                    <line x1="2" y1="10" x2="22" y2="10"></line>
+                  </svg>
                 </div>
-                <div className="ui-scale-in bg-[rgba(255,120,145,0.28)] border border-[rgba(255,170,185,0.35)] text-[#FF6B82] px-3 py-1.5 rounded-xl flex flex-col items-center">
-                  <span className="text-[16px] font-bold leading-none mb-0.5">16.5%</span>
-                  <span className="text-[10px] font-semibold leading-none">Interest rate</span>
+                <p className="ui-fade-up text-[14px] text-white/[0.72] font-medium">Current EMI</p>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex flex-col">
+                  <p ref={currentRef} className="ui-slide-right text-[32px] font-bold text-white leading-none">₹0</p>
+                  <p className="ui-fade-up text-[13px] text-white/[0.55] font-normal mt-1">per month</p>
+                </div>
+                <div className="ui-scale-in bg-[rgba(244,92,133,0.12)] border border-[rgba(244,92,133,0.45)] text-[#FF7F9D] px-2.5 py-1.5 rounded-[12px] flex flex-col items-center">
+                  <span className="text-[14px] font-semibold leading-none mb-0.5">16.5%</span>
+                  <span className="text-[10px] font-medium leading-none">interest rate</span>
                 </div>
               </div>
             </div>
 
             {/* Transition Arrow */}
-            <div className="ui-arrow z-20 -my-6 flex justify-center relative pointer-events-none">
-              <div className="w-[56px] h-[56px] rounded-full glass-arrow flex items-center justify-center text-[#315FEA] pointer-events-auto">
-                <ArrowRight className="w-6 h-6 rotate-90" />
+            <div className="ui-arrow z-20 flex flex-col items-center justify-center relative pointer-events-none py-1">
+              <div className="w-[1px] h-2 border-l border-dashed border-white/30 mb-1" />
+              <div className="w-[38px] h-[38px] rounded-full glass-arrow flex items-center justify-center text-white pointer-events-auto">
+                <ArrowRight className="w-5 h-5 rotate-90" />
               </div>
+              <div className="w-[1px] h-2 border-l border-dashed border-white/30 mt-1" />
             </div>
 
             {/* Consolidated EMI Glass Card */}
-            <div className="ui-fade-up glass-card p-5 pt-7 relative z-10">
-              <p className="ui-fade-up text-[14px] text-white font-semibold mb-1">With Consolidation</p>
-              <div className="flex items-center justify-between mt-2">
-                <div className="flex flex-col">
-                  <p ref={newRef} className="ui-slide-right text-[36px] font-bold text-white leading-none">₹0</p>
-                  <p className="ui-fade-up text-[13px] text-white/70 font-medium mt-1">per month</p>
+            <div className="ui-fade-up glass-card p-4 relative z-10">
+              <div className="flex items-center mb-2.5">
+                <div className="w-[16px] h-[16px] rounded flex items-center justify-center mr-2 opacity-70">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-white">
+                    <rect x="2" y="5" width="20" height="14" rx="2"></rect>
+                    <line x1="2" y1="10" x2="22" y2="10"></line>
+                  </svg>
                 </div>
-                <div className="ui-scale-in bg-[rgba(100,240,190,0.22)] border border-[rgba(100,240,190,0.3)] px-3 py-1.5 rounded-xl flex flex-col items-center">
-                  <span className="text-[16px] font-bold text-[#66F0BD] leading-none mb-0.5">10.99%</span>
-                  <span className="text-[10px] text-[#B7FFE2] font-semibold leading-none">Potential rate*</span>
+                <p className="ui-fade-up text-[14px] text-white/[0.72] font-medium">New EMI</p>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex flex-col">
+                  <p ref={newRef} className="ui-slide-right text-[32px] font-bold text-white leading-none">₹0</p>
+                  <p className="ui-fade-up text-[13px] text-white/[0.55] font-normal mt-1">per month</p>
+                </div>
+                <div className="ui-scale-in bg-[rgba(25,210,175,0.10)] border border-[rgba(25,210,175,0.40)] text-[#45E0C1] px-2.5 py-1.5 rounded-[12px] flex flex-col items-center">
+                  <span className="text-[14px] font-semibold leading-none mb-0.5">10.99%</span>
+                  <span className="text-[10px] font-medium leading-none">interest rate</span>
                 </div>
               </div>
             </div>
 
             {/* Savings Card */}
-            <div className="ui-fade-up mt-auto savings-card p-4 lg:p-5 flex items-center space-x-4">
-              <div className="ui-scale-in w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white flex-shrink-0 shadow-[0_4px_12px_rgba(0,0,0,0.1)] border border-white/30">
-                <Check className="w-5 h-5" />
-              </div>
-              <div className="overflow-hidden">
-                <p className="ui-fade-up text-[13px] text-white/90 font-medium mb-0.5">You could save</p>
-                <p ref={savingsRef} className="ui-slide-right text-[22px] font-bold text-white leading-tight">₹0 every month</p>
+            <div className="ui-fade-up mt-auto savings-card p-4 flex flex-col relative z-10">
+              <div className="flex items-start">
+                <div className="ui-scale-in w-[40px] h-[40px] rounded-full savings-icon-container flex items-center justify-center text-white flex-shrink-0 mr-3">
+                  <Check className="w-5 h-5" />
+                </div>
+                <div className="flex flex-col">
+                  <p className="ui-fade-up text-[14px] text-white/90 font-medium mb-1">You could save</p>
+                  <p ref={savingsRef} className="ui-slide-right text-[32px] font-bold text-white leading-tight mb-1">₹0</p>
+                  <p className="ui-fade-up text-[14px] text-white/70 font-medium">every month</p>
+                </div>
               </div>
             </div>
 
