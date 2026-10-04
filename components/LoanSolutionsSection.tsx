@@ -7,7 +7,7 @@ import Image from "next/image";
 import { AnimatedPhoneMockup } from "./ui/AnimatedPhoneMockup";
 import { AnimatedCreditCard } from "./ui/AnimatedCreditCard";
 
-const AnimatedCard = ({ children, className, bgStyle, bgImage, delay = 0 }: { children: React.ReactNode; className?: string, bgStyle?: string, bgImage?: string, delay?: number }) => {
+const AnimatedCard = ({ children, className, bgStyle, bgImage, bgPosition = 'center', delay = 0 }: { children: React.ReactNode; className?: string, bgStyle?: string, bgImage?: string, bgPosition?: string, delay?: number }) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
@@ -27,7 +27,7 @@ const AnimatedCard = ({ children, className, bgStyle, bgImage, delay = 0 }: { ch
       {bgImage && (
         <div
           className="absolute inset-0 z-0 opacity-[0.35]"
-          style={{ background: `url(${bgImage}) center/cover no-repeat` }}
+          style={{ background: `url(${bgImage}) ${bgPosition}/cover no-repeat` }}
         />
       )}
       <div className="relative z-10 flex flex-col h-full">
@@ -334,8 +334,8 @@ export const LoanSolutionsSection = () => {
             </div>
 
             {/* Headline */}
-            <h3 className="relative z-[5] max-w-[280px] text-[24px] sm:text-[28px] md:text-[32px] leading-[1.2] md:leading-[1.1] font-semibold tracking-[-0.03em] text-[#071B4F]">
-              Replace multiple <br className="hidden sm:block" />payments with one <br className="hidden sm:block" />simpler repayment.
+            <h3 className="relative z-[5] w-full text-[20px] min-[400px]:text-[24px] sm:text-[28px] md:text-[32px] leading-[1.2] md:leading-[1.1] font-semibold tracking-[-0.04em] text-[#071B4F]">
+              Replace multiple payments<br />with one simpler repayment.
             </h3>
 
             {/* Quote */}
@@ -346,7 +346,7 @@ export const LoanSolutionsSection = () => {
             </div>
 
             {/* Visualization */}
-            <div className="absolute left-1/2 -translate-x-1/2 bottom-[10px] md:bottom-0 w-[364px] h-[250px] z-[4] pointer-events-none scale-[0.9] sm:scale-[0.95] md:scale-100 origin-bottom">
+            <div className="absolute left-1/2 -translate-x-1/2 bottom-[-20px] md:bottom-0 w-[364px] h-[250px] z-[4] pointer-events-none scale-[0.9] sm:scale-[0.95] md:scale-100 origin-bottom">
 
               {/* Connectors */}
               <svg
@@ -365,8 +365,8 @@ export const LoanSolutionsSection = () => {
                 {[
                   { amount: '₹12,500', name: 'Personal Loan', icon: Banknote },
                   { amount: '₹8,300', name: 'Credit Card', icon: CreditCard },
-                  { amount: '₹4,200', name: 'Consumer Loan', icon: Smartphone },
-                  { amount: '₹3,800', name: 'Other Loan', icon: Banknote }
+                  { amount: '₹4,200', name: 'Overdraft', icon: Banknote },
+                  { amount: '₹3,800', name: 'App Loan', icon: Smartphone }
                 ].map((loan, i) => {
                   const Icon = loan.icon;
                   return (
@@ -410,7 +410,9 @@ export const LoanSolutionsSection = () => {
 
           {/* 5. Overdraft */}
           <AnimatedCard
+            className="min-h-[520px] lg:min-h-[440px]"
             bgImage="'/overdraft.png'"
+            bgPosition="100% center"
             bgStyle="radial-gradient(circle at bottom right, rgba(23,105,209,0.1) 0%, transparent 60%), rgba(255,255,255,0.68)"
             delay={0.2}
           >
@@ -430,15 +432,12 @@ export const LoanSolutionsSection = () => {
 
             <div className="pl-4 mb-8 quote-line">
               <p className="text-[#09244D] opacity-80 text-[16px] md:text-[18px] leading-[1.5] italic">
-                "₹70 lakh outstanding at<br />14% interest was becoming<br />difficult to manage..."
+                Take control of high-cost overdraft debt.
               </p>
             </div>
 
             <div className="mt-auto relative flex flex-col items-center">
-              {/* Bank Building Graphic Placeholder */}
-              <div className="w-[180px] h-[120px] mb-8 relative flex items-center justify-center group-hover:scale-105 transition-transform duration-500">
-                <Landmark className="w-32 h-32 text-[#DDEEFF]" strokeWidth={1} />
-              </div>
+              {/* Graphic removed as requested */}
 
               <div className="bg-white/80 backdrop-blur-md rounded-2xl p-4 flex items-center justify-between w-full shadow-sm border border-white/70">
                 <div className="text-center w-full">
@@ -447,7 +446,7 @@ export const LoanSolutionsSection = () => {
                 </div>
                 <ArrowRight className="w-6 h-6 text-[#1769D1] mx-2" />
                 <div className="text-center w-full">
-                  <p className="text-2xl font-bold text-[#12B878]">10.99%</p>
+                  <p className="text-2xl font-bold text-[#12B878]">11.75%</p>
                   <p className="text-[10px] text-[#09244D] opacity-70">Potential rate*</p>
                 </div>
               </div>
