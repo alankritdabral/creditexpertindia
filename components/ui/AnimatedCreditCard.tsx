@@ -63,7 +63,8 @@ export const AnimatedCreditCard = () => {
     <div className="flex items-center justify-center w-full -mt-68">
       <motion.div
         initial="hidden"
-        animate="visible"
+        whileInView="visible"
+        viewport={{ once: true }}
         variants={fadeInVariants}
         transition={{ duration: CARD_ANIMATION_DURATION }}
         onMouseMove={handleMouseMove}
@@ -75,9 +76,10 @@ export const AnimatedCreditCard = () => {
       >
         <motion.div style={{ rotateX, rotateY }} transition={springTransition} className="w-full">
           <motion.div
-            className="relative w-full aspect-[1.58] max-w-[320px] mx-auto overflow-hidden rounded-[20px] bg-gradient-to-br from-[#624bff] to-[#3a79ff] p-5 shadow-[0_15px_40px_rgba(58,121,255,0.3)] mb-4 flex flex-col justify-between"
+            className="relative w-full aspect-[1.58] max-w-[320px] mx-auto overflow-hidden rounded-[20px] bg-gradient-to-br from-[#123E8A] to-[#2D8CFF] p-5 shadow-[0_15px_40px_rgba(45,140,255,0.3)] mb-4 flex flex-col justify-between"
             initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
             transition={{ duration: CARD_ANIMATION_DURATION }}
           >
             {/* Dotted texture */}
@@ -100,7 +102,8 @@ export const AnimatedCreditCard = () => {
             <motion.div
               className="relative z-10 text-[18px] md:text-[20px] font-semibold tracking-[0.2em] text-white drop-shadow-sm mt-auto mb-4"
               initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
               transition={{ delay: 0.6 }}
             >
               {cardData.number}
@@ -110,7 +113,8 @@ export const AnimatedCreditCard = () => {
               <div className="flex space-x-5 md:space-x-8">
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
                   transition={{ delay: 0.8, duration: CARD_ANIMATION_DURATION }}
                 >
                   <div className="text-[8px] md:text-[9px] opacity-70 uppercase tracking-widest mb-0.5">Card Holder</div>
@@ -119,7 +123,8 @@ export const AnimatedCreditCard = () => {
 
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
                   transition={{ delay: 1, duration: CARD_ANIMATION_DURATION }}
                 >
                   <div className="text-[8px] md:text-[9px] opacity-70 uppercase tracking-widest mb-0.5">Expires</div>
@@ -130,15 +135,17 @@ export const AnimatedCreditCard = () => {
               </div>
 
               <motion.div
-                className="text-xl md:text-2xl font-bold text-white italic tracking-widest"
+                className="text-xl md:text-2xl font-bold text-white italic tracking-widest flex items-center gap-2"
                 initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
                 transition={{
                   delay: INITIAL_DELAY,
                   duration: CARD_ANIMATION_DURATION,
                 }}
               >
                 <span>VISA</span>
+                <div className="w-2 h-2 rounded-full bg-[#12B878] shadow-[0_0_8px_rgba(18,184,120,0.8)]" />
               </motion.div>
             </div>
           </motion.div>

@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import logo from "@/public/img/logo.png";
@@ -17,23 +17,14 @@ const navLinks = [
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   if (pathname?.startsWith('/admin') || pathname?.startsWith('/team')) return null;
 
   return (
     <>
-      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? '-translate-y-full opacity-0 pointer-events-none' : 'translate-y-0 opacity-100 bg-white py-5'} border-b border-icy-blue px-4 md:px-6 lg:px-8`}>
-        <div className="mx-auto max-w-[1220px] flex items-center justify-between">
+      <header className="absolute top-0 left-0 right-0 z-50 bg-transparent h-[60px] sm:h-auto sm:py-5 px-4 md:px-6 lg:px-8 flex items-center">
+        <div className="w-full mx-auto max-w-[1220px] flex items-center justify-between">
           
           {/* Brand Logo */}
           <Link href="/" className="flex items-center gap-2 group relative z-10 shrink-0">
@@ -42,7 +33,7 @@ export function Navbar() {
               alt="Credit Expert"
               width={160}
               height={40}
-              className="h-9 md:h-10 w-auto object-contain group-hover:opacity-80 transition-opacity"
+              className="h-[34px] sm:h-10 w-auto object-contain group-hover:opacity-80 transition-opacity"
               priority
             />
           </Link>
@@ -54,16 +45,16 @@ export function Navbar() {
                 <li key={l.href}>
                   <Link
                     href={l.href}
-                    className={`relative px-4 py-2 nav-link transition-colors rounded-full flex items-center ${
+                    className={`relative px-4 py-2 text-[15px] font-medium transition-colors rounded-full flex items-center ${
                       pathname === l.href
-                        ? 'text-blue-energy'
-                        : 'text-brand-black/80 hover:text-brand-black hover:bg-slate-50'
+                        ? 'text-slate-900'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/50'
                     }`}
                   >
                     {pathname === l.href && (
                       <motion.div
                         layoutId="navbar-active"
-                        className="absolute inset-0 bg-blue-energy/10 rounded-full"
+                        className="absolute inset-0 bg-slate-100/80 rounded-full"
                         transition={{ type: "spring", stiffness: 380, damping: 30 }}
                       />
                     )}
@@ -75,24 +66,24 @@ export function Navbar() {
           </nav>
 
           {/* Action CTAs */}
-          <div className="hidden lg:flex items-center justify-end gap-6 relative z-10 shrink-0">
-            <a
-              href="/admin/login"
-              className="nav-link text-brand-black/80 hover:text-brand-black transition-colors"
-            >
-              Staff Login
-            </a>
+          <div className="hidden lg:flex items-center justify-end gap-5 relative z-10 shrink-0">
             <a
               href="/contact"
-              className="nav-link text-brand-black/80 hover:text-brand-black transition-colors"
+              className="text-[15px] font-medium text-slate-600 hover:text-slate-900 transition-colors"
             >
-              Contact Us
+              Contact
+            </a>
+            <a
+              href="/admin/login"
+              className="text-[15px] font-medium text-slate-600 hover:text-slate-900 transition-colors"
+            >
+              Sign in <span className="ml-0.5 opacity-50">&rarr;</span>
             </a>
             <a
               href="#lead-form"
-              className="group flex items-center justify-center rounded-full bg-[#0A2540] px-4 py-2 nav-button text-white transition-all duration-300 hover:bg-[#113355] hover:shadow-[0_0_15px_rgba(10,37,64,0.3)] active:scale-95"
+              className="group flex items-center justify-center rounded-full bg-slate-900 px-4 py-2 text-[15px] font-medium text-white transition-all duration-200 hover:bg-slate-800 hover:shadow-md active:scale-95"
             >
-              Get Free Assessment
+              Get Assessment
               <ArrowRight className="ml-1.5 h-4 w-4 transition-transform group-hover:translate-x-1" />
             </a>
           </div>
@@ -102,9 +93,9 @@ export function Navbar() {
             type="button"
             aria-label="Toggle menu"
             onClick={() => setOpen(!open)}
-            className="inline-flex items-center justify-center text-brand-black lg:hidden relative z-10"
+            className="inline-flex items-center justify-center text-white bg-[#1769D1] hover:bg-[#071B4F] rounded-md lg:hidden relative z-10 w-[40px] h-[40px] shadow-sm transition-all"
           >
-            {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            {open ? <X className="h-5 w-5" strokeWidth={2.5} /> : <Menu className="h-5 w-5" strokeWidth={2.5} />}
           </button>
         </div>
       </header>

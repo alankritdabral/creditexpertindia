@@ -128,18 +128,16 @@ export function HeroGridBlock() {
   }, [words.length]);
 
   return (
-    <div className="flex flex-col justify-center h-full min-h-[500px] lg:min-h-[700px] p-8 md:px-12 lg:py-24">
-      <div>
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-50 border border-icy-blue text-brand-black/90 text-[11px] font-bold uppercase tracking-wider mb-8 shadow-sm">
-          <span className="relative flex h-1.5 w-1.5">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
-          </span>
-          <span className="opacity-80">Interest Saved for Customers:</span>
-          <AnimatedCurrency amount={displayAmount} isMounted={isMounted} />
+    <div className="flex flex-col justify-start pt-[40px] sm:pt-[70px] pb-6 sm:pb-12 sm:justify-center h-full min-h-max sm:min-h-[500px] lg:min-h-[700px] px-4 sm:p-8 md:px-12 lg:py-24 relative z-10 w-full">
+      <div className="w-full max-w-[340px] sm:max-w-3xl">
+        {/* Stripe-style Pill */}
+        <div className="inline-flex items-center gap-1.5 h-[34px] text-brand-black text-[11px] font-medium mb-5 whitespace-nowrap w-fit">
+          <span className="opacity-80">Interest Saved:</span>
+          <span className="text-[#16A34A] font-semibold"><AnimatedCurrency amount={displayAmount} isMounted={isMounted} /></span>
         </div>
 
-        <h1 className="hero-title text-brand-black mb-6">
+        {/* Stripe-style Heading */}
+        <h1 className="hero-title text-brand-black mb-6 font-medium tracking-[-0.04em] text-[clamp(36px,10vw,44px)] leading-[1.02] sm:text-5xl lg:text-[64px] lg:leading-[1.02]">
           A smarter way to <br className="hidden md:block" />
           <span className="inline-flex items-center flex-nowrap whitespace-nowrap">
             <motion.span layout transition={{ type: "spring", stiffness: 400, damping: 30 }} className="relative inline-flex items-center overflow-hidden h-[1.2em] mr-2 lg:mr-3 pb-1">
@@ -161,17 +159,18 @@ export function HeroGridBlock() {
           </span>
         </h1>
 
-        <p className="hero-description text-brand-black/70 mb-10">
+        <p className="hero-description text-brand-black/70 mb-8 sm:mb-10 text-[16px] leading-[1.5] sm:text-lg lg:text-xl max-w-[340px] sm:max-w-none">
           Combine multiple EMIs into one. Explore lower-rate financing options designed around your profile.
         </p>
 
-        <div className="flex flex-col sm:flex-row items-center gap-4 mb-10">
-          <Link href="#check-eligibility" className="w-full sm:w-auto px-6 py-3.5 bg-blue-energy text-white rounded-xl font-medium hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 group">
+        {/* Stripe-style CTAs */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 mb-8">
+          <Link href="#check-eligibility" className="flex w-full sm:w-auto px-[22px] h-[48px] bg-[#1769D1] text-white rounded-[10px] sm:rounded-full text-[15px] font-semibold hover:bg-[#071B4F] transition-all items-center justify-center gap-2 group shadow-sm">
             Check My Eligibility
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </Link>
-          <Link href="#calculator" className="w-full sm:w-auto px-6 py-3.5 bg-white text-brand-black border border-icy-blue hover:border-slate-300 rounded-xl font-medium hover:bg-slate-50 transition-colors flex items-center justify-center gap-2">
-            <Calculator className="w-4 h-4 text-blue-energy" />
+          <Link href="#calculator" className="flex w-full sm:w-auto px-[22px] h-[48px] bg-white text-brand-black border border-slate-200 rounded-[10px] sm:rounded-full text-[15px] font-semibold hover:bg-slate-50 transition-all items-center justify-center gap-2 group shadow-sm">
+            <Calculator className="w-4 h-4 text-slate-600" />
             See Potential Savings
           </Link>
         </div>
@@ -185,24 +184,24 @@ export function HeroGridBlock() {
 
 export function HeroLogos() {
   return (
-    <div className="w-full bg-white/50 backdrop-blur-sm relative z-20">
-      <div className="max-w-[1220px] mx-auto flex flex-col xl:flex-row xl:items-center py-6 border-t border-x border-slate-300 overflow-hidden">
-
-        <div className="flex-1 flex items-center min-w-0">
+    <div className="w-full bg-white/40 sm:bg-white/90 backdrop-blur-md relative z-20 border-t border-white/20">
+      <div className="max-w-[1220px] mx-auto flex flex-col xl:flex-row xl:items-center py-4 sm:py-6 overflow-hidden">
+        
+        <div className="flex-1 flex items-center min-w-0 logo-strip">
           <div className="flex w-max animate-marquee opacity-100 transition-all duration-500 items-center">
             {[...Array(2)].map((_, i) => (
-              <div key={i} className="flex shrink-0 items-center gap-14 pr-14">
-                <Image src={axisFinanceLogo} alt="Axis Finance" priority className="shrink-0 h-10 w-32 object-contain opacity-80 hover:opacity-100 transition-opacity mix-blend-multiply" />
-                <Image src={idfcLogo} alt="IDFC FIRST Bank" priority className="shrink-0 h-10 w-32 object-contain opacity-80 hover:opacity-100 transition-opacity mix-blend-multiply" />
-                <Image src={bajajFinservLogo} alt="Bajaj Finserv" priority className="shrink-0 h-10 w-32 object-contain opacity-80 hover:opacity-100 transition-opacity mix-blend-multiply" />
-                <Image src={yesBankLogo} alt="YES Bank" priority className="shrink-0 h-10 w-32 object-contain opacity-80 hover:opacity-100 transition-opacity mix-blend-multiply" />
-                <Image src={tataLogo} alt="TATA Capital" priority className="shrink-0 h-10 w-32 object-contain opacity-80 hover:opacity-100 transition-opacity mix-blend-multiply" />
-                <Image src={ltFinanceLogo} alt="L&T Finance" priority className="shrink-0 h-10 w-32 object-contain opacity-80 hover:opacity-100 transition-opacity mix-blend-multiply" />
-                <Image src={creditSaisonLogo} alt="Credit Saison" priority className="shrink-0 h-10 w-32 object-contain opacity-80 hover:opacity-100 transition-opacity mix-blend-multiply" />
-                <Image src={shriramLogo} alt="Shriram" priority className="shrink-0 h-10 w-32 object-contain opacity-80 hover:opacity-100 transition-opacity mix-blend-multiply" />
-                <Image src={smfgLogo} alt="SMFG" priority className="shrink-0 h-10 w-32 object-contain opacity-80 hover:opacity-100 transition-opacity mix-blend-multiply" />
-                <Image src={kotakBankLogo} alt="Kotak Mahindra Bank" priority className="shrink-0 h-10 w-32 object-contain opacity-80 hover:opacity-100 transition-opacity mix-blend-multiply" />
-                <Image src={iciciBankLogo} alt="ICICI Bank" priority className="shrink-0 h-10 w-32 object-contain opacity-80 hover:opacity-100 transition-opacity mix-blend-multiply" />
+              <div key={i} className="flex shrink-0 items-center gap-8 sm:gap-14 pr-8 sm:pr-14">
+                <Image src={axisFinanceLogo} alt="Axis Finance" priority className="shrink-0 h-[25px] sm:h-10 w-auto object-contain opacity-100 mix-blend-multiply" />
+                <Image src={idfcLogo} alt="IDFC FIRST Bank" priority className="shrink-0 h-[25px] sm:h-10 w-auto object-contain opacity-100 mix-blend-multiply" />
+                <Image src={bajajFinservLogo} alt="Bajaj Finserv" priority className="shrink-0 h-[25px] sm:h-10 w-auto object-contain opacity-100 mix-blend-multiply" />
+                <Image src={yesBankLogo} alt="YES Bank" priority className="shrink-0 h-[25px] sm:h-10 w-auto object-contain opacity-100 mix-blend-multiply" />
+                <Image src={tataLogo} alt="TATA Capital" priority className="shrink-0 h-[25px] sm:h-10 w-auto object-contain opacity-100 mix-blend-multiply" />
+                <Image src={ltFinanceLogo} alt="L&T Finance" priority className="shrink-0 h-[25px] sm:h-10 w-auto object-contain opacity-100 mix-blend-multiply" />
+                <Image src={creditSaisonLogo} alt="Credit Saison" priority className="shrink-0 h-[25px] sm:h-10 w-auto object-contain opacity-100 mix-blend-multiply" />
+                <Image src={shriramLogo} alt="Shriram" priority className="shrink-0 h-[25px] sm:h-10 w-auto object-contain opacity-100 mix-blend-multiply" />
+                <Image src={smfgLogo} alt="SMFG" priority className="shrink-0 h-[25px] sm:h-10 w-auto object-contain opacity-100 mix-blend-multiply" />
+                <Image src={kotakBankLogo} alt="Kotak Mahindra Bank" priority className="shrink-0 h-[25px] sm:h-10 w-auto object-contain opacity-100 mix-blend-multiply" />
+                <Image src={iciciBankLogo} alt="ICICI Bank" priority className="shrink-0 h-[25px] sm:h-10 w-auto object-contain opacity-100 mix-blend-multiply" />
               </div>
             ))}
           </div>

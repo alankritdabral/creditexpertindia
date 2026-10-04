@@ -13,12 +13,12 @@ if (typeof window !== "undefined") {
 const INJECTED_STYLES = `
   /* Realistic iPhone Mockup Hardware */
   .iphone-bezel {
-      background-color: #111;
+      background-color: #071B4F;
       box-shadow: 
-          inset 0 0 0 2px #52525B, 
-          inset 0 0 0 7px #000, 
-          0 40px 80px -15px rgba(0,0,0,0.9),
-          0 15px 25px -5px rgba(0,0,0,0.7);
+          inset 0 0 0 2px #123B87, 
+          inset 0 0 0 7px #071B4F, 
+          0 40px 80px -15px rgba(7,27,79,0.5),
+          0 15px 25px -5px rgba(7,27,79,0.4);
       transform-style: preserve-3d;
   }
 
@@ -34,8 +34,8 @@ const INJECTED_STYLES = `
   /* Gradient UI Elements */
   .ambient-gradient {
       background: 
-          radial-gradient(circle at 70% 25%, rgba(91, 73, 220, 0.20), transparent 45%),
-          linear-gradient(180deg, #08152F 0%, #0A1740 55%, #10184A 100%);
+          radial-gradient(circle at 70% 25%, rgba(45, 140, 255, 0.25), transparent 45%),
+          linear-gradient(180deg, #123B87 0%, #0c2b69 55%, #071B4F 100%);
   }
 
   .phone-screen {
@@ -60,27 +60,27 @@ const INJECTED_STYLES = `
   }
 
   .glass-card {
-      background: rgba(255,255,255,0.055);
+      background: rgba(255,255,255,0.06);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255,255,255,0.14);
+      border: 1px solid rgba(255,255,255,0.12);
       border-radius: 24px;
   }
 
   .savings-card {
-      background: linear-gradient(135deg, rgba(25, 215, 190, 0.22), rgba(67, 95, 255, 0.25));
-      border: 1px solid rgba(70, 220, 210, 0.45);
+      background: linear-gradient(135deg, rgba(18,184,120, 0.22), rgba(18,184,120, 0.35));
+      border: 1px solid rgba(18,184,120, 0.45);
       border-radius: 24px;
   }
 
   .glass-arrow {
-      background: rgba(75, 110, 255, 0.22);
-      border: 1px solid rgba(120, 150, 255, 0.35);
+      background: rgba(45,140,255, 0.22);
+      border: 1px solid rgba(45,140,255, 0.35);
   }
   
   .savings-icon-container {
-      background: rgba(65, 220, 190, 0.18);
-      border: 1px solid rgba(100,230,210,0.40);
+      background: rgba(18,184,120, 0.25);
+      border: 1px solid rgba(18,184,120, 0.50);
   }
   
   .hide-scrollbar::-webkit-scrollbar {
@@ -237,9 +237,9 @@ export function AnimatedPhoneMockup({ className }: { className?: string }) {
                   <p ref={currentRef} className="ui-slide-right text-[32px] font-bold text-white leading-none">₹0</p>
                   <p className="ui-fade-up text-[13px] text-white/[0.55] font-normal mt-1">per month</p>
                 </div>
-                <div className="ui-scale-in bg-[rgba(244,92,133,0.12)] border border-[rgba(244,92,133,0.45)] text-[#FF7F9D] px-2.5 py-1.5 rounded-[12px] flex flex-col items-center">
+                <div className="ui-scale-in bg-[rgba(45,140,255,0.15)] border border-[rgba(45,140,255,0.45)] text-[#6bb0ff] px-2.5 py-1.5 rounded-[12px] flex flex-col items-center">
                   <span className="text-[14px] font-semibold leading-none mb-0.5">16.5%</span>
-                  <span className="text-[10px] font-medium leading-none">interest rate</span>
+                  <span className="text-[10px] font-medium leading-none text-[#6bb0ff]">interest rate</span>
                 </div>
               </div>
             </div>
@@ -269,9 +269,9 @@ export function AnimatedPhoneMockup({ className }: { className?: string }) {
                   <p ref={newRef} className="ui-slide-right text-[32px] font-bold text-white leading-none">₹0</p>
                   <p className="ui-fade-up text-[13px] text-white/[0.55] font-normal mt-1">per month</p>
                 </div>
-                <div className="ui-scale-in bg-[rgba(25,210,175,0.10)] border border-[rgba(25,210,175,0.40)] text-[#45E0C1] px-2.5 py-1.5 rounded-[12px] flex flex-col items-center">
+                <div className="ui-scale-in bg-[rgba(18,184,120,0.20)] border border-[rgba(18,184,120,0.50)] text-[#12B878] px-2.5 py-1.5 rounded-[12px] flex flex-col items-center">
                   <span className="text-[14px] font-semibold leading-none mb-0.5">10.99%</span>
-                  <span className="text-[10px] font-medium leading-none">interest rate</span>
+                  <span className="text-[10px] font-medium leading-none text-[#12B878]">interest rate</span>
                 </div>
               </div>
             </div>

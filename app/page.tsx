@@ -15,17 +15,17 @@ const EligibleLoansSlider = dynamic(() => import("@/components/EligibleLoansSlid
 
 export default function Home() {
   return (
-    <div className="w-full pt-[76px]">
+    <div className="w-full">
 
       {/* Row 1: Hero & Visual/Video Block */}
-      <section className="relative w-full bg-white border-t border-b border-slate-300 overflow-hidden">
+      <section className="relative w-full border-t border-b border-slate-300 overflow-hidden pt-[40px] sm:pt-[76px] min-h-[400px] sm:h-auto sm:min-h-0 flex flex-col">
         {/* Background Image */}
-        <div className="absolute inset-0 pointer-events-none">
+        <div className="hero-skyline pointer-events-none">
           <Image
-            src="/hero-bg.png"
+            src="/Misty India Skyline with Orbital Arcs.png"
             alt="Hero Background"
             fill
-            className="object-cover object-center opacity-80"
+            className="object-cover object-bottom sm:object-center opacity-80"
             priority
           />
         </div>
@@ -38,9 +38,11 @@ export default function Home() {
             <HeroVisualBlock />
           </div>
         </div>
-
-        {/* Full width logos */}
-        <HeroLogos />
+        
+        {/* Full width logos - Inside hero section to overlay on the background image */}
+        <div className="relative z-20 mt-auto">
+          <HeroLogos />
+        </div>
       </section>
 
       {/* Row 1.5: Loan Solutions Section (New) */}
