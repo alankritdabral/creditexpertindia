@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import { Eligibility } from "@/components/Eligibility";
 import { WhoWeHelp } from "@/components/WhoWeHelp";
-import { LeadForm } from "@/components/LeadForm";
+import { EligibilityForm } from "@/components/EligibilityForm";
 import { AnimatedMeshBackground } from "@/components/AnimatedMeshBackground";
 
 export const metadata: Metadata = {
@@ -33,7 +33,7 @@ export default function EligibilityPage() {
 
       <Eligibility />
       <WhoWeHelp />
-      <LeadForm />
+      <EligibilityForm />
     </div>
   );
 }
