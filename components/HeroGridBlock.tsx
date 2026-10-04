@@ -132,7 +132,7 @@ export function HeroGridBlock() {
       <div className="w-full max-w-[340px] sm:max-w-3xl">
         {/* Stripe-style Pill */}
         <div className="inline-flex items-center gap-1.5 h-[34px] text-brand-black text-[11px] font-medium mb-5 whitespace-nowrap w-fit">
-          <span className="opacity-80">Interest Saved:</span>
+          <span className="opacity-80">Interest Saved By Customers:</span>
           <span className="text-[#16A34A] font-semibold"><AnimatedCurrency amount={displayAmount} isMounted={isMounted} /></span>
         </div>
 
@@ -186,7 +186,7 @@ export function HeroLogos() {
   return (
     <div className="w-full bg-white/40 sm:bg-white/90 backdrop-blur-md relative z-20 border-t border-white/20">
       <div className="max-w-[1220px] mx-auto flex flex-col xl:flex-row xl:items-center py-4 sm:py-6 overflow-hidden">
-        
+
         <div className="flex-1 flex items-center min-w-0 logo-strip">
           <div className="flex w-max animate-marquee opacity-100 transition-all duration-500 items-center">
             {[...Array(2)].map((_, i) => (
