@@ -4,6 +4,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, Smartphone, CreditCard, Banknote, Landmark, Check } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { AnimatedPhoneMockup } from "./ui/AnimatedPhoneMockup";
 import { AnimatedCreditCard } from "./ui/AnimatedCreditCard";
 
@@ -136,10 +137,10 @@ export const LoanSolutionsSection = () => {
 
             {/* Bottom Section (CTA + Avatars) */}
             <div className="relative z-10 mt-12 flex flex-col xl:flex-row xl:items-center justify-between gap-6">
-              <button className="bg-[#1769D1] hover:bg-[#071B4F] text-white rounded-full py-4 px-8 font-semibold flex items-center justify-center space-x-2 transition-colors w-full xl:w-auto shadow-md">
+              <Link href="#calculator" className="bg-[#1769D1] hover:bg-[#071B4F] text-white rounded-full py-4 px-8 font-semibold flex items-center justify-center space-x-2 transition-colors w-full xl:w-auto shadow-md">
                 <span>Check your EMI options</span>
                 <ArrowRight className="w-4 h-4" />
-              </button>
+              </Link>
 
               <div className="flex items-center space-x-3">
                 <div className="flex -space-x-2">

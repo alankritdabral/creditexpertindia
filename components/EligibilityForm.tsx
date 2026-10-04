@@ -525,7 +525,7 @@ export function EligibilityForm() {
               </div>
             </div>
             <div className="space-y-4">
-              <div className="flex gap-4">
+              <div className="flex flex-col gap-4">
                 <div className="relative flex-1">
                   <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                   <input type="text" placeholder="First Name" value={formData.firstName} onChange={e => setFormData({ ...formData, firstName: e.target.value })} className="w-full bg-white border border-icy-blue rounded-xl pl-11 pr-4 py-3.5 focus:ring-2 focus:ring-blue-energy/30 focus:border-blue-energy outline-none transition-all" />

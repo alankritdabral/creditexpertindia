@@ -28,7 +28,7 @@ export const AnimatedCreditCard = () => {
 
   const cardData = {
     number: '4111 1111 1111 9743',
-    holder: 'John Doe',
+    holder: 'Raj',
     expiry: '12/24',
   };
 

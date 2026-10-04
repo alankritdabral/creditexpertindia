@@ -159,8 +159,8 @@ export function AnimatedPhoneMockup({ className }: { className?: string }) {
           const counters = { current: 0, next: 0, savings: 0 };
           gsap.to(counters, {
             current: 25000,
-            next: 18499,
-            savings: 6501,
+            next: 18075,
+            savings: 6925,
             duration: 1.5,
             ease: "power2.out",
             delay: 0.2,
@@ -270,7 +270,7 @@ export function AnimatedPhoneMockup({ className }: { className?: string }) {
                   <p className="ui-fade-up text-[13px] text-white/[0.55] font-normal mt-1">per month</p>
                 </div>
                 <div className="ui-scale-in bg-[rgba(18,184,120,0.20)] border border-[rgba(18,184,120,0.50)] text-[#12B878] px-2.5 py-1.5 rounded-[12px] flex flex-col items-center">
-                  <span className="text-[14px] font-semibold leading-none mb-0.5">10.99%</span>
+                  <span className="text-[14px] font-semibold leading-none mb-0.5">9.99%</span>
                   <span className="text-[10px] font-medium leading-none text-[#12B878]">interest rate</span>
                 </div>
               </div>
