@@ -1,7 +1,11 @@
 'use client';
-import { Disclosure, Transition } from '@headlessui/react';
-import { ChevronDownIcon } from '@heroicons/react/24/outline';
 import { motion, Variants } from 'framer-motion';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 const faqs = [
   {
@@ -71,43 +75,25 @@ export function FAQ() {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: "-50px" }}
-        className="divide-y divide-slate-100"
       >
-        {faqs.map((faq, index) => (
-          <motion.div variants={itemVariants} key={index}>
-            <Disclosure as="div" className="py-5">
-              {({ open }: { open: boolean }) => (
-                <>
-                  <dt>
-                    <Disclosure.Button className="flex w-full items-center justify-between text-brand-black group">
-                      <div className="flex-1 px-4 text-center">
-                        <span className="text-base font-bold leading-7 group-hover:text-blue-energy transition-colors">{faq.question}</span>
-                      </div>
-                      <span className="flex h-7 items-center shrink-0">
-                        <ChevronDownIcon
-                          className={`${open ? '-rotate-180 text-blue-energy' : 'rotate-0 text-slate-400'} h-5 w-5 transform transition duration-200 ease-in-out`}
-                          aria-hidden="true"
-                        />
-                      </span>
-                    </Disclosure.Button>
-                  </dt>
-                  <Transition
-                    enter="transition duration-100 ease-out"
-                    enterFrom="transform scale-95 opacity-0"
-                    enterTo="transform scale-100 opacity-100"
-                    leave="transition duration-75 ease-out"
-                    leaveFrom="transform scale-100 opacity-100"
-                    leaveTo="transform scale-95 opacity-0"
-                  >
-                    <Disclosure.Panel as="dd" className="mt-4 text-center px-8">
-                      <p className="text-sm leading-relaxed text-brand-black/70 font-medium py-1 max-w-2xl mx-auto bg-slate-50 rounded-lg p-4">{faq.answer}</p>
-                    </Disclosure.Panel>
-                  </Transition>
-                </>
-              )}
-            </Disclosure>
-          </motion.div>
-        ))}
+        <Accordion type="single" collapsible className="w-full divide-y divide-slate-100">
+          {faqs.map((faq, index) => (
+            <motion.div variants={itemVariants} key={index}>
+              <AccordionItem value={`item-${index}`} className="border-b-0 py-2">
+                <AccordionTrigger className="hover:no-underline [&[data-state=open]>span]:text-blue-energy group text-brand-black">
+                  <div className="flex-1 px-4 text-center">
+                    <span className="text-base font-bold leading-7 group-hover:text-blue-energy transition-colors">{faq.question}</span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="mt-2 text-center px-8">
+                  <p className="text-sm leading-relaxed text-brand-black/70 font-medium py-1 max-w-2xl mx-auto bg-slate-50 rounded-lg p-4">
+                    {faq.answer}
+                  </p>
+                </AccordionContent>
+              </AccordionItem>
+            </motion.div>
+          ))}
+        </Accordion>
       </motion.div>
     </div>
   );
