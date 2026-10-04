@@ -37,8 +37,15 @@ export default function ContactPage() {
             <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600">
               <MapPin className="h-5 w-5" />
             </div>
-            <h3 className="mt-3 text-sm font-extrabold text-brand-black">Office Location</h3>
-            <p className="mt-1 text-xs text-brand-black/80 font-medium">{contact.address}</p>
+            <h3 className="mt-3 text-sm font-extrabold text-brand-black">Office Locations</h3>
+            <div className="mt-1 flex flex-col gap-3">
+              {contact.addresses.map((addr, idx) => (
+                <p key={idx} className="text-xs text-brand-black/80 font-medium">
+                  <strong className="text-brand-black block mb-1">{addr.city} Office:</strong>
+                  {addr.fullAddress}
+                </p>
+              ))}
+            </div>
           </div>
 
           <div className="rounded-2xl bg-slate-50 p-6 border border-icy-blue">

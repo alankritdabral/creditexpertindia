@@ -107,11 +107,13 @@ export function Footer() {
           <div>
             <h3 className="text-[16px] font-bold text-brand-black mb-6">Contact Details</h3>
             <ul role="list" className="space-y-4">
-              <li>
-                <span className="text-[15px] leading-relaxed text-brand-black/70 font-medium block">
-                  {contact.address}
-                </span>
-              </li>
+              {contact.addresses.map((addr, idx) => (
+                <li key={idx}>
+                  <span className="text-[15px] leading-relaxed text-brand-black/70 font-medium block">
+                    <strong className="text-brand-black">{addr.city}:</strong> {addr.fullAddress}
+                  </span>
+                </li>
+              ))}
               <li>
                 <a href={`mailto:${contact.email}`} className="text-[15px] text-brand-black/70 hover:text-brand-black transition-colors font-medium">
                   {contact.email}

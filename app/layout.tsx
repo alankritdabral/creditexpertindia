@@ -41,8 +41,31 @@ export const metadata: Metadata = {
     url: siteConfig.url,
     siteName: siteConfig.name,
     type: "website",
+    locale: "en_IN",
   },
-  robots: { index: true, follow: true },
+  twitter: {
+    card: "summary_large_image",
+    title: `${siteConfig.name} — Debt Consolidation & Personal Loans`,
+    description: "Explore debt consolidation, balance transfer and personal loans through our lending network. Check your options.",
+  },
+  icons: {
+    icon: [
+      { url: "/favicon.ico", type: "image/x-icon", sizes: "any" },
+      { url: "/favicon.ico", type: "image/x-icon", sizes: "48x48" },
+    ],
+    shortcut: "/favicon.ico",
+    apple: "/favicon.ico",
+  },
+  robots: { 
+    index: true, 
+    follow: true, 
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
   alternates: { canonical: "/" },
   formatDetection: {
     telephone: false,

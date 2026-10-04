@@ -11,7 +11,16 @@ export const claims = {
 export const contact = {
   whatsapp: "+91-9761471212",
   email: "akash.tyagi@creditexpertindia.com",
-  address: "2nd floor, Jumpstart Haridwar Bypass Rd, opp. Nilaya Hills, Saraswati Vihar, Ajabpur Kalan, Dehradun, Uttarakhand 248001",
+  addresses: [
+    {
+      city: "Dehradun",
+      fullAddress: "2nd floor, Jumpstart Haridwar Bypass Rd, opp. Nilaya Hills, Saraswati Vihar, Ajabpur Kalan, Dehradun, Uttarakhand 248001"
+    },
+    {
+      city: "Delhi",
+      fullAddress: "3rd floor 1/560A main GT road shahdra near jindal oil mills mansarovar park shahdara delhi-110032"
+    }
+  ],
   legalName: "Credit Expert India",
 } as const;
 
