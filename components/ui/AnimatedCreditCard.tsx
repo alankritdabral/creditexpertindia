@@ -20,8 +20,8 @@ const springTransition = {
 };
 
 export const AnimatedCreditCard = () => {
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
+  const x = useMotionValue(-50);
+  const y = useMotionValue(-50);
 
   const rotateX = useTransform(y, [-50, 50], [ROTATION_RANGE, -ROTATION_RANGE]);
   const rotateY = useTransform(x, [-50, 50], [-ROTATION_RANGE, ROTATION_RANGE]);
@@ -55,8 +55,8 @@ export const AnimatedCreditCard = () => {
   };
 
   const handleLeave = () => {
-    x.set(0);
-    y.set(0);
+    x.set(-50);
+    y.set(-50);
   };
 
   return (

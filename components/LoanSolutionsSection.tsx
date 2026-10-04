@@ -85,10 +85,10 @@ export const LoanSolutionsSection = () => {
       <div className="relative z-10 max-w-[1220px] mx-auto px-4 md:px-6 lg:px-8">
 
         {/* Section Heading */}
-        <div className="flex flex-col items-center text-center py-16">
-          <p className="text-sm font-bold tracking-wider text-[#1769D1] uppercase mb-4">
+        <div className="flex flex-col items-center text-center pt-12 pb-6 md:py-16">
+          <h2 className="text-[22px] font-bold tracking-wider text-[#1769D1] uppercase mb-0 md:mb-4">
             Bring Your Eligible Loans Together
-          </p>
+          </h2>
           <h2 className="hidden md:block section-title mx-auto text-[#071B4F] mb-4 max-w-2xl font-semibold">
             One simpler way to manage multiple<br />
             <span className="text-[#1769D1]">debts.</span>
@@ -103,7 +103,7 @@ export const LoanSolutionsSection = () => {
 
           {/* 1. Personal Loan (Spans 2 rows) */}
           <AnimatedCard
-            className="lg:row-span-2 min-h-[700px]"
+            className="lg:row-span-2 min-h-[500px] md:min-h-[600px] lg:min-h-[700px]"
             bgImage="'/personal_loann.png'"
             bgStyle="rgba(255,255,255,0.68)"
           >
@@ -118,14 +118,14 @@ export const LoanSolutionsSection = () => {
               </div>
             </div>
 
-            <h2 className="relative z-10 text-4xl lg:text-[2.75rem] font-bold text-[#071B4F] mb-6 leading-[1.1] tracking-tight">
-              Make your monthly <br /> repayments more <br />
+            <h2 className="relative z-10 text-3xl sm:text-4xl lg:text-[2.75rem] font-bold text-[#071B4F] mb-6 leading-[1.2] lg:leading-[1.1] tracking-tight">
+              Make your monthly <br className="hidden sm:block" /> repayments more <br className="hidden sm:block" />
               <span className="text-[#1769D1]">manageable.</span>
             </h2>
 
             <div className="relative z-10 pl-5 mb-10 quote-line">
               <p className="text-[#09244D] opacity-80 italic text-lg">
-                "We wanted to focus on her wedding,<br />not another financial burden."
+                Get a better rate and a more manageable EMI, without the complexity.
               </p>
             </div>
 
@@ -164,7 +164,7 @@ export const LoanSolutionsSection = () => {
 
           {/* 2. Credit Card */}
           <AnimatedCard
-            className="min-h-[560px]"
+            className="min-h-[510px] lg:min-h-[640px]"
             bgImage="'/Credit_card.png'"
             bgStyle="radial-gradient(circle at 70% 75%, rgba(70,150,255,.25), transparent 45%), linear-gradient(145deg, rgba(255,255,255,.9), rgba(220,238,255,.72))"
             delay={0.1}
@@ -183,19 +183,19 @@ export const LoanSolutionsSection = () => {
             </div>
 
             {/* Headline */}
-            <h3 className="relative z-[5] text-[28px] md:text-[34px] font-semibold text-[#071B4F] leading-[1.1] md:leading-[1.08] tracking-[-0.03em] mb-5">
-              Reduce the burden of<br />expensive credit-card<br />debt.
+            <h3 className="relative z-[5] text-[24px] sm:text-[28px] md:text-[34px] font-semibold text-[#071B4F] leading-[1.2] md:leading-[1.08] tracking-[-0.03em] mb-5">
+              Reduce the burden of<br className="hidden sm:block" /> expensive credit-card<br className="hidden sm:block" /> debt.
             </h3>
 
             {/* Quote */}
-            <div className="relative z-[5] border-l-[2px] border-[#2D8CFF] pl-4 mt-5 md:mt-6 mb-[120px] max-w-[280px]">
+            <div className="relative z-[5] border-l-[2px] border-[#2D8CFF] pl-4 mt-1 md:mt-6 mb-[120px] max-w-[280px]">
               <p className="text-[16px] md:text-[18px] text-[#09244D] opacity-80 italic leading-[1.5]">
-                "I was paying nearly 45%<br />interest on my credit..."
+                Take control of high-interest credit-card debt.
               </p>
             </div>
 
             {/* Three.js credit card */}
-            <div className="absolute z-[3] -right-[8%] md:-right-[5%] bottom-[70px] md:bottom-[60px] w-[85%] md:w-[78%] pointer-events-auto origin-bottom-right rotate-[-10deg]">
+            <div className="absolute z-[3] -right-[8%] md:-right-[5%] bottom-[20px] md:bottom-[20px] w-[85%] md:w-[78%] pointer-events-auto origin-bottom-right rotate-[-15deg]">
               <AnimatedCreditCard />
             </div>
 
@@ -217,7 +217,7 @@ export const LoanSolutionsSection = () => {
 
           {/* 3. App Loans */}
           <AnimatedCard
-            className="min-h-[592px]"
+            className="min-h-[480px] lg:min-h-[592px]"
             bgImage="'/app_loans.png'"
             bgStyle="radial-gradient(circle at 80% 80%, rgba(18,184,120,.12), transparent 35%), linear-gradient(145deg, #ffffff, #e9f5ff)"
             delay={0.2}
@@ -236,8 +236,8 @@ export const LoanSolutionsSection = () => {
             </div>
 
             {/* Heading */}
-            <h3 className="relative z-[5] max-w-[325px] text-[28px] md:text-[32px] leading-[1.1] font-semibold tracking-[-0.03em] text-[#071B4F]">
-              Bring scattered app<br />loans into a clearer plan.
+            <h3 className="relative z-[5] max-w-[325px] text-[24px] sm:text-[28px] md:text-[32px] leading-[1.2] md:leading-[1.1] font-semibold tracking-[-0.03em] text-[#071B4F]">
+              Bring scattered app<br className="hidden sm:block" />loans into a clearer plan.
             </h3>
 
             {/* Quote */}
@@ -263,7 +263,7 @@ export const LoanSolutionsSection = () => {
               </svg>
 
               {/* Loans List */}
-              <div className="absolute left-6 top-0 flex flex-col gap-2 z-[5]">
+              <div className="absolute left-1 sm:left-6 top-0 flex flex-col gap-2 z-[5] scale-[0.8] sm:scale-100 origin-top-left">
                 {[
                   { amount: '₹8,000', name: 'KreditBee', img: '/kreditbee.webp' },
                   { amount: '₹5,500', name: 'LazyPay', img: '/lazypay.webp' },
@@ -298,7 +298,7 @@ export const LoanSolutionsSection = () => {
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: 0.4 }}
-                className="absolute right-6 top-[79px] w-[120px] h-[118px] rounded-xl flex flex-col items-center justify-center text-white shadow-lg z-[6]"
+                className="absolute right-1 sm:right-6 top-[79px] w-[120px] h-[118px] rounded-xl flex flex-col items-center justify-center text-white shadow-lg z-[6] scale-[0.8] sm:scale-100 origin-top-right"
                 style={{
                   background: 'linear-gradient(135deg, #123E8A 0%, #1769D1 100%)'
                 }}
@@ -312,7 +312,7 @@ export const LoanSolutionsSection = () => {
 
           {/* 4. Multiple Loans */}
           <AnimatedCard
-            className="min-h-[512px]"
+            className="min-h-[450px] lg:min-h-[512px]"
             bgImage="'/multiple_loans.png'"
             bgStyle="radial-gradient(circle at 100% 100%, rgba(45,140,255,0.08), transparent 38%), linear-gradient(145deg, rgba(255,255,255,0.7) 0%, rgba(220,238,255,0.4) 100%)"
             delay={0.1}
@@ -334,8 +334,8 @@ export const LoanSolutionsSection = () => {
             </div>
 
             {/* Headline */}
-            <h3 className="relative z-[5] max-w-[280px] text-[28px] md:text-[32px] leading-[1.1] font-semibold tracking-[-0.03em] text-[#071B4F]">
-              Replace multiple<br />payments with one<br />simpler repayment.
+            <h3 className="relative z-[5] max-w-[280px] text-[24px] sm:text-[28px] md:text-[32px] leading-[1.2] md:leading-[1.1] font-semibold tracking-[-0.03em] text-[#071B4F]">
+              Replace multiple<br className="hidden sm:block" />payments with one<br className="hidden sm:block" />simpler repayment.
             </h3>
 
             {/* Quote */}
@@ -361,7 +361,7 @@ export const LoanSolutionsSection = () => {
               </svg>
 
               {/* Loans List */}
-              <div className="absolute left-6 top-0 flex flex-col gap-1.5 z-[5]">
+              <div className="absolute left-1 sm:left-6 top-0 flex flex-col gap-1.5 z-[5] scale-[0.8] sm:scale-100 origin-top-left">
                 {[
                   { amount: '₹12,500', name: 'Personal Loan', icon: Banknote },
                   { amount: '₹8,300', name: 'Credit Card', icon: CreditCard },
@@ -396,7 +396,7 @@ export const LoanSolutionsSection = () => {
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: 0.4 }}
-                className="absolute right-6 top-[50px] w-[116px] h-[110px] rounded-xl flex flex-col items-center justify-center text-white shadow-lg z-[6]"
+                className="absolute right-1 sm:right-6 top-[50px] w-[116px] h-[110px] rounded-xl flex flex-col items-center justify-center text-white shadow-lg z-[6] scale-[0.8] sm:scale-100 origin-top-right"
                 style={{
                   background: 'linear-gradient(135deg, #123E8A 0%, #1769D1 100%)'
                 }}
@@ -424,7 +424,7 @@ export const LoanSolutionsSection = () => {
               </div>
             </div>
 
-            <h3 className="text-[28px] md:text-[32px] leading-[1.1] font-semibold tracking-[-0.03em] text-[#071B4F] mb-6">
+            <h3 className="text-[24px] sm:text-[28px] md:text-[32px] leading-[1.2] md:leading-[1.1] font-semibold tracking-[-0.03em] text-[#071B4F] mb-6">
               Explore options for expensive overdraft debt.
             </h3>
 
