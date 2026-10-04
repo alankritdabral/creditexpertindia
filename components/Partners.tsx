@@ -1,8 +1,7 @@
 'use client';
 import React from 'react';
 import Image from 'next/image';
-import { motion } from 'framer-motion';
-
+import Marquee from 'react-fast-marquee';
 import hdfcLogo from '@/public/logos/hdfc.png';
 import iciciLogo from '@/public/logos/icici.png';
 import axisLogo from '@/public/logos/axis.png';
@@ -33,14 +32,10 @@ export function Partners() {
         
         {/* Banking Partners Slider (Stripe style top logo cloud) */}
         <div className="mb-20">
-          <div className="relative flex overflow-hidden w-full transition-all duration-500 [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
-            <motion.div 
-              className="flex items-center gap-16 md:gap-24 whitespace-nowrap w-max py-4"
-              animate={{ x: ["0%", "-50%"] }}
-              transition={{ ease: "linear", duration: 40, repeat: Infinity }}
-            >
-              {duplicatedBanks.map((bank, i) => (
-                <div key={i} className="flex items-center gap-3 transition-all duration-300">
+          <div className="relative w-full [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)] py-4">
+            <Marquee speed={40} gradient={false} pauseOnHover={true}>
+              {banks.map((bank, i) => (
+                <div key={i} className="flex items-center gap-3 mx-8 md:mx-12 transition-all duration-300">
                   <Image
                     src={bank.logo}
                     alt={bank.name}
@@ -54,7 +49,7 @@ export function Partners() {
                   <span className="text-xl font-bold text-slate-800 tracking-tight">{bank.name}</span>
                 </div>
               ))}
-            </motion.div>
+            </Marquee>
           </div>
         </div>
 
