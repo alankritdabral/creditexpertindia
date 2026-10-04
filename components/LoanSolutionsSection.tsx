@@ -217,7 +217,7 @@ export const LoanSolutionsSection = () => {
 
           {/* 3. App Loans */}
           <AnimatedCard
-            className="min-h-[480px] lg:min-h-[592px]"
+            className="min-h-[520px] lg:min-h-[592px]"
             bgImage="'/app_loans.png'"
             bgStyle="radial-gradient(circle at 80% 80%, rgba(18,184,120,.12), transparent 35%), linear-gradient(145deg, #ffffff, #e9f5ff)"
             delay={0.2}
@@ -237,18 +237,18 @@ export const LoanSolutionsSection = () => {
 
             {/* Heading */}
             <h3 className="relative z-[5] max-w-[325px] text-[24px] sm:text-[28px] md:text-[32px] leading-[1.2] md:leading-[1.1] font-semibold tracking-[-0.03em] text-[#071B4F]">
-              Bring scattered app<br className="hidden sm:block" />loans into a clearer plan.
+              Bring scattered app <br className="hidden sm:block" />loans into a clearer plan.
             </h3>
 
             {/* Quote */}
             <div className="relative z-[5] mt-6 pl-4 border-l-[2px] border-[#2D8CFF] max-w-[315px]">
               <p className="text-[#09244D] opacity-80 text-[16px] md:text-[18px] leading-[1.5] italic">
-                "One small loan became<br />several. I couldn't keep track..."
+                Simplify multiple app loans into one manageable payment
               </p>
             </div>
 
             {/* Visualization */}
-            <div className="absolute left-0 right-0 bottom-0 h-[270px] z-[4] pointer-events-none">
+            <div className="absolute left-1/2 -translate-x-1/2 bottom-0 w-[394px] h-[270px] z-[4] pointer-events-none scale-[0.9] sm:scale-[0.95] md:scale-100 origin-bottom">
 
               {/* Connectors */}
               <svg
@@ -263,7 +263,7 @@ export const LoanSolutionsSection = () => {
               </svg>
 
               {/* Loans List */}
-              <div className="absolute left-1 sm:left-6 top-0 flex flex-col gap-2 z-[5] scale-[0.8] sm:scale-100 origin-top-left">
+              <div className="absolute left-6 top-0 flex flex-col gap-2 z-[5]">
                 {[
                   { amount: '₹8,000', name: 'KreditBee', img: '/kreditbee.webp' },
                   { amount: '₹5,500', name: 'LazyPay', img: '/lazypay.webp' },
@@ -298,7 +298,7 @@ export const LoanSolutionsSection = () => {
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: 0.4 }}
-                className="absolute right-1 sm:right-6 top-[79px] w-[120px] h-[118px] rounded-xl flex flex-col items-center justify-center text-white shadow-lg z-[6] scale-[0.8] sm:scale-100 origin-top-right"
+                className="absolute right-6 top-[79px] w-[120px] h-[118px] rounded-xl flex flex-col items-center justify-center text-white shadow-lg z-[6]"
                 style={{
                   background: 'linear-gradient(135deg, #123E8A 0%, #1769D1 100%)'
                 }}
@@ -312,7 +312,7 @@ export const LoanSolutionsSection = () => {
 
           {/* 4. Multiple Loans */}
           <AnimatedCard
-            className="min-h-[450px] lg:min-h-[512px]"
+            className="min-h-[480px] lg:min-h-[512px]"
             bgImage="'/multiple_loans.png'"
             bgStyle="radial-gradient(circle at 100% 100%, rgba(45,140,255,0.08), transparent 38%), linear-gradient(145deg, rgba(255,255,255,0.7) 0%, rgba(220,238,255,0.4) 100%)"
             delay={0.1}
@@ -335,7 +335,7 @@ export const LoanSolutionsSection = () => {
 
             {/* Headline */}
             <h3 className="relative z-[5] max-w-[280px] text-[24px] sm:text-[28px] md:text-[32px] leading-[1.2] md:leading-[1.1] font-semibold tracking-[-0.03em] text-[#071B4F]">
-              Replace multiple<br className="hidden sm:block" />payments with one<br className="hidden sm:block" />simpler repayment.
+              Replace multiple <br className="hidden sm:block" />payments with one <br className="hidden sm:block" />simpler repayment.
             </h3>
 
             {/* Quote */}
@@ -346,7 +346,7 @@ export const LoanSolutionsSection = () => {
             </div>
 
             {/* Visualization */}
-            <div className="absolute left-0 right-0 bottom-0 h-[250px] z-[4] pointer-events-none">
+            <div className="absolute left-1/2 -translate-x-1/2 bottom-[10px] md:bottom-0 w-[364px] h-[250px] z-[4] pointer-events-none scale-[0.9] sm:scale-[0.95] md:scale-100 origin-bottom">
 
               {/* Connectors */}
               <svg
@@ -361,7 +361,7 @@ export const LoanSolutionsSection = () => {
               </svg>
 
               {/* Loans List */}
-              <div className="absolute left-1 sm:left-6 top-0 flex flex-col gap-1.5 z-[5] scale-[0.8] sm:scale-100 origin-top-left">
+              <div className="absolute left-6 top-0 flex flex-col gap-1.5 z-[5]">
                 {[
                   { amount: '₹12,500', name: 'Personal Loan', icon: Banknote },
                   { amount: '₹8,300', name: 'Credit Card', icon: CreditCard },
@@ -396,7 +396,7 @@ export const LoanSolutionsSection = () => {
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: 0.4 }}
-                className="absolute right-1 sm:right-6 top-[50px] w-[116px] h-[110px] rounded-xl flex flex-col items-center justify-center text-white shadow-lg z-[6] scale-[0.8] sm:scale-100 origin-top-right"
+                className="absolute right-6 top-[50px] w-[116px] h-[110px] rounded-xl flex flex-col items-center justify-center text-white shadow-lg z-[6]"
                 style={{
                   background: 'linear-gradient(135deg, #123E8A 0%, #1769D1 100%)'
                 }}
