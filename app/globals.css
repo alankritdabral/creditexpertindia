@@ -7,24 +7,82 @@
   --blue-energy: #3f8efc;
   --black: #000001;
   --white: #ffffff;
-  --savings-green: #00D924;
-  --warning-red: #DF1B41;
+  --surface-alternate: #f6f9fc;
+  --surface-tint: #e5edf5;
+  --ink-deep: #0a2540;
+  --ink-secondary: #061b31;
+  --body-slate: #3c4f69;
+  --muted-slate: #64748d;
+
+  /* Brand / Action Colors */
+  --primary-brand: #533afd;
+  --primary-strong: #635bff;
+  --primary-hover: #4434d4;
+  --secondary-border: #b9b9f9;
+
+  /* Accent / Status Colors */
+  --success-green: #15be53;
+  --warning-lemon: #9b6829;
+  --error-ruby: #df1b41;
+  --magenta-midpoint: #f96bee;
   
-  --card-shadow: 0 2px 5px -1px rgba(50, 50, 93, 0.25), 0 1px 3px -1px rgba(0, 0, 0, 0.3);
-  --card-shadow-hover: 0 13px 27px -5px rgba(50, 50, 93, 0.25), 0 8px 16px -8px rgba(0, 0, 0, 0.3);
+  /* Shadows */
+  --shadow-level-1: rgba(23,23,23,0.06) 0px 3px 6px;
+  --shadow-level-2: rgba(50,50,93,0.25) 0 13px 27px -5px, rgba(0,0,0,0.3) 0 8px 16px -8px;
+  --shadow-level-3: rgba(50,50,93,0.25) 0 30px 60px -12px, rgba(0,0,0,0.3) 0 18px 36px -18px;
+  --shadow-level-4: rgba(3,3,39,0.25) 0 14px 21px -14px, rgba(0,0,0,0.1) 0 8px 17px -8px;
 }
 
 @theme inline {
-  --color-icy-blue: var(--icy-blue);
-  --color-navy-electric: var(--navy-electric);
-  --color-baby-blue-ice: var(--baby-blue-ice);
-  --color-blue-energy: var(--blue-energy);
-  --color-brand-black: var(--black);
+  --color-white: var(--white);
+  --color-surface-alt: var(--surface-alternate);
+  --color-surface-tint: var(--surface-tint);
+  --color-brand-black: var(--ink-deep); /* Re-mapping legacy brand-black to ink-deep */
+  --color-ink-secondary: var(--ink-secondary);
+  --color-slate-body: var(--body-slate);
+  --color-slate-muted: var(--muted-slate);
   
-  --color-emerald-500: var(--savings-green);
-  --color-red-500: var(--warning-red);
+  --color-icy-blue: var(--surface-tint); /* Mapped for grid lines */
   
-  --font-sans: var(--font-manrope), var(--font-inter), "SF Pro Display", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --color-blue-energy: var(--primary-brand); /* Re-mapping legacy blue-energy */
+  --color-primary-brand: var(--primary-brand);
+  --color-primary-strong: var(--primary-strong);
+  --color-primary-hover: var(--primary-hover);
+  --color-secondary-border: var(--secondary-border);
+
+  --color-emerald-500: var(--success-green);
+  --color-red-500: var(--error-ruby);
+  
+  --shadow-ambient: var(--shadow-level-1);
+  --shadow-standard: var(--shadow-level-2);
+  --shadow-elevated: var(--shadow-level-3);
+  --shadow-deep: var(--shadow-level-4);
+  
+  /* Force standard spacing variables if specific values are missing */
+  --spacing-section: 76px;
+  
+  /* Map standard tailwind shadows to Stripe chromatic shadows globally */
+  --shadow-sm: var(--shadow-level-1);
+  --shadow-md: var(--shadow-level-1);
+  --shadow-lg: var(--shadow-level-2);
+  --shadow-xl: var(--shadow-level-3);
+  --shadow-2xl: var(--shadow-level-4);
+
+  /* Force font weights down to match Stripe's lightweight editorial aesthetic globally */
+  --font-weight-bold: 500;
+  --font-weight-extrabold: 500;
+  --font-weight-black: 500;
+
+  /* Force hardcoded legacy colors in components to map to Stripe CIELAB colors globally */
+  --color-slate-900: var(--ink-deep);
+  --color-slate-800: var(--ink-secondary);
+  --color-blue-500: var(--primary-strong);
+  --color-blue-600: var(--primary-brand);
+  --color-blue-700: var(--primary-hover);
+  --color-indigo-600: var(--primary-brand);
+  --color-indigo-700: var(--primary-hover);
+  
+  --font-sans: var(--font-inter), var(--font-manrope), "SF Pro Display", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-mono: var(--font-geist-mono);
 }
 
@@ -246,5 +304,82 @@ input[type="range"]::-webkit-slider-runnable-track {
 
 .animate-fade-in-up {
   animation: fadeInUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ── Stripe India Style Typography System ── */
+.hero-title {
+  font-family: var(--font-inter), sans-serif;
+  font-size: clamp(36px, 6vw, 48px);
+  font-weight: 400;
+  line-height: 0.98;
+  letter-spacing: -0.045em;
+  max-width: 900px;
+}
+
+.hero-description {
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+  max-width: 620px;
+}
+
+.section-title {
+  font-family: var(--font-inter), sans-serif;
+  font-size: clamp(28px, 4vw, 42px);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+  max-width: 700px;
+}
+
+.loan-card-title {
+  font-family: var(--font-inter), sans-serif;
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+}
+
+.loan-card-description {
+  font-family: var(--font-inter), sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: -0.005em;
+}
+
+.nav-link {
+  font-family: var(--font-inter), sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+.nav-button {
+  font-family: var(--font-inter), sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+@media (max-width: 639px) {
+  .hero-skyline {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 55%;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.15) 20%, rgba(0,0,0,0.65) 55%, black 100%);
+    mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.15) 20%, rgba(0,0,0,0.65) 55%, black 100%);
+  }
+}
+
+@media (min-width: 640px) {
+  .hero-skyline {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
 }
 

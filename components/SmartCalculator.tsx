@@ -50,7 +50,7 @@ export function SmartCalculator() {
   return (
     <div id="calculator" className="w-full h-full flex flex-col justify-between">
       <div className="mb-10">
-        <h2 className="text-3xl md:text-4xl font-extrabold text-brand-black tracking-tight mb-4">Calculate Potential Savings</h2>
+        <h2 className="section-title mx-auto text-brand-black mb-4">Calculate Potential Savings</h2>
         <p className="text-lg text-brand-black/70 max-w-2xl">
           See how much you could potentially save by consolidating your loans at a lower interest rate.
         </p>
