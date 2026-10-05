@@ -25,14 +25,14 @@ export function LoanNotificationManager({ onActiveCityChange, onHighlightCityCha
         onActiveCityChange(currentCity);
         if (onHighlightCityChange) onHighlightCityChange(currentCity);
         
-        await new Promise(r => setTimeout(r, 2500)); // Visible duration for highlight
+        await new Promise(r => setTimeout(r, 3000)); // Visible duration for highlight
         
         if (!isMounted) break;
 
         // Turn off highlight slightly before notification disappears
         if (onHighlightCityChange) onHighlightCityChange(null);
 
-        await new Promise(r => setTimeout(r, 500)); // Total ~3s visibility
+        await new Promise(r => setTimeout(r, 500)); // Notification visible without highlight
         
         if (!isMounted) break;
 
@@ -40,7 +40,7 @@ export function LoanNotificationManager({ onActiveCityChange, onHighlightCityCha
         setIsVisible(false);
         onActiveCityChange(null);
 
-        await new Promise(r => setTimeout(r, 1000)); // Gap before next state
+        await new Promise(r => setTimeout(r, 3500)); // Gap before next state
 
         if (!isMounted) break;
 

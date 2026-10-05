@@ -25,6 +25,7 @@ export default function Home() {
             src="/Misty India Skyline with Orbital Arcs.png"
             alt="Hero Background"
             fill
+            sizes="100vw"
             className="object-cover object-bottom sm:object-center opacity-80"
             priority
           />

@@ -2,8 +2,10 @@
 
 import React, { useState } from 'react';
 import { useReducedMotion } from 'framer-motion';
-import { IndiaMapScene } from './IndiaMapScene';
+import dynamic from 'next/dynamic';
 import { LoanNotificationManager } from './LoanNotificationManager';
+
+const IndiaMapScene = dynamic(() => import('./IndiaMapScene').then(mod => mod.IndiaMapScene), { ssr: false });
 
 export function HeroVisualBlock() {
   const [activeCity, setActiveCity] = useState<string | null>(null);

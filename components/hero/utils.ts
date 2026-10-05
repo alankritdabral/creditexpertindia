@@ -35,14 +35,16 @@ export const connections = [
 ];
 
 export const transactions = [
-  { city: "Tamil Nadu", amount: "₹4,10,000", time: "9m ago", status: "Loan Disbursed" },
-  { city: "Maharashtra", amount: "₹7,50,000", time: "12m ago", status: "Loan Disbursed" },
-  { city: "Karnataka", amount: "₹5,25,000", time: "16m ago", status: "Loan Disbursed" },
-  { city: "Delhi", amount: "₹3,80,000", time: "21m ago", status: "Loan Disbursed" },
-  { city: "West Bengal", amount: "₹2,10,000", time: "25m ago", status: "Loan Disbursed" },
-  { city: "Gujarat", amount: "₹6,40,000", time: "28m ago", status: "Loan Disbursed" },
-  { city: "Uttar Pradesh", amount: "₹8,90,000", time: "32m ago", status: "Loan Disbursed" },
-  { city: "Assam", amount: "₹1,75,000", time: "38m ago", status: "Loan Disbursed" },
-  { city: "Rajasthan", amount: "₹5,60,000", time: "42m ago", status: "Loan Disbursed" },
-  { city: "Bihar", amount: "₹3,20,000", time: "45m ago", status: "Loan Disbursed" }
+  { city: "Tamil Nadu", title: "Home Loan", amount: "₹18,50,000", time: "Just now", status: "Approved", type: "home" },
+  { city: "Maharashtra", title: "3 Loans Merged", amount: "₹42,300 → ₹31,850 EMI", time: "2m ago", status: "Consolidated", type: "merge" },
+  { city: "Karnataka", title: "EMI Reduced", amount: "₹28,500 → ₹21,200", time: "4m ago", status: "Refinanced", type: "reduce" },
+  { city: "Delhi", title: "Credit Card Debt", amount: "₹2,45,000 consolidated", time: "8m ago", status: "Cleared", type: "card" },
+  { city: "West Bengal", title: "Interest Rate Reduced", amount: "16.5% → 10.99%", time: "11m ago", status: "Updated", type: "percent" },
+  { city: "Gujarat", title: "Loan Transfer", amount: "₹9,50,000", time: "14m ago", status: "Transferred", type: "transfer" },
+  { city: "Uttar Pradesh", title: "Overdraft Refinanced", amount: "₹6,80,000", time: "17m ago", status: "Refinanced", type: "bank" },
+  { city: "Assam", title: "Interest Saved", amount: "₹3,84,600", time: "22m ago", status: "Saved", type: "save" },
+  { city: "Rajasthan", title: "App Loans Combined", amount: "4 loans → 1 EMI", time: "27m ago", status: "Merged", type: "app" },
+  { city: "Bihar", title: "Debt Consolidated", amount: "₹11,25,000", time: "32m ago", status: "Approved", type: "merge" },
+  { city: "Tamil Nadu", title: "Personal Loan", amount: "₹4,72,800", time: "36m ago", status: "Disbursed", type: "home" },
+  { city: "Maharashtra", title: "EMI Reduced", amount: "₹18,750 → ₹13,420", time: "41m ago", status: "Refinanced", type: "reduce" }
 ];

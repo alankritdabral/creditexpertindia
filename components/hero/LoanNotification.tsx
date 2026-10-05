@@ -1,12 +1,27 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Building, ChevronRight } from 'lucide-react';
+import { Building, Home, GitMerge, TrendingDown, CreditCard, Percent, ArrowRightLeft, Landmark, PiggyBank, Smartphone, ChevronRight } from 'lucide-react';
+
+const typeConfig = {
+  home: { icon: Home, color: "from-blue-800 to-blue-500", shadow: "rgba(59,130,246,0.4)" },
+  merge: { icon: GitMerge, color: "from-purple-800 to-purple-500", shadow: "rgba(168,85,247,0.4)" },
+  reduce: { icon: TrendingDown, color: "from-green-800 to-green-500", shadow: "rgba(34,197,94,0.4)" },
+  card: { icon: CreditCard, color: "from-orange-800 to-orange-500", shadow: "rgba(249,115,22,0.4)" },
+  percent: { icon: Percent, color: "from-teal-800 to-teal-500", shadow: "rgba(20,184,166,0.4)" },
+  transfer: { icon: ArrowRightLeft, color: "from-indigo-800 to-indigo-500", shadow: "rgba(99,102,241,0.4)" },
+  bank: { icon: Landmark, color: "from-rose-800 to-rose-500", shadow: "rgba(244,63,94,0.4)" },
+  save: { icon: PiggyBank, color: "from-emerald-800 to-emerald-500", shadow: "rgba(16,185,129,0.4)" },
+  app: { icon: Smartphone, color: "from-cyan-800 to-cyan-500", shadow: "rgba(6,182,212,0.4)" },
+  default: { icon: Building, color: "from-[#1E3A8A] to-[#3B82F6]", shadow: "rgba(59,130,246,0.4)" }
+};
 
 export interface Transaction {
   city: string;
+  title?: string;
   amount: string;
   time: string;
   status?: string;
+  type?: keyof typeof typeConfig;
 }
 
 interface LoanNotificationProps {
@@ -25,6 +40,9 @@ export function LoanNotification({ transaction, align = 'right', vAlign = 'top' 
   const isUP = transaction.city === "Uttar Pradesh";
   const scaleTarget = isUP ? 0.85 : 1;
   const scaleInitial = isUP ? 0.80 : 0.95;
+
+  const config = transaction.type ? typeConfig[transaction.type] : typeConfig.default;
+  const Icon = config.icon;
 
   let d = "";
   if (isTop) {
@@ -55,7 +73,7 @@ export function LoanNotification({ transaction, align = 'right', vAlign = 'top' 
         initial={{ opacity: 0, scale: 0, x: "-50%", y: "-50%" }}
         animate={{ opacity: 1, scale: 1, x: "-50%", y: "-50%" }}
         exit={{ opacity: 0, scale: 0, x: "-50%", y: "-50%" }}
-        transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
         className="absolute flex items-center justify-center"
         style={{ left: 0, top: 0 }}
       >
@@ -83,7 +101,7 @@ export function LoanNotification({ transaction, align = 'right', vAlign = 'top' 
           initial={{ pathLength: 0, opacity: 0 }}
           animate={{ pathLength: 1, opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.35, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.6, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
           className="drop-shadow-[0_0_3px_rgba(59,130,246,0.6)]"
         />
         <defs>
@@ -100,37 +118,36 @@ export function LoanNotification({ transaction, align = 'right', vAlign = 'top' 
         initial={{ opacity: 0, scale: scaleInitial }}
         animate={{ opacity: 1, scale: scaleTarget }}
         exit={{ opacity: 0, scale: scaleInitial }}
-        transition={{ duration: 0.45, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
-        className="absolute flex items-center p-3 sm:p-3.5 md:p-4 gap-3 sm:gap-3.5 md:gap-4"
+        transition={{ duration: 0.7, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        className="absolute flex items-center p-2.5 sm:p-3 md:p-3.5 gap-2.5 sm:gap-3 md:gap-3.5"
         style={{
           left: isLeft ? 'auto' : '40px',
           right: isLeft ? '40px' : 'auto',
           top: isTop ? 'auto' : '40px',
           bottom: isTop ? '40px' : 'auto',
           width: 'max-content',
-          minWidth: '210px',
+          minWidth: '180px',
           height: 'auto',
           background: 'rgba(255, 255, 255, 0.65)',
           backdropFilter: 'blur(18px)',
           WebkitBackdropFilter: 'blur(18px)',
           border: '1px solid rgba(255,255,255,0.5)',
           boxShadow: '0 8px 32px rgba(36, 63, 145, 0.15), 0 0 15px rgba(59, 130, 246, 0.1), inset 0 0 0 1px rgba(255,255,255,0.5)',
-          borderRadius: '20px',
+          borderRadius: '16px',
           transformOrigin: `${isTop ? 'bottom' : 'top'} ${isLeft ? 'right' : 'left'}`
         }}
       >
         {/* Left Icon */}
-        <div className="shrink-0 flex items-center justify-center w-[42px] h-[42px] md:w-[48px] md:h-[48px] rounded-full bg-gradient-to-br from-[#1E3A8A] to-[#3B82F6] shadow-[0_0_15px_rgba(59,130,246,0.4)]">
-          <Building className="w-5 h-5 md:w-6 md:h-6 text-white" />
+        <div className={`shrink-0 flex items-center justify-center w-[36px] h-[36px] md:w-[42px] md:h-[42px] rounded-full bg-gradient-to-br ${config.color}`} style={{ boxShadow: `0 0 15px ${config.shadow}` }}>
+          <Icon className="w-4 h-4 md:w-5 md:h-5 text-white" />
         </div>
 
         {/* Content */}
-        <div className="flex-1 flex flex-col justify-center min-w-[120px]">
+        <div className="flex-1 flex flex-col justify-center min-w-[100px]">
           <div className="flex justify-between items-center mb-0.5">
-            <span className="font-semibold text-[#0A2540] text-[14px] sm:text-[15px] md:text-[16px] truncate max-w-[120px]">{transaction.city}</span>
-            <span className="text-[#506480] text-[11px] md:text-[12px] whitespace-nowrap ml-2">{transaction.time}</span>
+            <span className="font-semibold text-[#0A2540] text-[13px] sm:text-[14px] md:text-[15px] truncate max-w-[130px]">{transaction.title || transaction.city}</span>
           </div>
-          <div className="text-[20px] sm:text-[24px] md:text-[26px] font-bold text-[#0A2540] leading-none mb-1 md:mb-1.5 tracking-tight">
+          <div className="text-[15px] sm:text-[17px] md:text-[19px] font-bold text-[#0A2540] leading-none mb-1 md:mb-1.5 tracking-tight">
             {transaction.amount}
           </div>
           <div className="flex items-center gap-1.5 text-[12px] md:text-[13px] text-[#506480] font-medium whitespace-nowrap">
