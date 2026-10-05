@@ -511,7 +511,7 @@ const LENDERS: LenderConfig[] = [
     maxLoanAmount: 6000000,    // Up to ₹60L
     minLoanAmount: 100000,
     maxTenure: 84,             // PL 84M; OD up to 96M
-    maxFoir: 80,
+    maxFoir: 70,
     employerBankId: null,      // No specific Excel data
     minSalary: 30000,
     minCibil: 700,
@@ -520,11 +520,11 @@ const LENDERS: LenderConfig[] = [
     bt: {
       personalLoan: true,
       multiplePLs: true,
-      maxPLBTs: 5,             // Max 5 PL/OD BTs
+      maxPLBTs: null,
       creditCard: true,
-      maxCCBTs: 6,             // Max 6 CC BTs
+      maxCCBTs: null,
       appLoan: true,
-      maxAppBTs: 3,            // Max 3 app loan BTs
+      maxAppBTs: null,
       overdraft: true,
       maxTotalBTs: 8,          // Max 8 total
       topUp: true,
@@ -1459,25 +1459,27 @@ export function analyzeLenderEligibility({
     // ── POONAWALLA specific ─────────────────────────────────────────────
     if (lender.id === "poonawalla" && isEligible) {
       // Validate specific BT counts
-      const plOdCount = catBLoans.filter(
-        (l: any) => l.type === "Personal Loan" || l.type === "Overdraft"
-      ).length;
+      const plCount = catBLoans.filter((l: any) => l.type === "Personal Loan").length;
+      const odCount = catBLoans.filter((l: any) => l.type === "Overdraft").length;
 
-      if (appCount > 3) {
-        isEligible = false;
-        rejectionReasons.push("Maximum 3 App Loan BTs allowed");
-      }
-      if (plOdCount > 5) {
-        isEligible = false;
-        rejectionReasons.push("Maximum 5 PL/OD BTs allowed");
-      }
-      if (ccCount > 6) {
-        isEligible = false;
-        rejectionReasons.push("Maximum 6 Credit Card BTs allowed");
-      }
-      if (totalBTCount > 8) {
-        isEligible = false;
-        rejectionReasons.push("Maximum 8 total BTs allowed");
+      if (odCount > 0) {
+        if (odCount > 1) {
+          isEligible = false;
+          rejectionReasons.push("Maximum 1 Overdraft BT allowed in OD combination");
+        }
+        if (plCount > 2) {
+          isEligible = false;
+          rejectionReasons.push("Maximum 2 Personal Loan BTs allowed in OD combination");
+        }
+        if (totalBTCount > 3) {
+          isEligible = false;
+          rejectionReasons.push("Maximum 3 total BTs allowed in OD combination");
+        }
+      } else {
+        if (totalBTCount > 8) {
+          isEligible = false;
+          rejectionReasons.push("Maximum 8 total BTs allowed");
+        }
       }
 
       // FOIR & capacity
