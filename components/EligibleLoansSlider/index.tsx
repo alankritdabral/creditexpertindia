@@ -56,14 +56,14 @@ export const EligibleLoansSlider = () => {
   });
 
   return (
-    <section className="relative w-full py-20 overflow-hidden bg-gray-50/50">
+    <section className="relative w-full py-10 md:py-20 overflow-hidden bg-gray-50/50">
       <div className="max-w-[1220px] mx-auto border-x border-slate-300">
         
-        <div className="px-6 lg:px-12 py-8 mb-4 text-center">
-          <p className="text-sm font-bold tracking-wider text-blue-600 uppercase mb-4">
+        <div className="px-4 md:px-6 lg:px-12 py-6 md:py-8 mb-2 md:mb-4 text-center">
+          <p className="text-[10px] md:text-sm font-bold tracking-wider text-blue-600 uppercase mb-2 md:mb-4">
             Bring Your Eligible Loans Together
           </p>
-          <h2 className="section-title mx-auto text-slate-900">
+          <h2 className="text-2xl md:text-[32px] lg:text-[42px] leading-[1.1] tracking-[-0.03em] font-semibold mx-auto text-slate-900 max-w-[280px] md:max-w-none">
             Different Loans. One Lower EMI.
           </h2>
         </div>
@@ -152,14 +152,14 @@ export const EligibleLoansSlider = () => {
         </div>
 
         {/* Bottom Metrics Bar */}
-        <div className="px-6 lg:px-12 mt-12 py-8 flex flex-wrap justify-center gap-4">
+        <div className="px-4 md:px-6 lg:px-12 mt-8 md:mt-12 py-6 md:py-8 flex flex-wrap justify-center gap-2 md:gap-4">
           {[
             "10,000+ Users",
             "4.9 Rating",
             "Real-time insights",
             "Secure & compliant"
           ].map((badge, i) => (
-            <div key={i} className="px-5 py-2.5 bg-white/70 backdrop-blur-md rounded-full border border-gray-200 shadow-sm text-sm font-semibold text-slate-700">
+            <div key={i} className="px-3 md:px-5 py-1.5 md:py-2.5 bg-white/70 backdrop-blur-md rounded-full border border-gray-200 shadow-sm text-xs md:text-sm font-semibold text-slate-700">
               {badge}
             </div>
           ))}

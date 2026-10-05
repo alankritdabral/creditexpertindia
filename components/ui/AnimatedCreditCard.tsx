@@ -100,7 +100,7 @@ export const AnimatedCreditCard = () => {
             </div>
 
             <motion.div
-              className="relative z-10 text-[18px] md:text-[20px] font-semibold tracking-[0.2em] text-white drop-shadow-sm mt-auto mb-4"
+              className="relative z-10 text-[18px] md:text-[20px] font-semibold tracking-[0.2em] text-white drop-shadow-sm mt-auto mb-4 whitespace-nowrap"
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
