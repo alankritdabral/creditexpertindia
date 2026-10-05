@@ -19,6 +19,10 @@ export const contact = {
     {
       city: "Delhi",
       fullAddress: "3rd floor 1/560A main GT road shahdra near jindal oil mills mansarovar park shahdara delhi-110032"
+    },
+    {
+      city: "Rudrapur",
+      fullAddress: "Balaji Dwar, Adarsh Colonial Road, Rudrapur, near SBI Bank ATM Rudrapur Uttarakhand 263153"
     }
   ],
   legalName: "Credit Expert India",
