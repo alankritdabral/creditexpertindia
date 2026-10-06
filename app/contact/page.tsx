@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { LeadForm } from "@/components/LeadForm";
+import { ContactForm } from "@/components/ContactForm";
 import { contact } from "@/lib/config";
 import { MapPin, Phone, Mail, Clock } from "lucide-react";
 import { AnimatedMeshBackground } from "@/components/AnimatedMeshBackground";
@@ -31,9 +31,15 @@ export default function ContactPage() {
         </div>
       </section>
 
-      <section className="py-12 bg-white border-b border-icy-blue">
+      <section className="py-12 lg:py-20 bg-white border-b border-icy-blue">
+        <div className="container-narrow px-4">
+          <ContactForm />
+        </div>
+      </section>
+
+      <section className="py-12 bg-slate-50 border-b border-icy-blue">
         <div className="container-narrow grid gap-6 sm:grid-cols-3 text-center">
-          <div className="rounded-2xl bg-slate-50 p-6 border border-icy-blue">
+          <div className="rounded-2xl bg-white p-6 border border-icy-blue shadow-sm">
             <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600">
               <MapPin className="h-5 w-5" />
             </div>
@@ -48,7 +54,7 @@ export default function ContactPage() {
             </div>
           </div>
 
-          <div className="rounded-2xl bg-slate-50 p-6 border border-icy-blue">
+          <div className="rounded-2xl bg-white p-6 border border-icy-blue shadow-sm">
             <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600">
               <Phone className="h-5 w-5" />
             </div>
@@ -56,7 +62,7 @@ export default function ContactPage() {
             <p className="mt-1 text-xs text-brand-black/80 font-medium">{contact.whatsapp}</p>
           </div>
 
-          <div className="rounded-2xl bg-slate-50 p-6 border border-icy-blue">
+          <div className="rounded-2xl bg-white p-6 border border-icy-blue shadow-sm">
             <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600">
               <Mail className="h-5 w-5" />
             </div>
@@ -65,8 +71,6 @@ export default function ContactPage() {
           </div>
         </div>
       </section>
-
-      <LeadForm />
     </div>
   );
 }
