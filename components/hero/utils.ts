@@ -34,7 +34,7 @@ export const connections = [
   ["Ahmedabad", "Mumbai"],
 ];
 
-export const transactions = [
+export const transactions: import('./LoanNotification').Transaction[] = [
   { city: "Tamil Nadu", title: "Home Loan", amount: "₹18,50,000", time: "Just now", status: "Approved", type: "home" },
   { city: "Maharashtra", title: "3 Loans Merged", amount: "₹42,300 → ₹31,850 EMI", time: "2m ago", status: "Consolidated", type: "merge" },
   { city: "Karnataka", title: "EMI Reduced", amount: "₹28,500 → ₹21,200", time: "4m ago", status: "Refinanced", type: "reduce" },
