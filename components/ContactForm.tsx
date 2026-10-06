@@ -24,6 +24,8 @@ export function ContactForm() {
     email: "",
     requirement: "",
     message: "",
+    netSalary: "",
+    ongoingEmi: "",
     consent: false,
   });
 
@@ -42,11 +44,26 @@ export function ContactForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name || !formData.phone || !formData.requirement) {
+    if (!formData.name || !formData.phone || !formData.requirement || !formData.netSalary || !formData.ongoingEmi) {
       setErrorMessage("Please fill all required fields.");
       setStatus("error");
       return;
     }
+
+    const salary = Number(formData.netSalary);
+    if (isNaN(salary) || salary <= 45000) {
+      setErrorMessage("Net salary must be greater than ₹45,000.");
+      setStatus("error");
+      return;
+    }
+    
+    const emi = Number(formData.ongoingEmi);
+    if (isNaN(emi) || emi > salary * 0.8) {
+      setErrorMessage("Ongoing EMI cannot be greater than 80% of net salary.");
+      setStatus("error");
+      return;
+    }
+
     if (!formData.consent) {
       setErrorMessage("Please agree to our contact policy.");
       setStatus("error");
@@ -77,6 +94,8 @@ export function ContactForm() {
         email: "",
         requirement: "",
         message: "",
+        netSalary: "",
+        ongoingEmi: "",
         consent: false,
       });
     } catch (error: any) {
@@ -208,6 +227,39 @@ export function ContactForm() {
               </option>
             ))}
           </select>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div className="space-y-1.5">
+            <label htmlFor="netSalary" className="text-sm font-semibold text-brand-black">
+              Net Monthly Salary (₹) <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="number"
+              id="netSalary"
+              name="netSalary"
+              value={formData.netSalary}
+              onChange={handleChange}
+              placeholder="e.g. 50000"
+              className="w-full bg-slate-50 border border-icy-blue rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-energy/30 focus:border-blue-energy outline-none transition-all"
+              required
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label htmlFor="ongoingEmi" className="text-sm font-semibold text-brand-black">
+              Ongoing EMI (₹) <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="number"
+              id="ongoingEmi"
+              name="ongoingEmi"
+              value={formData.ongoingEmi}
+              onChange={handleChange}
+              placeholder="e.g. 15000"
+              className="w-full bg-slate-50 border border-icy-blue rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-energy/30 focus:border-blue-energy outline-none transition-all"
+              required
+            />
+          </div>
         </div>
 
         <div className="space-y-1.5">

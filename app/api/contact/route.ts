@@ -18,13 +18,23 @@ const escapeHtml = (unsafe: string) => {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { name, phone, email, requirement, message, consent } = body;
+    const { name, phone, email, requirement, message, consent, netSalary, ongoingEmi } = body;
 
-    if (!name || !phone || !requirement) {
+    if (!name || !phone || !requirement || !netSalary || !ongoingEmi) {
       return NextResponse.json(
         { error: "Required fields are missing." },
         { status: 400 }
       );
+    }
+
+    const salary = Number(netSalary);
+    if (isNaN(salary) || salary <= 45000) {
+      return NextResponse.json({ error: "Net salary must be greater than ₹45,000." }, { status: 400 });
+    }
+    
+    const emi = Number(ongoingEmi);
+    if (isNaN(emi) || emi > salary * 0.8) {
+      return NextResponse.json({ error: "Ongoing EMI cannot be greater than 80% of net salary." }, { status: 400 });
     }
 
     // 1. Save to Firestore (Server-Side using Admin SDK to bypass client security rules)
@@ -34,6 +44,8 @@ export async function POST(request: Request) {
         phone,
         email: email || "",
         requirement,
+        netSalary: salary,
+        ongoingEmi: emi,
         message: message || "",
         consent: !!consent,
         source: "Credit Expert India Contact Form",
@@ -66,6 +78,14 @@ export async function POST(request: Request) {
             <tr>
               <td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Email:</strong></td>
               <td style="padding: 8px 0; border-bottom: 1px solid #eee;">${escapeHtml(email) || "Not provided"}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Net Salary:</strong></td>
+              <td style="padding: 8px 0; border-bottom: 1px solid #eee;">₹${escapeHtml(String(netSalary))}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Ongoing EMI:</strong></td>
+              <td style="padding: 8px 0; border-bottom: 1px solid #eee;">₹${escapeHtml(String(ongoingEmi))}</td>
             </tr>
             <tr>
               <td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Requirement:</strong></td>

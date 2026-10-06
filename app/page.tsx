@@ -12,6 +12,7 @@ const HowItWorks = dynamic(() => import("@/components/HowItWorks").then(mod => m
 const ScamProtection = dynamic(() => import("@/components/ScamProtection").then(mod => mod.ScamProtection));
 const FAQ = dynamic(() => import("@/components/FAQ").then(mod => mod.FAQ));
 const EligibleLoansSlider = dynamic(() => import("@/components/EligibleLoansSlider").then(mod => mod.EligibleLoansSlider));
+const ContactForm = dynamic(() => import("@/components/ContactForm").then(mod => mod.ContactForm));
 
 export default function Home() {
   return (
@@ -74,6 +75,15 @@ export default function Home() {
         <div className="max-w-[1220px] mx-auto p-8 md:p-12 border-x border-slate-300">
           <AnimatedSection>
             <SmartCalculator />
+          </AnimatedSection>
+        </div>
+      </section>
+
+      {/* Row 4.5: Contact Form */}
+      <section className="w-full bg-slate-50 border-b border-slate-300 py-12 md:py-20">
+        <div className="max-w-[1220px] mx-auto px-4 sm:px-6 lg:px-8">
+          <AnimatedSection>
+            <ContactForm />
           </AnimatedSection>
         </div>
       </section>
