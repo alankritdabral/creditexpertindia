@@ -313,7 +313,7 @@ export const LoanSolutionsSection = () => {
 
           {/* 4. Multiple Loans */}
           <AnimatedCard
-            className="min-h-[480px] lg:min-h-[512px]"
+            className="min-h-[480px] lg:min-h-[580px]"
             bgImage="'/multiple_loans.png'"
             bgStyle="radial-gradient(circle at 100% 100%, rgba(45,140,255,0.08), transparent 38%), linear-gradient(145deg, rgba(255,255,255,0.7) 0%, rgba(220,238,255,0.4) 100%)"
             delay={0.1}
@@ -347,7 +347,7 @@ export const LoanSolutionsSection = () => {
             </div>
 
             {/* Visualization */}
-            <div className="absolute left-1/2 -translate-x-1/2 bottom-[-20px] md:bottom-0 w-[364px] h-[250px] z-[4] pointer-events-none scale-[0.9] sm:scale-[0.95] md:scale-100 origin-bottom">
+            <div className="absolute left-1/2 -translate-x-1/2 bottom-[-20px] md:bottom-[-10px] lg:bottom-[10px] w-[364px] h-[250px] z-[4] pointer-events-none scale-[0.9] sm:scale-[0.95] md:scale-100 origin-bottom">
 
               {/* Connectors */}
               <svg

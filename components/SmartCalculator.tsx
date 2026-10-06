@@ -37,160 +37,213 @@ export function SmartCalculator() {
   }
 
   return (
-    <div id="calculator" className="w-full h-full flex flex-col justify-between">
-      <div className="mb-10 text-center md:text-left">
-        <h2 className="section-title text-brand-black mb-4">EMI Calculator</h2>
-        <p className="text-lg text-brand-black/70 max-w-2xl mx-auto md:mx-0">
-          Calculate your monthly EMI, total interest, and total amount payable.
-        </p>
+    <div id="calculator" className="w-full max-w-6xl mx-auto border border-[#D8E5F5] rounded-[32px] bg-white p-6 md:p-10 shadow-sm font-sans text-[#111827]">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 w-full mb-8">
+        
+        {/* Left Inputs Section */}
+        <div className="flex flex-col justify-center space-y-8">
+          {/* Loan Amount */}
+          <div>
+            <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-2">
+              <label className="text-[16px] font-semibold text-[#111827]">Loan Amount</label>
+              <div className="bg-[#EAF3FF] rounded-xl px-4 py-2 flex items-center font-bold text-[18px] text-[#2684FF]">
+                <span>₹</span>
+                <input 
+                  type="number" 
+                  value={principal}
+                  onChange={(e) => setPrincipal(Number(e.target.value))}
+                  className="w-[120px] bg-transparent outline-none text-right [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
+              </div>
+            </div>
+            <Slider 
+              min={50000} max={10000000} step={50000}
+              value={[principal]} onValueChange={(val) => setPrincipal(val[0])}
+              className="py-2 cursor-pointer"
+              showTooltip
+              tooltipContent={(val) => `₹${val.toLocaleString('en-IN')}`}
+            />
+            <div className="flex justify-between text-[13px] text-[#64748B] mt-2 font-medium">
+              <span>₹50K</span>
+              <span>₹1Cr+</span>
+            </div>
+          </div>
+
+          {/* Interest Rate */}
+          <div>
+            <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-2">
+              <label className="text-[16px] font-semibold text-[#111827]">Interest Rate (p.a.)</label>
+              <div className="bg-[#EAF3FF] rounded-xl px-4 py-2 flex items-center font-bold text-[18px] text-[#2684FF]">
+                <input 
+                  type="number" 
+                  value={rate}
+                  step="0.1"
+                  onChange={(e) => setRate(Number(e.target.value))}
+                  className="w-[70px] bg-transparent outline-none text-right [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
+                <span className="ml-1">%</span>
+              </div>
+            </div>
+            <Slider 
+              min={5} max={30} step={0.1}
+              value={[rate]} onValueChange={(val) => setRate(val[0])}
+              className="py-2 cursor-pointer"
+              showTooltip
+              tooltipContent={(val) => `${val}%`}
+            />
+             <div className="flex justify-between text-[13px] text-[#64748B] mt-2 font-medium">
+              <span>5%</span>
+              <span>30%</span>
+            </div>
+          </div>
+
+          {/* Loan Tenure */}
+          <div>
+            <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-2">
+              <label className="text-[16px] font-semibold text-[#111827]">Loan Tenure</label>
+              <div className="bg-[#EAF3FF] rounded-xl px-4 py-2 flex items-center font-bold text-[18px] text-[#2684FF]">
+                <input 
+                  type="number" 
+                  value={tenure}
+                  onChange={(e) => setTenure(Number(e.target.value))}
+                  className="w-[70px] bg-transparent outline-none text-right [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
+                <span className="ml-1">mo</span>
+              </div>
+            </div>
+            <Slider 
+              min={6} max={360} step={1}
+              value={[tenure]} onValueChange={(val) => setTenure(val[0])}
+              className="py-2 cursor-pointer"
+              showTooltip
+              tooltipContent={(val) => `${val} mo`}
+            />
+             <div className="flex justify-between text-[13px] text-[#64748B] mt-2 font-medium">
+              <span>6 Months</span>
+              <span>30 Years</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Results / Chart Section */}
+        <div className="bg-white rounded-[24px] p-6 md:p-8 border border-[#D8E5F5] shadow-[0_4px_24px_rgba(0,0,0,0.02)] flex flex-col items-center h-full">
+          <h3 className="text-[20px] font-bold mb-8 text-[#111827] w-full text-center md:text-left">Your EMI Details</h3>
+          
+          <div className="flex-1 flex flex-col items-center justify-end w-full max-w-[400px] relative min-h-[220px]">
+             {/* Chart Visualization (Bars) */}
+             <div className="flex items-end justify-center h-[180px] w-full gap-4 sm:gap-8">
+               {/* Total Interest Bar */}
+               <div className="flex flex-col items-center justify-end h-full w-[45px] sm:w-[50px] relative group">
+                 <span className="text-[11px] font-semibold text-[#64748B] mb-2 whitespace-nowrap opacity-100 transition-opacity">₹{totalInterest.toLocaleString('en-IN')}</span>
+                 <div 
+                   className="w-full bg-[#E2E8F0] rounded-t-xl transition-all duration-700 ease-out" 
+                   style={{ height: `${Math.max(15, (totalInterest / (totalPayment || 1)) * 100)}%` }}
+                 ></div>
+               </div>
+               
+               {/* Total Payable Bar */}
+               <div className="flex flex-col items-center justify-end h-full w-[45px] sm:w-[50px] relative group">
+                 <span className="text-[11px] font-semibold text-[#B8B1FF] mb-2 whitespace-nowrap opacity-100 transition-opacity">₹{totalPayment.toLocaleString('en-IN')}</span>
+                 <div 
+                   className="w-full bg-[#B8B1FF] rounded-t-xl transition-all duration-700 ease-out" 
+                   style={{ height: '100%' }}
+                 ></div>
+               </div>
+
+               {/* Divider Line to separate scales */}
+               <div className="h-[120px] w-px bg-[#F0F4F8] mx-2 hidden sm:block"></div>
+
+               {/* Current EMI Bar */}
+               <div className="flex flex-col items-center justify-end h-full w-[45px] sm:w-[50px] relative group">
+                 <span className="text-[11px] font-semibold text-[#2684FF] mb-2 whitespace-nowrap opacity-100 transition-opacity">₹{emi.toLocaleString('en-IN')}</span>
+                 <div 
+                   className="w-full bg-[#2684FF] rounded-t-xl transition-all duration-700 ease-out" 
+                   style={{ height: '100%' }}
+                 ></div>
+               </div>
+
+               {/* New EMI Bar */}
+               {savings > 0 && (
+                 <div className="flex flex-col items-center justify-end h-full w-[45px] sm:w-[50px] relative group">
+                   <span className="text-[11px] font-semibold text-[#72C900] mb-2 whitespace-nowrap opacity-100 transition-opacity">₹{baseEmi.toLocaleString('en-IN')}</span>
+                   <div 
+                     className="w-full bg-[#72C900] rounded-t-xl transition-all duration-700 ease-out" 
+                     style={{ 
+                       height: `${Math.max(5, ((baseEmi - (baseEmi * 0.95)) / ((emi || 1) - (baseEmi * 0.95))) * 100)}%` 
+                     }}
+                   ></div>
+                 </div>
+               )}
+             </div>
+          </div>
+
+          {/* Legend */}
+          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 mt-8 w-full pt-6 border-t border-[#F0F4F8]">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-[#E2E8F0]"></div>
+              <span className="text-[12px] text-[#64748B] font-medium">Total Interest</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-[#B8B1FF]"></div>
+              <span className="text-[12px] text-[#64748B] font-medium">Total Payable</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-[#2684FF]"></div>
+              <span className="text-[12px] text-[#64748B] font-medium">EMI</span>
+            </div>
+            {savings > 0 && (
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-[#72C900]"></div>
+                <span className="text-[12px] text-[#64748B] font-medium">New EMI</span>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 w-full">
-        {/* Inputs */}
-        <div className="lg:col-span-7 bg-icy-blue rounded-3xl p-6 md:p-8 border border-icy-blue/60 flex flex-col justify-center">
-          
-          <div className="space-y-8">
-            <div>
-              <div className="flex justify-between items-center mb-3">
-                <label className="text-sm font-semibold text-brand-black/70">Loan Amount</label>
-                <div className="relative flex items-center shadow-sm">
-                  <span className="absolute left-3 font-bold text-slate-400">₹</span>
-                  <input 
-                    type="number" 
-                    value={principal}
-                    onChange={(e) => setPrincipal(Number(e.target.value))}
-                    className="w-[140px] bg-white border border-icy-blue rounded-lg py-1.5 pl-7 pr-3 font-bold text-blue-energy focus:ring-2 focus:ring-blue-energy outline-none transition-shadow text-right [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                  />
-                </div>
-              </div>
-              <Slider 
-                min={50000} max={10000000} step={50000}
-                value={[principal]} onValueChange={(val) => setPrincipal(val[0])}
-                className="py-2"
-                showTooltip
-                tooltipContent={(val) => `₹${val.toLocaleString('en-IN')}`}
-              />
-              <div className="flex justify-between text-xs text-brand-black/50 mt-1 font-medium">
-                <span>₹50K</span>
-                <span>₹1Cr+</span>
-              </div>
-            </div>
-
-            <div>
-              <div className="flex justify-between items-center mb-3">
-                <label className="text-sm font-semibold text-brand-black/70">Interest Rate (p.a.)</label>
-                <div className="relative flex items-center shadow-sm">
-                  <input 
-                    type="number" 
-                    value={rate}
-                    step="0.1"
-                    onChange={(e) => setRate(Number(e.target.value))}
-                    className="w-[100px] bg-white border border-icy-blue rounded-lg py-1.5 pl-3 pr-8 font-bold text-blue-energy focus:ring-2 focus:ring-blue-energy outline-none transition-shadow text-right [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                  />
-                  <span className="absolute right-3 font-bold text-slate-400">%</span>
-                </div>
-              </div>
-              <Slider 
-                min={5} max={30} step={0.1}
-                value={[rate]} onValueChange={(val) => setRate(val[0])}
-                className="py-2"
-                showTooltip
-                tooltipContent={(val) => `${val}%`}
-              />
-               <div className="flex justify-between text-xs text-brand-black/50 mt-1 font-medium">
-                <span>5%</span>
-                <span>30%</span>
-              </div>
-            </div>
-
-            <div>
-              <div className="flex justify-between items-center mb-3">
-                <label className="text-sm font-semibold text-brand-black/70">Loan Tenure</label>
-                <div className="relative flex items-center shadow-sm">
-                  <input 
-                    type="number" 
-                    value={tenure}
-                    onChange={(e) => setTenure(Number(e.target.value))}
-                    className="w-[100px] bg-white border border-icy-blue rounded-lg py-1.5 pl-3 pr-10 font-bold text-blue-energy focus:ring-2 focus:ring-blue-energy outline-none transition-shadow text-right [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                  />
-                  <span className="absolute right-3 font-bold text-slate-400">mo</span>
-                </div>
-              </div>
-              <Slider 
-                min={6} max={360} step={1}
-                value={[tenure]} onValueChange={(val) => setTenure(val[0])}
-                className="py-2"
-                showTooltip
-                tooltipContent={(val) => `${val} mo`}
-              />
-               <div className="flex justify-between text-xs text-brand-black/50 mt-1 font-medium">
-                <span>6 Months</span>
-                <span>30 Years</span>
-              </div>
-            </div>
-
-          </div>
+      {/* Bottom Result Cards */}
+      <div className="flex flex-col lg:flex-row flex-wrap xl:flex-nowrap gap-4 mt-8 pt-8 border-t border-[#EEF1F5] items-stretch">
+        
+        {/* Monthly EMI Card */}
+        <div className="flex-1 min-w-[200px] bg-[#EAF3FF] rounded-2xl p-5 flex flex-col justify-center items-start">
+          <p className="text-[#2684FF] text-[14px] font-semibold mb-1">Monthly EMI</p>
+          <p className="text-[#2684FF] text-[32px] md:text-[36px] font-bold leading-none">₹{emi.toLocaleString('en-IN')}</p>
         </div>
 
-        {/* Outputs */}
-        <div className="lg:col-span-5 bg-[#0A2540] rounded-3xl p-6 md:p-8 text-white flex flex-col justify-between shadow-2xl relative overflow-hidden">
-          {/* Decorative BG */}
-          <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-blue-energy/30 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/3 pointer-events-none" />
-          
-          <div className="relative z-10">
-            <h3 className="text-2xl font-bold mb-8">Your EMI Details</h3>
-            
-            <div className="space-y-6">
-              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/10">
-                <p className="text-blue-200 text-sm font-semibold uppercase tracking-widest mb-2">Monthly EMI</p>
-                <p className="text-4xl md:text-5xl font-extrabold tracking-tight">₹{emi.toLocaleString('en-IN')}</p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-white/5 rounded-xl p-5 border border-white/10 backdrop-blur-sm">
-                  <p className="text-blue-200 text-xs font-semibold uppercase tracking-widest mb-2">Total Interest</p>
-                  <p className="text-xl font-bold">₹{totalInterest.toLocaleString('en-IN')}</p>
-                </div>
-                <div className="bg-white/5 rounded-xl p-5 border border-white/10 backdrop-blur-sm">
-                  <p className="text-blue-200 text-xs font-semibold uppercase tracking-widest mb-2">Total Payable</p>
-                  <p className="text-xl font-bold">₹{totalPayment.toLocaleString('en-IN')}</p>
-                </div>
-              </div>
-
-              {savings > 0 && (
-                <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-5 text-emerald-400 font-semibold text-center backdrop-blur-sm shadow-[0_0_15px_rgba(16,185,129,0.2)]">
-                  Potential Savings at 9.99%: <br className="sm:hidden"/> 
-                  <span className="text-emerald-300 font-bold text-2xl">₹{savings.toLocaleString('en-IN')}</span>
-                  <div className="mt-3 pt-3 border-t border-emerald-500/20 text-sm">
-                    New EMI at 9.99%: <span className="text-emerald-300 font-bold text-lg">₹{baseEmi.toLocaleString('en-IN')}</span>/mo
-                  </div>
-                </div>
-              )}
-              
-              <div className="flex items-center gap-3 bg-blue-energy/20 border border-blue-energy/30 rounded-xl p-4 mt-4">
-                 <PieChart className="w-8 h-8 text-blue-400 flex-shrink-0" />
-                 <div className="text-sm font-medium text-blue-100">
-                    Principal is <span className="font-bold text-white">{((principal/totalPayment)*100 || 0).toFixed(1)}%</span> and Interest is <span className="font-bold text-white">{((totalInterest/totalPayment)*100 || 0).toFixed(1)}%</span> of total amount payable.
-                 </div>
-              </div>
-            </div>
+        {/* Savings Card */}
+        {savings > 0 && (
+          <div className="flex-1 min-w-[220px] bg-[#F3FCE5] border border-[#72C900] rounded-2xl p-5 flex flex-col justify-center items-start text-[#72C900]">
+            <p className="text-[13px] font-semibold mb-1">Potential Savings at 9.99%</p>
+            <p className="text-[22px] font-bold mb-1">₹{savings.toLocaleString('en-IN')}</p>
+            <p className="text-[12px] opacity-90 font-medium">New EMI at 9.99%: ₹{baseEmi.toLocaleString('en-IN')}/mo</p>
           </div>
+        )}
 
-          <div className="relative z-10 mt-8 pt-6 border-t border-white/10">
-            <button className="w-full py-4 bg-blue-energy text-white rounded-xl font-bold hover:bg-[#524BFF] transition-colors flex items-center justify-center gap-2 group">
-              Apply Now
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </button>
-            
-            <div className="flex items-start gap-2 mt-5 text-slate-400 text-xs leading-relaxed">
-              <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
-              <p>
-                Calculations are estimates for illustration purposes only. 
-                Actual EMI, tenure, and interest rate depend on lender policies and customer eligibility.
-              </p>
-            </div>
+        {/* Principal/Interest Card */}
+        <div className="flex-1 min-w-[220px] bg-[#EAF3FF] border border-[#2684FF]/20 rounded-2xl p-5 flex items-center gap-4">
+          <div className="p-2 bg-[#2684FF]/10 rounded-full flex-shrink-0">
+            <PieChart className="w-6 h-6 text-[#2684FF]" />
           </div>
+          <p className="text-[13px] text-[#111827] font-medium leading-relaxed">
+            Principal is <span className="font-bold text-[#2684FF]">{((principal/totalPayment)*100 || 0).toFixed(1)}%</span> and Interest is <span className="font-bold text-[#2684FF]">{((totalInterest/totalPayment)*100 || 0).toFixed(1)}%</span> of total amount payable.
+          </p>
         </div>
+
+        {/* Apply Now Button */}
+        <div className="flex-1 min-w-[200px] flex">
+          <button className="w-full h-full min-h-[60px] py-4 bg-[#2684FF] text-white rounded-full font-bold hover:bg-[#1C6DD0] transition-colors flex items-center justify-center gap-2 group text-[18px] shadow-sm">
+            Apply Now
+            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+          </button>
+        </div>
+      </div>
+      
+      <div className="flex items-start justify-center gap-2 mt-8 text-[#64748B] text-[13px] leading-relaxed max-w-3xl mx-auto text-center">
+        <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+        <p>
+          Calculations are estimates for illustration purposes only. 
+          Actual EMI, tenure, and interest rate depend on lender policies and customer eligibility.
+        </p>
       </div>
     </div>
   );
