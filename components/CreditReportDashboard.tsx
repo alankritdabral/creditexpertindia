@@ -8,7 +8,7 @@ import { searchEmployers, EmployerResult } from "@/lib/employerLookup";
 import { useEffect } from "react";
 import { db } from "@/lib/firebaseClient";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
-
+import { generatePDFReport } from "@/lib/pdfGenerator";
 export function CreditReportDashboard({ bureau, cibilData, formData }: any) {
   const captureRef = useRef<HTMLDivElement>(null);
   const basicRef = useRef<HTMLDivElement>(null);
@@ -393,9 +393,12 @@ export function CreditReportDashboard({ bureau, cibilData, formData }: any) {
                   <>
                     {(cibilData?.credit_report_link || cibilData?.data?.pdf_url) && (
                       <a href={cibilData?.credit_report_link || cibilData?.data?.pdf_url} target="_blank" rel="noopener noreferrer" className="text-xs font-bold px-4 py-1.5 bg-blue-energy text-white rounded-full hover:bg-blue-700 transition-colors shadow-sm flex items-center gap-1">
-                        Download PDF
+                        Download Bureau PDF
                       </a>
                     )}
+                    <button onClick={() => generatePDFReport(bureau, cibilData, formData)} className="text-xs font-bold px-4 py-1.5 bg-emerald-600 text-white rounded-full hover:bg-emerald-700 transition-colors shadow-sm flex items-center gap-1">
+                      Download CIBIL PDF
+                    </button>
                     <div className="flex items-center gap-1 bg-indigo-50 p-1 rounded-full border border-indigo-100">
                       <button onClick={() => handleDownloadImage('basic')} disabled={isDownloadingImage} className="text-[10px] font-bold px-3 py-1 bg-white text-indigo-700 rounded-full hover:bg-indigo-600 hover:text-white transition-colors shadow-sm flex items-center gap-1 disabled:opacity-50">
                         {isDownloadingSection === 'basic' ? <Loader2 className="w-3 h-3 animate-spin" /> : <Download className="w-3 h-3" />} Basic
