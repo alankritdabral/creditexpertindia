@@ -51,7 +51,7 @@ export default function Home() {
       <LoanSolutionsSection />
 
       {/* Row 1.6: Contact Form */}
-      <section className="w-full bg-slate-50 border-b border-slate-300 py-12 md:py-20">
+      <section className="w-full bg-[#f4f8fc] border-b border-slate-300 py-12 md:py-20">
         <div className="max-w-[1220px] mx-auto px-4 sm:px-6 lg:px-8">
           <AnimatedSection>
             <ContactForm />
