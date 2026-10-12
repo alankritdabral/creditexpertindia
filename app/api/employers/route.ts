@@ -56,8 +56,8 @@ function getHeuristicTier(name: string): string {
  */
 async function loadEmployerIndex(): Promise<IndexedEmployer[]> {
   try {
-    const indexPath = path.join(process.cwd(), 'public', 'employerData', 'employerIndex.json');
-    const listPath = path.join(process.cwd(), 'public', 'employerData', 'searchList.json');
+    const indexPath = path.join(process.cwd(), 'data', 'employerData', 'employerIndex.json');
+    const listPath = path.join(process.cwd(), 'data', 'employerData', 'searchList.json');
 
     const [indexRaw, listRaw] = await Promise.all([
       fs.readFile(indexPath, 'utf-8'),

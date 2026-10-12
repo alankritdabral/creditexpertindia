@@ -3,14 +3,25 @@
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, Check, Plus, Trash2, User, Phone, Mail, MapPin, Briefcase, Building2, Shield, CreditCard, Loader2, AlertCircle, ChevronDown, ChevronUp, Download } from "lucide-react";
+import { ArrowRight, Check, Plus, Trash2, User, Phone, Mail, MapPin, Briefcase, Building2, Shield, CreditCard, Loader2, AlertCircle, ChevronDown, ChevronUp, Download, RotateCw, X, KeyRound } from "lucide-react";
+import dynamic from "next/dynamic";
 import { collection, doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebaseClient";
-import { analyzeLenderEligibility } from "@/lib/lenderEngine";
 import { searchEmployers, EmployerResult } from "@/lib/employerLookup";
 import { parseBureauData } from "@/lib/bureauParsers";
-import { CreditReportDashboard } from "./CreditReportDashboard";
-import { RecaptchaVerifier, signInWithPhoneNumber, ConfirmationResult } from "firebase/auth";
+
+const CreditReportDashboard = dynamic(
+  () => import("./CreditReportDashboard").then((mod) => mod.CreditReportDashboard),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex flex-col items-center justify-center p-12 text-center bg-white rounded-2xl border border-slate-200">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-600 mb-3" />
+        <p className="text-sm font-medium text-slate-700">Loading your report...</p>
+      </div>
+    ),
+  }
+);
 import { auth } from "@/lib/firebaseClient";
 import { getTeamSession } from "@/app/team/actions";
 import { logSystemEvent } from "@/lib/logger";
@@ -57,10 +68,11 @@ export function EligibilityForm() {
 
   const [teamBranch, setTeamBranch] = useState<string | null>(null);
   const [showOtpModal, setShowOtpModal] = useState(false);
-  const [otpCode, setOtpCode] = useState("");
+  const [otpDigits, setOtpDigits] = useState<string[]>(["", "", "", ""]);
   const [otpLoading, setOtpLoading] = useState(false);
   const [otpError, setOtpError] = useState<string | null>(null);
-  const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
+  const [otpCooldown, setOtpCooldown] = useState(0);
+  const otpInputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   useEffect(() => {
     getTeamSession().then(session => {
@@ -69,28 +81,25 @@ export function EligibilityForm() {
         setFormData(prev => ({ ...prev, bureau: "experian" }));
       }
     });
-
-    // Load MSG91 OTP scripts
-    const urls = [
-      'https://verify.msg91.com/otp-provider.js',
-      'https://verify.phone91.com/otp-provider.js'
-    ];
-    let i = 0;
-    function attempt() {
-      if (typeof document === 'undefined') return;
-      const s = document.createElement('script');
-      s.src = urls[i];
-      s.async = true;
-      s.onerror = () => {
-        i++;
-        if (i < urls.length) {
-          attempt();
-        }
-      };
-      document.head.appendChild(s);
-    }
-    attempt();
   }, []);
+
+  // Cooldown countdown timer for OTP resend
+  useEffect(() => {
+    if (otpCooldown <= 0) return;
+    const timer = setInterval(() => {
+      setOtpCooldown(prev => Math.max(0, prev - 1));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [otpCooldown]);
+
+  // Focus first digit when OTP modal opens
+  useEffect(() => {
+    if (showOtpModal) {
+      setTimeout(() => {
+        otpInputRefs.current[0]?.focus();
+      }, 150);
+    }
+  }, [showOtpModal]);
 
   const [cibilData, setCibilData] = useState<any>(null);
   const [manualLoans, setManualLoans] = useState<any[]>([]);
@@ -161,55 +170,139 @@ export function EligibilityForm() {
     setLoading(true);
 
     if (!teamBranch && !isAdmin) {
-      launchOTPWidget();
+      handleRequestOtp(false);
     } else {
       proceedToFetchReport();
     }
   };
 
-  const launchOTPWidget = () => {
-    if (typeof window !== 'undefined' && (window as any).initSendOTP) {
-      const configuration = {
-        widgetId: "366978693362303433303636",
-        tokenAuth: "519332T5zz4zfdtq6ab50388P1",
-        identifier: formData.mobile,
-        exposeMethods: false,
-        success: async (data: any) => {
-          if (data?.type === 'error' || String(data).includes('error') || String(data?.message).includes('error')) {
-            setError("OTP Service encountered an error. Please check your mobile number and try again.");
-            setLoading(false);
-            return;
-          }
-          const token = data.message || data;
-          try {
-            const res = await fetch("/api/verify-msg91-otp", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ token })
-            });
-            const vData = await res.json();
-            if (vData.success) {
-              proceedToFetchReport();
-            } else {
-              setError("OTP Verification failed. " + (vData.error || ""));
-              setLoading(false);
-            }
-          } catch (e: any) {
-            console.error(e);
-            setError("OTP Verification error.");
-            setLoading(false);
-          }
-        },
-        failure: (error: any) => {
-          console.error('OTP failure:', error);
-          setError("OTP could not be sent or verified. " + (error?.message || error || ""));
-          setLoading(false);
-        }
-      };
-      (window as any).initSendOTP(configuration);
+  const handleRequestOtp = async (isResend = false) => {
+    if (!isResend) {
+      setLoading(true);
+      setError(null);
     } else {
-      setError("OTP Service is loading or unavailable. Please try again in a few seconds.");
+      setOtpError(null);
+    }
+    setOtpLoading(true);
+
+    try {
+      const res = await fetch("/api/otp/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mobile: formData.mobile }),
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        setShowOtpModal(true);
+        setOtpCooldown(30);
+        setOtpDigits(["", "", "", ""]);
+        setOtpError(null);
+        setTimeout(() => {
+          otpInputRefs.current[0]?.focus();
+        }, 150);
+      } else {
+        if (isResend) {
+          setOtpError(data.error || "Failed to resend verification code.");
+        } else {
+          setError(data.error || "Failed to send verification SMS. Please check your mobile number.");
+        }
+      }
+    } catch (err: any) {
+      console.error("[OTP Request]", err);
+      if (isResend) {
+        setOtpError("Network error while resending verification code.");
+      } else {
+        setError("Network error while sending verification code. Please try again.");
+      }
+    } finally {
       setLoading(false);
+      setOtpLoading(false);
+    }
+  };
+
+  const handleOtpDigitChange = (index: number, value: string) => {
+    const cleaned = value.replace(/\D/g, "");
+    if (!cleaned) {
+      const newDigits = [...otpDigits];
+      newDigits[index] = "";
+      setOtpDigits(newDigits);
+      return;
+    }
+
+    // Support pasting 4 digits
+    if (cleaned.length > 1) {
+      const pasted = cleaned.slice(0, 4).split("");
+      const newDigits = [...otpDigits];
+      pasted.forEach((char, i) => {
+        if (index + i < 4) {
+          newDigits[index + i] = char;
+        }
+      });
+      setOtpDigits(newDigits);
+      const nextIndex = Math.min(3, index + pasted.length);
+      otpInputRefs.current[nextIndex]?.focus();
+
+      if (newDigits.every((d) => d !== "")) {
+        handleVerifyOtp(newDigits.join(""));
+      }
+      return;
+    }
+
+    const newDigits = [...otpDigits];
+    newDigits[index] = cleaned[0];
+    setOtpDigits(newDigits);
+
+    if (index < 3) {
+      otpInputRefs.current[index + 1]?.focus();
+    }
+
+    if (index === 3 || newDigits.every((d) => d !== "")) {
+      const fullOtp = newDigits.join("");
+      if (fullOtp.length === 4) {
+        handleVerifyOtp(fullOtp);
+      }
+    }
+  };
+
+  const handleOtpKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Backspace" && !otpDigits[index] && index > 0) {
+      otpInputRefs.current[index - 1]?.focus();
+    }
+  };
+
+  const handleVerifyOtp = async (codeToVerify?: string) => {
+    const code = codeToVerify || otpDigits.join("");
+    if (code.length < 4) {
+      setOtpError("Please enter all 4 digits of your verification code.");
+      return;
+    }
+
+    setOtpLoading(true);
+    setOtpError(null);
+
+    try {
+      const res = await fetch("/api/otp/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          mobile: formData.mobile,
+          otp: code,
+        }),
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        setShowOtpModal(false);
+        proceedToFetchReport();
+      } else {
+        setOtpError(data.error || "Invalid verification code. Please check and try again.");
+      }
+    } catch (err: any) {
+      console.error("[OTP Verify]", err);
+      setOtpError("Verification network error. Please try again.");
+    } finally {
+      setOtpLoading(false);
     }
   };
 
@@ -734,6 +827,137 @@ export function EligibilityForm() {
           </div>
         </div>
       )}
+      {/* MessageBot SMS OTP Verification Modal */}
+      <AnimatePresence>
+        {showOtpModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 15 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 15 }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
+              className="bg-white rounded-3xl shadow-2xl border border-slate-100 max-w-md w-full p-6 sm:p-8 relative overflow-hidden text-center"
+            >
+              {/* Background ambient accents */}
+              <div className="absolute -top-16 -right-16 w-36 h-36 bg-blue-100/60 rounded-full blur-2xl pointer-events-none" />
+              <div className="absolute -bottom-16 -left-16 w-36 h-36 bg-sky-100/60 rounded-full blur-2xl pointer-events-none" />
+
+              {/* Close Button */}
+              <button
+                onClick={() => {
+                  setShowOtpModal(false);
+                  setOtpError(null);
+                }}
+                className="absolute top-5 right-5 p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors"
+                aria-label="Close"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              {/* Icon */}
+              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-tr from-blue-energy to-sky-500 text-white flex items-center justify-center shadow-lg shadow-blue-energy/25">
+                <Shield className="w-8 h-8" />
+              </div>
+
+              {/* Title & Description */}
+              <h3 className="text-2xl font-black text-slate-800 tracking-tight">
+                Verify Your Mobile
+              </h3>
+              <p className="text-sm text-slate-500 mt-2 leading-relaxed">
+                We sent a 4-digit verification code via SMS to{" "}
+                <span className="font-bold text-slate-800">+91 {formData.mobile}</span>
+              </p>
+
+              {/* 4 Digit Inputs */}
+              <div className="my-6">
+                <div className="flex justify-center gap-3 sm:gap-4">
+                  {otpDigits.map((digit, idx) => (
+                    <input
+                      key={idx}
+                      ref={(el) => {
+                        otpInputRefs.current[idx] = el;
+                      }}
+                      type="text"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      maxLength={1}
+                      value={digit}
+                      onChange={(e) => handleOtpDigitChange(idx, e.target.value)}
+                      onKeyDown={(e) => handleOtpKeyDown(idx, e)}
+                      className={`w-14 h-16 sm:w-16 sm:h-18 text-center text-2xl font-black text-slate-900 bg-slate-50 border-2 rounded-2xl outline-none transition-all shadow-inner ${
+                        digit
+                          ? "border-blue-energy bg-white ring-2 ring-blue-energy/20"
+                          : "border-slate-200 focus:border-blue-energy focus:bg-white"
+                      }`}
+                    />
+                  ))}
+                </div>
+
+                {otpError && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mt-4 p-3 bg-red-50 border border-red-200 text-red-700 text-xs font-semibold rounded-xl flex items-center justify-center gap-2"
+                  >
+                    <AlertCircle className="w-4 h-4 shrink-0" />
+                    <span>{otpError}</span>
+                  </motion.div>
+                )}
+              </div>
+
+              {/* Primary Verify Button */}
+              <button
+                onClick={() => handleVerifyOtp()}
+                disabled={otpLoading || otpDigits.some((d) => !d)}
+                className="w-full bg-blue-energy text-white py-4 rounded-xl font-bold shadow-lg shadow-blue-energy/20 hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+              >
+                {otpLoading ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <span>Verifying Code...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Verify & Continue</span>
+                    <ArrowRight className="w-5 h-5" />
+                  </>
+                )}
+              </button>
+
+              {/* Resend / Change Mobile Row */}
+              <div className="mt-5 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-2 pt-2 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowOtpModal(false);
+                    setOtpError(null);
+                  }}
+                  className="text-slate-500 hover:text-slate-800 font-medium underline transition-colors"
+                >
+                  Change mobile number
+                </button>
+
+                {otpCooldown > 0 ? (
+                  <span className="text-slate-400 font-medium">
+                    Resend code in <strong className="text-slate-700">{otpCooldown}s</strong>
+                  </span>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => handleRequestOtp(true)}
+                    disabled={otpLoading}
+                    className="text-blue-energy hover:text-blue-700 font-bold transition-colors flex items-center gap-1"
+                  >
+                    <RotateCw className="w-3.5 h-3.5" />
+                    <span>Resend Code</span>
+                  </button>
+                )}
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
+
