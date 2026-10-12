@@ -7,7 +7,7 @@ const withAnalyzer = withBundleAnalyzer({
 
 const nextConfig: NextConfig = {
   images: {
-    unoptimized: true,
+    formats: ['image/avif', 'image/webp'],
   },
   allowedDevOrigins: ['192.168.100.7'],
 };

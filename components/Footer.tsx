@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import logoWithName from '@/public/img/logo_with_name.png';
+import logoWithName from '@/public/img/logo_with_name.webp';
 import { siteConfig, contact } from '@/lib/config';
 import { ArrowRight, MessageCircle, Facebook, Instagram, Linkedin } from 'lucide-react';
 import { usePathname } from 'next/navigation';

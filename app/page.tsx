@@ -3,7 +3,6 @@ import Image from "next/image";
 import { HeroGridBlock, HeroVisualBlock, HeroLogos } from "@/components/HeroGridBlock";
 import { AnimatedSection } from "@/components/AnimatedSection";
 import { LoanSolutionsSection } from "@/components/LoanSolutionsSection";
-import { DebtTypes } from "@/components/DebtTypes";
 
 // Lazy load below-the-fold components
 const SmartCalculator = dynamic(() => import("@/components/SmartCalculator").then(mod => mod.SmartCalculator));
@@ -23,7 +22,7 @@ export default function Home() {
         {/* Background Image */}
         <div className="hero-skyline pointer-events-none">
           <Image
-            src="/Misty India Skyline with Orbital Arcs.png"
+            src="/Misty India Skyline with Orbital Arcs.webp"
             alt="Hero Background"
             fill
             sizes="100vw"
@@ -59,8 +58,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Row 1.6: Debt Types Image Section */}
-      <DebtTypes />
 
       {/* Row 2: Eligible Loans Slider (Redesigned) */}
       <div className="w-full bg-white border-b border-slate-300">

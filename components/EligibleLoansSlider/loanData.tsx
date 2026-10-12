@@ -6,7 +6,7 @@ export const loanCategories = [
     id: "personal-loan",
     title: "Personal Loan",
     description: "High-interest personal loans can be refinanced at lower rates.",
-    image: "/img/marraige.png",
+    image: "/img/marraige.webp",
     icon: <IndianRupee className="w-5 h-5 text-blue-600" />,
     renderActiveContent: () => (
       <div className="flex flex-col h-full text-sm">
@@ -55,7 +55,7 @@ export const loanCategories = [
     id: "credit-card",
     title: "Credit Card Loans",
     description: "Convert high-interest credit card dues into a single, lower-interest EMI.",
-    image: "/img/creditcard.png",
+    image: "/img/creditcard.webp",
     icon: <CreditCard className="w-5 h-5 text-blue-600" />,
     renderActiveContent: () => (
       <div className="flex flex-col h-full text-sm">
@@ -101,7 +101,7 @@ export const loanCategories = [
     id: "app-loans",
     title: "App Loans",
     description: "Combine multiple app loans and reduce your total interest outgo.",
-    image: "/img/teenager.png",
+    image: "/img/teenager.webp",
     icon: <Smartphone className="w-5 h-5 text-blue-600" />,
     renderActiveContent: () => (
       <div className="flex flex-col h-full text-sm">
@@ -134,7 +134,7 @@ export const loanCategories = [
     id: "multiple-loans",
     title: "Multiple Loans",
     description: "Merge multiple EMIs into one simple, affordable EMI.",
-    image: "/img/multipleloans.png",
+    image: "/img/multipleloans.webp",
     icon: <Banknote className="w-5 h-5 text-blue-600" />,
     renderActiveContent: () => (
       <div className="flex flex-col h-full text-sm">
@@ -174,7 +174,7 @@ export const loanCategories = [
     id: "overdraft",
     title: "Overdraft / OD",
     description: "Refinance eligible OD facilities at potentially lower interest rates.",
-    image: "/img/od.png",
+    image: "/img/od.webp",
     icon: <Landmark className="w-5 h-5 text-blue-600" />,
     renderActiveContent: () => (
       <div className="flex flex-col h-full text-sm">

@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import logo from "@/public/img/logo.png";
+import logo from "@/public/img/logo.webp";
 import { ArrowRight, X, Home, Layers3, IndianRupee, Workflow, FileCheck, Mail, User, ShieldCheck, LogOut } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname, useRouter } from "next/navigation";

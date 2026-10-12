@@ -100,6 +100,7 @@ export const EligibleLoansSlider = () => {
                         src={slide.data.image}
                         alt={slide.data.title}
                         fill
+                        sizes="(max-width: 768px) 85vw, 380px"
                         className="object-cover"
                       />
                       <div className="absolute inset-0 bg-black/10 transition-opacity duration-300"></div>
@@ -118,6 +119,7 @@ export const EligibleLoansSlider = () => {
                       src={slide.data.image}
                       alt="Background"
                       fill
+                      sizes="(max-width: 768px) 85vw, 380px"
                       className="object-cover opacity-80"
                     />
                     

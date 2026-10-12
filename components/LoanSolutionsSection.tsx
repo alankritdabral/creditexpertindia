@@ -105,7 +105,7 @@ export const LoanSolutionsSection = () => {
           {/* 1. Personal Loan (Spans 2 rows) */}
           <AnimatedCard
             className="lg:row-span-2 min-h-[500px] md:min-h-[600px] lg:min-h-[700px]"
-            bgImage="'/personal_loann.png'"
+            bgImage="'/personal_loann.webp'"
             bgStyle="rgba(255,255,255,0.68)"
           >
             {/* Header */}
@@ -166,7 +166,7 @@ export const LoanSolutionsSection = () => {
           {/* 2. Credit Card */}
           <AnimatedCard
             className="min-h-[510px] lg:min-h-[640px]"
-            bgImage="'/Credit_card.png'"
+            bgImage="'/Credit_card.webp'"
             bgStyle="radial-gradient(circle at 70% 75%, rgba(70,150,255,.25), transparent 45%), linear-gradient(145deg, rgba(255,255,255,.9), rgba(220,238,255,.72))"
             delay={0.1}
           >
@@ -219,7 +219,7 @@ export const LoanSolutionsSection = () => {
           {/* 3. App Loans */}
           <AnimatedCard
             className="min-h-[520px] lg:min-h-[592px]"
-            bgImage="'/app_loans.png'"
+            bgImage="'/app_loans.webp'"
             bgStyle="radial-gradient(circle at 80% 80%, rgba(18,184,120,.12), transparent 35%), linear-gradient(145deg, #ffffff, #e9f5ff)"
             delay={0.2}
           >
@@ -314,7 +314,7 @@ export const LoanSolutionsSection = () => {
           {/* 4. Multiple Loans */}
           <AnimatedCard
             className="min-h-[480px] lg:min-h-[580px]"
-            bgImage="'/multiple_loans.png'"
+            bgImage="'/multiple_loans.webp'"
             bgStyle="radial-gradient(circle at 100% 100%, rgba(45,140,255,0.08), transparent 38%), linear-gradient(145deg, rgba(255,255,255,0.7) 0%, rgba(220,238,255,0.4) 100%)"
             delay={0.1}
           >
@@ -412,7 +412,7 @@ export const LoanSolutionsSection = () => {
           {/* 5. Overdraft */}
           <AnimatedCard
             className="min-h-[520px] lg:min-h-[440px]"
-            bgImage="'/overdraft.png'"
+            bgImage="'/overdraft.webp'"
             bgPosition="100% center"
             bgStyle="radial-gradient(circle at bottom right, rgba(23,105,209,0.1) 0%, transparent 60%), rgba(255,255,255,0.68)"
             delay={0.2}
