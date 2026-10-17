@@ -44,22 +44,62 @@ export async function POST(req: Request) {
       "One Time Password foraccount verification is {OTP}. Do not share this OTP with anyone.";
     const messageText = template.replace("{OTP}", otp);
 
-    // Send SMS via MessageBot
-    const smsResult = await sendMessageBotSms({
-      to: cleanMobile,
-      message: messageText,
-      messageType: "3", // OTP
-      sourceAddress: process.env.MESSAGEBOT_SENDER_ID || "CIBIL",
-    });
+    let dispatchResult: { success: boolean; channel?: string; error?: string; messageId?: any } = { success: false };
 
-    if (!smsResult.success) {
-      console.error("[OTP Send] MessageBot failed:", smsResult.error);
+    const prefersWhatsapp = body.channel === "whatsapp" || Boolean(process.env.MESSAGEBOT_WHATSAPP_API_TOKEN);
+
+    if (prefersWhatsapp) {
+      const waResult = await (await import("@/lib/messagebotWhatsapp")).sendWhatsappOtp({
+        phoneNumber: cleanMobile,
+        otpCode: otp,
+      });
+
+      if (waResult.success) {
+        dispatchResult = { success: true, channel: "whatsapp", messageId: waResult.campaignId };
+      } else {
+        console.warn("[OTP Send] WhatsApp dispatch failed, attempting SMS fallback:", waResult.error);
+        // Fallback to SMS if WhatsApp failed
+        const smsResult = await sendMessageBotSms({
+          to: cleanMobile,
+          message: messageText,
+          messageType: "3", // OTP
+          sourceAddress: process.env.MESSAGEBOT_SENDER_ID || "CIBIL",
+        });
+
+        if (smsResult.success) {
+          dispatchResult = { success: true, channel: "sms", messageId: smsResult.data?.MessageId };
+        } else {
+          dispatchResult = {
+            success: false,
+            error: waResult.error || smsResult.error || "Unable to dispatch verification code via WhatsApp or SMS.",
+          };
+        }
+      }
+    } else {
+      // Send SMS via MessageBot
+      const smsResult = await sendMessageBotSms({
+        to: cleanMobile,
+        message: messageText,
+        messageType: "3", // OTP
+        sourceAddress: process.env.MESSAGEBOT_SENDER_ID || "CIBIL",
+      });
+
+      if (smsResult.success) {
+        dispatchResult = { success: true, channel: "sms", messageId: smsResult.data?.MessageId };
+      } else {
+        console.error("[OTP Send] MessageBot SMS failed:", smsResult.error);
+        dispatchResult = {
+          success: false,
+          error: smsResult.error || "Unable to send SMS at this moment. Please verify your mobile number.",
+        };
+      }
+    }
+
+    if (!dispatchResult.success) {
       return NextResponse.json(
         {
           success: false,
-          error:
-            smsResult.error ||
-            "Unable to send SMS at this moment. Please verify your mobile number.",
+          error: dispatchResult.error || "Unable to dispatch OTP code. Please try again.",
         },
         { status: 502 }
       );
@@ -71,7 +111,7 @@ export async function POST(req: Request) {
     return NextResponse.json({
       success: true,
       message: "OTP sent successfully",
-      messageId: smsResult.data?.MessageId,
+      messageId: dispatchResult.messageId,
     });
   } catch (error: any) {
     console.error("[OTP Send] Unhandled error:", error);

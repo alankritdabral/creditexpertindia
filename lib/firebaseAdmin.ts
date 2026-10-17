@@ -1,6 +1,8 @@
-import * as admin from 'firebase-admin';
+import * as adminModule from 'firebase-admin';
 
-if (!admin.apps.length) {
+const admin = (adminModule as any).default || adminModule;
+
+if (!admin?.apps?.length) {
   try {
     // Only attempt initialization if we have the required environment variables
     if (process.env.FIREBASE_PROJECT_ID || process.env.FIREBASE_SERVICE_ACCOUNT_BASE64) {
@@ -30,7 +32,7 @@ if (!admin.apps.length) {
 }
 
 // Export dummy objects during build time if Firebase fails to initialize
-const adminDb = admin.apps.length ? admin.firestore() : ({} as admin.firestore.Firestore);
-const adminAuth = admin.apps.length ? admin.auth() : ({} as admin.auth.Auth);
+const adminDb = admin.apps?.length ? admin.firestore() : ({} as adminModule.firestore.Firestore);
+const adminAuth = admin.apps?.length ? admin.auth() : ({} as adminModule.auth.Auth);
 
 export { adminDb, adminAuth };

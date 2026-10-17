@@ -2,10 +2,11 @@
 
 import React, { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { collection, doc, getDoc, getDocs, updateDoc, query, orderBy, limit, startAfter, getCountFromServer, where } from "firebase/firestore";
 import { auth, db } from "@/lib/firebaseClient";
-import { Loader2, LogOut, ShieldCheck, Activity, Users, Database, Search, Filter, ArrowUpDown, Eye, X, RefreshCw, Clock, AlertCircle, FileWarning } from "lucide-react";
+import { Loader2, LogOut, ShieldCheck, Activity, Users, Database, Search, Filter, ArrowUpDown, Eye, X, RefreshCw, Clock, AlertCircle, FileWarning, MessageSquare } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CreditReportDashboard } from "@/components/CreditReportDashboard";
 import { parseBureauData } from "@/lib/bureauParsers";
@@ -409,6 +410,9 @@ export default function Dashboard() {
           <button onClick={() => setActiveTab("logs")} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${activeTab === "logs" ? "bg-blue-600 text-white shadow-lg shadow-blue-900/20 font-semibold" : "hover:bg-white/10 text-slate-400 hover:text-slate-200"}`}>
             <FileWarning className={`w-5 h-5 ${activeTab === "logs" ? "text-white" : "text-slate-400"}`} /> System Logs
           </button>
+          <Link href="/admin/whatsapp" className="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 hover:bg-emerald-500/10 text-emerald-400 hover:text-emerald-300 font-medium border border-emerald-500/20">
+            <MessageSquare className="w-5 h-5 text-emerald-400" /> WhatsApp Gateway
+          </Link>
         </nav>
 
         <button onClick={() => signOut(auth)} className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 transition-colors mt-auto text-red-400">
@@ -970,6 +974,10 @@ export default function Dashboard() {
           <FileWarning className={`w-5 h-5 mb-1 ${activeTab === "logs" ? "text-blue-600" : "text-slate-500"}`} />
           <span className="text-[10px]">Logs</span>
         </button>
+        <Link href="/admin/whatsapp" className="flex flex-col items-center p-2 rounded-xl text-emerald-600">
+          <MessageSquare className="w-5 h-5 mb-1 text-emerald-600" />
+          <span className="text-[10px] font-semibold">WhatsApp</span>
+        </Link>
       </div>
     </div>
   );
