@@ -140,6 +140,8 @@ export default function ExcelEmiCampaign({
   const [selectedSheetName, setSelectedSheetName] = useState<string>("");
   const [parsingFile, setParsingFile] = useState(false);
   const [parseError, setParseError] = useState<string | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // 2. Column Mapping State
   const [nameCol, setNameCol] = useState("");
@@ -230,48 +232,311 @@ export default function ExcelEmiCampaign({
     }
   }, [fileName, selectedSheetName]);
 
-  // Handle Excel File Upload
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  // Comprehensive Auto-detect columns based on common real-world patterns & banking aliases
+  const autoDetectColumns = (columns: string[]) => {
+    const cleanStr = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
+    const findCol = (exactList: string[], partialList: string[]) => {
+      // 1. Exact clean match
+      for (const pattern of exactList) {
+        const found = columns.find((c) => cleanStr(c) === pattern);
+        if (found) return found;
+      }
+      // 2. Partial includes match
+      for (const pattern of partialList) {
+        const found = columns.find((c) => cleanStr(c).includes(pattern));
+        if (found) return found;
+      }
+      return "";
+    };
+
+    const detectedName = findCol(
+      [
+        "customername",
+        "clientname",
+        "applicantname",
+        "borrowername",
+        "fullname",
+        "name",
+        "client",
+        "customer",
+        "borrower",
+        "applicant",
+        "membername",
+        "partyname",
+      ],
+      ["custname", "clientname", "applicant", "borrower", "fullname", "name"]
+    );
+
+    const detectedAmount = findCol(
+      [
+        "disbursementamount",
+        "sanctionamount",
+        "disbursement_amount",
+        "loanamount",
+        "loan_amount",
+        "amount",
+        "principal",
+        "loanamt",
+        "disbursedamt",
+        "disbursed",
+        "sanctionamt",
+        "pos",
+        "balance",
+        "outstanding",
+        "currentbalance",
+        "loanvalue",
+        "netdisbursed",
+        "principalamt",
+      ],
+      ["disburs", "loanamt", "amount", "sanction", "principal", "balance", "pos", "outstanding"]
+    );
+
+    const detectedTenure = findCol(
+      [
+        "tenor",
+        "tenure",
+        "months",
+        "duration",
+        "period",
+        "term",
+        "loanterm",
+        "tenuremonths",
+        "tenormonths",
+      ],
+      ["tenor", "tenure", "term", "month", "duration", "period"]
+    );
+
+    const detectedRoi = findCol(
+      [
+        "roi",
+        "interestrate",
+        "rate",
+        "rateofinterest",
+        "interest",
+        "rateofint",
+        "intrate",
+        "currentroi",
+        "existingroi",
+      ],
+      ["roi", "interest", "rate", "intrate"]
+    );
+
+    const detectedPhone = findCol(
+      [
+        "standardizedmobileno",
+        "mobileno",
+        "mobile",
+        "phone",
+        "contact",
+        "whatsappno",
+        "standardizedphone",
+        "mobilenumber",
+        "phonenumber",
+        "contactnumber",
+        "contactno",
+        "cell",
+        "cellphone",
+        "whatsapp",
+        "custmobile",
+      ],
+      ["mobile", "phone", "contact", "whatsapp", "cell"]
+    );
+
+    setNameCol(detectedName);
+    setAmountCol(detectedAmount);
+    setTenureCol(detectedTenure);
+    setRoiCol(detectedRoi);
+    setPhoneCol(detectedPhone);
+
+    return {
+      name: detectedName,
+      amount: detectedAmount,
+      tenure: detectedTenure,
+      roi: detectedRoi,
+      phone: detectedPhone,
+    };
+  };
+
+  // Robust Workbook Buffer Processing Engine (handles XLSX, XLS, CSV, multi-sheet, and header detection)
+  const processWorkbookBuffer = (buffer: ArrayBuffer, name: string, sizeStr: string) => {
+    const wb = XLSX.read(new Uint8Array(buffer), { type: "array" });
+
+    if (!wb.SheetNames || wb.SheetNames.length === 0) {
+      throw new Error("No sheets found in the uploaded Excel workbook.");
+    }
+
+    const parsedSheets: ParsedSheetData[] = [];
+
+    for (const sheetName of wb.SheetNames) {
+      const ws = wb.Sheets[sheetName];
+      if (!ws) continue;
+
+      const rawRows = XLSX.utils.sheet_to_json<Record<string, any>>(ws, { defval: "" });
+      let cols: string[] = [];
+      let rows = rawRows;
+
+      if (rawRows.length > 0) {
+        const keys = Object.keys(rawRows[0]);
+        const validKeys = keys.filter((k) => !k.startsWith("__EMPTY") && k.trim() !== "");
+
+        // If headers appear merged or on row 2, inspect raw row arrays
+        if (validKeys.length < 2) {
+          const rawArray = XLSX.utils.sheet_to_json<any[]>(ws, { header: 1, defval: "" });
+          const headerRowIdx = rawArray.findIndex(
+            (r) => Array.isArray(r) && r.filter((c) => String(c ?? "").trim().length > 0).length >= 2
+          );
+          if (headerRowIdx !== -1 && headerRowIdx < rawArray.length - 1) {
+            const headerRow = rawArray[headerRowIdx].map((c) => String(c ?? "").trim());
+            const dataRows: Record<string, any>[] = [];
+            for (let ri = headerRowIdx + 1; ri < rawArray.length; ri++) {
+              const rowArr = rawArray[ri];
+              if (!rowArr || rowArr.every((c) => String(c ?? "").trim() === "")) continue;
+              const obj: Record<string, any> = {};
+              headerRow.forEach((h, ci) => {
+                if (h) obj[h] = rowArr[ci] ?? "";
+              });
+              dataRows.push(obj);
+            }
+            cols = headerRow.filter(Boolean);
+            rows = dataRows;
+          } else {
+            cols = keys;
+          }
+        } else {
+          cols = keys.map((k) => k.trim());
+        }
+      }
+
+      parsedSheets.push({
+        name: sheetName,
+        rowCount: rows.length,
+        columns: cols,
+        rows,
+      });
+    }
+
+    const firstActiveSheet = parsedSheets.find((s) => s.rowCount > 0) || parsedSheets[0];
+    if (!firstActiveSheet || firstActiveSheet.rowCount === 0) {
+      setSheets(parsedSheets);
+      setSelectedSheetName(parsedSheets[0]?.name || "");
+      setFileName(name);
+      setFileSize(sizeStr);
+      setParseError("Workbook loaded, but all sheets appear to have 0 data rows.");
+      return;
+    }
+
+    setFileName(name);
+    setFileSize(sizeStr);
+    setSheets(parsedSheets);
+    setSelectedSheetName(firstActiveSheet.name);
+
+    // Reset column filter & pagination
+    setColumnFilterCol("");
+    setColumnFilterKeyword("");
+    setCurrentPage(1);
+
+    // Auto-detect columns on active sheet
+    const detected = autoDetectColumns(firstActiveSheet.columns);
+
+    // Sync Row 1 to single test sandbox immediately
+    if (firstActiveSheet.rows.length > 0) {
+      const first = firstActiveSheet.rows[0];
+      const rawPhone = detected.phone ? first[detected.phone] : "";
+      const phoneInfo = sanitizeIndianPhoneNumber(rawPhone);
+      const rawAmt = detected.amount ? String(first[detected.amount] ?? "").replace(/,/g, "").trim() : "";
+      const principal = parseFloat(rawAmt) || 200000;
+      const rawTenure = detected.tenure ? String(first[detected.tenure] ?? "").replace(/,/g, "").trim() : "";
+      const tenure = parseInt(rawTenure, 10) || 24;
+      const rawRoi = detected.roi ? String(first[detected.roi] ?? "").replace(/%/g, "").trim() : "";
+      const currentRoi = parseFloat(rawRoi) || 23.5;
+      const customerName = detected.name ? String(first[detected.name] ?? "").trim() : "";
+
+      setTestDetails({
+        name: customerName || "Customer 1",
+        phone: phoneInfo.isValid ? phoneInfo.formatted : (phoneInfo.raw || ""),
+        amount: principal > 0 ? principal : 200000,
+        tenure: tenure > 0 ? tenure : 24,
+        currentRoi: currentRoi > 0 ? currentRoi : 23.5,
+        targetRoi: targetRoi,
+        companyName: "Credit Expert India",
+      });
+    }
+
+    const clean = name.replace(/\.[^/.]+$/, "").replace(/[^a-zA-Z0-9_-]/g, "_");
+    setCampaignName(`EMI_${clean}_${firstActiveSheet.name || "Batch"}`);
+  };
+
+  // Load a user-supplied file
+  const loadFile = async (file: File) => {
     setParsingFile(true);
     setParseError(null);
-    setFileName(file.name);
-    setFileSize((file.size / (1024 * 1024)).toFixed(2) + " MB");
-
     try {
       const buffer = await file.arrayBuffer();
-      const wb = XLSX.read(buffer, { type: "array" });
-
-      if (!wb.SheetNames || wb.SheetNames.length === 0) {
-        throw new Error("No sheets found in the uploaded Excel workbook.");
-      }
-
-      const parsedSheets: ParsedSheetData[] = [];
-
-      for (const name of wb.SheetNames) {
-        const ws = wb.Sheets[name];
-        const rawRows = XLSX.utils.sheet_to_json<Record<string, any>>(ws, { defval: "" });
-        const cols = rawRows.length > 0 ? Object.keys(rawRows[0]) : [];
-
-        parsedSheets.push({
-          name,
-          rowCount: rawRows.length,
-          columns: cols,
-          rows: rawRows,
-        });
-      }
-
-      setSheets(parsedSheets);
-      const firstSheet = parsedSheets[0];
-      setSelectedSheetName(firstSheet.name);
-      autoDetectColumns(firstSheet.columns);
+      const sizeStr = (file.size / (1024 * 1024)).toFixed(2) + " MB";
+      processWorkbookBuffer(buffer, file.name, sizeStr);
     } catch (err: any) {
       console.error("[Excel Parse Error]:", err);
-      setParseError(err.message || "Failed to parse Excel file.");
+      setParseError(err.message || "Failed to parse Excel file. Please ensure it is a valid .xlsx, .xls, or .csv file.");
     } finally {
       setParsingFile(false);
+    }
+  };
+
+  // Handle Excel File Upload from standard <input type="file" />
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = ""; // Crucial: clear so re-uploading the same file always triggers onChange
+    if (!file) return;
+    await loadFile(file);
+  };
+
+  // File Drag & drop event handlers
+  const handleFileDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleFileDragEnter = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleFileDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleFileDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+
+    const file = e.dataTransfer.files?.[0];
+    if (!file) return;
+    await loadFile(file);
+  };
+
+  // Clear/Reset entire workbook state
+  const handleClearWorkbook = () => {
+    setFileName(null);
+    setFileSize(null);
+    setSheets([]);
+    setSelectedSheetName("");
+    setNameCol("");
+    setAmountCol("");
+    setTenureCol("");
+    setRoiCol("");
+    setPhoneCol("");
+    setColumnFilterKeyword("");
+    setColumnFilterCol("");
+    setCurrentPage(1);
+    setParseError(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
     }
   };
 
@@ -279,7 +544,6 @@ export default function ExcelEmiCampaign({
   const handleLoadDemoDec25 = async () => {
     setParsingFile(true);
     setParseError(null);
-    setFileName("Dec-25.xlsx");
 
     try {
       const res = await fetch("/data/Dec-25.xlsx");
@@ -287,32 +551,8 @@ export default function ExcelEmiCampaign({
         throw new Error(`Failed to load /data/Dec-25.xlsx (${res.status})`);
       }
       const buffer = await res.arrayBuffer();
-      setFileSize((buffer.byteLength / (1024 * 1024)).toFixed(2) + " MB");
-      const wb = XLSX.read(buffer, { type: "array" });
-
-      if (!wb.SheetNames || wb.SheetNames.length === 0) {
-        throw new Error("No sheets found in the demo workbook.");
-      }
-
-      const parsedSheets: ParsedSheetData[] = [];
-
-      for (const name of wb.SheetNames) {
-        const ws = wb.Sheets[name];
-        const rawRows = XLSX.utils.sheet_to_json<Record<string, any>>(ws, { defval: "" });
-        const cols = rawRows.length > 0 ? Object.keys(rawRows[0]) : [];
-
-        parsedSheets.push({
-          name,
-          rowCount: rawRows.length,
-          columns: cols,
-          rows: rawRows,
-        });
-      }
-
-      setSheets(parsedSheets);
-      const firstSheet = parsedSheets[0];
-      setSelectedSheetName(firstSheet.name);
-      autoDetectColumns(firstSheet.columns);
+      const sizeStr = (buffer.byteLength / (1024 * 1024)).toFixed(2) + " MB";
+      processWorkbookBuffer(buffer, "Dec-25.xlsx", sizeStr);
     } catch (err: any) {
       console.error("[Demo Load Error]:", err);
       setParseError(err.message || "Failed to load sample Dec-25.xlsx.");
@@ -321,61 +561,48 @@ export default function ExcelEmiCampaign({
     }
   };
 
-  // Auto-detect columns based on common patterns
-  const autoDetectColumns = (columns: string[]) => {
-    const findCol = (patterns: string[]) => {
-      return (
-        columns.find((c) =>
-          patterns.some((p) => c.toLowerCase().replace(/[^a-z0-9]/g, "") === p)
-        ) ||
-        columns.find((c) =>
-          patterns.some((p) => c.toLowerCase().replace(/[^a-z0-9]/g, "").includes(p))
-        ) ||
-        ""
-      );
-    };
-
-    const detectedName = findCol(["customername", "name", "clientname", "applicantname", "fullname"]);
-    const detectedAmount = findCol([
-      "disbursementamount",
-      "sanctionamount",
-      "disbursement_amount",
-      "loanamount",
-      "amount",
-      "principal",
-    ]);
-    const detectedTenure = findCol(["tenor", "tenure", "months", "duration", "period"]);
-    const detectedRoi = findCol(["roi", "interestrate", "rate", "rateofinterest"]);
-    const detectedPhone = findCol([
-      "standardizedmobileno",
-      "mobileno",
-      "mobile",
-      "phone",
-      "contact",
-      "whatsappno",
-      "standardizedphone",
-    ]);
-
-    if (detectedName) setNameCol(detectedName);
-    if (detectedAmount) setAmountCol(detectedAmount);
-    if (detectedTenure) setTenureCol(detectedTenure);
-    if (detectedRoi) setRoiCol(detectedRoi);
-    if (detectedPhone) setPhoneCol(detectedPhone);
-  };
-
   // Re-run auto-detection when switching sheet
   const handleSheetChange = (sheetName: string) => {
     setSelectedSheetName(sheetName);
     setCurrentPage(1);
 
+    let activeCols: string[] = [];
+    let activeRowsList: Record<string, any>[] = [];
+
     if (sheetName === "all") {
-      const allCols = Array.from(new Set(sheets.flatMap((s) => s.columns)));
-      autoDetectColumns(allCols);
+      activeCols = Array.from(new Set(sheets.flatMap((s) => s.columns)));
+      activeRowsList = sheets.flatMap((s) => s.rows);
     } else {
       const target = sheets.find((s) => s.name === sheetName);
       if (target) {
-        autoDetectColumns(target.columns);
+        activeCols = target.columns;
+        activeRowsList = target.rows;
       }
+    }
+
+    const detected = autoDetectColumns(activeCols);
+
+    if (activeRowsList.length > 0) {
+      const first = activeRowsList[0];
+      const rawPhone = detected.phone ? first[detected.phone] : "";
+      const phoneInfo = sanitizeIndianPhoneNumber(rawPhone);
+      const rawAmt = detected.amount ? String(first[detected.amount] ?? "").replace(/,/g, "").trim() : "";
+      const principal = parseFloat(rawAmt) || 200000;
+      const rawTenure = detected.tenure ? String(first[detected.tenure] ?? "").replace(/,/g, "").trim() : "";
+      const tenure = parseInt(rawTenure, 10) || 24;
+      const rawRoi = detected.roi ? String(first[detected.roi] ?? "").replace(/%/g, "").trim() : "";
+      const currentRoi = parseFloat(rawRoi) || 23.5;
+      const customerName = detected.name ? String(first[detected.name] ?? "").trim() : "";
+
+      setTestDetails({
+        name: customerName || "Customer 1",
+        phone: phoneInfo.isValid ? phoneInfo.formatted : (phoneInfo.raw || ""),
+        amount: principal > 0 ? principal : 200000,
+        tenure: tenure > 0 ? tenure : 24,
+        currentRoi: currentRoi > 0 ? currentRoi : 23.5,
+        targetRoi: targetRoi,
+        companyName: "Credit Expert India",
+      });
     }
   };
 
@@ -1080,6 +1307,15 @@ export default function ExcelEmiCampaign({
 
   return (
     <div className="space-y-6 text-[#0A2540]">
+      {/* Hidden Global Workbook File Input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".xlsx,.xls,.csv"
+        onChange={handleFileUpload}
+        className="hidden"
+      />
+
       {/* SECTION HEADER CARD (Credit Expert India Website Theme) */}
       <div className="bg-white border border-[#D8E5F5] rounded-[28px] p-6 sm:p-8 shadow-[0_2px_16px_-3px_rgba(50,50,93,0.06),0_4px_6px_-2px_rgba(0,0,0,0.03)] relative overflow-hidden">
         {/* Subtle decorative Misty Skyline image from homepage */}
@@ -1111,29 +1347,62 @@ export default function ExcelEmiCampaign({
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3 shrink-0">
+          <div className="flex flex-wrap items-center gap-2.5 shrink-0">
             {fileName ? (
-              <div className="flex items-center gap-3 bg-white border border-[#D8E5F5] rounded-2xl px-4 py-3 shrink-0 shadow-sm">
-                <div className="w-10 h-10 rounded-xl bg-[#EAF3FF] flex items-center justify-center text-[#0066FF]">
-                  <FileSpreadsheet className="w-5 h-5" />
-                </div>
-                <div>
-                  <div className="text-xs font-bold text-[#0A2540] truncate max-w-[180px]">{fileName}</div>
-                  <div className="text-[11px] text-[#64748B]">
-                    {fileSize} &bull; {sheets.length} sheet{sheets.length > 1 ? "s" : ""}
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3 bg-white border border-[#D8E5F5] rounded-2xl px-4 py-2.5 shadow-sm">
+                  <div className="w-9 h-9 rounded-xl bg-[#EAF3FF] flex items-center justify-center text-[#0066FF]">
+                    <FileSpreadsheet className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <div className="text-xs font-bold text-[#0A2540] truncate max-w-[170px]" title={fileName}>
+                      {fileName}
+                    </div>
+                    <div className="text-[11px] text-[#64748B]">
+                      {fileSize} &bull; {sheets.length} sheet{sheets.length > 1 ? "s" : ""}
+                    </div>
                   </div>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="px-3.5 py-2.5 rounded-2xl bg-white hover:bg-slate-50 text-[#0A2540] hover:text-[#0066FF] font-semibold text-xs transition border border-[#CBD5E1] hover:border-[#0066FF] shadow-xs flex items-center gap-1.5"
+                  title="Upload another Excel file"
+                >
+                  <UploadCloud className="w-3.5 h-3.5 text-[#0066FF]" />
+                  <span>Change</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={handleClearWorkbook}
+                  className="p-2.5 rounded-2xl bg-white hover:bg-red-50 text-slate-400 hover:text-red-600 font-semibold text-xs transition border border-[#CBD5E1] hover:border-red-300 shadow-xs"
+                  title="Clear loaded workbook"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
               </div>
             ) : (
-              <button
-                type="button"
-                onClick={handleLoadDemoDec25}
-                disabled={parsingFile}
-                className="px-4 py-2.5 rounded-2xl bg-[#0066FF] hover:bg-[#0052cc] text-white font-semibold text-xs transition flex items-center gap-2 shadow-md shadow-blue-500/20 disabled:opacity-50"
-              >
-                <Sparkles className="w-4 h-4" />
-                <span>Load Sample Dec-25.xlsx</span>
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={parsingFile}
+                  className="px-4 py-2.5 rounded-2xl bg-[#0066FF] hover:bg-[#0052cc] text-white font-semibold text-xs transition flex items-center gap-2 shadow-md shadow-blue-500/20 disabled:opacity-50 cursor-pointer"
+                >
+                  <UploadCloud className="w-4 h-4" />
+                  <span>Upload Excel File</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={handleLoadDemoDec25}
+                  disabled={parsingFile}
+                  className="px-3.5 py-2.5 rounded-2xl bg-white hover:bg-slate-50 text-[#0A2540] font-semibold text-xs transition flex items-center gap-1.5 border border-[#CBD5E1] shadow-xs disabled:opacity-50"
+                  title="Load sample Dec-25.xlsx demo workbook"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-[#0066FF]" />
+                  <span>Sample Dec-25.xlsx</span>
+                </button>
+              </div>
             )}
           </div>
         </div>
@@ -1179,40 +1448,82 @@ export default function ExcelEmiCampaign({
         </div>
 
         {sheets.length === 0 ? (
-          <div>
-            <label className="flex flex-col items-center justify-center p-10 border-2 border-dashed border-[#CBD5E1] hover:border-[#0066FF] rounded-2xl cursor-pointer bg-gradient-to-b from-[#F8FAFC] to-[#F1F5F9] hover:from-[#F0F7FF] hover:to-[#EAF3FF] transition-all group shadow-sm">
-              <div className="w-14 h-14 rounded-2xl bg-[#EAF3FF] group-hover:bg-[#0066FF] flex items-center justify-center text-[#0066FF] group-hover:text-white transition-all shadow-sm mb-3">
+          <div className="space-y-4">
+            {/* Interactive Drag & Drop Area */}
+            <div
+              onDragOver={handleFileDragOver}
+              onDragEnter={handleFileDragEnter}
+              onDragLeave={handleFileDragLeave}
+              onDrop={handleFileDrop}
+              onClick={() => fileInputRef.current?.click()}
+              className={`flex flex-col items-center justify-center p-10 border-2 border-dashed rounded-2xl cursor-pointer transition-all shadow-sm ${
+                isDragging
+                  ? "border-[#0066FF] bg-blue-50/70 ring-4 ring-[#0066FF]/20 scale-[1.01]"
+                  : "border-[#CBD5E1] hover:border-[#0066FF] bg-gradient-to-b from-[#F8FAFC] to-[#F1F5F9] hover:from-[#F0F7FF] hover:to-[#EAF3FF]"
+              }`}
+            >
+              <div
+                className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all shadow-sm mb-3 ${
+                  isDragging
+                    ? "bg-[#0066FF] text-white animate-bounce"
+                    : "bg-[#EAF3FF] text-[#0066FF]"
+                }`}
+              >
                 <UploadCloud className="w-7 h-7" />
               </div>
-              <span className="text-base font-bold text-[#0A2540] group-hover:text-[#0066FF] transition">
-                {parsingFile ? "Reading workbook sheets..." : "Click or drag & drop Excel workbook"}
+              <span className="text-base font-bold text-[#0A2540]">
+                {parsingFile
+                  ? "Reading & parsing workbook sheets..."
+                  : isDragging
+                  ? "Drop your Excel workbook here"
+                  : "Drag & drop your Excel workbook here, or click to browse"}
               </span>
               <span className="text-xs text-[#64748B] mt-1.5 text-center max-w-md">
-                Supports <code className="font-mono text-[#0A2540] font-semibold">.xlsx</code> and <code className="font-mono text-[#0A2540] font-semibold">.xls</code> (e.g. Dec-25.xlsx with multiple sheets)
+                Supports <code className="font-mono text-[#0A2540] font-semibold">.xlsx</code>,{" "}
+                <code className="font-mono text-[#0A2540] font-semibold">.xls</code>, and{" "}
+                <code className="font-mono text-[#0A2540] font-semibold">.csv</code> (multi-sheet workbooks supported)
               </span>
 
-              {/* Instant sample button */}
-              <div className="flex items-center gap-2 mt-4 pt-3 border-t border-slate-200/60" onClick={(e) => e.stopPropagation()}>
-                <span className="text-xs text-[#64748B]">Or test instantly with sample:</span>
+              <div className="mt-5">
                 <button
                   type="button"
-                  onClick={handleLoadDemoDec25}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    fileInputRef.current?.click();
+                  }}
                   disabled={parsingFile}
-                  className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-[#EAF3FF] text-[#0066FF] hover:bg-blue-100 border border-[#BFDBFE] transition flex items-center gap-1.5 shadow-sm"
+                  className="px-5 py-2.5 rounded-xl bg-[#0066FF] hover:bg-[#0052cc] text-white text-xs font-semibold shadow-md shadow-blue-500/20 transition flex items-center gap-2 cursor-pointer"
                 >
-                  <Sparkles className="w-3.5 h-3.5" />
-                  <span>Load &quot;Dec-25.xlsx&quot; (2 Sheets, 49,664 records)</span>
+                  <UploadCloud className="w-4 h-4" />
+                  <span>Browse File from Computer</span>
                 </button>
               </div>
+            </div>
 
-              <input
-                type="file"
-                accept=".xlsx,.xls,.csv"
-                onChange={handleFileUpload}
+            {/* Clearly Separated Sample Demo Loader */}
+            <div className="p-4 rounded-2xl bg-white border border-[#E2E8F0] flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xs">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-[#EAF3FF] text-[#0066FF] flex items-center justify-center shrink-0">
+                  <Sparkles className="w-4 h-4" />
+                </div>
+                <div>
+                  <div className="text-xs font-bold text-[#0A2540]">Need sample data to test with?</div>
+                  <div className="text-[11px] text-[#64748B]">
+                    Load our pre-packaged sample portfolio (<code className="font-mono text-[#0A2540]">Dec-25.xlsx</code> with 2 sheets &amp; 49,664 records)
+                  </div>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={handleLoadDemoDec25}
                 disabled={parsingFile}
-                className="hidden"
-              />
-            </label>
+                className="px-4 py-2 rounded-xl text-xs font-semibold bg-[#F1F5F9] hover:bg-[#E2E8F0] text-[#0A2540] transition border border-[#CBD5E1] flex items-center gap-1.5 shrink-0 disabled:opacity-50 cursor-pointer"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-[#0066FF]" />
+                <span>Load Sample Dec-25.xlsx</span>
+              </button>
+            </div>
+
             {parseError && (
               <div className="mt-3 p-3.5 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 flex items-center gap-2">
                 <AlertTriangle className="w-4 h-4 shrink-0 text-red-500" />
@@ -1273,17 +1584,23 @@ export default function ExcelEmiCampaign({
                 </div>
               </div>
 
-              <div className="md:col-span-4 flex md:justify-end">
-                <label className="cursor-pointer text-xs font-semibold text-[#0A2540] hover:text-[#0066FF] px-3.5 py-2 rounded-xl border border-[#D8E5F5] hover:border-[#0066FF] bg-white hover:bg-blue-50/50 transition flex items-center gap-2 shadow-sm">
+              <div className="md:col-span-4 flex md:justify-end items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="cursor-pointer text-xs font-semibold text-[#0A2540] hover:text-[#0066FF] px-3.5 py-2 rounded-xl border border-[#D8E5F5] hover:border-[#0066FF] bg-white hover:bg-blue-50/50 transition flex items-center gap-2 shadow-sm"
+                >
                   <UploadCloud className="w-4 h-4 text-[#0066FF]" />
                   <span>Upload different file</span>
-                  <input
-                    type="file"
-                    accept=".xlsx,.xls,.csv"
-                    onChange={handleFileUpload}
-                    className="hidden"
-                  />
-                </label>
+                </button>
+                <button
+                  type="button"
+                  onClick={handleClearWorkbook}
+                  className="p-2 rounded-xl text-xs font-semibold bg-white border border-[#D8E5F5] hover:border-red-300 hover:text-red-600 text-slate-400 hover:bg-red-50/50 transition shadow-sm"
+                  title="Remove file and reset"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
               </div>
             </div>
 
@@ -1516,6 +1833,45 @@ export default function ExcelEmiCampaign({
                 Match sheet headers to calculate EMIs and customer variables
               </span>
             </div>
+
+            {/* Column Auto-Detection Status Banner */}
+            {(!nameCol || !amountCol || !tenureCol || !roiCol || !phoneCol) ? (
+              <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-900 flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-xs">
+                <div className="flex items-center gap-2.5">
+                  <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+                  <span>
+                    <strong>Action Required:</strong> Please select matching columns below for:{" "}
+                    <strong>
+                      {[
+                        !nameCol && "Customer Name",
+                        !amountCol && "Loan Amount",
+                        !tenureCol && "Tenure",
+                        !roiCol && "Current ROI",
+                        !phoneCol && "Mobile / Phone",
+                      ]
+                        .filter(Boolean)
+                        .join(", ")}
+                    </strong>
+                    .
+                  </span>
+                </div>
+                <span className="text-[11px] text-amber-700 bg-amber-100/70 px-2 py-0.5 rounded-md self-start sm:self-auto font-medium">
+                  {5 - [!nameCol, !amountCol, !tenureCol, !roiCol, !phoneCol].filter(Boolean).length}/5 Mapped
+                </span>
+              </div>
+            ) : (
+              <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-900 flex items-center justify-between gap-2 shadow-xs">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>
+                    All 5 required columns mapped: <strong>{nameCol}</strong> (Name), <strong>{amountCol}</strong> (Amount), <strong>{tenureCol}</strong> (Tenure), <strong>{roiCol}</strong> (ROI), <strong>{phoneCol}</strong> (Phone).
+                  </span>
+                </div>
+                <span className="text-[11px] text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-md font-semibold shrink-0">
+                  5/5 Ready
+                </span>
+              </div>
+            )}
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
               {/* Column 1: Customer Name */}
