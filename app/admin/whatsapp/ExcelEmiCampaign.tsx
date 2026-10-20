@@ -207,6 +207,7 @@ export default function ExcelEmiCampaign({
   const [totalToProcess, setTotalToProcess] = useState(0);
   const [dispatchLogs, setDispatchLogs] = useState<DispatchLogItem[]>([]);
   const [stats, setStats] = useState({ success: 0, failed: 0, skipped: 0 });
+  const [failedRowsList, setFailedRowsList] = useState<RowProcessingResult[]>([]);
 
   // Refs for pause/stop control
   const isPausedRef = useRef(false);
@@ -682,8 +683,7 @@ export default function ExcelEmiCampaign({
     }
 
     const counts: Record<string, number> = {};
-    const sampleLimit = Math.min(rawActiveRows.length, 3000);
-    for (let i = 0; i < sampleLimit; i++) {
+    for (let i = 0; i < rawActiveRows.length; i++) {
       const val = rawActiveRows[i][columnFilterCol];
       if (val !== undefined && val !== null) {
         const s = String(val).trim();
@@ -695,7 +695,7 @@ export default function ExcelEmiCampaign({
 
     return Object.entries(counts)
       .sort((a, b) => b[1] - a[1])
-      .slice(0, 6)
+      .slice(0, 8)
       .map(([value, count]) => ({ value, count }));
   }, [columnFilterCol, rawActiveRows]);
 
@@ -1079,6 +1079,7 @@ export default function ExcelEmiCampaign({
       const res = await fetch("/api/whatsapp", {
         method: "POST",
         body: formData,
+        signal: AbortSignal.timeout(45000),
       });
       const data = await res.json();
       setCustomTestResponse(data);
@@ -1089,15 +1090,18 @@ export default function ExcelEmiCampaign({
     } catch (err: any) {
       setCustomTestResponse({
         success: false,
-        error: err.message || "Network exception while contacting WhatsApp API.",
+        error:
+          err.name === "TimeoutError"
+            ? "Request timed out after 45s. Check network or gateway latency."
+            : err.message || "Network exception while contacting WhatsApp API.",
       });
     } finally {
       setSendingCustomTest(false);
     }
   };
 
-  // Launch Batch Dispatch
-  const handleStartBatchDispatch = async () => {
+  // Launch Batch Dispatch (supports retry of failed recipients)
+  const handleStartBatchDispatch = async (itemsOverride?: RowProcessingResult[]) => {
     if (processedData.length === 0) {
       alert("No data available to send.");
       return;
@@ -1112,7 +1116,11 @@ export default function ExcelEmiCampaign({
 
     // Determine target subset based on scope
     let itemsToProcess: RowProcessingResult[] = [];
-    if (dispatchRange === "count") {
+    const isRetryMode = Boolean(itemsOverride && itemsOverride.length > 0);
+
+    if (isRetryMode && itemsOverride) {
+      itemsToProcess = itemsOverride;
+    } else if (dispatchRange === "count") {
       const startIdx = Math.max(0, customRangeStart - 1);
       const count = Math.max(1, customPeopleCount);
       const endIdx = Math.min(processedData.length, startIdx + count);
@@ -1143,11 +1151,16 @@ export default function ExcelEmiCampaign({
       }
     }
 
-    const filterNotice = isColumnFilterActive
-      ? `\n\n🎯 Target Filter Active: Column "${columnFilterCol === "__ALL__" ? "All Columns" : columnFilterCol}" ${columnFilterCondition} "${columnFilterKeyword}"\n(${itemsToProcess.length} of ${rawActiveRows.length.toLocaleString()} total workbook records)`
-      : "";
+    const filterNotice =
+      isColumnFilterActive && !isRetryMode
+        ? `\n\n🎯 Target Filter Active: Column "${columnFilterCol === "__ALL__" ? "All Columns" : columnFilterCol}" ${columnFilterCondition} "${columnFilterKeyword}"\n(${itemsToProcess.length} of ${rawActiveRows.length.toLocaleString()} total workbook records)`
+        : "";
 
-    const confirmMsg = `Are you sure you want to launch this campaign to ${itemsToProcess.length} recipients?${filterNotice}\n\n• Template: #${selectedTemplateId} (${currentTemplate?.TemplateName || "Selected"})\n• Throttle: ${throttleDelayMs}ms delay between requests\n• Target ROI: ${targetRoi}%\n• Sample: "${itemsToProcess[0]?.sampleString || ""}"`;
+    const confirmPrefix = isRetryMode
+      ? `Retry dispatching to ${itemsToProcess.length} previously failed recipients?`
+      : `Are you sure you want to launch this campaign to ${itemsToProcess.length} recipients?${filterNotice}`;
+
+    const confirmMsg = `${confirmPrefix}\n\n• Template: #${selectedTemplateId} (${currentTemplate?.TemplateName || "Selected"})\n• Throttle: ${throttleDelayMs}ms delay between requests\n• Target ROI: ${targetRoi}%\n• Sample: "${itemsToProcess[0]?.sampleString || ""}"`;
     if (!window.confirm(confirmMsg)) return;
 
     // Reset controls
@@ -1156,12 +1169,20 @@ export default function ExcelEmiCampaign({
     setDispatchStatus("running");
     setTotalToProcess(itemsToProcess.length);
     setProgressIndex(0);
-    setStats({ success: 0, failed: 0, skipped: 0 });
-    setDispatchLogs([]);
 
-    let currentSuccess = 0;
+    let currentSuccess = isRetryMode ? stats.success : 0;
     let currentFailed = 0;
-    let currentSkipped = 0;
+    let currentSkipped = isRetryMode ? stats.skipped : 0;
+    const newFailedItems: RowProcessingResult[] = [];
+
+    if (!isRetryMode) {
+      setStats({ success: 0, failed: 0, skipped: 0 });
+      setDispatchLogs([]);
+      setFailedRowsList([]);
+    } else {
+      setStats((prev) => ({ ...prev, failed: 0 }));
+      setFailedRowsList([]);
+    }
 
     for (let i = 0; i < itemsToProcess.length; i++) {
       if (isAbortedRef.current) {
@@ -1222,6 +1243,7 @@ export default function ExcelEmiCampaign({
         const res = await fetch("/api/whatsapp", {
           method: "POST",
           body: formData,
+          signal: AbortSignal.timeout(45000),
         });
         const data = await res.json();
 
@@ -1243,6 +1265,8 @@ export default function ExcelEmiCampaign({
           ]);
         } else {
           currentFailed++;
+          newFailedItems.push(item);
+          setFailedRowsList([...newFailedItems]);
           setStats({ success: currentSuccess, failed: currentFailed, skipped: currentSkipped });
           setDispatchLogs((prev) => [
             {
@@ -1260,6 +1284,8 @@ export default function ExcelEmiCampaign({
         }
       } catch (err: any) {
         currentFailed++;
+        newFailedItems.push(item);
+        setFailedRowsList([...newFailedItems]);
         setStats({ success: currentSuccess, failed: currentFailed, skipped: currentSkipped });
         setDispatchLogs((prev) => [
           {
@@ -1269,7 +1295,10 @@ export default function ExcelEmiCampaign({
             name: item.name,
             phone: item.phoneInfo.formatted,
             status: "FAILED",
-            error: err.message || "Network exception",
+            error:
+              err.name === "TimeoutError"
+                ? "Request timed out after 45s"
+                : err.message || "Network exception",
             sampleString: item.sampleString,
           },
           ...prev.slice(0, 49),
@@ -1755,10 +1784,11 @@ export default function ExcelEmiCampaign({
                         type="button"
                         onClick={() => {
                           setColumnFilterKeyword(value);
+                          setColumnFilterCondition("exact");
                           setCurrentPage(1);
                         }}
                         className={`px-2 py-0.5 rounded-lg text-[10px] font-medium transition border flex items-center gap-1 ${
-                          columnFilterKeyword === value
+                          columnFilterKeyword === value && columnFilterCondition === "exact"
                             ? "bg-[#0066FF] text-white border-[#0066FF] shadow-xs"
                             : "bg-white text-[#3C4F69] border-[#CBD5E1] hover:border-[#0066FF] hover:bg-blue-50/50"
                         }`}
@@ -3802,7 +3832,7 @@ export default function ExcelEmiCampaign({
                 dispatchStatus === "aborted" ? (
                   <button
                     type="button"
-                    onClick={handleStartBatchDispatch}
+                    onClick={() => handleStartBatchDispatch()}
                     className="px-6 py-2.5 rounded-xl bg-[#10B981] hover:bg-[#059669] text-white font-bold text-xs flex items-center gap-2 shadow-lg shadow-emerald-500/25 transition"
                   >
                     <Play className="w-4 h-4 fill-white" />
@@ -3837,6 +3867,22 @@ export default function ExcelEmiCampaign({
                     <span>Resume Campaign</span>
                   </button>
                 )}
+
+                {/* Quick Retry for Failed Recipients */}
+                {failedRowsList.length > 0 &&
+                  (dispatchStatus === "idle" ||
+                    dispatchStatus === "completed" ||
+                    dispatchStatus === "aborted") && (
+                    <button
+                      type="button"
+                      onClick={() => handleStartBatchDispatch(failedRowsList)}
+                      className="px-5 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs flex items-center gap-2 shadow-lg shadow-amber-600/25 transition"
+                      title="Re-dispatch only the rows that previously encountered network timeouts or errors"
+                    >
+                      <RotateCcw className="w-4 h-4" />
+                      <span>Retry Failed ({failedRowsList.length})</span>
+                    </button>
+                  )}
 
                 {(dispatchStatus === "running" || dispatchStatus === "paused") && (
                   <button

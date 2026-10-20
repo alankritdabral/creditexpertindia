@@ -27,13 +27,13 @@ export function Footer() {
               </p>
             </div>
             <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
-              <a
-                href="#check-eligibility"
+              <Link
+                href="/eligibility#credit-profile"
                 className="flex items-center gap-2 rounded-full bg-white px-6 py-3 text-[14px] font-bold text-brand-black hover:bg-slate-100 transition-colors whitespace-nowrap"
               >
                 Get Free Assessment
                 <ArrowRight className="w-4 h-4" />
-              </a>
+              </Link>
               <a
                 href={`https://wa.me/${contact.whatsapp.replace(/[^0-9]/g, '')}?text=Hi%2C%20I%20would%20like%20help%20with%20my%20loans.`}
                 target="_blank"

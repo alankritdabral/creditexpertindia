@@ -146,7 +146,7 @@ export function ContactForm() {
     }
 
     return (
-      <div className="bg-white rounded-3xl shadow-[0_8px_30px_rgb(7,27,58,0.06)] border border-slate-200/50 p-6 sm:p-10 relative z-20 flex flex-col" id="contact-form">
+      <div className="bg-white rounded-3xl shadow-[0_8px_30px_rgb(7,27,58,0.06)] border border-slate-200/50 p-6 sm:p-10 relative z-20 flex flex-col scroll-mt-24" id="contact-form">
         <div className="mb-6 md:mb-8 shrink-0">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-2">
             <h2 className="text-[26px] font-bold text-[#0B2945]">Get in touch</h2>

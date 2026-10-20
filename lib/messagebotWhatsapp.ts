@@ -1,10 +1,32 @@
 import dns from "dns";
+import net from "net";
 
-// Ensure Node.js prioritizes IPv4 over IPv6 to avoid connection timeouts
+// 1. Ensure Node.js prioritizes IPv4 over IPv6 in DNS lookup
 try {
   dns.setDefaultResultOrder("ipv4first");
 } catch {
   // Ignore in environments where this method is unavailable
+}
+
+// 2. Disable Node's Happy Eyeballs autoSelectFamily algorithm.
+// On networks where IPv6 is unroutable, Node's default 250ms socket attempt timeout
+// causes dual-stack socket cancellation when connecting to overseas Cloudflare edges,
+// producing AggregateError: ETIMEDOUT.
+try {
+  if (typeof (net as any).setDefaultAutoSelectFamily === "function") {
+    (net as any).setDefaultAutoSelectFamily(false);
+  }
+} catch {
+  // Ignore
+}
+
+// 3. Expand the attempt timeout in case any worker or child agent re-enables it
+try {
+  if (typeof (net as any).setDefaultAutoSelectFamilyAttemptTimeout === "function") {
+    (net as any).setDefaultAutoSelectFamilyAttemptTimeout(3000);
+  }
+} catch {
+  // Ignore
 }
 
 const DEFAULT_BASE_URL = "https://papi.messagebot.in";
@@ -168,6 +190,93 @@ export function formatWhatsappNumber(raw: string): string {
   return digits;
 }
 
+interface FetchMessagebotOptions extends RequestInit {
+  timeoutMs?: number;
+  retries?: number;
+  retryDelayMs?: number;
+}
+
+/**
+ * Robust fetch wrapper for MessageBot API:
+ * - Applies per-attempt timeout via AbortController
+ * - Automatically retries on transient socket/network errors (ETIMEDOUT, ECONNRESET, ENETUNREACH, fetch failed)
+ * - Prevents unhandled crashes and produces informative, friendly error diagnostics
+ */
+async function fetchMessagebotWithRetry(
+  url: string,
+  options: FetchMessagebotOptions = {}
+): Promise<Response> {
+  const {
+    timeoutMs = 35000,
+    retries = 2,
+    retryDelayMs = 800,
+    ...fetchOptions
+  } = options;
+
+  let lastError: any = null;
+
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    const controller = new AbortController();
+    const timer = setTimeout(
+      () =>
+        controller.abort(
+          new Error(`Gateway connection timed out after ${Math.round(timeoutMs / 1000)}s`)
+        ),
+      timeoutMs
+    );
+
+    try {
+      const response = await fetch(url, {
+        ...fetchOptions,
+        signal: controller.signal,
+      });
+      clearTimeout(timer);
+      return response;
+    } catch (err: any) {
+      clearTimeout(timer);
+      lastError = err;
+
+      const isRetryable =
+        err?.name === "TimeoutError" ||
+        err?.name === "AbortError" ||
+        err?.code === "ETIMEDOUT" ||
+        err?.code === "ECONNRESET" ||
+        err?.code === "ECONNREFUSED" ||
+        err?.code === "ENETUNREACH" ||
+        err?.cause?.code === "ETIMEDOUT" ||
+        err?.cause?.name === "AggregateError" ||
+        String(err?.message || "").toLowerCase().includes("fetch failed") ||
+        String(err?.message || "").toLowerCase().includes("timeout");
+
+      if (attempt < retries && isRetryable) {
+        console.warn(
+          `[MessageBot API] Attempt ${attempt + 1}/${retries + 1} to ${url} failed (${err.code || err.cause?.code || err.message}). Retrying in ${retryDelayMs * (attempt + 1)}ms...`
+        );
+        await new Promise((r) => setTimeout(r, retryDelayMs * (attempt + 1)));
+        continue;
+      }
+      break;
+    }
+  }
+
+  let friendlyMsg = lastError?.message || "Network exception while contacting MessageBot gateway.";
+  if (
+    lastError?.code === "ETIMEDOUT" ||
+    lastError?.cause?.code === "ETIMEDOUT" ||
+    lastError?.cause?.name === "AggregateError"
+  ) {
+    friendlyMsg =
+      "MessageBot gateway connection timed out (ETIMEDOUT). The remote server or local network took too long to connect. Please check internet connection or retry.";
+  } else if (lastError?.name === "TimeoutError" || lastError?.name === "AbortError") {
+    friendlyMsg = `MessageBot gateway took longer than ${Math.round(timeoutMs / 1000)}s to respond.`;
+  }
+
+  const enhancedError = new Error(friendlyMsg);
+  (enhancedError as any).cause = lastError;
+  (enhancedError as any).code = lastError?.code || lastError?.cause?.code || "ETIMEDOUT";
+  throw enhancedError;
+}
+
 /**
  * 1. WhatsApp Send OTP API
  * POST https://papi.messagebot.in/whatsapp/SendOtp
@@ -208,11 +317,12 @@ export async function sendWhatsappOtp({
 
   try {
     const url = `${process.env.MESSAGEBOT_WHATSAPP_BASE_URL || DEFAULT_BASE_URL}/whatsapp/SendOtp`;
-    const response = await fetch(url, {
+    const response = await fetchMessagebotWithRetry(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
-      signal: AbortSignal.timeout(12000),
+      timeoutMs: 25000,
+      retries: 1,
     });
 
     const resJson: WhatsappBaseResponse = await response.json();
@@ -232,7 +342,7 @@ export async function sendWhatsappOtp({
       data: resJson,
     };
   } catch (err: any) {
-    console.error("[WhatsApp API: SendOtp Exception]", err);
+    console.error("[WhatsApp API: SendOtp Exception]", err?.message || err);
     return {
       success: false,
       error: err.message || "Network exception while contacting WhatsApp OTP gateway.",
@@ -299,10 +409,12 @@ export async function sendWhatsappMessage(
 
   try {
     const url = `${process.env.MESSAGEBOT_WHATSAPP_BASE_URL || DEFAULT_BASE_URL}/whatsapp/SendMessage`;
-    const response = await fetch(url, {
+    const response = await fetchMessagebotWithRetry(url, {
       method: "POST",
       body: formData,
-      signal: AbortSignal.timeout(15000),
+      timeoutMs: 35000,
+      retries: 2,
+      retryDelayMs: 800,
     });
 
     const resJson: WhatsappBaseResponse = await response.json();
@@ -323,7 +435,7 @@ export async function sendWhatsappMessage(
       data: resJson,
     };
   } catch (err: any) {
-    console.error("[WhatsApp API: SendMessage Exception]", err);
+    console.error("[WhatsApp API: SendMessage Exception]", err?.message || err);
     return {
       success: false,
       error: err.message || "Network exception while dispatching WhatsApp message.",
@@ -345,9 +457,10 @@ export async function getWhatsappTimeZoneList(
 
   try {
     const url = `${process.env.MESSAGEBOT_WHATSAPP_BASE_URL || DEFAULT_BASE_URL}/common/GetTimeZoneList?apiToken=${encodeURIComponent(token)}`;
-    const response = await fetch(url, {
+    const response = await fetchMessagebotWithRetry(url, {
       method: "GET",
-      signal: AbortSignal.timeout(10000),
+      timeoutMs: 15000,
+      retries: 1,
     });
 
     const resJson: WhatsappBaseResponse<TimeZoneItem[]> = await response.json();
@@ -388,14 +501,15 @@ export async function getWhatsappDlrDetails({
 
   try {
     const url = `${process.env.MESSAGEBOT_WHATSAPP_BASE_URL || DEFAULT_BASE_URL}/Whatsapp/GetDlrDetails`;
-    const response = await fetch(url, {
+    const response = await fetchMessagebotWithRetry(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         apiToken: token,
         WhatsAppCampaignId: String(campaignId),
       }),
-      signal: AbortSignal.timeout(10000),
+      timeoutMs: 20000,
+      retries: 1,
     });
 
     const resJson: WhatsappBaseResponse<WhatsappDlrData> = await response.json();
@@ -442,14 +556,15 @@ export async function getWhatsappCampaignDetails({
 
   try {
     const url = `${process.env.MESSAGEBOT_WHATSAPP_BASE_URL || DEFAULT_BASE_URL}/whatsapp/GetWhatsAppCampaignDetails`;
-    const response = await fetch(url, {
+    const response = await fetchMessagebotWithRetry(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         apiToken: token,
         campaignId: formattedCampaignIds,
       }),
-      signal: AbortSignal.timeout(10000),
+      timeoutMs: 20000,
+      retries: 1,
     });
 
     const resJson: WhatsappBaseResponse<WhatsappCampaignItem[]> = await response.json();
@@ -508,10 +623,11 @@ export async function addWhatsappTemplate(
 
   try {
     const url = `${process.env.MESSAGEBOT_WHATSAPP_BASE_URL || DEFAULT_BASE_URL}/whatsapp/templates/add`;
-    const response = await fetch(url, {
+    const response = await fetchMessagebotWithRetry(url, {
       method: "POST",
       body: formData,
-      signal: AbortSignal.timeout(15000),
+      timeoutMs: 25000,
+      retries: 1,
     });
 
     const resJson: WhatsappBaseResponse = await response.json();
@@ -550,9 +666,10 @@ export async function getWhatsappTemplatesList(
 
   try {
     const url = `${process.env.MESSAGEBOT_WHATSAPP_BASE_URL || DEFAULT_BASE_URL}/whatsapp/templates/getlist?apitoken=${encodeURIComponent(token)}`;
-    const response = await fetch(url, {
+    const response = await fetchMessagebotWithRetry(url, {
       method: "GET",
-      signal: AbortSignal.timeout(12000),
+      timeoutMs: 20000,
+      retries: 1,
     });
 
     const resJson: WhatsappBaseResponse<WhatsappTemplateItem[]> = await response.json();
@@ -595,9 +712,10 @@ export async function getWhatsappTemplateById({
 
   try {
     const url = `${process.env.MESSAGEBOT_WHATSAPP_BASE_URL || DEFAULT_BASE_URL}/whatsapp/templates/GetById?whatsAppTemplateId=${encodeURIComponent(templateId)}&apiToken=${encodeURIComponent(token)}&apitoken=${encodeURIComponent(token)}`;
-    const response = await fetch(url, {
+    const response = await fetchMessagebotWithRetry(url, {
       method: "GET",
-      signal: AbortSignal.timeout(10000),
+      timeoutMs: 15000,
+      retries: 1,
     });
 
     const resJson: WhatsappBaseResponse<WhatsappTemplateItem> = await response.json();

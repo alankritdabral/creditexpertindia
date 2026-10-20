@@ -1,8 +1,8 @@
 import { Metadata } from "next";
+import Image from "next/image";
 import { ContactForm } from "@/components/ContactForm";
 import { contact } from "@/lib/config";
-import { MapPin, Phone, Mail, Clock } from "lucide-react";
-import { AnimatedMeshBackground } from "@/components/AnimatedMeshBackground";
+import { MapPin, Phone, Mail, ArrowRight } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Contact Us | Credit Expert India",
@@ -13,10 +13,17 @@ export default function ContactPage() {
   return (
     <div className="min-h-screen bg-slate-50">
       
-      <section className="relative w-full pt-32 pb-24 lg:pt-40 lg:pb-32 bg-background overflow-hidden border-b border-icy-blue">
-        <div className="absolute inset-0 -z-10 h-full w-full">
-          <AnimatedMeshBackground />
-          <div className="absolute top-0 right-0 w-full h-full max-w-[60%] transform origin-top-right -skew-y-12 bg-gradient-to-bl from-[#E2D6CC]/40 to-transparent pointer-events-none" />
+      <section className="relative isolate w-full pt-32 pb-24 lg:pt-40 lg:pb-32 overflow-hidden border-b border-icy-blue">
+        <div className="absolute inset-0 pointer-events-none z-0">
+          <Image
+            src="/contact.png"
+            alt="Contact Hero Background"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-right sm:object-[75%_center] opacity-75"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-white/80 via-white/30 to-transparent" />
         </div>
         <div className="container-narrow text-center relative z-10">
           <span className="text-xs font-extrabold uppercase tracking-widest text-brand-black/80">
@@ -28,6 +35,15 @@ export default function ContactPage() {
           <p className="mt-3 max-w-2xl mx-auto text-sm text-brand-black/80 font-medium">
             Have questions about your debt consolidation or loan options? We are here to assist.
           </p>
+          <div className="mt-8 flex justify-center">
+            <a
+              href="#contact-form"
+              className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-slate-900 px-8 text-sm font-semibold text-white hover:bg-slate-800 transition-colors shadow-lg"
+            >
+              <span>Get in Touch</span>
+              <ArrowRight className="h-4 w-4" />
+            </a>
+          </div>
         </div>
       </section>
 

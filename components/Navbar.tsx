@@ -125,13 +125,13 @@ export function Navbar() {
                 Sign in <span className="ml-0.5 opacity-50">&rarr;</span>
               </a>
             )}
-            <a
-              href="#lead-form"
+            <Link
+              href={pathname === "/" ? "#lead-form" : pathname === "/eligibility" ? "#credit-profile" : "/eligibility#credit-profile"}
               className="group flex items-center justify-center rounded-full bg-slate-900 px-4 py-2 text-[15px] font-medium text-white transition-all duration-200 hover:bg-slate-800 hover:shadow-md active:scale-95"
             >
               Get Assessment
               <ArrowRight className="ml-1.5 h-4 w-4 transition-transform group-hover:translate-x-1" />
-            </a>
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}
@@ -210,7 +210,7 @@ export function Navbar() {
 
                 {/* Primary CTA */}
                 <Link
-                  href="#lead-form"
+                  href={pathname === "/" ? "#lead-form" : pathname === "/eligibility" ? "#credit-profile" : "/eligibility#credit-profile"}
                   onClick={() => setOpen(false)}
                   className="mx-2 mb-4 group flex items-center justify-between p-3 rounded-full text-white active:scale-[0.98] transition-transform shadow-lg shadow-blue-900/20"
                   style={{ background: 'linear-gradient(135deg, #0B5ED7, #0751C9)' }}

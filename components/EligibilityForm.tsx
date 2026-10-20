@@ -601,7 +601,7 @@ export function EligibilityForm() {
         return (
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-2xl font-bold text-brand-black">Credit Profile & Identity</h3>
+              <h3 id="credit-profile-identity" className="text-2xl font-bold text-brand-black scroll-mt-28">Credit Profile & Identity</h3>
               <div className="flex gap-2">
                 {isAdmin && (
                   <div className="flex items-center gap-1.5 px-3 py-1 bg-purple-50 border border-purple-100 rounded-full text-purple-600 shadow-sm" title="Logged in as Admin">

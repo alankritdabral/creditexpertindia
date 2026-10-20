@@ -23,7 +23,7 @@ export function WhoWeHelp() {
               <motion.a
                 whileHover={{ scale: 1.02, y: -1 }}
                 whileTap={{ scale: 0.98 }}
-                href="#lead-form"
+                href="#credit-profile"
                 className="shimmer-btn inline-flex h-12 items-center justify-center gap-2 rounded-full bg-[#091328] px-7 text-xs font-extrabold tracking-wider text-white shadow-md hover:bg-[#132247]"
               >
                 <span>CHECK MY ELIGIBILITY</span>
