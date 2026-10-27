@@ -88,20 +88,101 @@ export function formatInrCurrency(
   return options.showSymbol ? `₹${formatted}` : formatted;
 }
 
-/**
- * Validates and formats Indian 10-digit mobile number to WhatsApp international format (91XXXXXXXXXX).
- */
-export function sanitizeIndianPhoneNumber(raw: any): {
+export type PhoneFormatOption =
+  | "auto"              // Smart Combined / Auto-Detect (Mixed: 10-digit, 91 prefix, 91 with space/dash, etc.)
+  | "plain_10"          // Pure 10-digit without country code (e.g. 9876543210 -> Prepend 91)
+  | "has_91"            // Already has 91 or +91 (e.g. 919876543210 or +919876543210)
+  | "space_separated"   // 91 then space or separator (e.g. 91 9876543210 or +91 98765 43210)
+  | "last_10";          // Extract last 10 digits & add 91 (safe fallback for dirty/prefixed numbers)
+
+export interface PhoneSanitizeResult {
   raw: string;
   formatted: string;
   isValid: boolean;
   error?: string;
-} {
-  if (raw === undefined || raw === null) {
+  detectedFormat?: string;
+}
+
+export const PHONE_FORMAT_OPTIONS: {
+  id: PhoneFormatOption;
+  label: string;
+  shortLabel: string;
+  description: string;
+  example: string;
+  badge?: string;
+}[] = [
+  {
+    id: "auto",
+    label: "Auto-Detect / Combined (Smart)",
+    shortLabel: "Auto Combined",
+    description: "Handles mixed formats in same column: plain 10-digit, +91, 91 with space/hyphen, leading 0, etc.",
+    example: "9876543210, +91 98765 43210, 919876543210",
+    badge: "Recommended",
+  },
+  {
+    id: "plain_10",
+    label: "Simply Number (Plain 10-Digit)",
+    shortLabel: "Plain 10-Digit",
+    description: "Column contains 10-digit mobile numbers without country code. Automatically prepends +91.",
+    example: "9827322519 ➔ 919827322519",
+  },
+  {
+    id: "has_91",
+    label: "With 91 Automatically",
+    shortLabel: "With 91 Prefix",
+    description: "Column already includes 91 or +91 country prefix. Verifies and cleans non-digits.",
+    example: "919827322519 or +919827322519",
+  },
+  {
+    id: "space_separated",
+    label: "91 Then Space / Dash Then Number",
+    shortLabel: "91 With Space",
+    description: "Column formatted with space or hyphen delimiter. Strips separators and standardizes to 91XXXXXXXXXX.",
+    example: "91 98273 22519 or +91-9827322519",
+  },
+  {
+    id: "last_10",
+    label: "Extract Last 10 Digits",
+    shortLabel: "Last 10 Digits",
+    description: "Extracts the rightmost 10 digits and prepends 91. Robust fallback for messy/erratic columns.",
+    example: "0091-9827322519 ➔ 919827322519",
+  },
+];
+
+/**
+ * Validates and formats Indian 10-digit mobile number to WhatsApp international format (91XXXXXXXXXX).
+ * Supports configurable format modes:
+ * - auto: Smart detection across mixed rows (pure 10-digit, with 91, 91 with spaces, leading 0, etc.)
+ * - plain_10: Strictly pure 10-digit numbers without country code (automatically adds 91)
+ * - has_91: Numbers already prefixed with 91 or +91
+ * - space_separated: Numbers written with 91 followed by space/separator
+ * - last_10: Extracts the last 10 digits and prepends 91
+ */
+export function sanitizeIndianPhoneNumber(
+  raw: any,
+  mode: PhoneFormatOption = "auto",
+  defaultCountryCode: string = "91"
+): PhoneSanitizeResult {
+  if (raw === undefined || raw === null || raw === "") {
     return { raw: "", formatted: "", isValid: false, error: "Empty phone number" };
   }
 
-  const rawStr = String(raw).trim();
+  let rawStr = String(raw).trim();
+  // Strip trailing decimal zeroes from Excel (e.g. 9827322519.0 or 919827322519.00)
+  rawStr = rawStr.replace(/\.0+$/, "");
+
+  // If scientific notation e.g. 9.827322519e+09 or 9.19827e+11 from Excel
+  if (/^[+-]?\d+(\.\d+)?[eE][+-]?\d+$/.test(rawStr)) {
+    try {
+      const num = Number(rawStr);
+      if (!isNaN(num) && isFinite(num)) {
+        rawStr = BigInt(Math.round(num)).toString();
+      }
+    } catch {
+      // ignore
+    }
+  }
+
   // Strip non-digits
   const digits = rawStr.replace(/\D/g, "");
 
@@ -109,33 +190,193 @@ export function sanitizeIndianPhoneNumber(raw: any): {
     return { raw: rawStr, formatted: "", isValid: false, error: "No digits found" };
   }
 
-  // 10-digit mobile number: prefix with 91
-  if (digits.length === 10) {
-    if (/^[6-9]\d{9}$/.test(digits)) {
-      return { raw: rawStr, formatted: `91${digits}`, isValid: true };
+  const cc = defaultCountryCode.replace(/\D/g, "") || "91";
+
+  // MODE: Plain 10-digit numbers (no country code in column)
+  if (mode === "plain_10") {
+    let tenDigits = digits;
+    if (digits.length === 11 && digits.startsWith("0")) {
+      tenDigits = digits.slice(1);
     }
+    // If user selected plain_10 but row accidentally had 91 prefix
+    if (digits.length === (cc.length + 10) && digits.startsWith(cc)) {
+      tenDigits = digits.slice(cc.length);
+    }
+
+    if (tenDigits.length === 10) {
+      const valid = /^[6-9]\d{9}$/.test(tenDigits);
+      return {
+        raw: rawStr,
+        formatted: `${cc}${tenDigits}`,
+        isValid: valid,
+        detectedFormat: "10-Digit Mobile",
+        error: valid ? undefined : "Indian mobile numbers typically start with 6, 7, 8, or 9",
+      };
+    }
+
     return {
       raw: rawStr,
-      formatted: `91${digits}`,
+      formatted: `${cc}${tenDigits.slice(-10)}`,
       isValid: false,
-      error: "Indian mobile numbers typically start with 6, 7, 8, or 9",
+      error: `Expected 10 digits, found ${digits.length} digits`,
     };
   }
 
-  // 12 digits starting with 91: e.g. 919827322519
-  if (digits.length === 12 && digits.startsWith("91")) {
-    const local = digits.slice(2);
-    if (/^[6-9]\d{9}$/.test(local)) {
-      return { raw: rawStr, formatted: digits, isValid: true };
+  // MODE: Already has 91 / +91 prefix
+  if (mode === "has_91") {
+    if (digits.startsWith(cc) && digits.length === (cc.length + 10)) {
+      const local = digits.slice(cc.length);
+      const valid = /^[6-9]\d{9}$/.test(local);
+      return {
+        raw: rawStr,
+        formatted: digits,
+        isValid: valid,
+        detectedFormat: "With 91 Prefix",
+        error: valid ? undefined : "10-digit mobile portion should start with 6, 7, 8, or 9",
+      };
     }
-    return { raw: rawStr, formatted: digits, isValid: false, error: "Invalid mobile 10-digit portion" };
+    // Tolerant fallback: if 10 digits provided, auto-prepend 91
+    if (digits.length === 10 && /^[6-9]\d{9}$/.test(digits)) {
+      return {
+        raw: rawStr,
+        formatted: `${cc}${digits}`,
+        isValid: true,
+        detectedFormat: "10-Digit (Auto-Prepended 91)",
+      };
+    }
+    return {
+      raw: rawStr,
+      formatted: digits,
+      isValid: false,
+      error: `Expected number starting with ${cc} (12 digits), found ${digits.length} digits`,
+    };
   }
 
-  // 11 digits starting with 0: e.g. 09827322519
+  // MODE: 91 then space / dash separator
+  if (mode === "space_separated") {
+    if (digits.startsWith(cc) && digits.length === (cc.length + 10)) {
+      const local = digits.slice(cc.length);
+      const valid = /^[6-9]\d{9}$/.test(local);
+      return {
+        raw: rawStr,
+        formatted: digits,
+        isValid: valid,
+        detectedFormat: "91 With Separator",
+        error: valid ? undefined : "10-digit mobile portion should start with 6, 7, 8, or 9",
+      };
+    }
+    if (digits.length === 10 && /^[6-9]\d{9}$/.test(digits)) {
+      return {
+        raw: rawStr,
+        formatted: `${cc}${digits}`,
+        isValid: true,
+        detectedFormat: "10-Digit (Auto-Prepended 91)",
+      };
+    }
+    return {
+      raw: rawStr,
+      formatted: digits,
+      isValid: false,
+      error: `Expected ${cc} followed by 10 digits (e.g. "91 98765 43210"), found ${digits.length} digits`,
+    };
+  }
+
+  // MODE: Extract last 10 digits
+  if (mode === "last_10") {
+    if (digits.length >= 10) {
+      const last10 = digits.slice(-10);
+      const valid = /^[6-9]\d{9}$/.test(last10);
+      return {
+        raw: rawStr,
+        formatted: `${cc}${last10}`,
+        isValid: valid,
+        detectedFormat: "Last 10 Digits",
+        error: valid ? undefined : "Last 10 digits do not match Indian mobile pattern (6-9)",
+      };
+    }
+    return {
+      raw: rawStr,
+      formatted: digits,
+      isValid: false,
+      error: `Fewer than 10 digits found (${digits.length})`,
+    };
+  }
+
+  // MODE: "auto" (Combined / Smart Auto-Detect - default)
+  // 1. Pure 10-digit mobile number: e.g. 9827322519 -> 919827322519
+  if (digits.length === 10) {
+    const valid = /^[6-9]\d{9}$/.test(digits);
+    return {
+      raw: rawStr,
+      formatted: `${cc}${digits}`,
+      isValid: valid,
+      detectedFormat: "10-Digit Mobile",
+      error: valid ? undefined : "Indian mobile numbers typically start with 6, 7, 8, or 9",
+    };
+  }
+
+  // 2. 12 digits starting with cc (e.g. 91): 919827322519
+  if (digits.length === (cc.length + 10) && digits.startsWith(cc)) {
+    const local = digits.slice(cc.length);
+    const valid = /^[6-9]\d{9}$/.test(local);
+    return {
+      raw: rawStr,
+      formatted: digits,
+      isValid: valid,
+      detectedFormat: "With 91 Prefix",
+      error: valid ? undefined : "Invalid 10-digit mobile number portion after 91",
+    };
+  }
+
+  // 3. 11 digits starting with 0: e.g. 09827322519
   if (digits.length === 11 && digits.startsWith("0")) {
     const local = digits.slice(1);
-    if (/^[6-9]\d{9}$/.test(local)) {
-      return { raw: rawStr, formatted: `91${local}`, isValid: true };
+    const valid = /^[6-9]\d{9}$/.test(local);
+    return {
+      raw: rawStr,
+      formatted: `${cc}${local}`,
+      isValid: valid,
+      detectedFormat: "Leading 0 Mobile",
+      error: valid ? undefined : "Invalid 10-digit mobile number portion after 0",
+    };
+  }
+
+  // 4. 13 digits starting with 091: e.g. 0919827322519
+  if (digits.length === 13 && digits.startsWith("091")) {
+    const local = digits.slice(3);
+    const valid = /^[6-9]\d{9}$/.test(local);
+    return {
+      raw: rawStr,
+      formatted: `${cc}${local}`,
+      isValid: valid,
+      detectedFormat: "Leading 091 Prefix",
+      error: valid ? undefined : "Invalid mobile number portion",
+    };
+  }
+
+  // 5. 13 digits starting with 910: e.g. 9109827322519 or 91 09827322519
+  if (digits.length === 13 && digits.startsWith("910")) {
+    const local = digits.slice(3);
+    const valid = /^[6-9]\d{9}$/.test(local);
+    return {
+      raw: rawStr,
+      formatted: `${cc}${local}`,
+      isValid: valid,
+      detectedFormat: "91 + Leading 0",
+      error: valid ? undefined : "Invalid mobile number portion",
+    };
+  }
+
+  // 6. If digits >= 10 and ends with a valid 10-digit Indian mobile (starts with 6-9)
+  if (digits.length > 10) {
+    const last10 = digits.slice(-10);
+    if (/^[6-9]\d{9}$/.test(last10)) {
+      return {
+        raw: rawStr,
+        formatted: `${cc}${last10}`,
+        isValid: true,
+        detectedFormat: "Extracted Mobile (Last 10)",
+      };
     }
   }
 
@@ -144,6 +385,92 @@ export function sanitizeIndianPhoneNumber(raw: any): {
     formatted: digits,
     isValid: false,
     error: `Invalid length (${digits.length} digits). Expected 10 digits or with 91 prefix.`,
+  };
+}
+
+/**
+ * Analyzes sample cell values from an Excel phone column to suggest the best format option.
+ */
+export function inspectPhoneColumnFormat(samples: any[]): {
+  detectedMode: PhoneFormatOption;
+  summary: string;
+  hasSpacesOrDashes: boolean;
+  validRatio: number;
+} {
+  let plain10Count = 0;
+  let has91Count = 0;
+  let spaceSepCount = 0;
+  let validCount = 0;
+
+  const validSamples = samples.filter(
+    (s) => s !== undefined && s !== null && String(s).trim() !== ""
+  );
+
+  if (validSamples.length === 0) {
+    return {
+      detectedMode: "auto",
+      summary: "No data rows available to inspect",
+      hasSpacesOrDashes: false,
+      validRatio: 0,
+    };
+  }
+
+  for (const item of validSamples) {
+    const str = String(item).trim().replace(/\.0+$/, "");
+    const digits = str.replace(/\D/g, "");
+
+    const hasSep = str.includes(" ") || str.includes("-");
+    if (hasSep) {
+      spaceSepCount++;
+    }
+
+    if (digits.length === 10 && /^[6-9]\d{9}$/.test(digits)) {
+      plain10Count++;
+      validCount++;
+    } else if (digits.length === 12 && digits.startsWith("91")) {
+      has91Count++;
+      validCount++;
+    } else if (digits.length >= 10 && /^[6-9]\d{9}$/.test(digits.slice(-10))) {
+      validCount++;
+    }
+  }
+
+  const total = validSamples.length;
+  const validRatio = Math.round((validCount / total) * 100);
+  const hasSpacesOrDashes = spaceSepCount > 0;
+
+  if (spaceSepCount > total * 0.3) {
+    return {
+      detectedMode: "space_separated",
+      summary: `Detected: 91 with space/separator (${spaceSepCount}/${total} sample rows)`,
+      hasSpacesOrDashes: true,
+      validRatio,
+    };
+  }
+
+  if (has91Count > total * 0.6) {
+    return {
+      detectedMode: "has_91",
+      summary: `Detected: Column already has 91 prefix (${has91Count}/${total} sample rows)`,
+      hasSpacesOrDashes,
+      validRatio,
+    };
+  }
+
+  if (plain10Count > total * 0.6) {
+    return {
+      detectedMode: "plain_10",
+      summary: `Detected: Plain 10-digit mobile numbers (${plain10Count}/${total} sample rows)`,
+      hasSpacesOrDashes,
+      validRatio,
+    };
+  }
+
+  return {
+    detectedMode: "auto",
+    summary: `Detected: Mixed/Combined formats (${validCount}/${total} valid)`,
+    hasSpacesOrDashes,
+    validRatio,
   };
 }
 

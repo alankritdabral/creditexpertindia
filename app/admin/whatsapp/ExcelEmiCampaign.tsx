@@ -61,6 +61,9 @@ import {
   VARIABLE_SOURCE_OPTIONS,
   VARIABLE_PRESETS,
   EmiCalculationResult,
+  PhoneFormatOption,
+  PHONE_FORMAT_OPTIONS,
+  inspectPhoneColumnFormat,
 } from "@/lib/emiCalculations";
 
 interface ExcelEmiCampaignProps {
@@ -81,7 +84,13 @@ interface RowProcessingResult {
   rowIndex: number;
   row: Record<string, any>;
   name: string;
-  phoneInfo: { raw: string; formatted: string; isValid: boolean; error?: string };
+  phoneInfo: {
+    raw: string;
+    formatted: string;
+    isValid: boolean;
+    error?: string;
+    detectedFormat?: string;
+  };
   principal: number;
   tenure: number;
   currentRoi: number;
@@ -149,6 +158,14 @@ export default function ExcelEmiCampaign({
   const [tenureCol, setTenureCol] = useState("");
   const [roiCol, setRoiCol] = useState("");
   const [phoneCol, setPhoneCol] = useState("");
+  const [phoneFormatMode, setPhoneFormatMode] = useState<PhoneFormatOption>("auto");
+  const [phoneDefaultCountryCode, setPhoneDefaultCountryCode] = useState<string>("91");
+  const [autoDetectedPhoneHint, setAutoDetectedPhoneHint] = useState<{
+    detectedMode: PhoneFormatOption;
+    summary: string;
+    hasSpacesOrDashes: boolean;
+    validRatio: number;
+  } | null>(null);
   const [tenureUnit, setTenureUnit] = useState<"months" | "years">("months");
   const [targetRoi, setTargetRoi] = useState<number>(9.99);
 
@@ -444,7 +461,7 @@ export default function ExcelEmiCampaign({
     if (firstActiveSheet.rows.length > 0) {
       const first = firstActiveSheet.rows[0];
       const rawPhone = detected.phone ? first[detected.phone] : "";
-      const phoneInfo = sanitizeIndianPhoneNumber(rawPhone);
+      const phoneInfo = sanitizeIndianPhoneNumber(rawPhone, phoneFormatMode, phoneDefaultCountryCode);
       const rawAmt = detected.amount ? String(first[detected.amount] ?? "").replace(/,/g, "").trim() : "";
       const principal = parseFloat(rawAmt) || 200000;
       const rawTenure = detected.tenure ? String(first[detected.tenure] ?? "").replace(/,/g, "").trim() : "";
@@ -586,7 +603,7 @@ export default function ExcelEmiCampaign({
     if (activeRowsList.length > 0) {
       const first = activeRowsList[0];
       const rawPhone = detected.phone ? first[detected.phone] : "";
-      const phoneInfo = sanitizeIndianPhoneNumber(rawPhone);
+      const phoneInfo = sanitizeIndianPhoneNumber(rawPhone, phoneFormatMode, phoneDefaultCountryCode);
       const rawAmt = detected.amount ? String(first[detected.amount] ?? "").replace(/,/g, "").trim() : "";
       const principal = parseFloat(rawAmt) || 200000;
       const rawTenure = detected.tenure ? String(first[detected.tenure] ?? "").replace(/,/g, "").trim() : "";
@@ -716,7 +733,7 @@ export default function ExcelEmiCampaign({
     return activeRows.map((row, index) => {
       const name = String(row[nameCol] ?? "").trim();
       const rawPhone = row[phoneCol];
-      const phoneInfo = sanitizeIndianPhoneNumber(rawPhone);
+      const phoneInfo = sanitizeIndianPhoneNumber(rawPhone, phoneFormatMode, phoneDefaultCountryCode);
 
       // Parse loan amount
       const rawAmt = String(row[amountCol] ?? "").replace(/,/g, "").trim();
@@ -770,6 +787,8 @@ export default function ExcelEmiCampaign({
     tenureCol,
     roiCol,
     phoneCol,
+    phoneFormatMode,
+    phoneDefaultCountryCode,
     tenureUnit,
     targetRoi,
     variableSlots,
@@ -800,6 +819,53 @@ export default function ExcelEmiCampaign({
   }, [filteredData, currentPage, pageSize]);
 
   const totalPages = Math.ceil(filteredData.length / pageSize) || 1;
+
+  // Analyze phone column format whenever phoneCol or activeRows change
+  useEffect(() => {
+    if (!phoneCol || activeRows.length === 0) {
+      setAutoDetectedPhoneHint(null);
+      return;
+    }
+    const samples = activeRows.slice(0, 50).map((r) => r[phoneCol]);
+    const hint = inspectPhoneColumnFormat(samples);
+    setAutoDetectedPhoneHint(hint);
+  }, [phoneCol, activeRows]);
+
+  // Overall phone number validity stats for current processed dataset
+  const phoneStats = useMemo(() => {
+    if (!processedData || processedData.length === 0) {
+      return { total: 0, valid: 0, invalid: 0, validPercent: 0 };
+    }
+    const total = processedData.length;
+    let valid = 0;
+    for (const item of processedData) {
+      if (item.phoneInfo.isValid) valid++;
+    }
+    return {
+      total,
+      valid,
+      invalid: total - valid,
+      validPercent: total > 0 ? Math.round((valid / total) * 100) : 0,
+    };
+  }, [processedData]);
+
+  // Live row-by-row phone sample transformations for UI inspection
+  const phoneSamples = useMemo(() => {
+    if (!phoneCol || activeRows.length === 0) return [];
+    return activeRows.slice(0, 4).map((row, idx) => {
+      const rawVal = row[phoneCol];
+      const info = sanitizeIndianPhoneNumber(rawVal, phoneFormatMode, phoneDefaultCountryCode);
+      return {
+        index: idx + 1,
+        name: nameCol ? String(row[nameCol] ?? "").trim() : `Row ${idx + 1}`,
+        raw: rawVal === undefined || rawVal === null ? "" : String(rawVal),
+        formatted: info.formatted,
+        isValid: info.isValid,
+        error: info.error,
+        detectedFormat: info.detectedFormat,
+      };
+    });
+  }, [activeRows, phoneCol, phoneFormatMode, phoneDefaultCountryCode, nameCol]);
 
   // Header image handlers
   const handleHeaderFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -1028,7 +1094,7 @@ export default function ExcelEmiCampaign({
 
   // Dispatch Custom Single Test
   const handleSendCustomTest = async () => {
-    const phoneCheck = sanitizeIndianPhoneNumber(testDetails.phone);
+    const phoneCheck = sanitizeIndianPhoneNumber(testDetails.phone, phoneFormatMode, phoneDefaultCountryCode);
     if (!phoneCheck.isValid) {
       alert(`Please enter a valid recipient phone number:\n${phoneCheck.error || "Empty"}`);
       return;
@@ -1485,18 +1551,16 @@ export default function ExcelEmiCampaign({
               onDragLeave={handleFileDragLeave}
               onDrop={handleFileDrop}
               onClick={() => fileInputRef.current?.click()}
-              className={`flex flex-col items-center justify-center p-10 border-2 border-dashed rounded-2xl cursor-pointer transition-all shadow-sm ${
-                isDragging
+              className={`flex flex-col items-center justify-center p-10 border-2 border-dashed rounded-2xl cursor-pointer transition-all shadow-sm ${isDragging
                   ? "border-[#0066FF] bg-blue-50/70 ring-4 ring-[#0066FF]/20 scale-[1.01]"
                   : "border-[#CBD5E1] hover:border-[#0066FF] bg-gradient-to-b from-[#F8FAFC] to-[#F1F5F9] hover:from-[#F0F7FF] hover:to-[#EAF3FF]"
-              }`}
+                }`}
             >
               <div
-                className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all shadow-sm mb-3 ${
-                  isDragging
+                className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all shadow-sm mb-3 ${isDragging
                     ? "bg-[#0066FF] text-white animate-bounce"
                     : "bg-[#EAF3FF] text-[#0066FF]"
-                }`}
+                  }`}
               >
                 <UploadCloud className="w-7 h-7" />
               </div>
@@ -1504,8 +1568,8 @@ export default function ExcelEmiCampaign({
                 {parsingFile
                   ? "Reading & parsing workbook sheets..."
                   : isDragging
-                  ? "Drop your Excel workbook here"
-                  : "Drag & drop your Excel workbook here, or click to browse"}
+                    ? "Drop your Excel workbook here"
+                    : "Drag & drop your Excel workbook here, or click to browse"}
               </span>
               <span className="text-xs text-[#64748B] mt-1.5 text-center max-w-md">
                 Supports <code className="font-mono text-[#0A2540] font-semibold">.xlsx</code>,{" "}
@@ -1574,19 +1638,17 @@ export default function ExcelEmiCampaign({
                       key={sheet.name}
                       type="button"
                       onClick={() => handleSheetChange(sheet.name)}
-                      className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-2 border ${
-                        selectedSheetName === sheet.name
+                      className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-2 border ${selectedSheetName === sheet.name
                           ? "bg-[#0066FF] text-white border-[#0066FF] shadow-md shadow-blue-500/20"
                           : "bg-white text-[#3C4F69] border-[#D8E5F5] hover:border-[#0066FF] hover:bg-slate-50"
-                      }`}
+                        }`}
                     >
                       <span>{sheet.name}</span>
                       <span
-                        className={`text-[10px] px-1.5 py-0.5 rounded-md font-mono ${
-                          selectedSheetName === sheet.name
+                        className={`text-[10px] px-1.5 py-0.5 rounded-md font-mono ${selectedSheetName === sheet.name
                             ? "bg-blue-700 text-white"
                             : "bg-[#F1F5F9] text-[#64748B]"
-                        }`}
+                          }`}
                       >
                         {sheet.rowCount.toLocaleString()} rows
                       </span>
@@ -1597,11 +1659,10 @@ export default function ExcelEmiCampaign({
                     <button
                       type="button"
                       onClick={() => handleSheetChange("all")}
-                      className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-2 border ${
-                        selectedSheetName === "all"
+                      className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-2 border ${selectedSheetName === "all"
                           ? "bg-purple-600 text-white border-purple-600 shadow-md shadow-purple-500/20"
                           : "bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100"
-                      }`}
+                        }`}
                     >
                       <Layers className="w-3.5 h-3.5" />
                       <span>All Sheets Combined</span>
@@ -1759,11 +1820,10 @@ export default function ExcelEmiCampaign({
                             ? "Case Sensitive is ON (click to make case-insensitive)"
                             : "Case Insensitive (click to match exact case)"
                         }
-                        className={`px-2.5 py-2 rounded-xl text-xs font-mono font-bold transition border ${
-                          columnFilterCaseSensitive
+                        className={`px-2.5 py-2 rounded-xl text-xs font-mono font-bold transition border ${columnFilterCaseSensitive
                             ? "bg-[#0066FF] text-white border-[#0066FF]"
                             : "bg-white text-[#64748B] border-[#CBD5E1] hover:text-[#0A2540]"
-                        }`}
+                          }`}
                       >
                         Aa
                       </button>
@@ -1787,11 +1847,10 @@ export default function ExcelEmiCampaign({
                           setColumnFilterCondition("exact");
                           setCurrentPage(1);
                         }}
-                        className={`px-2 py-0.5 rounded-lg text-[10px] font-medium transition border flex items-center gap-1 ${
-                          columnFilterKeyword === value && columnFilterCondition === "exact"
+                        className={`px-2 py-0.5 rounded-lg text-[10px] font-medium transition border flex items-center gap-1 ${columnFilterKeyword === value && columnFilterCondition === "exact"
                             ? "bg-[#0066FF] text-white border-[#0066FF] shadow-xs"
                             : "bg-white text-[#3C4F69] border-[#CBD5E1] hover:border-[#0066FF] hover:bg-blue-50/50"
-                        }`}
+                          }`}
                       >
                         <span className="truncate max-w-[140px]">{value}</span>
                         <span className="text-[9px] opacity-75 font-mono">({count.toLocaleString()})</span>
@@ -1803,17 +1862,15 @@ export default function ExcelEmiCampaign({
                 {/* Live Match Summary Bar */}
                 {isColumnFilterActive && (
                   <div
-                    className={`p-3 rounded-xl text-xs flex flex-wrap items-center justify-between gap-2 border ${
-                      activeRows.length > 0
+                    className={`p-3 rounded-xl text-xs flex flex-wrap items-center justify-between gap-2 border ${activeRows.length > 0
                         ? "bg-emerald-50/90 text-emerald-900 border-emerald-200"
                         : "bg-amber-50 text-amber-900 border-amber-200"
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center gap-2">
                       <CheckCircle2
-                        className={`w-4 h-4 shrink-0 ${
-                          activeRows.length > 0 ? "text-emerald-600" : "text-amber-500"
-                        }`}
+                        className={`w-4 h-4 shrink-0 ${activeRows.length > 0 ? "text-emerald-600" : "text-amber-500"
+                          }`}
                       />
                       <span>
                         {activeRows.length > 0 ? (
@@ -1961,22 +2018,20 @@ export default function ExcelEmiCampaign({
                     <button
                       type="button"
                       onClick={() => setTenureUnit("months")}
-                      className={`px-1.5 py-0.5 rounded ${
-                        tenureUnit === "months"
+                      className={`px-1.5 py-0.5 rounded ${tenureUnit === "months"
                           ? "bg-[#0066FF] text-white font-bold"
                           : "text-[#64748B] hover:text-[#0A2540]"
-                      }`}
+                        }`}
                     >
                       Mos
                     </button>
                     <button
                       type="button"
                       onClick={() => setTenureUnit("years")}
-                      className={`px-1.5 py-0.5 rounded ${
-                        tenureUnit === "years"
+                      className={`px-1.5 py-0.5 rounded ${tenureUnit === "years"
                           ? "bg-[#0066FF] text-white font-bold"
                           : "text-[#64748B] hover:text-[#0A2540]"
-                      }`}
+                        }`}
                     >
                       Yrs
                     </button>
@@ -2046,6 +2101,185 @@ export default function ExcelEmiCampaign({
               </div>
             </div>
 
+            {/* Phone Number Treatment & Format Rule Option Selector Panel */}
+            {phoneCol && (
+              <div className="mt-3 p-4 rounded-2xl bg-gradient-to-br from-blue-50/90 via-[#F8FAFC] to-indigo-50/70 border border-[#BFDBFE] space-y-3.5 shadow-xs">
+                {/* Header & Validity Count Badge */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-2 border-b border-[#DBEAFE]">
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-lg bg-[#0066FF] text-white flex items-center justify-center shadow-xs">
+                      <Phone className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h4 className="text-xs font-bold text-[#0A2540] flex items-center gap-2">
+                        <span>Phone Number Column Format Rule</span>
+                        <span className="text-[10px] px-2 py-0.5 rounded-md bg-[#0066FF]/10 text-[#0066FF] font-mono font-semibold">
+                          Column: {phoneCol}
+                        </span>
+                      </h4>
+                      <p className="text-[11px] text-[#64748B]">
+                        Select how phone numbers in this column are structured (plain 10-digit, with 91, 91 with space, or mixed).
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 self-start sm:self-auto flex-wrap">
+                    {/* Live Validation Counter Badge */}
+                    {phoneStats.invalid === 0 ? (
+                      <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 text-[11px] font-bold flex items-center gap-1.5 shadow-xs">
+                        <Check className="w-3.5 h-3.5 text-emerald-600 stroke-[2.5]" />
+                        {phoneStats.valid.toLocaleString()} / {phoneStats.total.toLocaleString()} Valid (100%)
+                      </span>
+                    ) : (
+                      <span className="px-3 py-1 rounded-full bg-amber-100 text-amber-900 border border-amber-300 text-[11px] font-bold flex items-center gap-1.5 shadow-xs">
+                        <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
+                        {phoneStats.valid.toLocaleString()} Valid · {phoneStats.invalid.toLocaleString()} Invalid
+                      </span>
+                    )}
+
+                    {/* Country Code Prefix Setting */}
+                    <div className="flex items-center gap-1 bg-white border border-[#CBD5E1] rounded-xl px-2.5 py-1 shadow-xs">
+                      <span className="text-[11px] font-bold text-[#64748B]">Prefix:</span>
+                      <span className="text-[11px] font-mono font-bold text-[#0066FF]">+</span>
+                      <input
+                        type="text"
+                        value={phoneDefaultCountryCode}
+                        onChange={(e) => setPhoneDefaultCountryCode(e.target.value.replace(/\D/g, "") || "91")}
+                        className="w-7 text-[11px] font-mono font-bold text-[#0A2540] focus:outline-none text-center bg-transparent"
+                        title="Default country dialing code (defaults to 91 for India)"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Auto Detection Intelligence Tip */}
+                {autoDetectedPhoneHint && (
+                  <div className="p-2.5 rounded-xl bg-white/80 border border-blue-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-[#0A2540]">
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-[#0066FF] shrink-0" />
+                      <span>
+                        <strong>Smart Auto-Analysis:</strong> {autoDetectedPhoneHint.summary}
+                      </span>
+                    </div>
+                    {phoneFormatMode !== autoDetectedPhoneHint.detectedMode && (
+                      <button
+                        type="button"
+                        onClick={() => setPhoneFormatMode(autoDetectedPhoneHint.detectedMode)}
+                        className="text-[11px] font-semibold text-[#0066FF] hover:underline self-start sm:self-auto shrink-0"
+                      >
+                        Apply Detected Mode
+                      </button>
+                    )}
+                  </div>
+                )}
+
+                {/* Selectable Format Options */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-2.5">
+                  {PHONE_FORMAT_OPTIONS.map((opt) => {
+                    const isSelected = phoneFormatMode === opt.id;
+                    return (
+                      <button
+                        key={opt.id}
+                        type="button"
+                        onClick={() => setPhoneFormatMode(opt.id)}
+                        className={`text-left p-3 rounded-xl border transition-all duration-150 flex flex-col justify-between ${
+                          isSelected
+                            ? "bg-white border-[#0066FF] ring-2 ring-[#0066FF]/20 shadow-sm"
+                            : "bg-white/60 hover:bg-white border-[#CBD5E1] text-[#475569] hover:border-[#94A3B8]"
+                        }`}
+                      >
+                        <div>
+                          <div className="flex items-center justify-between mb-1">
+                            <span
+                              className={`text-xs font-bold ${
+                                isSelected ? "text-[#0066FF]" : "text-[#0A2540]"
+                              }`}
+                            >
+                              {opt.label}
+                            </span>
+                            {opt.badge && (
+                              <span className="text-[9px] uppercase px-1.5 py-0.5 rounded-md font-bold bg-[#0066FF] text-white">
+                                {opt.badge}
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-[11px] text-[#64748B] leading-snug line-clamp-2">
+                            {opt.description}
+                          </p>
+                        </div>
+                        <div className="mt-2 pt-1.5 border-t border-slate-100 flex items-center justify-between">
+                          <code className="text-[10px] font-mono text-[#0066FF] font-semibold truncate max-w-[140px]">
+                            {opt.example}
+                          </code>
+                          <span
+                            className={`w-3.5 h-3.5 rounded-full flex items-center justify-center text-[10px] shrink-0 ${
+                              isSelected
+                                ? "bg-[#0066FF] text-white font-bold"
+                                : "border border-slate-300"
+                            }`}
+                          >
+                            {isSelected && <Check className="w-2.5 h-2.5 stroke-[3]" />}
+                          </span>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Live Sample Transformations (from user's real file rows) */}
+                {phoneSamples.length > 0 && (
+                  <div className="pt-2">
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="text-[11px] font-bold text-[#475569] flex items-center gap-1.5">
+                        <Eye className="w-3.5 h-3.5 text-[#0066FF]" />
+                        Live Row Sanitization Preview (Sheet: {selectedSheetName || "Active"}):
+                      </span>
+                      <span className="text-[10px] text-[#64748B]">
+                        Formatted to WhatsApp API requirement (+91XXXXXXXXXX)
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+                      {phoneSamples.map((sample) => (
+                        <div
+                          key={sample.index}
+                          className="bg-white p-2.5 rounded-xl border border-slate-200 text-xs shadow-2xs"
+                        >
+                          <div className="flex items-center justify-between text-[11px] text-[#64748B] mb-1">
+                            <span className="font-semibold text-[#0A2540] truncate max-w-[120px]">
+                              {sample.name}
+                            </span>
+                            <span className="font-mono text-[10px]">Row {sample.index}</span>
+                          </div>
+                          <div className="space-y-0.5">
+                            <div className="text-[11px] text-slate-500 truncate">
+                              Excel: <span className="font-mono font-medium text-slate-700">{sample.raw || "(empty)"}</span>
+                            </div>
+                            <div className="flex items-center justify-between pt-0.5">
+                              <span className="text-[11px] font-mono font-bold text-[#0066FF] truncate">
+                                ➔ +{sample.formatted}
+                              </span>
+                              {sample.isValid ? (
+                                <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold flex items-center gap-0.5">
+                                  <Check className="w-3 h-3 text-emerald-600" /> Valid
+                                </span>
+                              ) : (
+                                <span
+                                  className="text-[10px] px-1.5 py-0.5 rounded bg-red-50 text-red-700 border border-red-200 font-semibold flex items-center gap-0.5"
+                                  title={sample.error}
+                                >
+                                  <AlertTriangle className="w-3 h-3 text-red-500" /> Invalid
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Target ROI Parameter Banner */}
             <div className="pt-2 flex flex-wrap items-center gap-4 bg-[#F0FDF4] p-3.5 rounded-xl border border-[#BBF7D0]">
               <div className="flex items-center gap-2">
@@ -2097,11 +2331,10 @@ export default function ExcelEmiCampaign({
                     </label>
                     {currentTemplate && (
                       <span
-                        className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase ${
-                          isMediaTemplate
+                        className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase ${isMediaTemplate
                             ? "bg-purple-50 text-purple-700 border border-purple-200"
                             : "bg-[#F0FDF4] text-[#15803D] border border-[#BBF7D0]"
-                        }`}
+                          }`}
                       >
                         {isMediaTemplate ? "📸 Media (Image) Template" : "📝 Text Template"}
                       </span>
@@ -2203,19 +2436,17 @@ export default function ExcelEmiCampaign({
               {/* Media File Upload for Image Templates */}
               <div className="lg:col-span-6">
                 <div
-                  className={`p-4 rounded-xl border transition h-full flex flex-col justify-between ${
-                    isMediaTemplate
+                  className={`p-4 rounded-xl border transition h-full flex flex-col justify-between ${isMediaTemplate
                       ? "bg-purple-50/60 border-purple-200"
                       : "bg-[#F8FAFC] border-[#E2E8F0]"
-                  }`}
+                    }`}
                 >
                   <div>
                     <div className="flex items-center justify-between mb-1.5">
                       <div className="flex items-center gap-2">
                         <ImageIcon
-                          className={`w-4 h-4 ${
-                            isMediaTemplate ? "text-purple-600" : "text-slate-500"
-                          }`}
+                          className={`w-4 h-4 ${isMediaTemplate ? "text-purple-600" : "text-slate-500"
+                            }`}
                         />
                         <span className="text-xs font-bold text-[#0A2540]">
                           Header Media File{" "}
@@ -2354,17 +2585,16 @@ export default function ExcelEmiCampaign({
                       onDragOver={(e) => handleDragOver(e, idx)}
                       onDrop={(e) => handleDrop(e, idx)}
                       onDragEnd={handleDragEnd}
-                      className={`p-4 rounded-xl border transition-all duration-200 ${
-                        isDragOverThis
+                      className={`p-4 rounded-xl border transition-all duration-200 ${isDragOverThis
                           ? "bg-blue-50/80 border-[#0066FF] shadow-lg scale-[1.01]"
                           : isDraggingThis
-                          ? "opacity-40 border-dashed border-[#0066FF] bg-slate-50"
-                          : isDifferenceMode
-                          ? "bg-[#FFFDF7] border-amber-200 hover:border-amber-300 shadow-sm"
-                          : isCustomMode
-                          ? "bg-[#FAF8FF] border-purple-200 hover:border-purple-300 shadow-sm"
-                          : "bg-[#F8FAFC] border-[#E2E8F0] hover:border-slate-300 shadow-sm"
-                      }`}
+                            ? "opacity-40 border-dashed border-[#0066FF] bg-slate-50"
+                            : isDifferenceMode
+                              ? "bg-[#FFFDF7] border-amber-200 hover:border-amber-300 shadow-sm"
+                              : isCustomMode
+                                ? "bg-[#FAF8FF] border-purple-200 hover:border-purple-300 shadow-sm"
+                                : "bg-[#F8FAFC] border-[#E2E8F0] hover:border-slate-300 shadow-sm"
+                        }`}
                     >
                       <div className="flex flex-col gap-3">
                         {/* Top Row: Handle, Slot Badge, 3-Mode Switcher, and Position Controls */}
@@ -2396,11 +2626,10 @@ export default function ExcelEmiCampaign({
                                         : slot.sourceType,
                                   })
                                 }
-                                className={`px-2.5 py-1 rounded-md font-medium transition flex items-center gap-1 ${
-                                  isSelectMode
+                                className={`px-2.5 py-1 rounded-md font-medium transition flex items-center gap-1 ${isSelectMode
                                     ? "bg-[#0066FF] text-white font-semibold shadow-sm"
                                     : "text-[#64748B] hover:text-[#0A2540]"
-                                }`}
+                                  }`}
                               >
                                 <Tag className="w-3 h-3" />
                                 <span>Predefined Tag</span>
@@ -2420,11 +2649,10 @@ export default function ExcelEmiCampaign({
                                     includeRupeeSymbol: slot.includeRupeeSymbol ?? false,
                                   })
                                 }
-                                className={`px-2.5 py-1 rounded-md font-medium transition flex items-center gap-1 ${
-                                  isDifferenceMode
+                                className={`px-2.5 py-1 rounded-md font-medium transition flex items-center gap-1 ${isDifferenceMode
                                     ? "bg-amber-600 text-white font-semibold shadow-sm"
                                     : "text-[#64748B] hover:text-[#0A2540]"
-                                }`}
+                                  }`}
                               >
                                 <MinusCircle className="w-3 h-3" />
                                 <span>Difference (A − B)</span>
@@ -2439,11 +2667,10 @@ export default function ExcelEmiCampaign({
                                     customText: slot.customText || slot.staticValue || "",
                                   })
                                 }
-                                className={`px-2.5 py-1 rounded-md font-medium transition flex items-center gap-1 ${
-                                  isCustomMode
+                                className={`px-2.5 py-1 rounded-md font-medium transition flex items-center gap-1 ${isCustomMode
                                     ? "bg-purple-600 text-white font-semibold shadow-sm"
                                     : "text-[#64748B] hover:text-[#0A2540]"
-                                }`}
+                                  }`}
                               >
                                 <PenLine className="w-3 h-3" />
                                 <span>Write Custom Text</span>
@@ -2644,20 +2871,20 @@ export default function ExcelEmiCampaign({
                                       processedData.length > 0
                                         ? processedData[0].row
                                         : {
-                                            [amountCol || "amount"]: testDetails.amount,
-                                            [tenureCol || "tenure"]: testDetails.tenure,
-                                            [roiCol || "roi"]: testDetails.currentRoi,
-                                            [nameCol || "name"]: testDetails.name,
-                                            amount: testDetails.amount,
-                                            tenure: testDetails.tenure,
-                                            roi: testDetails.currentRoi,
-                                            name: testDetails.name,
-                                            company: testDetails.companyName,
-                                            ...testExtraFields.reduce((acc, f) => {
-                                              if (f.key.trim()) acc[f.key.trim()] = f.value;
-                                              return acc;
-                                            }, {} as Record<string, any>),
-                                          },
+                                          [amountCol || "amount"]: testDetails.amount,
+                                          [tenureCol || "tenure"]: testDetails.tenure,
+                                          [roiCol || "roi"]: testDetails.currentRoi,
+                                          [nameCol || "name"]: testDetails.name,
+                                          amount: testDetails.amount,
+                                          tenure: testDetails.tenure,
+                                          roi: testDetails.currentRoi,
+                                          name: testDetails.name,
+                                          company: testDetails.companyName,
+                                          ...testExtraFields.reduce((acc, f) => {
+                                            if (f.key.trim()) acc[f.key.trim()] = f.value;
+                                            return acc;
+                                          }, {} as Record<string, any>),
+                                        },
                                       {
                                         nameCol: nameCol || "name",
                                         amountCol: amountCol || "amount",
@@ -2758,36 +2985,36 @@ export default function ExcelEmiCampaign({
                                 slot.sourceType === "emi_diff" ||
                                 slot.sourceType === "total_savings" ||
                                 slot.sourceType === "total_amount") && (
-                                <div className="flex items-center gap-3">
-                                  <label className="flex items-center gap-1.5 text-xs text-[#3C4F69] cursor-pointer">
-                                    <input
-                                      type="checkbox"
-                                      checked={slot.formatAsCurrency ?? false}
-                                      onChange={(e) =>
-                                        updateVariableSlot(idx, { formatAsCurrency: e.target.checked })
-                                      }
-                                      className="rounded border-[#CBD5E1] text-[#0066FF] focus:ring-0 w-3.5 h-3.5"
-                                    />
-                                    <span>Format Indian Numbering</span>
-                                  </label>
-
-                                  {slot.formatAsCurrency && (
-                                    <label className="flex items-center gap-1 text-xs text-[#3C4F69] cursor-pointer">
+                                  <div className="flex items-center gap-3">
+                                    <label className="flex items-center gap-1.5 text-xs text-[#3C4F69] cursor-pointer">
                                       <input
                                         type="checkbox"
-                                        checked={slot.includeRupeeSymbol ?? false}
+                                        checked={slot.formatAsCurrency ?? false}
                                         onChange={(e) =>
-                                          updateVariableSlot(idx, {
-                                            includeRupeeSymbol: e.target.checked,
-                                          })
+                                          updateVariableSlot(idx, { formatAsCurrency: e.target.checked })
                                         }
                                         className="rounded border-[#CBD5E1] text-[#0066FF] focus:ring-0 w-3.5 h-3.5"
                                       />
-                                      <span>Include ₹ Symbol</span>
+                                      <span>Format Indian Numbering</span>
                                     </label>
-                                  )}
-                                </div>
-                              )}
+
+                                    {slot.formatAsCurrency && (
+                                      <label className="flex items-center gap-1 text-xs text-[#3C4F69] cursor-pointer">
+                                        <input
+                                          type="checkbox"
+                                          checked={slot.includeRupeeSymbol ?? false}
+                                          onChange={(e) =>
+                                            updateVariableSlot(idx, {
+                                              includeRupeeSymbol: e.target.checked,
+                                            })
+                                          }
+                                          className="rounded border-[#CBD5E1] text-[#0066FF] focus:ring-0 w-3.5 h-3.5"
+                                        />
+                                        <span>Include ₹ Symbol</span>
+                                      </label>
+                                    )}
+                                  </div>
+                                )}
                             </div>
                           </div>
                         ) : (
@@ -2915,11 +3142,10 @@ export default function ExcelEmiCampaign({
                       setFilterMode("all");
                       setCurrentPage(1);
                     }}
-                    className={`px-2.5 py-1 rounded-lg transition ${
-                      filterMode === "all"
+                    className={`px-2.5 py-1 rounded-lg transition ${filterMode === "all"
                         ? "bg-[#0066FF] text-white font-semibold shadow-xs"
                         : "text-[#64748B] hover:text-[#0A2540]"
-                    }`}
+                      }`}
                   >
                     All ({processedData.length})
                   </button>
@@ -2929,11 +3155,10 @@ export default function ExcelEmiCampaign({
                       setFilterMode("valid");
                       setCurrentPage(1);
                     }}
-                    className={`px-2.5 py-1 rounded-lg transition ${
-                      filterMode === "valid"
+                    className={`px-2.5 py-1 rounded-lg transition ${filterMode === "valid"
                         ? "bg-[#0066FF] text-white font-semibold shadow-xs"
                         : "text-[#64748B] hover:text-[#0A2540]"
-                    }`}
+                      }`}
                   >
                     Valid Phone
                   </button>
@@ -2943,11 +3168,10 @@ export default function ExcelEmiCampaign({
                       setFilterMode("invalid");
                       setCurrentPage(1);
                     }}
-                    className={`px-2.5 py-1 rounded-lg transition ${
-                      filterMode === "invalid"
+                    className={`px-2.5 py-1 rounded-lg transition ${filterMode === "invalid"
                         ? "bg-red-600 text-white font-semibold shadow-xs"
                         : "text-[#64748B] hover:text-[#0A2540]"
-                    }`}
+                      }`}
                   >
                     Invalid Phone
                   </button>
@@ -2957,15 +3181,34 @@ export default function ExcelEmiCampaign({
                       setFilterMode("savings");
                       setCurrentPage(1);
                     }}
-                    className={`px-2.5 py-1 rounded-lg transition ${
-                      filterMode === "savings"
+                    className={`px-2.5 py-1 rounded-lg transition ${filterMode === "savings"
                         ? "bg-[#0066FF] text-white font-semibold shadow-xs"
                         : "text-[#64748B] hover:text-[#0A2540]"
-                    }`}
+                      }`}
                   >
                     Eligible for Savings
                   </button>
                 </div>
+
+                {/* Quick Phone Rule Switcher directly in Table Toolbar */}
+                {phoneCol && (
+                  <div className="flex items-center gap-1.5 bg-[#F1F5F9] border border-slate-200 rounded-xl px-2.5 py-1 text-xs">
+                    <Phone className="w-3.5 h-3.5 text-[#0066FF]" />
+                    <span className="font-semibold text-[#0A2540] hidden sm:inline">Phone Rule:</span>
+                    <select
+                      value={phoneFormatMode}
+                      onChange={(e) => setPhoneFormatMode(e.target.value as PhoneFormatOption)}
+                      className="bg-transparent text-xs text-[#0066FF] font-semibold focus:outline-none cursor-pointer"
+                      title="Switch phone formatting rule applied to column"
+                    >
+                      {PHONE_FORMAT_OPTIONS.map((opt) => (
+                        <option key={opt.id} value={opt.id}>
+                          {opt.shortLabel}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -3000,10 +3243,17 @@ export default function ExcelEmiCampaign({
                       </td>
                       <td className="py-2.5 px-3.5">
                         {item.phoneInfo.isValid ? (
-                          <span className="text-emerald-700 font-mono font-medium flex items-center gap-1">
-                            <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                            +{item.phoneInfo.formatted}
-                          </span>
+                          <div>
+                            <span className="text-emerald-700 font-mono font-medium flex items-center gap-1">
+                              <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                              +{item.phoneInfo.formatted}
+                            </span>
+                            {item.phoneInfo.detectedFormat && (
+                              <span className="text-[10px] text-slate-400 font-sans block pl-4">
+                                {item.phoneInfo.detectedFormat}
+                              </span>
+                            )}
+                          </div>
                         ) : (
                           <span
                             className="text-red-600 font-mono text-xs flex items-center gap-1"
@@ -3385,24 +3635,22 @@ export default function ExcelEmiCampaign({
 
                 {/* TEST HEADER MEDIA ATTACHMENT CARD */}
                 <div
-                  className={`p-3.5 rounded-xl border transition-all ${
-                    isMediaTemplate && !headerFile
+                  className={`p-3.5 rounded-xl border transition-all ${isMediaTemplate && !headerFile
                       ? "bg-amber-50/70 border-amber-300 shadow-sm"
                       : headerFile
-                      ? "bg-white border-[#BBF7D0] shadow-xs"
-                      : "bg-white border-[#D8E5F5] shadow-xs"
-                  }`}
+                        ? "bg-white border-[#BBF7D0] shadow-xs"
+                        : "bg-white border-[#D8E5F5] shadow-xs"
+                    }`}
                 >
                   <div className="flex flex-wrap items-center justify-between gap-2.5 mb-2.5">
                     <div className="flex flex-wrap items-center gap-2">
                       <ImageIcon
-                        className={`w-4 h-4 ${
-                          isMediaTemplate
+                        className={`w-4 h-4 ${isMediaTemplate
                             ? headerFile
                               ? "text-emerald-600"
                               : "text-amber-600"
                             : "text-slate-500"
-                        }`}
+                          }`}
                       />
                       <span className="text-xs font-bold text-[#0A2540]">
                         Header Media File for Test
@@ -3565,11 +3813,10 @@ export default function ExcelEmiCampaign({
                 {/* Test Result Feedback Banner */}
                 {customTestResponse && (
                   <div
-                    className={`p-3.5 rounded-xl border text-xs flex items-center justify-between gap-3 shadow-xs ${
-                      customTestResponse.success
+                    className={`p-3.5 rounded-xl border text-xs flex items-center justify-between gap-3 shadow-xs ${customTestResponse.success
                         ? "bg-[#F0FDF4] border-[#86EFAC] text-emerald-800"
                         : "bg-red-50 border-red-200 text-red-700"
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center gap-2">
                       {customTestResponse.success ? (
@@ -3657,11 +3904,10 @@ export default function ExcelEmiCampaign({
                   <button
                     type="button"
                     onClick={() => setDispatchRange("count")}
-                    className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 border ${
-                      dispatchRange === "count"
+                    className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 border ${dispatchRange === "count"
                         ? "bg-[#0066FF] text-white border-[#0066FF] shadow-md shadow-blue-500/20"
                         : "bg-white text-[#3C4F69] border-[#D8E5F5] hover:bg-slate-50"
-                    }`}
+                      }`}
                   >
                     <Users className="w-3.5 h-3.5" />
                     <span>Send to Custom Count</span>
@@ -3669,22 +3915,20 @@ export default function ExcelEmiCampaign({
                   <button
                     type="button"
                     onClick={() => setDispatchRange("range")}
-                    className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition border ${
-                      dispatchRange === "range"
+                    className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition border ${dispatchRange === "range"
                         ? "bg-[#0066FF] text-white border-[#0066FF] shadow-md shadow-blue-500/20"
                         : "bg-white text-[#3C4F69] border-[#D8E5F5] hover:bg-slate-50"
-                    }`}
+                      }`}
                   >
                     Specific Row Range
                   </button>
                   <button
                     type="button"
                     onClick={() => setDispatchRange("all")}
-                    className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition border ${
-                      dispatchRange === "all"
+                    className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition border ${dispatchRange === "all"
                         ? "bg-[#0066FF] text-white border-[#0066FF] shadow-md shadow-blue-500/20"
                         : "bg-white text-[#3C4F69] border-[#D8E5F5] hover:bg-slate-50"
-                    }`}
+                      }`}
                   >
                     {isColumnFilterActive
                       ? `All Filtered (${processedData.length.toLocaleString()} People)`
@@ -3693,11 +3937,10 @@ export default function ExcelEmiCampaign({
                   <button
                     type="button"
                     onClick={() => setDispatchRange("test")}
-                    className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition border ${
-                      dispatchRange === "test"
+                    className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition border ${dispatchRange === "test"
                         ? "bg-[#0066FF] text-white border-[#0066FF] shadow-md shadow-blue-500/20"
                         : "bg-white text-[#3C4F69] border-[#D8E5F5] hover:bg-slate-50"
-                    }`}
+                      }`}
                   >
                     First 10 Rows
                   </button>
@@ -3749,11 +3992,10 @@ export default function ExcelEmiCampaign({
                           key={count}
                           type="button"
                           onClick={() => setCustomPeopleCount(count)}
-                          className={`px-2.5 py-0.5 rounded-lg text-xs font-mono transition border ${
-                            customPeopleCount === count
+                          className={`px-2.5 py-0.5 rounded-lg text-xs font-mono transition border ${customPeopleCount === count
                               ? "bg-[#0066FF] text-white border-[#0066FF] font-bold shadow-xs"
                               : "bg-white text-[#3C4F69] border-[#CBD5E1] hover:border-[#0066FF]"
-                          }`}
+                            }`}
                         >
                           {count}
                         </button>
@@ -3828,8 +4070,8 @@ export default function ExcelEmiCampaign({
             <div className="flex flex-wrap items-center justify-between gap-4 pt-3.5 border-t border-[#E2E8F0]">
               <div className="flex items-center gap-3">
                 {dispatchStatus === "idle" ||
-                dispatchStatus === "completed" ||
-                dispatchStatus === "aborted" ? (
+                  dispatchStatus === "completed" ||
+                  dispatchStatus === "aborted" ? (
                   <button
                     type="button"
                     onClick={() => handleStartBatchDispatch()}
@@ -3841,10 +4083,10 @@ export default function ExcelEmiCampaign({
                       {dispatchRange === "count"
                         ? `${Math.min(customPeopleCount, processedData.length)} People`
                         : dispatchRange === "range"
-                        ? `${Math.max(0, customRangeEnd - customRangeStart + 1)} People`
-                        : dispatchRange === "test"
-                        ? "10 Test People"
-                        : `${processedData.length.toLocaleString()} People`}
+                          ? `${Math.max(0, customRangeEnd - customRangeStart + 1)} People`
+                          : dispatchRange === "test"
+                            ? "10 Test People"
+                            : `${processedData.length.toLocaleString()} People`}
                       )
                     </span>
                   </button>
@@ -3920,15 +4162,14 @@ export default function ExcelEmiCampaign({
               <div className="space-y-1.5 pt-2">
                 <div className="w-full bg-[#E2E8F0] h-2.5 rounded-full overflow-hidden shadow-inner">
                   <div
-                    className={`h-full transition-all duration-300 ${
-                      dispatchStatus === "completed"
+                    className={`h-full transition-all duration-300 ${dispatchStatus === "completed"
                         ? "bg-[#10B981]"
                         : dispatchStatus === "paused"
-                        ? "bg-amber-500"
-                        : dispatchStatus === "aborted"
-                        ? "bg-red-600"
-                        : "bg-[#10B981]"
-                    }`}
+                          ? "bg-amber-500"
+                          : dispatchStatus === "aborted"
+                            ? "bg-red-600"
+                            : "bg-[#10B981]"
+                      }`}
                     style={{
                       width: `${Math.min(100, (progressIndex / totalToProcess) * 100)}%`,
                     }}
@@ -3938,15 +4179,14 @@ export default function ExcelEmiCampaign({
                   <span>
                     Status:{" "}
                     <strong
-                      className={`uppercase ${
-                        dispatchStatus === "running"
+                      className={`uppercase ${dispatchStatus === "running"
                           ? "text-[#10B981]"
                           : dispatchStatus === "paused"
-                          ? "text-amber-600"
-                          : dispatchStatus === "completed"
-                          ? "text-[#10B981] font-bold"
-                          : "text-slate-600"
-                      }`}
+                            ? "text-amber-600"
+                            : dispatchStatus === "completed"
+                              ? "text-[#10B981] font-bold"
+                              : "text-slate-600"
+                        }`}
                     >
                       {dispatchStatus}
                     </strong>

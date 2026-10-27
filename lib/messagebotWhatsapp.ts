@@ -163,28 +163,59 @@ export function getWhatsappApiToken(overrideToken?: string): string {
  * Standardize phone number for WhatsApp (format: 91XXXXXXXXXX)
  * Automatically adds '91' prefix for 10-digit Indian numbers or handles leading '0'
  */
-export function formatWhatsappNumber(raw: string): string {
+export function formatWhatsappNumber(raw: string, defaultCountryCode: string = "91"): string {
   if (!raw) return "";
-  const digits = String(raw).replace(/\D/g, "");
+  let s = String(raw).trim();
+
+  // Strip trailing decimal zeroes (e.g. from Excel numeric floats like 9827322519.0)
+  s = s.replace(/\.0+$/, "");
+
+  // If scientific notation e.g. 9.827322519e+09 or 9.19827e+11
+  if (/^[+-]?\d+(\.\d+)?[eE][+-]?\d+$/.test(s)) {
+    try {
+      const num = Number(s);
+      if (!isNaN(num) && isFinite(num)) {
+        s = BigInt(Math.round(num)).toString();
+      }
+    } catch {
+      // ignore
+    }
+  }
+
+  const digits = s.replace(/\D/g, "");
+  const cc = defaultCountryCode.replace(/\D/g, "") || "91";
 
   // 10-digit mobile number: e.g. 9827322519 -> 919827322519
   if (digits.length === 10) {
-    return `91${digits}`;
+    return `${cc}${digits}`;
   }
 
   // 11 digits starting with 0: e.g. 09827322519 -> 919827322519
   if (digits.length === 11 && digits.startsWith("0")) {
-    return `91${digits.slice(1)}`;
+    return `${cc}${digits.slice(1)}`;
+  }
+
+  // 12 digits starting with cc (e.g. 91): already has 91 country code
+  if (digits.length === (cc.length + 10) && digits.startsWith(cc)) {
+    return digits;
   }
 
   // 13 digits starting with 091: e.g. 0919827322519 -> 919827322519
   if (digits.length === 13 && digits.startsWith("091")) {
-    return digits.slice(1);
+    return `${cc}${digits.slice(3)}`;
   }
 
-  // 12 digits starting with 91: already has 91 country code
-  if (digits.length === 12 && digits.startsWith("91")) {
-    return digits;
+  // 13 digits starting with 910: e.g. 9109827322519 -> 919827322519
+  if (digits.length === 13 && digits.startsWith("910")) {
+    return `${cc}${digits.slice(3)}`;
+  }
+
+  // Fallback: if ends with 10 digits starting with 6-9
+  if (digits.length > 10) {
+    const last10 = digits.slice(-10);
+    if (/^[6-9]\d{9}$/.test(last10)) {
+      return `${cc}${last10}`;
+    }
   }
 
   return digits;
