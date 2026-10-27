@@ -64,6 +64,7 @@ import {
   PhoneFormatOption,
   PHONE_FORMAT_OPTIONS,
   inspectPhoneColumnFormat,
+  cleanHyperlinkText,
 } from "@/lib/emiCalculations";
 
 interface ExcelEmiCampaignProps {
@@ -270,12 +271,16 @@ export default function ExcelEmiCampaign({
 
     const detectedName = findCol(
       [
+        "candidatename",
         "customername",
         "clientname",
         "applicantname",
         "borrowername",
         "fullname",
         "name",
+        "candidate",
+        "leadname",
+        "lead",
         "client",
         "customer",
         "borrower",
@@ -283,7 +288,7 @@ export default function ExcelEmiCampaign({
         "membername",
         "partyname",
       ],
-      ["custname", "clientname", "applicant", "borrower", "fullname", "name"]
+      ["candidatename", "candidate", "custname", "clientname", "applicant", "borrower", "fullname", "lead", "name"]
     );
 
     const detectedAmount = findCol(
@@ -390,6 +395,25 @@ export default function ExcelEmiCampaign({
       const ws = wb.Sheets[sheetName];
       if (!ws) continue;
 
+      // Pre-process any cells with =HYPERLINK(...) formulas or cell hyperlinks
+      // to ensure cell.v and cell.w contain the clean friendly name instead of formulas/URLs
+      for (const cellKey of Object.keys(ws)) {
+        if (cellKey.startsWith("!")) continue;
+        const cell = ws[cellKey];
+        if (cell) {
+          if (cell.f && /HYPERLINK/i.test(cell.f)) {
+            const clean = cleanHyperlinkText(cell.f);
+            if (clean && (!cell.v || String(cell.v).includes("HYPERLINK"))) {
+              cell.v = clean;
+              cell.w = clean;
+            }
+          } else if (cell.v && typeof cell.v === "string" && /HYPERLINK/i.test(cell.v)) {
+            cell.v = cleanHyperlinkText(cell.v);
+            cell.w = cell.v;
+          }
+        }
+      }
+
       const rawRows = XLSX.utils.sheet_to_json<Record<string, any>>(ws, { defval: "" });
       let cols: string[] = [];
       let rows = rawRows;
@@ -426,11 +450,20 @@ export default function ExcelEmiCampaign({
         }
       }
 
+      // Ensure all cell values across all columns are cleaned of hyperlink formulas/tags
+      const sanitizedRows = rows.map((r) => {
+        const cleanedRow: Record<string, any> = {};
+        for (const [k, v] of Object.entries(r)) {
+          cleanedRow[k] = typeof v === "string" ? cleanHyperlinkText(v) : v;
+        }
+        return cleanedRow;
+      });
+
       parsedSheets.push({
         name: sheetName,
-        rowCount: rows.length,
+        rowCount: sanitizedRows.length,
         columns: cols,
-        rows,
+        rows: sanitizedRows,
       });
     }
 
@@ -731,7 +764,7 @@ export default function ExcelEmiCampaign({
     if (!nameCol && !amountCol) return [];
 
     return activeRows.map((row, index) => {
-      const name = String(row[nameCol] ?? "").trim();
+      const name = cleanHyperlinkText(row[nameCol]);
       const rawPhone = row[phoneCol];
       const phoneInfo = sanitizeIndianPhoneNumber(rawPhone, phoneFormatMode, phoneDefaultCountryCode);
 
@@ -857,7 +890,7 @@ export default function ExcelEmiCampaign({
       const info = sanitizeIndianPhoneNumber(rawVal, phoneFormatMode, phoneDefaultCountryCode);
       return {
         index: idx + 1,
-        name: nameCol ? String(row[nameCol] ?? "").trim() : `Row ${idx + 1}`,
+        name: nameCol ? cleanHyperlinkText(row[nameCol]) : `Row ${idx + 1}`,
         raw: rawVal === undefined || rawVal === null ? "" : String(rawVal),
         formatted: info.formatted,
         isValid: info.isValid,
@@ -1922,18 +1955,15 @@ export default function ExcelEmiCampaign({
             </div>
 
             {/* Column Auto-Detection Status Banner */}
-            {(!nameCol || !amountCol || !tenureCol || !roiCol || !phoneCol) ? (
+            {!nameCol || !phoneCol ? (
               <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-900 flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-xs">
                 <div className="flex items-center gap-2.5">
                   <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
                   <span>
-                    <strong>Action Required:</strong> Please select matching columns below for:{" "}
+                    <strong>Required Columns Missing:</strong> Please select matching columns below for:{" "}
                     <strong>
                       {[
-                        !nameCol && "Customer Name",
-                        !amountCol && "Loan Amount",
-                        !tenureCol && "Tenure",
-                        !roiCol && "Current ROI",
+                        !nameCol && "Customer / Candidate Name",
                         !phoneCol && "Mobile / Phone",
                       ]
                         .filter(Boolean)
@@ -1943,7 +1973,22 @@ export default function ExcelEmiCampaign({
                   </span>
                 </div>
                 <span className="text-[11px] text-amber-700 bg-amber-100/70 px-2 py-0.5 rounded-md self-start sm:self-auto font-medium">
-                  {5 - [!nameCol, !amountCol, !tenureCol, !roiCol, !phoneCol].filter(Boolean).length}/5 Mapped
+                  {[nameCol, phoneCol].filter(Boolean).length}/2 Essential Mapped
+                </span>
+              </div>
+            ) : !amountCol || !tenureCol || !roiCol ? (
+              <div className="p-3 rounded-xl bg-blue-50 border border-blue-200 text-xs text-blue-900 flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-xs">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0" />
+                  <span>
+                    Essential columns mapped: <strong>{nameCol}</strong> (Name) &amp; <strong>{phoneCol}</strong> (Phone). Ready for messaging!
+                    <span className="block sm:inline sm:ml-1 text-slate-500 text-[11px]">
+                      (Loan Amount, Tenure &amp; ROI are optional unless your template uses EMI calculations).
+                    </span>
+                  </span>
+                </div>
+                <span className="text-[11px] text-blue-700 bg-blue-100 px-2 py-0.5 rounded-md font-semibold shrink-0">
+                  Ready (General Campaign)
                 </span>
               </div>
             ) : (
@@ -1951,11 +1996,11 @@ export default function ExcelEmiCampaign({
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                   <span>
-                    All 5 required columns mapped: <strong>{nameCol}</strong> (Name), <strong>{amountCol}</strong> (Amount), <strong>{tenureCol}</strong> (Tenure), <strong>{roiCol}</strong> (ROI), <strong>{phoneCol}</strong> (Phone).
+                    All 5 columns mapped: <strong>{nameCol}</strong> (Name), <strong>{amountCol}</strong> (Amount), <strong>{tenureCol}</strong> (Tenure), <strong>{roiCol}</strong> (ROI), <strong>{phoneCol}</strong> (Phone). Full EMI calculation engine active!
                   </span>
                 </div>
                 <span className="text-[11px] text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-md font-semibold shrink-0">
-                  5/5 Ready
+                  5/5 Full EMI Ready
                 </span>
               </div>
             )}
@@ -1965,7 +2010,7 @@ export default function ExcelEmiCampaign({
               <div>
                 <label className="block text-xs font-bold text-[#0A2540] mb-1.5 flex items-center gap-1.5">
                   <User className="w-3.5 h-3.5 text-[#0066FF]" />
-                  Customer Name <span className="text-red-500">*</span>
+                  Customer / Candidate Name <span className="text-red-500">*</span>
                 </label>
                 <select
                   value={nameCol}
@@ -1980,7 +2025,7 @@ export default function ExcelEmiCampaign({
                   ))}
                 </select>
                 <p className="text-[10px] text-[#64748B] mt-1 truncate">
-                  e.g. CUSTOMERNAME
+                  e.g. Candidate Name / CUSTOMERNAME
                 </p>
               </div>
 
@@ -1988,7 +2033,7 @@ export default function ExcelEmiCampaign({
               <div>
                 <label className="block text-xs font-bold text-[#0A2540] mb-1.5 flex items-center gap-1.5">
                   <DollarSign className="w-3.5 h-3.5 text-[#0066FF]" />
-                  Total Amount (Loan) <span className="text-red-500">*</span>
+                  Total Amount (Loan) <span className="text-slate-400 font-normal text-[10px] ml-1">(Optional)</span>
                 </label>
                 <select
                   value={amountCol}
@@ -2012,7 +2057,7 @@ export default function ExcelEmiCampaign({
                 <div className="flex items-center justify-between mb-1.5">
                   <label className="text-xs font-bold text-[#0A2540] flex items-center gap-1.5">
                     <Clock className="w-3.5 h-3.5 text-[#0066FF]" />
-                    Tenure <span className="text-red-500">*</span>
+                    Tenure <span className="text-slate-400 font-normal text-[10px] ml-1">(Optional)</span>
                   </label>
                   <div className="flex items-center gap-1 text-[10px]">
                     <button
@@ -2058,7 +2103,7 @@ export default function ExcelEmiCampaign({
               <div>
                 <label className="block text-xs font-bold text-[#0A2540] mb-1.5 flex items-center gap-1.5">
                   <TrendingDown className="w-3.5 h-3.5 text-amber-500" />
-                  Current ROI (%) <span className="text-red-500">*</span>
+                  Current ROI (%) <span className="text-slate-400 font-normal text-[10px] ml-1">(Optional)</span>
                 </label>
                 <select
                   value={roiCol}

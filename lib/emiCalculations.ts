@@ -88,6 +88,63 @@ export function formatInrCurrency(
   return options.showSymbol ? `₹${formatted}` : formatted;
 }
 
+/**
+ * Strips Excel formulas, HYPERLINK wrappers, HTML links, markdown links,
+ * and URL artifacts from a string, returning only the clean display name or text.
+ * 
+ * Handles cases like:
+ * - '=HYPERLINK("https://recruiter.shine.com/...","Bhagyashree Mangesh Pardeshi")'
+ * - 'HYPERLINK("url", "Candidate Name")'
+ * - '<a href="...">Candidate Name</a>'
+ * - '[Candidate Name](https://...)'
+ * - 'Candidate Name (https://...)'
+ * - Clean strings: 'Bhagyashree Mangesh Pardeshi'
+ */
+export function cleanHyperlinkText(value: any): string {
+  if (value === undefined || value === null) return "";
+  let s = String(value).trim();
+  if (!s) return "";
+
+  // 1. Excel HYPERLINK formula: =HYPERLINK("url", "friendly_name")
+  const hyperlinkRegex = /^\s*=?\s*HYPERLINK\s*\(\s*(?:"(?:[^"\\]|\\.|"")*"|'(?:[^'\\]|\\.|'')*'|[^,]+)\s*,\s*(?:"((?:[^"\\]|\\.|"")*)"|'((?:[^'\\]|\\.|'')*)'|([^)]+))\s*\)\s*$/i;
+  const match = s.match(hyperlinkRegex);
+  if (match) {
+    const extracted = (match[1] || match[2] || match[3] || "").replace(/""/g, '"').trim();
+    if (extracted) {
+      return extracted;
+    }
+  }
+
+  // Fallback regex if HYPERLINK is embedded or slightly malformed
+  const generalHyperlinkRegex = /HYPERLINK\s*\([^,]+,\s*["']?([^"')]+)["']?\s*\)/i;
+  const generalMatch = s.match(generalHyperlinkRegex);
+  if (generalMatch && generalMatch[1] && generalMatch[1].trim()) {
+    return generalMatch[1].trim();
+  }
+
+  // 2. HTML anchor tag: <a href="...">Candidate Name</a>
+  const htmlMatch = s.match(/<a\b[^>]*>(.*?)<\/a>/i);
+  if (htmlMatch && htmlMatch[1] && htmlMatch[1].trim()) {
+    return htmlMatch[1].replace(/<[^>]+>/g, "").trim();
+  }
+
+  // 3. Markdown link: [Candidate Name](https://...)
+  const mdMatch = s.match(/\[([^\]]+)\]\([^)]+\)/);
+  if (mdMatch && mdMatch[1] && mdMatch[1].trim()) {
+    return mdMatch[1].trim();
+  }
+
+  // 4. Trailing or leading URL in parentheses: Candidate Name (https://...)
+  s = s.replace(/\s*\(\s*https?:\/\/[^\s)]+\s*\)\s*/gi, " ").trim();
+
+  // 5. Quotes unwrapping
+  if (/^["'](.*)["']$/.test(s)) {
+    s = s.slice(1, -1).trim();
+  }
+
+  return s;
+}
+
 export type PhoneFormatOption =
   | "auto"              // Smart Combined / Auto-Detect (Mixed: 10-digit, 91 prefix, 91 with space/dash, etc.)
   | "plain_10"          // Pure 10-digit without country code (e.g. 9876543210 -> Prepend 91)
@@ -710,7 +767,7 @@ export function resolveVariableValue(
     let text = slot.customText !== undefined ? slot.customText : (slot.staticValue || "");
     if (!text) return "";
 
-    const customerName = String(row[mapping.nameCol] ?? "").trim();
+    const customerName = cleanHyperlinkText(row[mapping.nameCol]);
     const tenureVal = String(row[mapping.tenureCol] ?? "").trim();
     const curRoiVal = parseFloat(String(row[mapping.roiCol] ?? 0));
     const loanAmtVal = parseFloat(String(row[mapping.amountCol] ?? 0)) || 0;
@@ -735,7 +792,7 @@ export function resolveVariableValue(
 
     // Replace any {COLUMN_NAME} token matching an Excel column
     text = text.replace(/\{([A-Za-z0-9_-]+)\}/g, (match, colKey) => {
-      if (row[colKey] !== undefined) return String(row[colKey]).trim();
+      if (row[colKey] !== undefined) return cleanHyperlinkText(row[colKey]);
       return match;
     });
 
@@ -744,7 +801,7 @@ export function resolveVariableValue(
 
   switch (slot.sourceType) {
     case "name":
-      return String(row[mapping.nameCol] ?? "").trim();
+      return cleanHyperlinkText(row[mapping.nameCol]);
 
     case "current_emi":
       return formatAmt(calc.currentEmi);
@@ -780,7 +837,7 @@ export function resolveVariableValue(
       return String(slot.staticValue ?? "").trim();
 
     case "custom_column":
-      return String(slot.customColumnName ? row[slot.customColumnName] ?? "" : "").trim();
+      return cleanHyperlinkText(slot.customColumnName ? row[slot.customColumnName] : "");
 
     default:
       return "";
