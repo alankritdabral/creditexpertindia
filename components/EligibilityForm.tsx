@@ -308,10 +308,10 @@ export function EligibilityForm() {
 
   const proceedToFetchReport = async () => {
     let activeBureau: string | undefined;
-    // TEMP: DB operations (read & write) temporarily disabled as requested - will remove in future.
+    const requestId = "req_" + Math.random().toString(36).substring(2, 10);
+    let startTime = 0;
+    let fallbackStartTime = 0;
     try {
-      /*
-      // TEMP: Disabled DB Read (Cache Check)
       // 1. Check Database First
       const safePan = formData.pan ? formData.pan.toUpperCase() : "NOPAN";
       const docId = `${safePan}_${formData.mobile}_${formData.bureau}`;
@@ -384,12 +384,13 @@ export function EligibilityForm() {
         console.error("Error checking cache:", e);
         // Continue to fetch if DB read fails (e.g. missing permissions)
       }
-      */
 
-      // 2. Direct Bureau Fetch (No DB Read) -> Calls API directly
+      // 2. Not in DB or no cache -> Fetch from Surepass
       const currentBureau = typeof activeBureau !== "undefined" ? activeBureau : formData.bureau;
+      const isV2 = currentBureau.startsWith("v2");
       const isExperian = currentBureau.startsWith("experian");
       const isCrif = currentBureau.startsWith("crif");
+      const isPdf = currentBureau.endsWith("_pdf");
 
       let bodyPayload: any = {};
       if (isCrif) {
@@ -418,8 +419,8 @@ export function EligibilityForm() {
         };
       }
 
-      // TEMP: Disabled logSystemEvent to avoid DB write to system_logs
-      /*
+      // Send the request through our new Next.js API Route which talks to IDSPay
+      startTime = Date.now();
       await logSystemEvent({
         level: "info",
         event: "BUREAU_REQUEST_STARTED",
@@ -430,7 +431,6 @@ export function EligibilityForm() {
         message: "Initiating bureau request",
         identifiers: { pan: formData.pan, mobile: formData.mobile },
       });
-      */
 
       const initialRes = await fetch("/api/idspay", {
         method: "POST",
@@ -456,8 +456,6 @@ export function EligibilityForm() {
         const fallbackReason = data.message || "Experian returned incomplete data or a mismatch.";
         console.warn("Experian failed, falling back to CRIF", fallbackReason);
         
-        // TEMP: Disabled logSystemEvent to avoid DB write to system_logs
-        /*
         await logSystemEvent({
           level: "warning",
           event: "BUREAU_FALLBACK_TRIGGERED",
@@ -474,7 +472,6 @@ export function EligibilityForm() {
           identifiers: { pan: formData.pan, mobile: formData.mobile },
           duration_ms: Date.now() - startTime
         });
-        */
         
         const crifPayload = {
           first_name: formData.firstName,
@@ -483,6 +480,7 @@ export function EligibilityForm() {
           name_lookup: 0
         };
         
+        fallbackStartTime = Date.now();
         res = await fetch("/api/idspay", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -507,8 +505,6 @@ export function EligibilityForm() {
         const errMsg = data.message || data.error || "Failed to fetch credit report. Please check your details.";
         setError(errMsg);
         
-        // TEMP: Disabled logSystemEvent to avoid DB write to system_logs
-        /*
         await logSystemEvent({
           level: "error",
           event: fallbackData ? "ALL_BUREAUS_FAILED" : "BUREAU_REQUEST_FAILED",
@@ -524,10 +520,7 @@ export function EligibilityForm() {
           identifiers: { pan: formData.pan, mobile: formData.mobile },
           duration_ms: fallbackData ? Date.now() - fallbackStartTime : Date.now() - startTime
         });
-        */
       } else {
-        // TEMP: Disabled logSystemEvent to avoid DB write to system_logs
-        /*
         await logSystemEvent({
           level: "info",
           event: fallbackData ? "BUREAU_FALLBACK_SUCCESS" : "BUREAU_REQUEST_SUCCESS",
@@ -542,10 +535,8 @@ export function EligibilityForm() {
           identifiers: { pan: formData.pan, mobile: formData.mobile },
           duration_ms: fallbackData ? Date.now() - fallbackStartTime : Date.now() - startTime
         });
-        */
 
-        // TEMP: Disabled DB Write (Saving to Firebase credit_reports collection)
-        /*
+        // Save to Firebase
         try {
           const safePan = formData.pan ? formData.pan.toUpperCase() : "NOPAN";
           const docId = `${safePan}_${formData.mobile}_${typeof activeBureau !== "undefined" ? activeBureau : formData.bureau}`;
@@ -583,15 +574,12 @@ export function EligibilityForm() {
         } catch (e) {
           console.error("Error saving to Firebase", e);
         }
-        */
 
         processFetchedReport(data.data);
       }
     } catch (e: any) {
       setError("A network error occurred. Please try again.");
       
-      // TEMP: Disabled logSystemEvent to avoid DB write to system_logs
-      /*
       await logSystemEvent({
         level: "critical",
         event: "BUREAU_NETWORK_ERROR",
@@ -602,7 +590,6 @@ export function EligibilityForm() {
         identifiers: { pan: formData.pan, mobile: formData.mobile },
         duration_ms: startTime > 0 ? Date.now() - startTime : undefined
       });
-      */
     } finally {
       setLoading(false);
     }
