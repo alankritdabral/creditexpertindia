@@ -169,15 +169,11 @@ export function EligibilityForm() {
     setError(null);
     setLoading(true);
 
-    // TEMP: OTP verification temporarily disabled for normal credit/CIBIL report fetch as requested
-    proceedToFetchReport();
-    /*
     if (!teamBranch && !isAdmin) {
       handleRequestOtp(false);
     } else {
       proceedToFetchReport();
     }
-    */
   };
 
   const handleRequestOtp = async (isResend = false) => {
