@@ -43,6 +43,8 @@ export function CreditReportDashboard({ bureau, cibilData, formData }: any) {
     }
 
     // 2. Load from Firebase as source of truth
+    // TEMP: Disabled DB Read (Overrides) - will remove in future
+    /*
     const loadFromDB = async () => {
       try {
         const docSnap = await getDoc(doc(db, "credit_reports", docId));
@@ -58,6 +60,7 @@ export function CreditReportDashboard({ bureau, cibilData, formData }: any) {
       }
     };
     loadFromDB();
+    */
   }, [sessionKey, docId]);
 
   useEffect(() => {
@@ -69,6 +72,8 @@ export function CreditReportDashboard({ bureau, cibilData, formData }: any) {
     }
 
     // Save to Firebase (debounced)
+    // TEMP: Disabled DB Write (Overrides) - will remove in future
+    /*
     const handler = setTimeout(async () => {
       try {
         // Only update if there are keys, to avoid writing empty data needlessly
@@ -83,6 +88,7 @@ export function CreditReportDashboard({ bureau, cibilData, formData }: any) {
     }, 5000);
 
     return () => clearTimeout(handler);
+    */
   }, [userOverrides, loanOverrides, sessionKey, docId]);
 
   const [showEmployerDropdown, setShowEmployerDropdown] = useState(false);
