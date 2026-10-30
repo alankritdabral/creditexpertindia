@@ -1,15 +1,43 @@
 "use client";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, Plus, Loader2, Trash2, Download, AlertCircle, ChevronDown, ChevronUp } from "lucide-react";
+import { Check, Plus, Loader2, Trash2, Download, AlertCircle, ChevronDown, ChevronUp, Save } from "lucide-react";
 import { analyzeLenderEligibility } from "@/lib/lenderEngine";
 import { parseBureauData } from "@/lib/bureauParsers";
 import { searchEmployers, EmployerResult } from "@/lib/employerLookup";
-import { useEffect } from "react";
-import { db } from "@/lib/firebaseClient";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { generatePDFReport } from "@/lib/pdfGenerator";
-export function CreditReportDashboard({ bureau, cibilData, formData }: any) {
+import { CreditReportProvider, useCreditReport } from "@/context/CreditReportContext";
+
+export function CreditReportDashboard(props: any) {
+  const existingContext = useCreditReport();
+  if (existingContext) {
+    return <CreditReportDashboardInner {...props} />;
+  }
+
+  const safePan = props.formData?.pan ? props.formData.pan.toUpperCase() : "NOPAN";
+  const docId = `${safePan}_${props.formData?.mobile}_${props.bureau || props.formData?.bureau}`;
+  const sessionKey = `report_session_${safePan}_${props.formData?.mobile || "NOMOBILE"}`;
+
+  return (
+    <CreditReportProvider docId={docId} sessionKey={sessionKey} initialOverrides={props.initialOverrides}>
+      <CreditReportDashboardInner {...props} />
+    </CreditReportProvider>
+  );
+}
+
+function CreditReportDashboardInner({ bureau, cibilData, formData }: any) {
+  const {
+    userOverrides,
+    setUserOverrides,
+    loanOverrides,
+    setLoanOverrides,
+    saveOverridesToDB,
+    isDirty,
+    isSaving,
+    sessionKey,
+    docId,
+  } = useCreditReport()!;
+
   const captureRef = useRef<HTMLDivElement>(null);
   const basicRef = useRef<HTMLDivElement>(null);
   const loansRef = useRef<HTMLDivElement>(null);
@@ -17,73 +45,10 @@ export function CreditReportDashboard({ bureau, cibilData, formData }: any) {
   const [isDownloadingImage, setIsDownloadingImage] = useState(false);
   const [isDownloadingSection, setIsDownloadingSection] = useState<string | null>(null);
   const [isPreparingDownload, setIsPreparingDownload] = useState(false);
-  const [userOverrides, setUserOverrides] = useState<any>({});
   const [manualLoans, setManualLoans] = useState<any[]>([]);
 
   const [expandedAccount, setExpandedAccount] = useState<string | null>(null);
   const [dashboardTab, setDashboardTab] = useState<"enquiries" | "ongoing" | "closed" | "eligibility">("enquiries");
-  const [loanOverrides, setLoanOverrides] = useState<any>({});
-
-  const sessionKey = `report_session_${formData?.pan || "NOPAN"}_${formData?.mobile || "NOMOBILE"}`;
-  const safePan = formData?.pan ? formData.pan.toUpperCase() : "NOPAN";
-  const docId = `${safePan}_${formData?.mobile}_${bureau || formData?.bureau}`;
-
-  useEffect(() => {
-    // 1. Try to load from session storage for instant UX
-    try {
-      const saved = sessionStorage.getItem(sessionKey);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        if (parsed.userOverrides) setUserOverrides(parsed.userOverrides);
-        if (parsed.loanOverrides) setLoanOverrides(parsed.loanOverrides);
-      }
-    } catch (e) {
-      console.error("Failed to load session overrides", e);
-    }
-
-    // 2. Load from Firebase as source of truth
-    const loadFromDB = async () => {
-      try {
-        const docSnap = await getDoc(doc(db, "credit_reports", docId));
-        if (docSnap.exists()) {
-          const data = docSnap.data();
-          if (data.overrides) {
-            setUserOverrides((prev: any) => ({ ...prev, ...data.overrides.userOverrides }));
-            setLoanOverrides((prev: any) => ({ ...prev, ...data.overrides.loanOverrides }));
-          }
-        }
-      } catch (e) {
-        console.error("Failed to load overrides from DB", e);
-      }
-    };
-    loadFromDB();
-  }, [sessionKey, docId]);
-
-  useEffect(() => {
-    // Save to session storage instantly
-    try {
-      sessionStorage.setItem(sessionKey, JSON.stringify({ userOverrides, loanOverrides }));
-    } catch (e) {
-      console.error("Failed to save session overrides", e);
-    }
-
-    // Save to Firebase (debounced)
-    const handler = setTimeout(async () => {
-      try {
-        // Only update if there are keys, to avoid writing empty data needlessly
-        if (Object.keys(userOverrides).length > 0 || Object.keys(loanOverrides).length > 0) {
-          await updateDoc(doc(db, "credit_reports", docId), {
-            overrides: { userOverrides, loanOverrides }
-          });
-        }
-      } catch (e) {
-        console.error("Failed to save overrides to DB", e);
-      }
-    }, 5000);
-
-    return () => clearTimeout(handler);
-  }, [userOverrides, loanOverrides, sessionKey, docId]);
 
   const [showEmployerDropdown, setShowEmployerDropdown] = useState(false);
   const [employerSearch, setEmployerSearch] = useState("");
@@ -396,9 +361,26 @@ export function CreditReportDashboard({ bureau, cibilData, formData }: any) {
                         Download Bureau PDF
                       </a>
                     )}
-                    <button onClick={() => generatePDFReport(bureau, cibilData, formData)} className="text-xs font-bold px-4 py-1.5 bg-emerald-600 text-white rounded-full hover:bg-emerald-700 transition-colors shadow-sm flex items-center gap-1">
+                    <button
+                      onClick={async () => {
+                        if (isDirty) await saveOverridesToDB();
+                        generatePDFReport(bureau, cibilData, formData);
+                      }}
+                      className="text-xs font-bold px-4 py-1.5 bg-emerald-600 text-white rounded-full hover:bg-emerald-700 transition-colors shadow-sm flex items-center gap-1"
+                    >
                       Download CIBIL PDF
                     </button>
+                    {isDirty && (
+                      <button
+                        onClick={() => saveOverridesToDB()}
+                        disabled={isSaving}
+                        className="text-xs font-bold px-3 py-1.5 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors shadow-sm flex items-center gap-1.5"
+                        title="Save overrides to cloud database"
+                      >
+                        {isSaving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+                        Save Changes
+                      </button>
+                    )}
                     <div className="flex items-center gap-1 bg-indigo-50 p-1 rounded-full border border-indigo-100">
                       <button onClick={() => handleDownloadImage('basic')} disabled={isDownloadingImage} className="text-[10px] font-bold px-3 py-1 bg-white text-indigo-700 rounded-full hover:bg-indigo-600 hover:text-white transition-colors shadow-sm flex items-center gap-1 disabled:opacity-50">
                         {isDownloadingSection === 'basic' ? <Loader2 className="w-3 h-3 animate-spin" /> : <Download className="w-3 h-3" />} Basic

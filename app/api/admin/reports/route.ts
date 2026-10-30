@@ -22,8 +22,8 @@ export async function GET(request: Request) {
       const endDate = new Date(end);
       queryRef = queryRef.where('created_at', '>=', startDate).where('created_at', '<=', endDate);
     } else {
-      // All Reports uses limit and order
-      const qLimit = parseInt(limitQuery || '1000');
+      // All Reports uses limit and order (default 200 instead of 1000 to save reads)
+      const qLimit = parseInt(limitQuery || '200');
       // If branch is provided, Firestore requires a composite index to use orderBy. 
       // We skip orderBy here to avoid the index error, and sort locally instead.
       if (!branch) {

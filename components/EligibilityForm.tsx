@@ -108,11 +108,14 @@ export function EligibilityForm() {
   const [historyReports, setHistoryReports] = useState<any[]>([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
 
-  const fetchBranchHistory = async () => {
+  const fetchBranchHistory = async (force = false) => {
     setShowHistoryModal(true);
+    if (!force && historyReports.length > 0) {
+      return;
+    }
     setLoadingHistory(true);
     try {
-      const res = await fetch(`/api/admin/reports?branch=${teamBranch}`);
+      const res = await fetch(`/api/admin/reports?branch=${teamBranch}&limit=50`);
       const data = await res.json();
       if (data.success) {
         setHistoryReports(data.reports);
@@ -736,7 +739,7 @@ export function EligibilityForm() {
         <p className="text-lg text-brand-black/70">Take a minute to tell us about your situation.</p>
         {teamBranch && step === 1 && (
           <button
-            onClick={fetchBranchHistory}
+            onClick={() => fetchBranchHistory()}
             className="md:absolute right-0 top-0 mt-4 md:mt-2 bg-white border border-slate-200 text-slate-600 px-4 py-2 rounded-lg text-sm font-bold shadow-sm hover:bg-slate-50 transition-colors"
           >
             {loadingHistory ? <Loader2 className="w-4 h-4 animate-spin inline mr-2" /> : null}
@@ -764,7 +767,16 @@ export function EligibilityForm() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-4xl max-h-[85vh] flex flex-col">
             <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50 rounded-t-2xl">
-              <h3 className="font-bold text-lg text-slate-800">Recently Accessed Reports ({teamBranch})</h3>
+              <div className="flex items-center gap-2">
+                <h3 className="font-bold text-lg text-slate-800">Recently Accessed Reports ({teamBranch})</h3>
+                <button
+                  onClick={() => fetchBranchHistory(true)}
+                  title="Refresh branch reports from database"
+                  className="p-1 hover:bg-slate-200 rounded-md text-slate-600 transition-colors"
+                >
+                  <RotateCw className={`w-4 h-4 ${loadingHistory ? "animate-spin" : ""}`} />
+                </button>
+              </div>
               <button onClick={() => setShowHistoryModal(false)} className="p-1 hover:bg-slate-200 rounded-md text-slate-500 transition-colors">
                 <span className="text-xl leading-none">&times;</span>
               </button>

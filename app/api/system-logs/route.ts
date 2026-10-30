@@ -54,8 +54,13 @@ export async function POST(req: Request) {
       created_at: new Date() // Store as ISO date or Date object. Firebase admin will handle Date.
     };
 
-    // 3. Save to Firestore
-    await adminDb.collection("system_logs").add(logDocument);
+    // 3. Log event to server console (captured free of charge by cloud logging)
+    console.log(`[SystemLog][${safeLevel.toUpperCase()}] ${safeEvent}:`, JSON.stringify(logDocument));
+
+    // Only write to Firestore for errors and critical events to prevent massive write amplification
+    if (safeLevel === "error" || safeLevel === "critical") {
+      await adminDb.collection("system_logs").add(logDocument);
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {

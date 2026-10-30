@@ -11,7 +11,17 @@ import { motion, AnimatePresence } from "framer-motion";
 import { CreditReportDashboard } from "@/components/CreditReportDashboard";
 import { parseBureauData } from "@/lib/bureauParsers";
 
+import { AdminDataProvider, useAdminData } from "@/context/AdminDataContext";
+
 export default function Dashboard() {
+  return (
+    <AdminDataProvider>
+      <DashboardContent />
+    </AdminDataProvider>
+  );
+}
+
+function DashboardContent() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("reports");
@@ -36,15 +46,25 @@ export default function Dashboard() {
     return "No Email Found";
   };
 
-  // Codes State
-  const [codes, setCodes] = useState({ rudrapur: "", delhi: "", dehradun: "" });
-  const [savingCodes, setSavingCodes] = useState(false);
+  // Shared Admin Context State
+  const {
+    reports,
+    setReports,
+    loadingReports,
+    activity,
+    setActivity,
+    activityLoading,
+    codes,
+    setCodes,
+    savingCodes,
+    fetchReports,
+    fetchActivity,
+    fetchCodes,
+    handleUpdateCode: updateCodeInContext,
+    refreshAll,
+  } = useAdminData();
 
   // Activity State
-  const [activity, setActivity] = useState<any>({
-    rudrapur: { count: 0, cost: 0, reports: [] }, delhi: { count: 0, cost: 0, reports: [] }, dehradun: { count: 0, cost: 0, reports: [] }, customer: { count: 0, cost: 0, reports: [] }
-  });
-  const [activityLoading, setActivityLoading] = useState(false);
   const [activityDateFilter, setActivityDateFilter] = useState("today");
   const [activityStartDate, setActivityStartDate] = useState("");
   const [activityEndDate, setActivityEndDate] = useState("");
@@ -53,10 +73,7 @@ export default function Dashboard() {
   // Timer State
   const [resetTimeLeft, setResetTimeLeft] = useState("");
 
-  // Reports State
-  const [reports, setReports] = useState<any[]>([]);
   const [lastVisible, setLastVisible] = useState<any>(null);
-  const [loadingReports, setLoadingReports] = useState(false);
 
   // Filters State
   const [searchQuery, setSearchQuery] = useState("");
@@ -145,22 +162,6 @@ export default function Dashboard() {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 12;
 
-  const fetchCodes = async () => {
-    try {
-      const rudrapur = await getDoc(doc(db, "access_code_creditexpert", "rudrapur"));
-      const delhi = await getDoc(doc(db, "access_code_creditexpert", "delhi"));
-      const dehradun = await getDoc(doc(db, "access_code_creditexpert", "dehradun"));
-
-      setCodes({
-        rudrapur: rudrapur.exists() ? rudrapur.data().code : "",
-        delhi: delhi.exists() ? delhi.data().code : "",
-        dehradun: dehradun.exists() ? dehradun.data().code : "",
-      });
-    } catch (e) {
-      console.error("Error fetching codes:", e);
-    }
-  };
-
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (!user) {
@@ -171,108 +172,15 @@ export default function Dashboard() {
       }
     });
     return () => unsubscribe();
-  }, [router]);
+  }, [router, fetchCodes]);
 
   const handleUpdateCode = async (branch: string) => {
-    setSavingCodes(true);
-    try {
-      await updateDoc(doc(db, "access_code_creditexpert", branch), {
-        code: codes[branch as keyof typeof codes],
-        updatedAt: new Date()
-      });
+    const success = await updateCodeInContext(branch);
+    if (success) {
       alert(`${branch.toUpperCase()} code updated successfully!`);
-    } catch (e) {
-      console.error("Error updating code:", e);
+    } else {
       alert("Failed to update code.");
     }
-    setSavingCodes(false);
-  };
-
-  const fetchActivity = async () => {
-    setActivityLoading(true);
-    try {
-      let start: Date;
-      let end: Date;
-
-      const now = new Date();
-      if (activityDateFilter === "today") {
-        start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        end = new Date(start.getTime() + 24 * 60 * 60 * 1000 - 1);
-      } else if (activityDateFilter === "yesterday") {
-        start = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
-        end = new Date(start.getTime() + 24 * 60 * 60 * 1000 - 1);
-      } else if (activityDateFilter === "range") {
-        if (!activityStartDate || !activityEndDate) {
-          setActivityLoading(false);
-          return;
-        }
-        start = new Date(activityStartDate);
-        const endDay = new Date(activityEndDate);
-        end = new Date(endDay.getTime() + 24 * 60 * 60 * 1000 - 1);
-      } else {
-        if (!activityStartDate) {
-          setActivityLoading(false);
-          return;
-        }
-        start = new Date(activityStartDate);
-        end = new Date(start.getTime() + 24 * 60 * 60 * 1000 - 1);
-      }
-
-      const res = await fetch(`/api/admin/reports?startDate=${start.toISOString()}&endDate=${end.toISOString()}&_t=${Date.now()}`);
-      const apiData = await res.json();
-
-      const stats: any = {
-        rudrapur: { count: 0, cost: 0, reports: [] },
-        delhi: { count: 0, cost: 0, reports: [] },
-        dehradun: { count: 0, cost: 0, reports: [] },
-        customer: { count: 0, cost: 0, reports: [] }
-      };
-
-      if (apiData.success) {
-        apiData.reports.forEach((data: any) => {
-          const branch = data.branch || "customer";
-          const bureau = data.bureau || "";
-
-          if (stats[branch]) {
-            stats[branch].count += 1;
-            let cost = bureau.startsWith("experian") ? 10.62 : bureau.startsWith("crif") ? 14.16 : 59;
-            if (data.fallbackData?.fallback_from_experian) {
-              cost += 10.62; // Include the failed Experian hit cost
-            }
-            stats[branch].cost += cost;
-            stats[branch].reports.push(data);
-          }
-        });
-      }
-
-      // Sort reports locally (newest first)
-      for (const key in stats) {
-        stats[key].reports.sort((a: any, b: any) => {
-          const timeA = a.created_at?.seconds || 0;
-          const timeB = b.created_at?.seconds || 0;
-          return timeB - timeA;
-        });
-      }
-
-      setActivity(stats);
-    } catch (e) {
-      console.error("Error fetching activity:", e);
-    }
-    setActivityLoading(false);
-  };
-
-  const fetchReports = async () => {
-    setLoadingReports(true);
-    try {
-      const res = await fetch(`/api/admin/reports?limit=1000&_t=${Date.now()}`);
-      const apiData = await res.json();
-      if (apiData.success) {
-        setReports(apiData.reports);
-      }
-    } catch (e) {
-      console.error("Error fetching reports:", e);
-    }
-    setLoadingReports(false);
   };
 
   useEffect(() => {
@@ -282,29 +190,23 @@ export default function Dashboard() {
     return () => clearTimeout(handler);
   }, [searchQuery]);
 
-  // Re-fetch reports initially or when activeTab changes
+  // Fetch reports when activeTab is reports (uses 5min context cache, 0 reads on tab switch)
   useEffect(() => {
-    if (activeTab === "reports" && reports.length === 0) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setCurrentPage(1);
+    if (activeTab === "reports") {
       fetchReports();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTab]);
+  }, [activeTab, fetchReports]);
 
   // Reset page on filter change
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setCurrentPage(1);
   }, [branchFilter, debouncedSearchQuery, sortOrder]);
 
   useEffect(() => {
     if (activeTab === "activity") {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      fetchActivity();
+      fetchActivity(activityDateFilter, activityStartDate, activityEndDate);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTab, activityDateFilter, activityStartDate, activityEndDate]);
+  }, [activeTab, activityDateFilter, activityStartDate, activityEndDate, fetchActivity]);
 
   useEffect(() => {
     const calculateTimeLeft = () => {
@@ -508,8 +410,8 @@ export default function Dashboard() {
                     )}
                   </div>
                 )}
-                <button onClick={fetchActivity} className="p-2 bg-white border border-slate-200 rounded-lg text-slate-600 hover:bg-slate-50 transition-colors flex-shrink-0">
-                  <RefreshCw className="w-4 h-4" />
+                <button onClick={() => fetchActivity(activityDateFilter, activityStartDate, activityEndDate, true)} className="p-2 bg-white border border-slate-200 rounded-lg text-slate-600 hover:bg-slate-50 transition-colors flex-shrink-0" title="Refresh activity">
+                  <RefreshCw className={`w-4 h-4 ${activityLoading ? "animate-spin" : ""}`} />
                 </button>
               </div>
             </div>
@@ -653,6 +555,14 @@ export default function Dashboard() {
                 >
                   <ArrowUpDown className="w-4 h-4" />
                   {sortOrder === "desc" ? "Newest First" : "Oldest First"}
+                </button>
+
+                <button
+                  onClick={() => fetchReports(true)}
+                  title="Refresh reports from database"
+                  className="p-2 bg-white border border-slate-200 rounded-lg text-slate-600 hover:bg-slate-50 transition-colors flex-shrink-0"
+                >
+                  <RefreshCw className={`w-4 h-4 ${loadingReports ? "animate-spin" : ""}`} />
                 </button>
               </div>
             </div>
@@ -910,6 +820,7 @@ export default function Dashboard() {
                     pan: viewingReport.pan,
                     bureau: viewingReport.bureau
                   }}
+                  initialOverrides={viewingReport.overrides}
                 />
               </div>
             </motion.div>
