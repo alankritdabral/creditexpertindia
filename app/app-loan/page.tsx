@@ -4,8 +4,9 @@ import { LeadForm } from "@/components/LeadForm";
 import { AnimatedMeshBackground } from "@/components/AnimatedMeshBackground";
 
 export const metadata: Metadata = {
-  title: "App Loan & Fintech Loan Consolidation | Credit Expert India",
+  title: "App Loan & Fintech Debt Consolidation Options",
   description: "Consolidate multiple short-term app loans and digital credit line EMIs into one single lower-cost bank loan.",
+  alternates: { canonical: "/app-loan" },
 };
 
 export default function AppLoanPage() {

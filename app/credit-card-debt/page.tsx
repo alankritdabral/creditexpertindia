@@ -5,8 +5,9 @@ import { FAQ } from "@/components/FAQ";
 import { AnimatedMeshBackground } from "@/components/AnimatedMeshBackground";
 
 export const metadata: Metadata = {
-  title: "Credit Card Debt Relief & Payoff Options | Credit Expert India",
+  title: "Credit Card Debt Relief & Payoff Options",
   description: "Replace expensive 36%-42% p.a. revolving credit card interest with a structured lower-rate personal loan. Explore credit card debt payoff options.",
+  alternates: { canonical: "/credit-card-debt" },
 };
 
 export default function CreditCardDebtPage() {

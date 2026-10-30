@@ -6,8 +6,48 @@ import { FAQ } from "@/components/FAQ";
 import { AnimatedMeshBackground } from "@/components/AnimatedMeshBackground";
 
 export const metadata: Metadata = {
-  title: "Debt Consolidation Loans for Salaried Professionals | Credit Expert India",
+  title: "Debt Consolidation Loans for Salaried Professionals",
   description: "Combine multiple personal loans, credit card dues, and app loans into one single lower-rate EMI plan. Explore debt consolidation options with bank partners.",
+  alternates: { canonical: "/debt-consolidation" },
+};
+
+const debtConsolidationFaqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "Can you help with multiple loans?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Yes. We can review multiple loans and EMIs together and help you understand whether consolidation or another option may be suitable."
+      }
+    },
+    {
+      "@type": "Question",
+      name: "Can you help with credit-card debt?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "We can review your credit-card dues and help you understand potential repayment or consolidation options available based on your situation."
+      }
+    },
+    {
+      "@type": "Question",
+      name: "Do you guarantee loan approval or lower interest rates?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "No. Final approval, interest rate, loan amount and tenure are decided by the respective lender based on its eligibility criteria."
+      }
+    },
+    {
+      "@type": "Question",
+      name: "Is the loan assessment free?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "The initial assessment can be offered without obligation. Any applicable lender charges are always communicated clearly before proceeding."
+      }
+    }
+  ]
 };
 
 export default function DebtConsolidationPage() {
@@ -48,6 +88,10 @@ export default function DebtConsolidationPage() {
         </div>
       </section>
 
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(debtConsolidationFaqSchema) }}
+      />
       <DebtConsolidation />
       <LoanCalculator />
       <LeadForm />

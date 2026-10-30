@@ -1,8 +1,15 @@
 import dynamic from "next/dynamic";
 import Image from "next/image";
+import { Metadata } from "next";
 import { HeroGridBlock, HeroVisualBlock, HeroLogos } from "@/components/HeroGridBlock";
 import { AnimatedSection } from "@/components/AnimatedSection";
 import { LoanSolutionsSection } from "@/components/LoanSolutionsSection";
+
+export const metadata: Metadata = {
+  title: "Debt Consolidation & Personal Loans for Salaried Staff | Credit Expert India",
+  description: "Paying too much interest on loans, credit-card dues or multiple EMIs? Credit Expert India helps you explore debt consolidation, balance transfer and personal loan options starting from 9.95% p.a.* for eligible salaried applicants.",
+  alternates: { canonical: "/" },
+};
 
 // Lazy load below-the-fold components
 const SmartCalculator = dynamic(() => import("@/components/SmartCalculator").then(mod => mod.SmartCalculator));

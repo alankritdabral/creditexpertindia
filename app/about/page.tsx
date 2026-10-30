@@ -4,8 +4,9 @@ import { LeadForm } from "@/components/LeadForm";
 import { AnimatedMeshBackground } from "@/components/AnimatedMeshBackground";
 
 export const metadata: Metadata = {
-  title: "About Us | Credit Expert India",
+  title: "About Our Mission & Debt Advisory Services",
   description: "Learn about Credit Expert India's mission to provide transparent debt advisory and consolidation assistance for salaried Indian professionals.",
+  alternates: { canonical: "/about" },
 };
 
 export default function AboutPage() {

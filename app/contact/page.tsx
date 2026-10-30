@@ -5,13 +5,35 @@ import { contact } from "@/lib/config";
 import { MapPin, Phone, Mail, ArrowRight } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Contact Us | Credit Expert India",
+  title: "Contact Our Financial & Loan Advisory Team",
   description: "Get in touch with Credit Expert India debt specialists for assistance with personal loans and debt consolidation.",
+  alternates: { canonical: "/contact" },
+};
+
+const localBusinessSchema = {
+  "@context": "https://schema.org",
+  "@graph": contact.addresses.map((addr) => ({
+    "@type": "FinancialService",
+    "name": `Credit Expert India - ${addr.city} Branch`,
+    "description": "Debt consolidation, balance transfer and personal loan advisory services.",
+    "telephone": contact.whatsapp,
+    "email": contact.email,
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": addr.fullAddress,
+      "addressLocality": addr.city,
+      "addressCountry": "IN"
+    }
+  }))
 };
 
 export default function ContactPage() {
   return (
     <div className="min-h-screen bg-slate-50">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
+      />
       
       <section className="relative isolate w-full pt-32 pb-24 lg:pt-40 lg:pb-32 overflow-hidden border-b border-icy-blue">
         <div className="absolute inset-0 pointer-events-none z-0">

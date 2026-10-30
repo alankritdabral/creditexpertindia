@@ -5,8 +5,9 @@ import { LeadForm } from "@/components/LeadForm";
 import { AnimatedMeshBackground } from "@/components/AnimatedMeshBackground";
 
 export const metadata: Metadata = {
-  title: "Personal Loans for Salaried Staff from 9.95% p.a.* | Credit Expert India",
+  title: "Personal Loans for Salaried Staff from 9.95% p.a.*",
   description: "Check personal loan options for salaried professionals. Rates starting from 9.95% p.a.* with soft profile eligibility checks and partner bank network.",
+  alternates: { canonical: "/personal-loan" },
 };
 
 export default function PersonalLoanPage() {

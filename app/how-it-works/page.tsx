@@ -4,8 +4,9 @@ import { LeadForm } from "@/components/LeadForm";
 import { AnimatedMeshBackground } from "@/components/AnimatedMeshBackground";
 
 export const metadata: Metadata = {
-  title: "How It Works | Credit Expert India Workflow",
+  title: "How It Works — Step-by-Step Loan Advisory Process",
   description: "Understand our 5-step process from soft profile assessment to lender evaluation and decision.",
+  alternates: { canonical: "/how-it-works" },
 };
 
 export default function HowItWorksPage() {

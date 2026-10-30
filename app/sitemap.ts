@@ -18,12 +18,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/privacy-policy',
     '/team',
     '/terms-and-conditions',
-    '/app-loan'
+    '/app-loan',
+    '/calculators/debt-consolidation-calculator',
   ].map((route) => ({
     url: `${siteConfig.url}${route}`,
     lastModified: new Date().toISOString(),
     changeFrequency: 'weekly' as const,
-    priority: route === '' ? 1 : 0.8,
+    priority: route === '' ? 1 : route.startsWith('/calculators') ? 0.9 : 0.8,
   }));
 
   return [...routes];

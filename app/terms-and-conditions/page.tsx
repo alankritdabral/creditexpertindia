@@ -1,8 +1,9 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Terms & Conditions | Credit Expert India",
-  description: "Terms and Conditions for Credit Expert India",
+  title: "Terms and Conditions of Advisory Service",
+  description: "Terms and Conditions for using Credit Expert India debt consolidation and loan advisory services.",
+  alternates: { canonical: "/terms-and-conditions" },
 };
 
 export default function TermsAndConditionsPage() {

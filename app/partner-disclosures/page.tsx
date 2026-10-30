@@ -1,8 +1,9 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Partner Disclosures | Credit Expert India",
-  description: "Partner Disclosures for Credit Expert India",
+  title: "Partner Disclosures & Lending Affiliations",
+  description: "Lending partner disclosures, banking network affiliations, and facilitation terms for Credit Expert India.",
+  alternates: { canonical: "/partner-disclosures" },
 };
 
 export default function PartnerDisclosuresPage() {

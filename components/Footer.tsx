@@ -87,6 +87,7 @@ export function Footer() {
               <li><Link href="/contact" className="text-[15px] text-brand-black/70 hover:text-brand-black transition-colors font-medium">Contact us</Link></li>
               <li><Link href="/about" className="text-[15px] text-brand-black/70 hover:text-brand-black transition-colors font-medium">About us</Link></li>
               <li><Link href="/debt-consolidation" className="text-[15px] text-brand-black/70 hover:text-brand-black transition-colors font-medium">Debt Consolidation</Link></li>
+              <li><Link href="/calculators/debt-consolidation-calculator" className="text-[15px] text-brand-black/70 hover:text-brand-black transition-colors font-medium">EMI Calculator</Link></li>
               <li><Link href="/personal-loan" className="text-[15px] text-brand-black/70 hover:text-brand-black transition-colors font-medium">Personal Loans</Link></li>
               <li><Link href="/faq" className="text-[15px] text-brand-black/70 hover:text-brand-black transition-colors font-medium">FAQ</Link></li>
             </ul>

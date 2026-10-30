@@ -65,7 +65,6 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
-  alternates: { canonical: "/" },
   formatDetection: {
     telephone: false,
   },
@@ -79,15 +78,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     url: siteConfig.url,
     description: "Helps borrowers explore debt consolidation, balance transfer and personal loan options.",
     areaServed: "IN",
-  };
-
-  const faqLd = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: [
-      { "@type": "Question", name: "What is debt consolidation?", acceptedAnswer: { "@type": "Answer", text: "Combining eligible existing debts into a single loan structure with one repayment, where eligible." } },
-      { "@type": "Question", name: "Is loan approval guaranteed?", acceptedAnswer: { "@type": "Answer", text: "No. Loan approval is not guaranteed. The lender makes the final decision." } },
-    ],
   };
 
   return (
@@ -107,7 +97,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           `}
         </Script>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
         <ScrollProgress />
         <Navbar />
         <main className="flex-1">{children}</main>

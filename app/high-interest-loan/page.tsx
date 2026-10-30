@@ -4,8 +4,9 @@ import { LeadForm } from "@/components/LeadForm";
 import { AnimatedMeshBackground } from "@/components/AnimatedMeshBackground";
 
 export const metadata: Metadata = {
-  title: "High-Interest Loan Refinancing & Advisory | Credit Expert India",
+  title: "High-Interest Loan Refinancing & Relief Options",
   description: "Explore options to refinance high-rate personal loans and reduce monthly EMI burden with partner banks.",
+  alternates: { canonical: "/high-interest-loan" },
 };
 
 export default function HighInterestLoanPage() {

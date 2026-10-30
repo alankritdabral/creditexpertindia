@@ -4,8 +4,9 @@ import { LeadForm } from "@/components/LeadForm";
 import { AnimatedMeshBackground } from "@/components/AnimatedMeshBackground";
 
 export const metadata: Metadata = {
-  title: "Personal Loan Balance Transfer | Credit Expert India",
+  title: "Personal Loan Balance Transfer to Lower Interest Rates",
   description: "Transfer your high-interest personal loan to partner banks with lower interest rates. Calculate monthly EMI savings and apply for balance transfer.",
+  alternates: { canonical: "/loan-balance-transfer" },
 };
 
 export default function BalanceTransferPage() {

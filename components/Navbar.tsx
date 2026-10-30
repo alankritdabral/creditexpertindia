@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import logo from "@/public/img/logo.webp";
-import { ArrowRight, X, Home, Layers3, IndianRupee, Workflow, FileCheck, Mail, User, ShieldCheck, LogOut } from "lucide-react";
+import { ArrowRight, X, Home, Layers3, IndianRupee, Workflow, FileCheck, Mail, User, ShieldCheck, LogOut, Calculator } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname, useRouter } from "next/navigation";
 import { onAuthStateChanged, signOut } from "firebase/auth";
@@ -13,6 +13,7 @@ const navLinks = [
   { label: "Home", href: "/", icon: Home },
   { label: "Debt Consolidation", href: "/debt-consolidation", icon: Layers3 },
   { label: "Personal Loan", href: "/personal-loan", icon: IndianRupee },
+  { label: "Calculator", href: "/calculators/debt-consolidation-calculator", icon: Calculator },
   { label: "How It Works", href: "/how-it-works", icon: Workflow },
   { label: "Eligibility", href: "/eligibility", icon: FileCheck },
 ];

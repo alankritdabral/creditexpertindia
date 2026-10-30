@@ -5,8 +5,9 @@ import { WhoWeHelp } from "@/components/WhoWeHelp";
 import { EligibilityForm } from "@/components/EligibilityForm";
 
 export const metadata: Metadata = {
-  title: "Loan Eligibility Criteria & Document Requirements | Credit Expert India",
+  title: "Check Loan Eligibility & Required Documents",
   description: "Check eligibility criteria and document requirements for salaried debt consolidation and personal loans.",
+  alternates: { canonical: "/eligibility" },
 };
 
 export default function EligibilityPage() {
