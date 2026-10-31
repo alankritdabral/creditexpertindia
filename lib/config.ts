@@ -28,6 +28,19 @@ export const contact = {
   legalName: "Credit Expert India",
 } as const;
 
+// TODO(legal): fill these in with verified details. The footer, /about and /contact show a
+// field only when it has a value, so nothing is invented. Add them in lib/config.ts.
+export const identity = {
+  registeredName: null as string | null,
+  cin: null as string | null,
+  registeredAddress: null as string | null,
+  grievanceOfficer: null as { name: string; email: string; phone?: string; responseTime?: string } | null,
+  phone: null as string | null,
+} as const;
+
+export const facilitatorStatement =
+  "Credit Expert India is a loan facilitator, not a bank or NBFC. Rates, eligibility and approval depend on the lender, and the final decision is the lender's. Fees and charges may apply; review the lender's terms before accepting an offer.";
+
 export const lendingPartners = {
   enabled: true,
   headline: "Affiliated Banking & Lending Partners",

@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import { Inter, Manrope } from "next/font/google";
 import "./globals.css";
-import { Navbar } from "@/components/Navbar";
-import { Footer } from "@/components/Footer";
-import { ScrollProgress } from "@/components/ScrollProgress";
+import { SiteFrame } from "@/components/site/SiteFrame";
+import { SiteHeader } from "@/components/site/SiteHeader";
+import { SiteFooter } from "@/components/site/SiteFooter";
+import { StickyActionBar } from "@/components/site/StickyActionBar";
 import { siteConfig } from "@/lib/config";
 
 const inter = Inter({
@@ -82,7 +83,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <html lang="en" className={`${inter.variable} ${manrope.variable} h-full antialiased font-sans scroll-smooth`}>
-      <body className="min-h-full flex flex-col bg-background text-brand-black [font-feature-settings:'ss01'] overflow-x-hidden">
+      <body className="min-h-full flex flex-col bg-page text-ink">
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-VNY6TW0ZW0"
           strategy="afterInteractive"
@@ -97,10 +98,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           `}
         </Script>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-        <ScrollProgress />
-        <Navbar />
-        <main className="flex-1">{children}</main>
-        <Footer />
+        <SiteFrame header={<SiteHeader />} footer={<SiteFooter />} bar={<StickyActionBar />}>
+          {children}
+        </SiteFrame>
       </body>
     </html>
   );

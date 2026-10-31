@@ -1,12 +1,26 @@
 // All copy aligned with credit-expert-india-website-redesign.md blueprint
+export const ctas = {
+  primary: "Check My Options",
+  secondary: "Talk to an Expert",
+  tertiary: "Calculate My Savings",
+} as const;
+
+export const solutionLinks = [
+  { label: "Debt Consolidation", href: "/debt-consolidation", desc: "Combine several EMIs into one" },
+  { label: "Credit Card Debt", href: "/credit-card-debt", desc: "Move expensive card dues to a lower rate" },
+  { label: "App Loans", href: "/app-loan", desc: "Replace several short-term app loans" },
+  { label: "High-Interest Loans", href: "/high-interest-loan", desc: "Check whether a cheaper loan fits" },
+  { label: "Loan Balance Transfer", href: "/loan-balance-transfer", desc: "Move a loan to a lower-rate lender" },
+  { label: "Personal Loan", href: "/personal-loan", desc: "A new loan based on your profile" },
+  { label: "Savings Calculator", href: "/calculators/debt-consolidation-calculator", desc: "Estimate the difference in EMI" },
+] as const;
+
 export const navLinks = [
   { label: "Home", href: "/" },
-  { label: "Debt Solutions", href: "/debt-consolidation" },
   { label: "Personal Loan", href: "/personal-loan" },
   { label: "How It Works", href: "/how-it-works" },
   { label: "About Us", href: "/about" },
   { label: "FAQs", href: "/faq" },
-  { label: "Contact", href: "/contact" },
 ] as const;
 
 export const hero = {
@@ -125,12 +139,12 @@ export const howItWorks = [
 export const whyUs = [
   {
     title: "Lending Network",
-    desc: "Explore applicable options from partner banks and NBFCs where relationships genuinely exist across India.",
+    desc: "We help you explore applicable options across banks and NBFCs. The final decision is always made by the lender.",
     icon: "building",
   },
   {
     title: "Privacy First",
-    desc: "Customer information is handled confidentially with bank-grade security according to our strict privacy policy.",
+    desc: "Your information is kept confidential and handled as described in our privacy policy.",
     icon: "lock",
   },
   {
@@ -189,7 +203,8 @@ export const faqs = [
   },
   {
     q: "Does checking eligibility affect my CIBIL score?",
-    a: "No. Initial eligibility assessment on Credit Expert India is a soft profile check and does not impact your CIBIL score. A hard enquiry is only conducted by partner banks if you decide to formally submit a loan application.",
+    // TODO(compliance): confirm with the bureau partner that the report fetch is recorded as a soft enquiry.
+    a: "Looking at your own credit report is generally treated as a soft enquiry and does not lower your score. A lender may make a hard enquiry if you formally apply for a loan with them, and that can affect your score. Never share your OTP with anyone.",
   },
   {
     q: "Do you guarantee loan approval?",
@@ -201,10 +216,12 @@ export const faqs = [
   },
   {
     q: "Are there processing fees?",
-    a: "Initial credit advisory on Credit Expert India is 100% free. Any loan processing fees or stamp duty charges are charged directly by the lending bank/NBFC and will be clearly disclosed before loan agreement signing.",
+    a: "There is no charge for the initial assessment on Credit Expert India. Any loan processing fees or stamp duty charges are charged directly by the lending bank/NBFC and will be clearly disclosed before loan agreement signing.",
   },
 ];
 
+// UNVERIFIED SAMPLE TEXT. Do not render these on the site until real testimonials
+// exist with each customer's written consent.
 export const testimonials = [
   {
     name: "Rahul S.",
