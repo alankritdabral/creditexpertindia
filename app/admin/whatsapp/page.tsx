@@ -1,5 +1,6 @@
 "use client";
 
+import { adminFetch } from "@/lib/adminFetch";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import {
@@ -198,7 +199,7 @@ export default function WhatsAppHubPage() {
     setStatusLoading(true);
     try {
       const tokenParam = apiTokenOverride ? `?apiToken=${encodeURIComponent(apiTokenOverride)}` : "";
-      const res = await fetch(`/api/whatsapp?action=status${tokenParam}`);
+      const res = await adminFetch(`/api/whatsapp?action=status${tokenParam}`);
       const data = await res.json();
       if (data.success) {
         setStatus(data.status);
@@ -222,7 +223,7 @@ export default function WhatsAppHubPage() {
     setLoadingTimezones(true);
     try {
       const tokenParam = apiTokenOverride ? `&apiToken=${encodeURIComponent(apiTokenOverride)}` : "";
-      const res = await fetch(`/api/whatsapp?action=timezones${tokenParam}`);
+      const res = await adminFetch(`/api/whatsapp?action=timezones${tokenParam}`);
       const data = await res.json();
       if (data.success && Array.isArray(data.timezones)) {
         setTimezones(data.timezones);
@@ -239,7 +240,7 @@ export default function WhatsAppHubPage() {
     setLoadingTemplates(true);
     try {
       const tokenParam = apiTokenOverride ? `&apiToken=${encodeURIComponent(apiTokenOverride)}` : "";
-      const res = await fetch(`/api/whatsapp?action=templates${tokenParam}`);
+      const res = await adminFetch(`/api/whatsapp?action=templates${tokenParam}`);
       const data = await res.json();
       if (data.success && Array.isArray(data.templates)) {
         setTemplatesList(data.templates);
@@ -287,7 +288,7 @@ export default function WhatsAppHubPage() {
       if (type && type !== "ALL") params.append("type", type);
       params.append("limit", "150");
 
-      const res = await fetch(`/api/whatsapp?${params.toString()}`);
+      const res = await adminFetch(`/api/whatsapp?${params.toString()}`);
       const data = await res.json();
       if (data.success) {
         setMessagesList(data.messages || []);
@@ -305,7 +306,7 @@ export default function WhatsAppHubPage() {
     if (!campaignId) return;
     setSyncingDlrId(String(campaignId));
     try {
-      const res = await fetch("/api/whatsapp", {
+      const res = await adminFetch("/api/whatsapp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -342,7 +343,7 @@ export default function WhatsAppHubPage() {
 
     setSyncingAllDlrs(true);
     try {
-      await fetch("/api/whatsapp", {
+      await adminFetch("/api/whatsapp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -364,7 +365,7 @@ export default function WhatsAppHubPage() {
     setTestingConnection(true);
     setConnectionMessage(null);
     try {
-      const res = await fetch("/api/whatsapp", {
+      const res = await adminFetch("/api/whatsapp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -409,7 +410,7 @@ export default function WhatsAppHubPage() {
     setOtpResponse(null);
 
     try {
-      const res = await fetch("/api/whatsapp", {
+      const res = await adminFetch("/api/whatsapp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -482,7 +483,7 @@ export default function WhatsAppHubPage() {
         formData.append("templateFileExtension", ext);
       }
 
-      const res = await fetch("/api/whatsapp", {
+      const res = await adminFetch("/api/whatsapp", {
         method: "POST",
         body: formData,
       });
@@ -509,7 +510,7 @@ export default function WhatsAppHubPage() {
     setDlrData(null);
 
     try {
-      const res = await fetch("/api/whatsapp", {
+      const res = await adminFetch("/api/whatsapp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -538,7 +539,7 @@ export default function WhatsAppHubPage() {
     setCampaignsError(null);
 
     try {
-      const res = await fetch("/api/whatsapp", {
+      const res = await adminFetch("/api/whatsapp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -567,7 +568,7 @@ export default function WhatsAppHubPage() {
     setTemplateSubmitResult(null);
 
     try {
-      const res = await fetch("/api/whatsapp", {
+      const res = await adminFetch("/api/whatsapp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { signToken, verifyToken } from "@/lib/serverTokens";
 
 export async function setTeamSession(branch: string) {
   const cookieStore = await cookies();
@@ -25,15 +26,27 @@ export async function setTeamSession(branch: string) {
     expires: expireDateUTC,
     path: '/',
   });
+
+  // Signed, HTTP-only proof of the branch. The server trusts this, never the readable cookie alone.
+  cookieStore.set('team_sig', signToken('team', branch, expireDateUTC.getTime()), {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production',
+    expires: expireDateUTC,
+    path: '/',
+  });
 }
 
 export async function getTeamSession() {
   const cookieStore = await cookies();
-  const branchCookie = cookieStore.get('team_branch');
-  return branchCookie?.value || null;
+  const branch = cookieStore.get('team_branch')?.value;
+  const sig = cookieStore.get('team_sig')?.value;
+  if (!branch || !sig) return null;
+  return verifyToken('team', branch, sig) ? branch : null;
 }
 
 export async function clearTeamSession() {
   const cookieStore = await cookies();
   cookieStore.delete('team_branch');
+  cookieStore.delete('team_sig');
 }

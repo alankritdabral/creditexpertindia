@@ -1,8 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getStaff } from "@/lib/serverAuth";
+import { verifyOtpToken } from "@/lib/serverTokens";
 
 export async function POST(req: NextRequest) {
   try {
     const { bureau, bodyPayload } = await req.json();
+
+    // Paid bureau lookups: staff, or a visitor who just verified OTP for this exact mobile number.
+    const staff = await getStaff(req);
+    if (!staff) {
+      const mobile = String(bodyPayload?.mobile_no || bodyPayload?.phone_number || "");
+      if (!mobile || !verifyOtpToken(mobile, req.headers.get("x-otp-token"))) {
+        return NextResponse.json(
+          { error: "Mobile verification required. Please verify your OTP and try again." },
+          { status: 401 }
+        );
+      }
+    }
 
     if (!bureau || !bodyPayload) {
       return NextResponse.json(

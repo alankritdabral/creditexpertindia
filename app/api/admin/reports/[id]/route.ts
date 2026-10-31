@@ -1,7 +1,10 @@
 import { NextResponse } from 'next/server';
 import { adminDb } from '@/lib/firebaseAdmin';
+import { getStaff, unauthorized } from '@/lib/serverAuth';
 
 export async function GET(request: Request, context: { params: Promise<{ id: string }> }) {
+  const staff = await getStaff(request);
+  if (!staff) return unauthorized(401);
   try {
     const { id } = await context.params;
     const docSnap = await adminDb.collection('credit_reports').doc(id).get();
@@ -11,6 +14,7 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
     }
 
     const docData = docSnap.data();
+    if (staff.kind === 'team' && docData?.branch !== staff.branch) return unauthorized(403);
     const report = {
       id: docSnap.id,
       ...docData,

@@ -1,5 +1,6 @@
 "use client";
 
+import { adminFetch, adminAuthHeaders } from "@/lib/adminFetch";
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -68,6 +69,7 @@ export function EligibilityForm() {
 
   const [teamBranch, setTeamBranch] = useState<string | null>(null);
   const [showOtpModal, setShowOtpModal] = useState(false);
+  const otpTokenRef = useRef<string | null>(null);
   const [otpDigits, setOtpDigits] = useState<string[]>(["", "", "", ""]);
   const [otpLoading, setOtpLoading] = useState(false);
   const [otpError, setOtpError] = useState<string | null>(null);
@@ -115,7 +117,7 @@ export function EligibilityForm() {
     }
     setLoadingHistory(true);
     try {
-      const res = await fetch(`/api/admin/reports?branch=${teamBranch}&limit=50`);
+      const res = await adminFetch(`/api/admin/reports?branch=${teamBranch}&limit=50`);
       const data = await res.json();
       if (data.success) {
         setHistoryReports(data.reports);
@@ -296,6 +298,7 @@ export function EligibilityForm() {
       const data = await res.json();
 
       if (data.success) {
+        otpTokenRef.current = data.otpToken || null;
         setShowOtpModal(false);
         proceedToFetchReport();
       } else {
@@ -439,6 +442,8 @@ export function EligibilityForm() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          ...(otpTokenRef.current ? { "x-otp-token": otpTokenRef.current } : {}),
+          ...(await adminAuthHeaders()),
         },
         body: JSON.stringify({ bureau: typeof activeBureau !== "undefined" ? activeBureau : formData.bureau, bodyPayload })
       });
@@ -486,7 +491,11 @@ export function EligibilityForm() {
         fallbackStartTime = Date.now();
         res = await fetch("/api/idspay", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            ...(otpTokenRef.current ? { "x-otp-token": otpTokenRef.current } : {}),
+            ...(await adminAuthHeaders()),
+          },
           body: JSON.stringify({ bureau: "crif_v1", bodyPayload: crifPayload })
         });
         
@@ -815,7 +824,7 @@ export function EligibilityForm() {
                             onClick={async () => {
                               setShowHistoryModal(false);
                               try {
-                                const res = await fetch(`/api/admin/reports/${r.id}`);
+                                const res = await adminFetch(`/api/admin/reports/${r.id}`);
                                 const apiData = await res.json();
                                 if (apiData.success) {
                                   setFormData({ ...formData, bureau: apiData.report.bureau, pan: apiData.report.pan, mobile: apiData.report.mobile });

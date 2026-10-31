@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { requireAdmin } from "@/lib/serverAuth";
 import {
   sendWhatsappOtp,
   sendWhatsappMessage,
@@ -19,6 +20,8 @@ import {
 } from "@/lib/whatsappLogs";
 
 export async function GET(req: Request) {
+  const denied = await requireAdmin(req);
+  if (denied) return denied;
   try {
     const { searchParams } = new URL(req.url);
     const action = searchParams.get("action");
@@ -133,6 +136,8 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
+  const denied = await requireAdmin(req);
+  if (denied) return denied;
   try {
     const contentType = req.headers.get("content-type") || "";
     let action = "";

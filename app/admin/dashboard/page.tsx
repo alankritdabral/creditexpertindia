@@ -1,5 +1,6 @@
 "use client";
 
+import { adminFetch } from "@/lib/adminFetch";
 import React, { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -117,7 +118,7 @@ function DashboardContent() {
   const fetchLogs = async () => {
     setLoadingLogs(true);
     try {
-      const res = await fetch(`/api/admin/logs?limit=200&_t=${Date.now()}`);
+      const res = await adminFetch(`/api/admin/logs?limit=200&_t=${Date.now()}`);
       const apiData = await res.json();
       if (apiData.success) {
         setSystemLogs(apiData.logs);
@@ -144,7 +145,7 @@ function DashboardContent() {
 
     setLoadingReportId(reportMeta.id);
     try {
-      const res = await fetch(`/api/admin/reports/${reportMeta.id}`);
+      const res = await adminFetch(`/api/admin/reports/${reportMeta.id}`);
       const apiData = await res.json();
       if (apiData.success) {
         setViewingReport(apiData.report);

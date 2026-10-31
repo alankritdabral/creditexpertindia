@@ -1,5 +1,6 @@
 "use client";
 
+import { adminFetch } from "@/lib/adminFetch";
 import React, { createContext, useContext, useState, useCallback, ReactNode, useRef } from "react";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "@/lib/firebaseClient";
@@ -59,7 +60,7 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
     setLoadingReports(true);
     try {
       // Limit to 200 by default (cuts reads by 80% compared to 1000)
-      const res = await fetch(`/api/admin/reports?limit=200&_t=${now}`);
+      const res = await adminFetch(`/api/admin/reports?limit=200&_t=${now}`);
       const apiData = await res.json();
       if (apiData.success) {
         setReports(apiData.reports);

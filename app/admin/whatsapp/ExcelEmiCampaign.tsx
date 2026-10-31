@@ -1,5 +1,6 @@
 "use client";
 
+import { adminFetch } from "@/lib/adminFetch";
 import React, { useState, useMemo, useRef, useEffect } from "react";
 import * as XLSX from "xlsx";
 import {
@@ -1175,7 +1176,7 @@ export default function ExcelEmiCampaign({
         formData.append("templateFileExtension", ext);
       }
 
-      const res = await fetch("/api/whatsapp", {
+      const res = await adminFetch("/api/whatsapp", {
         method: "POST",
         body: formData,
         signal: AbortSignal.timeout(45000),
@@ -1339,7 +1340,7 @@ export default function ExcelEmiCampaign({
           formData.append("templateFileExtension", ext);
         }
 
-        const res = await fetch("/api/whatsapp", {
+        const res = await adminFetch("/api/whatsapp", {
           method: "POST",
           body: formData,
           signal: AbortSignal.timeout(45000),

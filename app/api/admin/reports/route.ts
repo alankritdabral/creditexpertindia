@@ -1,14 +1,19 @@
 import { NextResponse } from 'next/server';
 import { adminDb } from '@/lib/firebaseAdmin';
+import { getStaff, unauthorized } from '@/lib/serverAuth';
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
+  const staff = await getStaff(request);
+  if (!staff) return unauthorized(401);
   try {
     const { searchParams } = new URL(request.url);
     const start = searchParams.get('startDate');
     const end = searchParams.get('endDate');
     const limitQuery = searchParams.get('limit');
     const branch = searchParams.get('branch');
+    // Branch team members may only read their own branch.
+    if (staff.kind === 'team' && branch !== staff.branch) return unauthorized(403);
     
     let queryRef: any = adminDb.collection('credit_reports');
 
