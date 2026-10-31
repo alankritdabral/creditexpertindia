@@ -146,8 +146,9 @@ export async function verifyStoredOtp(
   const cleanMobile = mobile.replace(/\D/g, "").slice(-10);
   const otpKey = `otp:${cleanMobile}`;
 
-  // Allow bypass OTP in development/test if configured
-  const devBypassOtp = process.env.OTP_DEV_BYPASS;
+  // Allow bypass OTP in development/test if configured. Never in production: a fixed code
+  // would pass verification for every mobile number and unlock the paid bureau lookup.
+  const devBypassOtp = process.env.NODE_ENV !== "production" ? process.env.OTP_DEV_BYPASS : undefined;
   if (devBypassOtp && enteredOtp.trim() === devBypassOtp.trim()) {
     return { success: true };
   }
