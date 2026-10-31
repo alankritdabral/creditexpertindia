@@ -129,3 +129,69 @@ export function calculateMultiDebtConsolidation(input: MultiDebtConsolidationInp
   };
 }
 
+
+export type RefinanceInput = {
+  /** Outstanding balance being refinanced. */
+  balance: number;
+  /** Annual rate on the existing debt, in percent. */
+  currentRatePercent: number;
+  /** Months left on the existing debt. */
+  remainingMonths: number;
+  /** Illustrative annual rate on the new loan, in percent. */
+  newRatePercent: number;
+  /** Tenure of the new loan; defaults to the remaining months. */
+  newTenureMonths?: number;
+  processingFeePercent?: number;
+};
+
+export type RefinanceResult = {
+  currentEMI: number;
+  newEMI: number;
+  monthlyDifference: number;
+  currentTotalRepayment: number;
+  newTotalRepayment: number;
+  processingFee: number;
+  currentInterest: number;
+  newInterest: number;
+  /** Positive = cheaper overall after the fee; negative = costs more overall. */
+  lifetimeSavings: number;
+  /** True when a longer tenure lowers the EMI but the total cost goes up. */
+  lowerEmiButCostsMore: boolean;
+};
+
+const ZERO_REFINANCE: RefinanceResult = {
+  currentEMI: 0, newEMI: 0, monthlyDifference: 0, currentTotalRepayment: 0, newTotalRepayment: 0,
+  processingFee: 0, currentInterest: 0, newInterest: 0, lifetimeSavings: 0, lowerEmiButCostsMore: false,
+};
+
+/**
+ * Compares the same balance at the current rate and at a new rate, on consistent terms.
+ * The current EMI is derived from the balance, rate and remaining tenure, never typed in
+ * separately, so the result cannot claim more than the inputs support. Illustrative only.
+ */
+export function compareRefinance(input: RefinanceInput): RefinanceResult {
+  const { balance, currentRatePercent, remainingMonths, newRatePercent, processingFeePercent = 0 } = input;
+  const newTenure = input.newTenureMonths ?? remainingMonths;
+  if (!(balance > 0) || !(remainingMonths > 0) || !(newTenure > 0)) return { ...ZERO_REFINANCE };
+
+  const currentEMI = calculateEMI(balance, currentRatePercent, remainingMonths);
+  const newEMI = calculateEMI(balance, newRatePercent, newTenure);
+  const processingFee = (balance * Math.max(0, processingFeePercent)) / 100;
+  const currentTotalRepayment = currentEMI * remainingMonths;
+  const newTotalRepayment = newEMI * newTenure + processingFee;
+  const monthlyDifference = currentEMI - newEMI;
+  const lifetimeSavings = currentTotalRepayment - newTotalRepayment;
+
+  return {
+    currentEMI,
+    newEMI,
+    monthlyDifference,
+    currentTotalRepayment,
+    newTotalRepayment,
+    processingFee,
+    currentInterest: currentTotalRepayment - balance,
+    newInterest: newEMI * newTenure - balance,
+    lifetimeSavings,
+    lowerEmiButCostsMore: monthlyDifference > 0 && lifetimeSavings < 0,
+  };
+}
