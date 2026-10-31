@@ -1,29 +1,15 @@
-import { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import Link from "next/link";
 import { DebtConsolidationCalculator } from "@/components/DebtConsolidationCalculator";
 import { AnimatedMeshBackground } from "@/components/AnimatedMeshBackground";
 import { siteConfig } from "@/lib/config";
 import { CheckCircle2, ShieldCheck, ArrowRight, HelpCircle, Layers3, Calculator, Percent, Clock } from "lucide-react";
 
-export const metadata: Metadata = {
-  title: "Debt Consolidation Calculator India: Estimate Single EMI & Savings",
-  description: "Free online debt consolidation calculator for Indian borrowers. Combine multiple personal loans, credit card dues, and instant app loans into one single lower EMI with partner banks.",
-  keywords: [
-    "debt consolidation calculator",
-    "debt consolidation calculator India",
-    "loan consolidation calculator",
-    "combine multiple emis calculator",
-    "credit card debt consolidation calculator",
-    "emi savings calculator",
-  ],
-  alternates: { canonical: "/calculators/debt-consolidation-calculator" },
-  openGraph: {
-    title: "Debt Consolidation Calculator India | Credit Expert India",
-    description: "Combine multiple loan and credit card EMIs into one single lower monthly payment. Check your potential monthly savings instantly.",
-    url: `${siteConfig.url}/calculators/debt-consolidation-calculator`,
-    type: "website",
-  },
-};
+export const metadata = pageMetadata({
+  title: "Debt Consolidation Calculator",
+  description: "Estimate your single EMI and monthly difference when you combine loans, card dues and app loans. Illustrative only; the lender sets the real terms.",
+  path: "/calculators/debt-consolidation-calculator",
+});
 
 const calculatorSchema = {
   "@context": "https://schema.org",

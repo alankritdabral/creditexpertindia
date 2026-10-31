@@ -1,3 +1,4 @@
+import { ButtonLink } from "@/components/ui/Button";
 import { PageHero } from "@/components/sections/PageHero";
 import { Section } from "@/components/ui/Section";
 import { Card } from "@/components/ui/Card";
@@ -15,7 +16,9 @@ export const metadata = pageMetadata({
 export default function EligibilityPage() {
   return (
     <>
-      <PageHero title="Check your eligibility" lead="See the typical criteria and documents first. Then, if you choose, check your credit profile with your consent." />
+      <PageHero title="Check your eligibility" lead="See the typical criteria and documents first. Then, if you choose, check your credit profile with your consent.">
+        <ButtonLink href="#credit-profile" size="lg" className="mt-8">Check my credit profile</ButtonLink>
+      </PageHero>
       <Section bg="page">
         <div className="grid gap-6 lg:grid-cols-3">
           <Card>
