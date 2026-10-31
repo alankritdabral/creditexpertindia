@@ -152,7 +152,7 @@ export default function DebtConsolidationCalculatorPage() {
               <CheckCircle2 className="w-4 h-4 text-emerald-600" /> Weighted average interest rate
             </span>
             <span className="flex items-center gap-1.5">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600" /> Zero CIBIL score impact
+              <CheckCircle2 className="w-4 h-4 text-emerald-600" /> No credit check to use the calculator
             </span>
           </div>
         </div>
@@ -375,10 +375,10 @@ export default function DebtConsolidationCalculatorPage() {
           {/* Bottom CTA Banner */}
           <div className="p-8 sm:p-10 rounded-3xl bg-slate-900 text-white text-center space-y-4">
             <h3 className="text-xl sm:text-2xl font-bold">
-              Ready to Explore Real Pre-Approved Options?
+              Ready to Explore Your Options?
             </h3>
             <p className="text-xs sm:text-sm text-slate-400 max-w-xl mx-auto">
-              Get an unpressured, confidential assessment from Credit Expert India's senior debt advisors. We work with 50+ RBI-regulated lenders to find the optimal consolidation structure for your profile.
+              Get an unpressured, confidential assessment from Credit Expert India's senior debt advisors. We help you explore options across banks and NBFCs for your profile. The lender makes the final decision.
             </p>
             <div className="pt-2 flex flex-col sm:flex-row justify-center gap-3">
               <Link

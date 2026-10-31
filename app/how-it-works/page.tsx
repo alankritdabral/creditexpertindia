@@ -1,38 +1,29 @@
-import { Metadata } from "next";
-import { HowItWorks } from "@/components/HowItWorks";
-import { LeadForm } from "@/components/LeadForm";
-import { AnimatedMeshBackground } from "@/components/AnimatedMeshBackground";
+import { PageHero } from "@/components/sections/PageHero";
+import { ProcessSteps } from "@/components/sections/ProcessSteps";
+import { LeadSection } from "@/components/sections/LeadSection";
+import { Section } from "@/components/ui/Section";
+import { Card } from "@/components/ui/Card";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "How It Works — Step-by-Step Loan Advisory Process",
-  description: "Understand our 5-step process from soft profile assessment to lender evaluation and decision.",
-  alternates: { canonical: "/how-it-works" },
-};
+export const metadata = pageMetadata({
+  title: "How It Works",
+  description: "Five clear steps from telling us your situation to the lender's decision. See what we do, what you do, and what the lender decides.",
+  path: "/how-it-works",
+});
 
 export default function HowItWorksPage() {
   return (
-    <div className="min-h-screen bg-slate-50">
-      
-      <section className="relative w-full pt-32 pb-24 lg:pt-40 lg:pb-32 bg-background overflow-hidden border-b border-icy-blue">
-        <div className="absolute inset-0 -z-10 h-full w-full">
-          <AnimatedMeshBackground />
-          <div className="absolute top-0 right-0 w-full h-full max-w-[60%] transform origin-top-right -skew-y-12 bg-gradient-to-bl from-[#E2D6CC]/40 to-transparent pointer-events-none" />
+    <>
+      <PageHero title="How Credit Expert India works" lead="Five steps. You share your situation, we review your options, and the lender makes the final decision." />
+      <ProcessSteps bg="page" title="The five steps" />
+      <Section bg="surface">
+        <div className="grid gap-6 md:grid-cols-3">
+          <Card><h2 className="text-lg font-bold">What we do</h2><p className="mt-2 text-[15px] leading-6 text-ink-muted">Review your income and loans, explain your options in plain language, and help you prepare an application.</p></Card>
+          <Card><h2 className="text-lg font-bold">What you do</h2><p className="mt-2 text-[15px] leading-6 text-ink-muted">Share accurate details, choose whether to go ahead, and read the lender's terms before you accept anything.</p></Card>
+          <Card><h2 className="text-lg font-bold">What the lender decides</h2><p className="mt-2 text-[15px] leading-6 text-ink-muted">Whether to approve, at what rate, for what amount and for how long. We cannot promise any of these.</p></Card>
         </div>
-        <div className="container-narrow text-center relative z-10">
-          <span className="text-xs font-extrabold uppercase tracking-widest text-brand-black/80">
-            TRANSPARENT PROCESS
-          </span>
-          <h1 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl text-brand-black">
-            How Credit Expert India Works
-          </h1>
-          <p className="mt-3 max-w-2xl mx-auto text-sm text-brand-black/80 font-medium">
-            A step-by-step overview of how we assess your debt profile and facilitate applications with RBI-regulated lenders.
-          </p>
-        </div>
-      </section>
-
-      <HowItWorks />
-      <LeadForm />
-    </div>
+      </Section>
+      <LeadSection source="how-it-works" />
+    </>
   );
 }

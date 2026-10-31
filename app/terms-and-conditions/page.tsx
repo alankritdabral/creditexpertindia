@@ -1,19 +1,17 @@
-import { Metadata } from "next";
+import { LegalPage } from "@/components/sections/LegalPage";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Terms and Conditions of Advisory Service",
-  description: "Terms and Conditions for using Credit Expert India debt consolidation and loan advisory services.",
-  alternates: { canonical: "/terms-and-conditions" },
-};
+export const metadata = pageMetadata({
+  title: "Terms and Conditions",
+  description: "Terms for using the Credit Expert India website and its loan facilitation services.",
+  path: "/terms-and-conditions",
+});
 
-export default function TermsAndConditionsPage() {
+// TODO(legal): the wording below is unchanged from the previous site. Have counsel review it and
+// then set the date shown with <LegalPage updated="...">.
+export default function Page() {
   return (
-    <div className="min-h-screen bg-slate-50 pt-32 pb-24">
-      <div className="container-narrow bg-white p-8 sm:p-12 rounded-2xl border border-icy-blue shadow-sm">
-        <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl text-brand-black mb-8">
-          Terms & Conditions
-        </h1>
-        <div className="prose prose-slate max-w-none">
+    <LegalPage title="Terms & Conditions">
           <p>Welcome to Credit Expert India!</p>
           <p>
             These terms and conditions outline the rules and regulations for the use of Credit Expert India's Website, located at creditexpertindia.com.
@@ -33,8 +31,6 @@ export default function TermsAndConditionsPage() {
           <p>
             Credit Expert India is a loan facilitator and not a bank or NBFC. Final loan approval, interest rate and loan terms are determined by the respective lender based on its policies and eligibility criteria. We do not guarantee loan approval or specific rates.
           </p>
-        </div>
-      </div>
-    </div>
+        </LegalPage>
   );
 }

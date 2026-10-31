@@ -12,7 +12,7 @@ import { FaqSection } from "@/components/sections/FaqSection";
 import { LeadSection } from "@/components/sections/LeadSection";
 
 export const metadata: Metadata = {
-  title: "Debt Consolidation & Personal Loans for Salaried Staff | Credit Expert India",
+  title: { absolute: "Debt Consolidation & Personal Loans for Salaried Staff | Credit Expert India" },
   description:
     "Too many EMIs or high-interest dues? Explore debt consolidation, balance transfer and personal loan options for salaried applicants. Free initial assessment; the lender makes the final decision.",
   alternates: { canonical: "/" },

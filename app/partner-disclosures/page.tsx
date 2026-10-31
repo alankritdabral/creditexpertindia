@@ -1,19 +1,17 @@
-import { Metadata } from "next";
+import { LegalPage } from "@/components/sections/LegalPage";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Partner Disclosures & Lending Affiliations",
-  description: "Lending partner disclosures, banking network affiliations, and facilitation terms for Credit Expert India.",
-  alternates: { canonical: "/partner-disclosures" },
-};
+export const metadata = pageMetadata({
+  title: "Partner Disclosures",
+  description: "How Credit Expert India works with lenders, how it is paid, and what it does not guarantee.",
+  path: "/partner-disclosures",
+});
 
-export default function PartnerDisclosuresPage() {
+// TODO(legal): the wording below is unchanged from the previous site. Have counsel review it and
+// then set the date shown with <LegalPage updated="...">.
+export default function Page() {
   return (
-    <div className="min-h-screen bg-slate-50 pt-32 pb-24">
-      <div className="container-narrow bg-white p-8 sm:p-12 rounded-2xl border border-icy-blue shadow-sm">
-        <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl text-brand-black mb-8">
-          Partner Disclosures
-        </h1>
-        <div className="prose prose-slate max-w-none">
+    <LegalPage title="Partner Disclosures">
           <p>
             Credit Expert India operates as an independent loan facilitator. We are not a lender, bank, or NBFC (Non-Banking Financial Company).
           </p>
@@ -32,8 +30,6 @@ export default function PartnerDisclosuresPage() {
           <p>
             We encourage all users to carefully review the terms and conditions of any loan offer provided by a lending partner before accepting it. Ensure you understand all fees, interest rates, repayment schedules, and potential penalties.
           </p>
-        </div>
-      </div>
-    </div>
+        </LegalPage>
   );
 }

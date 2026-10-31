@@ -1,19 +1,17 @@
-import { Metadata } from "next";
+import { LegalPage } from "@/components/sections/LegalPage";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Privacy Policy & Data Security",
-  description: "Learn how Credit Expert India protects borrower data, handles privacy, and complies with data security regulations.",
-  alternates: { canonical: "/privacy-policy" },
-};
+export const metadata = pageMetadata({
+  title: "Privacy Policy and Data Security",
+  description: "How Credit Expert India collects, uses and protects your personal information.",
+  path: "/privacy-policy",
+});
 
-export default function PrivacyPolicyPage() {
+// TODO(legal): the wording below is unchanged from the previous site. Have counsel review it and
+// then set the date shown with <LegalPage updated="...">.
+export default function Page() {
   return (
-    <div className="min-h-screen bg-slate-50 pt-32 pb-24">
-      <div className="container-narrow bg-white p-8 sm:p-12 rounded-2xl border border-icy-blue shadow-sm">
-        <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl text-brand-black mb-8">
-          Privacy Policy
-        </h1>
-        <div className="prose prose-slate max-w-none">
+    <LegalPage title="Privacy Policy">
           <p>
             At Credit Expert India, accessible from creditexpertindia.com, one of our main priorities is the privacy of our visitors. This Privacy Policy document contains types of information that is collected and recorded by Credit Expert India and how we use it.
           </p>
@@ -38,8 +36,6 @@ export default function PrivacyPolicyPage() {
             <li>Send you emails</li>
             <li>Find and prevent fraud</li>
           </ul>
-        </div>
-      </div>
-    </div>
+        </LegalPage>
   );
 }

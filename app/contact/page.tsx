@@ -1,114 +1,68 @@
-import { Metadata } from "next";
-import Image from "next/image";
-import { ContactForm } from "@/components/ContactForm";
-import { contact } from "@/lib/config";
-import { MapPin, Phone, Mail, ArrowRight } from "lucide-react";
+import { Mail, MapPin, MessageCircle } from "lucide-react";
+import { PageHero } from "@/components/sections/PageHero";
+import { Section } from "@/components/ui/Section";
+import { Card } from "@/components/ui/Card";
+import { ShortLeadForm } from "@/components/sections/ShortLeadForm";
+import { WhatsAppButton } from "@/components/site/WhatsAppButton";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { contact, identity } from "@/lib/config";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Contact Our Financial & Loan Advisory Team",
-  description: "Get in touch with Credit Expert India debt specialists for assistance with personal loans and debt consolidation.",
-  alternates: { canonical: "/contact" },
-};
+export const metadata = pageMetadata({
+  title: "Contact Us",
+  description: "Talk to a credit specialist on WhatsApp, email us, or leave your details. Offices in Dehradun, Delhi and Rudrapur.",
+  path: "/contact",
+});
 
 const localBusinessSchema = {
   "@context": "https://schema.org",
   "@graph": contact.addresses.map((addr) => ({
     "@type": "FinancialService",
-    "name": `Credit Expert India - ${addr.city} Branch`,
-    "description": "Debt consolidation, balance transfer and personal loan advisory services.",
-    "telephone": contact.whatsapp,
-    "email": contact.email,
-    "address": {
-      "@type": "PostalAddress",
-      "streetAddress": addr.fullAddress,
-      "addressLocality": addr.city,
-      "addressCountry": "IN"
-    }
-  }))
+    name: `Credit Expert India - ${addr.city}`,
+    description: "Debt consolidation, balance transfer and personal loan assistance. A loan facilitator, not a bank or NBFC.",
+    telephone: identity.phone || contact.whatsapp,
+    email: contact.email,
+    address: { "@type": "PostalAddress", streetAddress: addr.fullAddress, addressLocality: addr.city, addressCountry: "IN" },
+  })),
 };
 
 export default function ContactPage() {
   return (
-    <div className="min-h-screen bg-slate-50">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
-      />
-      
-      <section className="relative isolate w-full pt-32 pb-24 lg:pt-40 lg:pb-32 overflow-hidden border-b border-icy-blue">
-        <div className="absolute inset-0 pointer-events-none z-0">
-          <Image
-            src="/contact.png"
-            alt="Contact Hero Background"
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover object-right sm:object-[75%_center] opacity-75"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-white/80 via-white/30 to-transparent" />
-        </div>
-        <div className="container-narrow text-center relative z-10">
-          <span className="text-xs font-extrabold uppercase tracking-widest text-brand-black/80">
-            CONTACT & SUPPORT
-          </span>
-          <h1 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl text-brand-black">
-            Speak With a Credit Specialist
-          </h1>
-          <p className="mt-3 max-w-2xl mx-auto text-sm text-brand-black/80 font-medium">
-            Have questions about your debt consolidation or loan options? We are here to assist.
-          </p>
-          <div className="mt-8 flex justify-center">
-            <a
-              href="#contact-form"
-              className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-slate-900 px-8 text-sm font-semibold text-white hover:bg-slate-800 transition-colors shadow-lg"
-            >
-              <span>Get in Touch</span>
-              <ArrowRight className="h-4 w-4" />
-            </a>
+    <>
+      <JsonLd data={localBusinessSchema} />
+      <PageHero title="Talk to a credit specialist" lead="Message us on WhatsApp for the quickest reply, or leave your details and we will contact you." />
+      <Section bg="page">
+        <div className="grid gap-8 lg:grid-cols-[1fr_1fr] lg:gap-12">
+          <div className="space-y-6">
+            <Card>
+              <h2 className="text-xl font-bold">Reach us</h2>
+              <ul className="mt-4 space-y-4 text-[15px] leading-6">
+                <li className="flex items-start gap-3"><MessageCircle className="mt-0.5 h-5 w-5 shrink-0 text-primary" aria-hidden="true" /><span><span className="font-semibold">WhatsApp</span><br />{contact.whatsapp}</span></li>
+                <li className="flex items-start gap-3"><Mail className="mt-0.5 h-5 w-5 shrink-0 text-primary" aria-hidden="true" /><span><span className="font-semibold">Email</span><br /><a className="text-primary underline" href={`mailto:${contact.email}`}>{contact.email}</a></span></li>
+              </ul>
+              <div className="mt-5"><WhatsAppButton location="contact-page" size="lg" /></div>
+            </Card>
+            <Card>
+              <h2 className="text-xl font-bold">Our offices</h2>
+              <ul className="mt-4 space-y-4 text-[15px] leading-6">
+                {contact.addresses.map((a) => (
+                  <li key={a.city} className="flex items-start gap-3"><MapPin className="mt-0.5 h-5 w-5 shrink-0 text-primary" aria-hidden="true" /><span><span className="font-semibold">{a.city}</span><br />{a.fullAddress}</span></li>
+                ))}
+              </ul>
+            </Card>
+            {identity.grievanceOfficer ? (
+              <Card>
+                <h2 className="text-xl font-bold">Grievance officer</h2>
+                <p className="mt-3 text-[15px] leading-6">{identity.grievanceOfficer.name}<br /><a className="text-primary underline" href={`mailto:${identity.grievanceOfficer.email}`}>{identity.grievanceOfficer.email}</a>{identity.grievanceOfficer.phone ? <><br />{identity.grievanceOfficer.phone}</> : null}{identity.grievanceOfficer.responseTime ? <><br />We respond within {identity.grievanceOfficer.responseTime}.</> : null}</p>
+              </Card>
+            ) : null}
           </div>
+          <Card id="get-started" className="self-start p-6 sm:p-8">
+            <h2 className="mb-5 text-xl font-bold">Leave your details</h2>
+            <ShortLeadForm source="contact" />
+          </Card>
         </div>
-      </section>
-
-      <section className="py-12 lg:py-20 bg-white border-b border-icy-blue">
-        <div className="container-narrow px-4">
-          <ContactForm />
-        </div>
-      </section>
-
-      <section className="py-12 bg-slate-50 border-b border-icy-blue">
-        <div className="container-narrow grid gap-6 sm:grid-cols-3 text-center">
-          <div className="rounded-2xl bg-white p-6 border border-icy-blue shadow-sm">
-            <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600">
-              <MapPin className="h-5 w-5" />
-            </div>
-            <h3 className="mt-3 text-sm font-extrabold text-brand-black">Office Locations</h3>
-            <div className="mt-1 flex flex-col gap-3">
-              {contact.addresses.map((addr, idx) => (
-                <p key={idx} className="text-xs text-brand-black/80 font-medium">
-                  <strong className="text-brand-black block mb-1">{addr.city} Office:</strong>
-                  {addr.fullAddress}
-                </p>
-              ))}
-            </div>
-          </div>
-
-          <div className="rounded-2xl bg-white p-6 border border-icy-blue shadow-sm">
-            <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600">
-              <Phone className="h-5 w-5" />
-            </div>
-            <h3 className="mt-3 text-sm font-extrabold text-brand-black">Phone Support</h3>
-            <p className="mt-1 text-xs text-brand-black/80 font-medium">{contact.whatsapp}</p>
-          </div>
-
-          <div className="rounded-2xl bg-white p-6 border border-icy-blue shadow-sm">
-            <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600">
-              <Mail className="h-5 w-5" />
-            </div>
-            <h3 className="mt-3 text-sm font-extrabold text-brand-black">Email Inquiry</h3>
-            <p className="mt-1 text-xs text-brand-black/80 font-medium">{contact.email}</p>
-          </div>
-        </div>
-      </section>
-    </div>
+      </Section>
+    </>
   );
 }

@@ -7,6 +7,8 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { StickyActionBar } from "@/components/site/StickyActionBar";
 import { siteConfig } from "@/lib/config";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { organizationJsonLd } from "@/lib/seo";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -35,19 +37,7 @@ export const metadata: Metadata = {
     "credit card debt consolidation",
   ],
   metadataBase: new URL(siteConfig.url),
-  openGraph: {
-    title: `${siteConfig.name} — Paying Too Much Interest?`,
-    description: "Explore debt consolidation, balance transfer and personal loans through our lending network. Check your options.",
-    url: siteConfig.url,
-    siteName: siteConfig.name,
-    type: "website",
-    locale: "en_IN",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: `${siteConfig.name} — Debt Consolidation & Personal Loans`,
-    description: "Explore debt consolidation, balance transfer and personal loans through our lending network. Check your options.",
-  },
+  openGraph: { siteName: siteConfig.name, type: "website", locale: "en_IN" },
   icons: {
     icon: [
       { url: "/favicon.ico", type: "image/x-icon", sizes: "any" },
@@ -72,15 +62,6 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "FinancialService",
-    name: siteConfig.name,
-    url: siteConfig.url,
-    description: "Helps borrowers explore debt consolidation, balance transfer and personal loan options.",
-    areaServed: "IN",
-  };
-
   return (
     <html lang="en" className={`${inter.variable} ${manrope.variable} h-full antialiased font-sans scroll-smooth`}>
       <body className="min-h-full flex flex-col bg-page text-ink">
@@ -97,7 +78,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             gtag('config', 'G-VNY6TW0ZW0');
           `}
         </Script>
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+        <JsonLd data={organizationJsonLd()} />
         <SiteFrame header={<SiteHeader />} footer={<SiteFooter />} bar={<StickyActionBar />}>
           {children}
         </SiteFrame>

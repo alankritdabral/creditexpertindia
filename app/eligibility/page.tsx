@@ -1,59 +1,43 @@
-import { Metadata } from "next";
-import Image from "next/image";
-import { Eligibility } from "@/components/Eligibility";
-import { WhoWeHelp } from "@/components/WhoWeHelp";
+import { PageHero } from "@/components/sections/PageHero";
+import { Section } from "@/components/ui/Section";
+import { Card } from "@/components/ui/Card";
+import { Disclaimer } from "@/components/ui/Disclaimer";
 import { EligibilityForm } from "@/components/EligibilityForm";
+import { eligibility, documents, whoWeHelp } from "@/content/site";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Check Loan Eligibility & Required Documents",
-  description: "Check eligibility criteria and document requirements for salaried debt consolidation and personal loans.",
-  alternates: { canonical: "/eligibility" },
-};
+export const metadata = pageMetadata({
+  title: "Check Loan Eligibility and Documents",
+  description: "See typical eligibility criteria and documents for salaried personal loans and debt consolidation, then check your credit profile with your consent.",
+  path: "/eligibility",
+});
 
 export default function EligibilityPage() {
   return (
-    <div className="min-h-screen bg-slate-50">
-
-      <section className="relative isolate w-full pt-32 pb-24 lg:pt-40 lg:pb-32 overflow-hidden border-b border-icy-blue">
-        <div className="absolute inset-0 pointer-events-none z-0">
-          <Image
-            src="/eligibility.png"
-            alt="Eligibility Hero Background"
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover object-right sm:object-[75%_center] opacity-55"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-white/85 via-white/30 to-transparent" />
+    <>
+      <PageHero title="Check your eligibility" lead="See the typical criteria and documents first. Then, if you choose, check your credit profile with your consent." />
+      <Section bg="page">
+        <div className="grid gap-6 lg:grid-cols-3">
+          <Card>
+            <h2 className="text-xl font-bold">Typical criteria</h2>
+            <ul className="mt-4 space-y-2.5">{eligibility.map((e) => (<li key={e} className="text-[15px] leading-6">{e}</li>))}</ul>
+          </Card>
+          <Card>
+            <h2 className="text-xl font-bold">Documents you may need</h2>
+            <ul className="mt-4 space-y-2.5">{documents.map((d) => (<li key={d} className="text-[15px] leading-6">{d}</li>))}</ul>
+          </Card>
+          <Card>
+            <h2 className="text-xl font-bold">Who we help</h2>
+            <ul className="mt-4 space-y-2.5">{whoWeHelp.map((w) => (<li key={w} className="text-[15px] leading-6">{w}</li>))}</ul>
+          </Card>
         </div>
-        <div className="container-narrow text-center relative z-10">
-          <span className="text-xs font-extrabold uppercase tracking-widest text-brand-black/80">
-            TRANSPARENT ADVISORY
-          </span>
-          <h1 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl text-brand-black">
-            Loan Eligibility & Criteria Guidelines
-          </h1>
-          <p className="mt-3 max-w-2xl mx-auto text-sm text-brand-black/80 font-medium">
-            Clear guidelines on age, income, employment profile, and documentation required for salaried loan assessments.
-          </p>
-          <div className="mt-8 flex justify-center">
-            <a
-              href="#credit-profile"
-              className="inline-flex h-12 items-center justify-center rounded-full bg-slate-900 px-8 text-sm font-semibold text-white hover:bg-slate-800 transition-colors shadow-lg"
-            >
-              Check My Eligibility
-            </a>
-          </div>
-        </div>
-      </section>
-
-      <Eligibility />
-      <WhoWeHelp />
-      <section id="credit-profile" className="py-16 sm:py-24 bg-white border-t border-icy-blue scroll-mt-20">
-        <div className="container-narrow">
+        <Disclaimer className="mt-6">Each lender sets its own criteria. Meeting these does not guarantee approval.</Disclaimer>
+      </Section>
+      <section id="credit-profile" className="scroll-mt-20 border-t border-line bg-surface py-12 lg:py-16">
+        <div className="mx-auto w-full max-w-[1200px] px-4 sm:px-6 lg:px-8">
           <EligibilityForm />
         </div>
       </section>
-    </div>
+    </>
   );
 }

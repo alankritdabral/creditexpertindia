@@ -1,39 +1,48 @@
-import { Metadata } from "next";
-import { WhyUs } from "@/components/WhyUs";
-import { LeadForm } from "@/components/LeadForm";
-import { AnimatedMeshBackground } from "@/components/AnimatedMeshBackground";
+import { Check } from "lucide-react";
+import { PageHero } from "@/components/sections/PageHero";
+import { Section, SectionHeader } from "@/components/ui/Section";
+import { Card } from "@/components/ui/Card";
+import { WhyUsSection } from "@/components/sections/WhyUsSection";
+import { LeadSection } from "@/components/sections/LeadSection";
+import { contact, facilitatorStatement, identity } from "@/lib/config";
+import { pageMetadata } from "@/lib/seo";
+import { whoWeHelp } from "@/content/site";
 
-export const metadata: Metadata = {
-  title: "About Our Mission & Debt Advisory Services",
-  description: "Learn about Credit Expert India's mission to provide transparent debt advisory and consolidation assistance for salaried Indian professionals.",
-  alternates: { canonical: "/about" },
-};
+export const metadata = pageMetadata({
+  title: "About Credit Expert India",
+  description: "Who we are, who we help and how we work. A loan facilitator for salaried borrowers, with plain explanations and a person to talk to.",
+  path: "/about",
+});
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-slate-50">
-      
-      <section className="relative w-full pt-32 pb-24 lg:pt-40 lg:pb-32 bg-background overflow-hidden border-b border-icy-blue">
-        <div className="absolute inset-0 -z-10 h-full w-full">
-          <AnimatedMeshBackground />
-          <div className="absolute top-0 right-0 w-full h-full max-w-[60%] transform origin-top-right -skew-y-12 bg-gradient-to-bl from-[#E2D6CC]/40 to-transparent pointer-events-none" />
+    <>
+      <PageHero
+        title="Helping salaried Indians understand their borrowing options"
+        lead="Credit Expert India helps people with several EMIs, high-interest dues or a new borrowing need explore their options. We keep claims conservative, explain costs plainly, and leave the final decision to the lender and to you."
+      />
+      <Section bg="page">
+        <div className="grid gap-6 lg:grid-cols-2">
+          <Card>
+            <h2 className="text-xl font-bold">Who we help</h2>
+            <ul className="mt-4 space-y-3">
+              {whoWeHelp.map((w) => (<li key={w} className="flex items-start gap-3 text-[15px] leading-6"><Check className="mt-0.5 h-5 w-5 shrink-0 text-success" aria-hidden="true" />{w}</li>))}
+            </ul>
+          </Card>
+          <Card>
+            <h2 className="text-xl font-bold">Who we are</h2>
+            <dl className="mt-4 space-y-3 text-[15px] leading-6">
+              <div><dt className="font-semibold">Name</dt><dd className="text-ink-muted">{identity.registeredName || contact.legalName}</dd></div>
+              {identity.cin ? <div><dt className="font-semibold">CIN</dt><dd className="text-ink-muted">{identity.cin}</dd></div> : null}
+              {identity.registeredAddress ? <div><dt className="font-semibold">Registered office</dt><dd className="text-ink-muted">{identity.registeredAddress}</dd></div> : null}
+              <div><dt className="font-semibold">Offices</dt><dd className="space-y-1 text-ink-muted">{contact.addresses.map((a) => (<p key={a.city}>{a.city}: {a.fullAddress}</p>))}</dd></div>
+            </dl>
+            <p className="mt-4 border-t border-line pt-4 text-sm leading-[22px] text-ink-muted">{facilitatorStatement}</p>
+          </Card>
         </div>
-        <div className="container-narrow text-center relative z-10">
-          <span className="text-xs font-extrabold uppercase tracking-widest text-brand-black/80">
-            OUR MISSION
-          </span>
-          <h1 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-5xl leading-tight text-brand-black">
-            Empowering Salaried Indians <br className="hidden sm:inline" />
-            <span className="text-brand-black/80">To Overcome Debt Traps</span>
-          </h1>
-          <p className="mt-4 max-w-2xl mx-auto text-base text-brand-black/80 font-medium leading-7">
-            Credit Expert India is a financial service platform facilitating debt consolidation and personal loan inquiries. We focus on conservative claims, transparent communication, and human guidance.
-          </p>
-        </div>
-      </section>
-
-      <WhyUs />
-      <LeadForm />
-    </div>
+      </Section>
+      <WhyUsSection bg="surface" />
+      <LeadSection source="about" />
+    </>
   );
 }

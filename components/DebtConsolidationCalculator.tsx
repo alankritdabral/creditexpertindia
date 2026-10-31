@@ -509,7 +509,7 @@ export function DebtConsolidationCalculator() {
                   onClick={() => setIsModalOpen(true)}
                   className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold text-sm shadow-lg shadow-blue-500/25 flex items-center justify-center gap-2 transition-all cursor-pointer group"
                 >
-                  <span>Explore Pre-Approved Lender Options</span>
+                  <span>Check My Options</span>
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </button>
                 <p className="text-center text-[11px] text-slate-400 mt-2 flex items-center justify-center gap-1">
@@ -529,7 +529,7 @@ export function DebtConsolidationCalculator() {
             <ul className="text-xs text-slate-600 space-y-2">
               <li className="flex items-start gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                <span><strong>50+ RBI-Regulated Lenders:</strong> Compare partner private banks and NBFC networks.</span>
+                <span><strong>Banks and NBFCs:</strong> We help you explore options across lenders; the lender decides.</span>
               </li>
               <li className="flex items-start gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />

@@ -212,7 +212,7 @@ export const faqs = [
   },
   {
     q: "What documents are required?",
-    a: "Standard requirements include PAN card, Aadhaar card, latest 3 months' salary slips, 6 months' bank statements, and current loan/card statements. Minimal documentation applies for pre-approved salaried offers.",
+    a: "Standard requirements include PAN card, Aadhaar card, latest 3 months' salary slips, 6 months' bank statements, and current loan/card statements.",
   },
   {
     q: "Are there processing fees?",
