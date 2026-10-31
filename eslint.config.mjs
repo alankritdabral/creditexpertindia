@@ -12,6 +12,16 @@ const eslintConfig = defineConfig([
       "@typescript-eslint/no-explicit-any": "off"
     }
   },
+  // Internal admin tools predate these React Compiler rules and are restyled last.
+  // Kept as warnings there so they stay visible; public code is held to errors.
+  {
+    files: ["app/admin/**"],
+    rules: {
+      "react-hooks/set-state-in-effect": "warn",
+      "react-hooks/immutability": "warn",
+      "react-hooks/purity": "warn",
+    },
+  },
   // Override default ignores of eslint-config-next.
   globalIgnores([
     // Default ignores of eslint-config-next:

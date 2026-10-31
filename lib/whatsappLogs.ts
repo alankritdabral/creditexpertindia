@@ -130,7 +130,7 @@ export async function getWhatsappMessageLogs(options?: {
       .limit(maxLimit)
       .get();
 
-    let allMessages: WhatsappMessageRecord[] = snapshot.docs.map((doc: any) => ({
+    const allMessages: WhatsappMessageRecord[] = snapshot.docs.map((doc: any) => ({
       id: doc.id,
       ...doc.data(),
     }));

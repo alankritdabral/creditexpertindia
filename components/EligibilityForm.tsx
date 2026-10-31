@@ -26,6 +26,8 @@ const CreditReportDashboard = dynamic(
 import { auth } from "@/lib/firebaseClient";
 import { getTeamSession } from "@/app/team/actions";
 import { logSystemEvent } from "@/lib/logger";
+import { track } from "@/lib/analytics";
+import { whatsappHref } from "@/components/site/WhatsAppButton";
 
 const getPrefixes = (str: string) => {
   const arr = [];
@@ -44,6 +46,10 @@ const generateSearchTokens = (name: string, mobile: string, pan: string) => {
   }
   return Array.from(tokens);
 };
+
+// Impure helpers live outside the component so render stays pure.
+const nowMs = () => Date.now();
+const randomId = () => Math.random().toString(36).substring(2, 10);
 
 export function EligibilityForm() {
 
@@ -84,6 +90,19 @@ export function EligibilityForm() {
       }
     });
   }, []);
+
+  // Escape closes the OTP dialog
+  useEffect(() => {
+    if (!showOtpModal) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setShowOtpModal(false);
+        setOtpError(null);
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [showOtpModal]);
 
   // Cooldown countdown timer for OTP resend
   useEffect(() => {
@@ -134,6 +153,7 @@ export function EligibilityForm() {
 
   const processFetchedReport = (reportData: any) => {
     setCibilData(reportData);
+    track("report_shown");
     if (reportData?.credit_report_link) {
       window.open(reportData.credit_report_link, "_blank");
     }
@@ -199,6 +219,7 @@ export function EligibilityForm() {
       const data = await res.json();
 
       if (data.success) {
+        track("otp_sent", { resend: isResend });
         setShowOtpModal(true);
         setOtpCooldown(30);
         setOtpDigits(["", "", "", ""]);
@@ -298,6 +319,7 @@ export function EligibilityForm() {
       const data = await res.json();
 
       if (data.success) {
+        track("otp_verified");
         otpTokenRef.current = data.otpToken || null;
         setShowOtpModal(false);
         proceedToFetchReport();
@@ -313,8 +335,10 @@ export function EligibilityForm() {
   };
 
   const proceedToFetchReport = async () => {
+    setLoading(true);
+    setError(null);
     let activeBureau: string | undefined;
-    const requestId = "req_" + Math.random().toString(36).substring(2, 10);
+    const requestId = "req_" + randomId();
     let startTime = 0;
     let fallbackStartTime = 0;
     try {
@@ -426,7 +450,7 @@ export function EligibilityForm() {
       }
 
       // Send the request through our new Next.js API Route which talks to IDSPay
-      startTime = Date.now();
+      startTime = nowMs();
       await logSystemEvent({
         level: "info",
         event: "BUREAU_REQUEST_STARTED",
@@ -478,7 +502,7 @@ export function EligibilityForm() {
           },
           message: fallbackReason,
           identifiers: { pan: formData.pan, mobile: formData.mobile },
-          duration_ms: Date.now() - startTime
+          duration_ms: nowMs() - startTime
         });
         
         const crifPayload = {
@@ -488,7 +512,7 @@ export function EligibilityForm() {
           name_lookup: 0
         };
         
-        fallbackStartTime = Date.now();
+        fallbackStartTime = nowMs();
         res = await fetch("/api/idspay", {
           method: "POST",
           headers: {
@@ -530,7 +554,7 @@ export function EligibilityForm() {
           },
           message: errMsg,
           identifiers: { pan: formData.pan, mobile: formData.mobile },
-          duration_ms: fallbackData ? Date.now() - fallbackStartTime : Date.now() - startTime
+          duration_ms: fallbackData ? nowMs() - fallbackStartTime : nowMs() - startTime
         });
       } else {
         await logSystemEvent({
@@ -545,7 +569,7 @@ export function EligibilityForm() {
           },
           message: "Bureau request completed successfully",
           identifiers: { pan: formData.pan, mobile: formData.mobile },
-          duration_ms: fallbackData ? Date.now() - fallbackStartTime : Date.now() - startTime
+          duration_ms: fallbackData ? nowMs() - fallbackStartTime : nowMs() - startTime
         });
 
         // Save to Firebase
@@ -600,7 +624,7 @@ export function EligibilityForm() {
         application_id: `app_${formData.mobile}`,
         message: e?.message || "A network error occurred",
         identifiers: { pan: formData.pan, mobile: formData.mobile },
-        duration_ms: startTime > 0 ? Date.now() - startTime : undefined
+        duration_ms: startTime > 0 ? nowMs() - startTime : undefined
       });
     } finally {
       setLoading(false);
@@ -633,11 +657,11 @@ export function EligibilityForm() {
               <div className="flex flex-col gap-4">
                 <div className="relative flex-1">
                   <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                  <input type="text" placeholder="First Name" value={formData.firstName} onChange={e => setFormData({ ...formData, firstName: e.target.value })} className="w-full bg-white border border-icy-blue rounded-xl pl-11 pr-4 py-3.5 focus:ring-2 focus:ring-blue-energy/30 focus:border-blue-energy outline-none transition-all" />
+                  <input type="text" aria-label="First name" autoComplete="given-name" placeholder="First Name" value={formData.firstName} onChange={e => setFormData({ ...formData, firstName: e.target.value })} className="w-full bg-white border border-field rounded-xl pl-11 pr-4 py-3.5 focus:ring-2 focus:ring-blue-energy/30 focus:border-blue-energy outline-none transition-all" />
                 </div>
                 <div className="relative flex-1">
                   <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                  <input type="text" placeholder="Last Name" value={formData.lastName} onChange={e => setFormData({ ...formData, lastName: e.target.value })} className="w-full bg-white border border-icy-blue rounded-xl pl-11 pr-4 py-3.5 focus:ring-2 focus:ring-blue-energy/30 focus:border-blue-energy outline-none transition-all" />
+                  <input type="text" aria-label="Last name" autoComplete="family-name" placeholder="Last Name" value={formData.lastName} onChange={e => setFormData({ ...formData, lastName: e.target.value })} className="w-full bg-white border border-field rounded-xl pl-11 pr-4 py-3.5 focus:ring-2 focus:ring-blue-energy/30 focus:border-blue-energy outline-none transition-all" />
                 </div>
               </div>
               {!formData.bureau.startsWith('crif') && (
@@ -645,23 +669,28 @@ export function EligibilityForm() {
                   <CreditCard className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                   <input
                     type="text"
+                    aria-label="PAN number"
+                    autoComplete="off"
+                    autoCapitalize="characters"
                     placeholder="PAN Number"
                     value={formData.pan}
                     onChange={e => setFormData({ ...formData, pan: e.target.value.toUpperCase() })}
-                    className="w-full bg-white border border-icy-blue rounded-xl pl-11 pr-4 py-3.5 focus:ring-2 focus:ring-blue-energy/30 focus:border-blue-energy outline-none transition-all uppercase"
+                    className="w-full bg-white border border-field rounded-xl pl-11 pr-4 py-3.5 focus:ring-2 focus:ring-blue-energy/30 focus:border-blue-energy outline-none transition-all uppercase"
                     maxLength={10}
                   />
                 </div>
               )}
               <div className="relative">
                 <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                <input type="tel" placeholder="Mobile Number" value={formData.mobile} onChange={e => setFormData({ ...formData, mobile: e.target.value })} className="w-full bg-white border border-icy-blue rounded-xl pl-11 pr-4 py-3.5 focus:ring-2 focus:ring-blue-energy/30 focus:border-blue-energy outline-none transition-all" />
+                <input type="tel" aria-label="Mobile number" inputMode="numeric" autoComplete="tel-national" maxLength={10} placeholder="Mobile Number" value={formData.mobile} onChange={e => setFormData({ ...formData, mobile: e.target.value.replace(/\D/g, "").slice(0, 10) })} className="w-full bg-white border border-field rounded-xl pl-11 pr-4 py-3.5 focus:ring-2 focus:ring-blue-energy/30 focus:border-blue-energy outline-none transition-all" />
               </div>
               {(formData.bureau === 'experian' || formData.bureau === 'v1_json') && (
                 <div className="relative">
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-xs">DOB</span>
                   <input
                     type="date"
+                    aria-label="Date of birth"
+                    autoComplete="bday"
                     value={formData.dob}
                     onChange={e => setFormData({ ...formData, dob: e.target.value })}
                     className="w-full bg-white border border-icy-blue rounded-xl pl-12 pr-4 py-3.5 focus:ring-2 focus:ring-blue-energy/30 focus:border-blue-energy outline-none transition-all text-sm"
@@ -672,9 +701,10 @@ export function EligibilityForm() {
                 <div className="relative">
                   <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                   <select
+                    aria-label="Gender"
                     value={formData.gender}
                     onChange={e => setFormData({ ...formData, gender: e.target.value })}
-                    className="w-full bg-white border border-icy-blue rounded-xl pl-11 pr-4 py-3.5 focus:ring-2 focus:ring-blue-energy/30 focus:border-blue-energy outline-none text-brand-black transition-all"
+                    className="w-full bg-white border border-field rounded-xl pl-11 pr-4 py-3.5 focus:ring-2 focus:ring-blue-energy/30 focus:border-blue-energy outline-none text-brand-black transition-all"
                   >
                     <option value="male">Male</option>
                     <option value="female">Female</option>
@@ -713,14 +743,24 @@ export function EligibilityForm() {
                 />
                 <span className="text-xs text-brand-black/70 leading-relaxed">
                   <strong>Credit Report Consent</strong><br />
-                  By continuing, I consent and authorize Credit Expert India to securely retrieve my credit report from the credit bureau.
+                  By continuing, I consent and authorize Credit Expert India to securely retrieve my credit report from the credit bureau. See the <Link href="/privacy-policy" className="font-semibold text-primary underline">Privacy Policy</Link>. {/* TODO(legal): confirm wording with counsel. */}
                 </span>
               </label>
 
               {error && (
-                <div className="p-3 rounded-lg bg-red-50 border border-red-200 flex items-start gap-3">
-                  <AlertCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
-                  <p className="text-sm text-red-800">{error}</p>
+                <div role="alert" className="p-3 rounded-lg bg-red-50 border border-red-200 flex items-start gap-3">
+                  <AlertCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" aria-hidden="true" />
+                  <div className="text-sm text-red-800">
+                    <p>{error}</p>
+                    <p className="mt-1">Your details are still here. You can try again, or <a href={whatsappHref()} target="_blank" rel="noopener noreferrer" className="font-semibold underline">talk to an expert on WhatsApp</a>.</p>
+                  </div>
+                </div>
+              )}
+
+              {loading && !showOtpModal && (
+                <div role="status" className="p-3 rounded-lg bg-primary-soft border border-line flex items-start gap-3">
+                  <Loader2 className="w-5 h-5 text-primary shrink-0 mt-0.5 animate-spin" aria-hidden="true" />
+                  <p className="text-sm text-ink">{otpLoading ? "Sending your verification code…" : "Fetching your credit report. This usually takes 10 to 30 seconds. Please keep this page open."}</p>
                 </div>
               )}
 
@@ -729,7 +769,7 @@ export function EligibilityForm() {
                 disabled={loading}
                 className="w-full mt-6 bg-blue-energy text-white py-4 rounded-xl font-bold shadow-lg shadow-blue-energy/20 hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
               >
-                {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <span>Fetch Credit Report</span>}
+                {loading ? <><Loader2 className="w-5 h-5 animate-spin" aria-hidden="true" /><span>Please wait…</span></> : <span>Fetch Credit Report</span>}
                 {!loading && <ArrowRight className="w-5 h-5" />}
               </button>
             </div>
@@ -853,6 +893,9 @@ export function EligibilityForm() {
         {showOtpModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md">
             <motion.div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="otp-title"
               initial={{ opacity: 0, scale: 0.95, y: 15 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 15 }}
@@ -881,11 +924,11 @@ export function EligibilityForm() {
               </div>
 
               {/* Title & Description */}
-              <h3 className="text-2xl font-black text-slate-800 tracking-tight">
+              <h3 id="otp-title" className="text-2xl font-black text-slate-800 tracking-tight">
                 Verify Your Mobile
               </h3>
               <p className="text-sm text-slate-500 mt-2 leading-relaxed">
-                We sent a 4-digit verification code via SMS to{" "}
+                We sent a 4-digit verification code to{" "}
                 <span className="font-bold text-slate-800">+91 {formData.mobile}</span>
               </p>
 
@@ -901,6 +944,8 @@ export function EligibilityForm() {
                       type="text"
                       inputMode="numeric"
                       pattern="[0-9]*"
+                      aria-label={`Digit ${idx + 1} of 4`}
+                      autoComplete={idx === 0 ? "one-time-code" : "off"}
                       maxLength={1}
                       value={digit}
                       onChange={(e) => handleOtpDigitChange(idx, e.target.value)}

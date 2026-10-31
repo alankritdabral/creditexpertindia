@@ -22,23 +22,25 @@ const linkClass = (active: boolean) =>
   );
 
 function SolutionsMenu({ pathname }: { pathname: string }) {
-  const [open, setOpen] = useState(false);
+  // The menu is open only for the page it was opened on, so navigating closes it without an effect.
+  const [openPath, setOpenPath] = useState<string | null>(null);
+  const open = openPath === pathname;
+  const setOpen = (value: boolean | ((o: boolean) => boolean)) =>
+    setOpenPath((cur) => ((typeof value === "function" ? value(cur === pathname) : value) ? pathname : null));
   const ref = useRef<HTMLDivElement>(null);
   const button = useRef<HTMLButtonElement>(null);
   const active = solutionLinks.some((l) => l.href === pathname);
-
-  useEffect(() => setOpen(false), [pathname]);
 
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
-        setOpen(false);
+        setOpenPath(null);
         button.current?.focus();
       }
     };
     const onOutside = (e: Event) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpenPath(null);
     };
     document.addEventListener("keydown", onKey);
     document.addEventListener("mousedown", onOutside);
@@ -85,13 +87,14 @@ function SolutionsMenu({ pathname }: { pathname: string }) {
 
 export function SiteHeader() {
   const pathname = usePathname() || "/";
-  const [mobileOpen, setMobileOpen] = useState(false);
-
-  useEffect(() => setMobileOpen(false), [pathname]);
+  const [mobileOpenPath, setMobileOpenPath] = useState<string | null>(null);
+  const mobileOpen = mobileOpenPath === pathname;
+  const setMobileOpen = (value: boolean | ((o: boolean) => boolean)) =>
+    setMobileOpenPath((cur) => ((typeof value === "function" ? value(cur === pathname) : value) ? pathname : null));
 
   useEffect(() => {
     if (!mobileOpen) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setMobileOpen(false);
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setMobileOpenPath(null);
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
   }, [mobileOpen]);
