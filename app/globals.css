@@ -1,88 +1,122 @@
 @import "tailwindcss";
 
+/*
+ * Design tokens. Contrast ratios (WCAG 2.x) were computed from these hex values:
+ *   ink on page 15.5, muted on page 6.5, white on primary 10.3, white on success 5.4,
+ *   danger on white 6.6, field border on white 3.8 (UI components need 3.0).
+ */
 :root {
-  --icy-blue: #add7f6;
-  --navy-electric: #090c9b;
-  --baby-blue-ice: #87bfff;
-  --blue-energy: #3f8efc;
-  --black: #000001;
+  /* Surfaces */
+  --page: #f6f8fb;
+  --surface: #ffffff;
+  --surface-tint: #e8eef9;
+  --surface-dark: #0b1f3a;
+  --line: #dde3ec;            /* decorative dividers and card edges */
+  --field: #77839a;           /* input and control borders (3:1 against white) */
+
+  /* Text */
+  --ink: #0b1f3a;
+  --ink-muted: #4a5b73;
+
+  /* Brand and status */
+  --primary: #0b3b8f;
+  --primary-hover: #082c6c;
+  --primary-soft: #e8eef9;
+  --success: #0e7a4f;
+  --success-soft: #e6f4ee;
+  --danger: #b42318;
+  --danger-soft: #fdecea;
+  --warning: #8a5a00;
+  --warning-soft: #fff4db;
+
+  /* Legacy names, kept so components not yet rebuilt follow the new palette */
+  --icy-blue: var(--surface-tint);
+  --navy-electric: var(--primary);
+  --baby-blue-ice: #7f9fd6;
+  --blue-energy: var(--primary);
+  --black: var(--ink);
   --white: #ffffff;
-  --surface-alternate: #f6f9fc;
-  --surface-tint: #e5edf5;
-  --ink-deep: #0a2540;
-  --ink-secondary: #061b31;
+  --surface-alternate: var(--page);
+  --ink-deep: var(--ink);
+  --ink-secondary: var(--ink);
   --body-slate: #3c4f69;
-  --muted-slate: #64748d;
-
-  /* Brand / Action Colors */
-  --primary-brand: #533afd;
-  --primary-strong: #635bff;
-  --primary-hover: #4434d4;
-  --secondary-border: #b9b9f9;
-
-  /* Accent / Status Colors */
-  --success-green: #15be53;
-  --warning-lemon: #9b6829;
-  --error-ruby: #df1b41;
+  --muted-slate: var(--ink-muted);
+  --primary-brand: var(--primary);
+  --primary-strong: #1550b8;
+  --secondary-border: #b8c6e0;
+  --success-green: var(--success);
+  --warning-lemon: var(--warning);
+  --error-ruby: var(--danger);
   --magenta-midpoint: #f96bee;
-  
-  /* Shadows */
-  --shadow-level-1: rgba(23,23,23,0.06) 0px 3px 6px;
-  --shadow-level-2: rgba(50,50,93,0.25) 0 13px 27px -5px, rgba(0,0,0,0.3) 0 8px 16px -8px;
-  --shadow-level-3: rgba(50,50,93,0.25) 0 30px 60px -12px, rgba(0,0,0,0.3) 0 18px 36px -18px;
-  --shadow-level-4: rgba(3,3,39,0.25) 0 14px 21px -14px, rgba(0,0,0,0.1) 0 8px 17px -8px;
+
+  /* One soft elevation for raised cards, one for overlays */
+  --shadow-card: 0 1px 2px rgba(11, 31, 58, 0.06), 0 4px 16px rgba(11, 31, 58, 0.06);
+  --shadow-overlay: 0 8px 32px rgba(11, 31, 58, 0.16);
+  --shadow-level-1: var(--shadow-card);
+  --shadow-level-2: var(--shadow-card);
+  --shadow-level-3: var(--shadow-overlay);
+  --shadow-level-4: var(--shadow-overlay);
 }
 
 @theme inline {
+  /* New semantic utilities: bg-page, bg-surface, text-ink, text-ink-muted, bg-primary, border-line ... */
+  --color-page: var(--page);
+  --color-surface: var(--surface);
+  --color-surface-dark: var(--surface-dark);
+  --color-line: var(--line);
+  --color-field: var(--field);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-soft: var(--primary-soft);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+
+  /* Legacy colour utilities used by existing components */
   --color-white: var(--white);
   --color-surface-alt: var(--surface-alternate);
   --color-surface-tint: var(--surface-tint);
-  --color-brand-black: var(--ink-deep); /* Re-mapping legacy brand-black to ink-deep */
-  --color-ink-secondary: var(--ink-secondary);
+  --color-brand-black: var(--ink);
+  --color-ink-secondary: var(--ink);
   --color-slate-body: var(--body-slate);
-  --color-slate-muted: var(--muted-slate);
-  
-  --color-icy-blue: var(--surface-tint); /* Mapped for grid lines */
-  
-  --color-blue-energy: var(--primary-brand); /* Re-mapping legacy blue-energy */
-  --color-primary-brand: var(--primary-brand);
+  --color-slate-muted: var(--ink-muted);
+  --color-icy-blue: var(--surface-tint);
+  --color-blue-energy: var(--primary);
+  --color-primary-brand: var(--primary);
   --color-primary-strong: var(--primary-strong);
-  --color-primary-hover: var(--primary-hover);
   --color-secondary-border: var(--secondary-border);
+  --color-emerald-500: var(--success);
+  --color-red-500: var(--danger);
 
-  --color-emerald-500: var(--success-green);
-  --color-red-500: var(--error-ruby);
-  
-  --shadow-ambient: var(--shadow-level-1);
-  --shadow-standard: var(--shadow-level-2);
-  --shadow-elevated: var(--shadow-level-3);
-  --shadow-deep: var(--shadow-level-4);
-  
-  /* Force standard spacing variables if specific values are missing */
-  --spacing-section: 76px;
-  
-  /* Map standard tailwind shadows to Stripe chromatic shadows globally */
-  --shadow-sm: var(--shadow-level-1);
-  --shadow-md: var(--shadow-level-1);
-  --shadow-lg: var(--shadow-level-2);
-  --shadow-xl: var(--shadow-level-3);
-  --shadow-2xl: var(--shadow-level-4);
-
-  /* Force font weights down to match Stripe's lightweight editorial aesthetic globally */
-  --font-weight-bold: 500;
-  --font-weight-extrabold: 500;
-  --font-weight-black: 500;
-
-  /* Force hardcoded legacy colors in components to map to Stripe CIELAB colors globally */
-  --color-slate-900: var(--ink-deep);
-  --color-slate-800: var(--ink-secondary);
+  /* Existing blue and indigo utilities now resolve to the navy primary */
+  --color-slate-900: var(--ink);
+  --color-slate-800: var(--ink);
   --color-blue-500: var(--primary-strong);
-  --color-blue-600: var(--primary-brand);
+  --color-blue-600: var(--primary);
   --color-blue-700: var(--primary-hover);
-  --color-indigo-600: var(--primary-brand);
+  --color-indigo-600: var(--primary);
   --color-indigo-700: var(--primary-hover);
-  
-  --font-sans: var(--font-inter), var(--font-manrope), "SF Pro Display", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+  --shadow-ambient: var(--shadow-card);
+  --shadow-standard: var(--shadow-card);
+  --shadow-elevated: var(--shadow-overlay);
+  --shadow-deep: var(--shadow-overlay);
+  --shadow-sm: var(--shadow-card);
+  --shadow-md: var(--shadow-card);
+  --shadow-lg: var(--shadow-overlay);
+  --shadow-xl: var(--shadow-overlay);
+  --shadow-2xl: var(--shadow-overlay);
+
+  --spacing-section: 96px;
+
+  /* Manrope for headings and figures, Inter for body. Font weights use Tailwind's defaults. */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-heading: var(--font-manrope), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono);
 
   --animate-accordion-down: accordion-down 0.2s ease-out;
@@ -100,7 +134,7 @@
 }
 * {
   scrollbar-width: thin;
-  scrollbar-color: #cbd5e1 transparent;
+  scrollbar-color: var(--field) transparent;
 }
 
 html {
@@ -128,8 +162,8 @@ html.lenis body {
 
 
 body {
-  background: var(--white);
-  color: var(--black);
+  background: var(--page);
+  color: var(--ink);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -386,3 +420,30 @@ input[type="range"]::-webkit-slider-runnable-track {
   }
 }
 
+
+
+/* ── Base: headings, focus and motion ── */
+h1, h2, h3, h4 {
+  font-family: var(--font-heading);
+  text-wrap: balance;
+}
+
+.num {
+  font-family: var(--font-heading);
+  font-variant-numeric: tabular-nums;
+}
+
+:where(a, button, input, select, textarea, summary, [role="button"], [tabindex]):focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
