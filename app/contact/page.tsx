@@ -1,12 +1,15 @@
 import { Metadata } from "next";
+import { buildMetadata } from "@/lib/seo";
 import { ProductHero } from "@/components/ProductHero";
 import { ContactForm } from "@/components/ContactForm";
 import { contact } from "@/lib/config";
 
-export const metadata: Metadata = {
-  title: "Contact Us | Credit Expert India",
-  description: "Get in touch with Credit Expert India debt specialists for assistance with personal loans and debt consolidation.",
-};
+export const metadata: Metadata = buildMetadata({
+  title: "Contact Us",
+  description:
+    "Get in touch with Credit Expert India debt specialists for assistance with personal loans and debt consolidation.",
+  path: "/contact",
+});
 
 const localBusinessSchema = {
   "@context": "https://schema.org",

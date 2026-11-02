@@ -1,12 +1,15 @@
 import { Metadata } from "next";
+import { buildMetadata } from "@/lib/seo";
 import { FAQ } from "@/components/FAQ";
 import { LeadForm } from "@/components/LeadForm";
 import { ProductHero } from "@/components/ProductHero";
 
-export const metadata: Metadata = {
-  title: "Frequently Asked Questions | Credit Expert India",
-  description: "Find answers to all common questions about debt consolidation, personal loans, interest rates, CIBIL score impact, and lender approval.",
-};
+export const metadata: Metadata = buildMetadata({
+  title: "Frequently Asked Questions",
+  description:
+    "Find answers to all common questions about debt consolidation, personal loans, interest rates, CIBIL score impact, and lender approval.",
+  path: "/faq",
+});
 
 const faqPageSchema = {
   "@context": "https://schema.org",

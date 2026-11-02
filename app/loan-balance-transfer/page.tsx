@@ -1,12 +1,15 @@
 import { Metadata } from "next";
+import { buildMetadata } from "@/lib/seo";
 import { LoanCalculator } from "@/components/LoanCalculator";
 import { LeadForm } from "@/components/LeadForm";
 import { ProductHero } from "@/components/ProductHero";
 
-export const metadata: Metadata = {
-  title: "Personal Loan Balance Transfer | Credit Expert India",
-  description: "Transfer your high-interest personal loan to partner banks with lower interest rates. Calculate monthly EMI savings and apply for balance transfer.",
-};
+export const metadata: Metadata = buildMetadata({
+  title: "Personal Loan Balance Transfer",
+  description:
+    "Transfer your high-interest personal loan to partner banks with lower interest rates. Calculate monthly EMI savings and apply for balance transfer.",
+  path: "/loan-balance-transfer",
+});
 
 export default function BalanceTransferPage() {
   return (

@@ -1,13 +1,16 @@
 import { Metadata } from "next";
+import { buildMetadata } from "@/lib/seo";
 import { LoanCalculator } from "@/components/LoanCalculator";
 import { LeadForm } from "@/components/LeadForm";
 import { FAQ } from "@/components/FAQ";
 import { ProductHero } from "@/components/ProductHero";
 
-export const metadata: Metadata = {
-  title: "Credit Card Debt Relief & Payoff Options | Credit Expert India",
-  description: "Replace expensive 36%-42% p.a. revolving credit card interest with a structured lower-rate personal loan. Explore credit card debt payoff options.",
-};
+export const metadata: Metadata = buildMetadata({
+  title: "Credit Card Debt Relief & Payoff Options",
+  description:
+    "Replace expensive 36%-42% p.a. revolving credit card interest with a structured lower-rate personal loan. Explore credit card debt payoff options.",
+  path: "/credit-card-debt",
+});
 
 export default function CreditCardDebtPage() {
   return (

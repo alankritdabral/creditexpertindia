@@ -1,13 +1,15 @@
 import { Metadata } from "next";
+import { buildMetadata } from "@/lib/seo";
 import { ProductHero } from "@/components/ProductHero";
 import { SmartCalculator } from "@/components/SmartCalculator";
 import { LeadForm } from "@/components/LeadForm";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildMetadata({
   title: "Personal Loan EMI Calculator",
-  description: "Work out the monthly EMI, total interest and total payable on a personal loan. Free and instant, made for salaried borrowers.",
-  alternates: { canonical: "/personal-loan-emi-calculator" },
-};
+  description:
+    "Work out the monthly EMI, total interest and total payable on a personal loan. Free and instant, made for salaried borrowers.",
+  path: "/personal-loan-emi-calculator",
+});
 
 export default function Page() {
   return (

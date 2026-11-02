@@ -1,12 +1,15 @@
 import { Metadata } from "next";
+import { buildMetadata } from "@/lib/seo";
 import { LoanCalculator } from "@/components/LoanCalculator";
 import { LeadForm } from "@/components/LeadForm";
 import { ProductHero } from "@/components/ProductHero";
 
-export const metadata: Metadata = {
-  title: "App Loan & Fintech Loan Consolidation | Credit Expert India",
-  description: "Consolidate multiple short-term app loans and digital credit line EMIs into one single lower-cost bank loan.",
-};
+export const metadata: Metadata = buildMetadata({
+  title: "App Loan & Fintech Loan Consolidation",
+  description:
+    "Consolidate multiple short-term app loans and digital credit line EMIs into one single lower-cost bank loan.",
+  path: "/app-loan",
+});
 
 export default function AppLoanPage() {
   return (

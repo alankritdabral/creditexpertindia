@@ -1,15 +1,17 @@
 import { Metadata } from "next";
+import { buildMetadata } from "@/lib/seo";
 import { ProductHero } from "@/components/ProductHero";
 import { Eligibility } from "@/components/Eligibility";
 import { LoanCalculator } from "@/components/LoanCalculator";
 import { LeadForm } from "@/components/LeadForm";
 import { FAQ } from "@/components/FAQ";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildMetadata({
   title: "Overdraft Options for Salaried Employees",
-  description: "Explore overdraft and credit-line options for salaried professionals, and see whether a personal loan or consolidation would cost you less.",
-  alternates: { canonical: "/personal-loan-overdraft" },
-};
+  description:
+    "Explore overdraft and credit-line options for salaried professionals, and see whether a personal loan or consolidation would cost you less.",
+  path: "/personal-loan-overdraft",
+});
 
 const points = [
   { t: "A limit you can draw from", d: "Instead of one lump sum, you get a limit and use what you need, when you need it." },

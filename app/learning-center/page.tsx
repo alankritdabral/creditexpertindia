@@ -1,14 +1,16 @@
 import { Metadata } from "next";
+import { buildMetadata } from "@/lib/seo";
 import Link from "next/link";
 import { ProductHero } from "@/components/ProductHero";
 import { LeadForm } from "@/components/LeadForm";
 import { articles } from "@/content/articles";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildMetadata({
   title: "Learning Center: Loans & EMIs Explained Simply",
-  description: "Plain-language guides on EMIs, debt consolidation, credit-card interest, balance transfers and salaried loan eligibility.",
-  alternates: { canonical: "/learning-center" },
-};
+  description:
+    "Plain-language guides on EMIs, debt consolidation, credit-card interest, balance transfers and salaried loan eligibility.",
+  path: "/learning-center",
+});
 
 export default function Page() {
   return (

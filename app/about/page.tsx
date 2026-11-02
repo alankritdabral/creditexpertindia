@@ -1,12 +1,15 @@
 import { Metadata } from "next";
+import { buildMetadata } from "@/lib/seo";
 import { WhyUs } from "@/components/WhyUs";
 import { LeadForm } from "@/components/LeadForm";
 import { ProductHero } from "@/components/ProductHero";
 
-export const metadata: Metadata = {
-  title: "About Us | Credit Expert India",
-  description: "Learn about Credit Expert India's mission to provide transparent debt advisory and consolidation assistance for salaried Indian professionals.",
-};
+export const metadata: Metadata = buildMetadata({
+  title: "About Us",
+  description:
+    "Learn about Credit Expert India's mission to provide transparent debt advisory and consolidation assistance for salaried Indian professionals.",
+  path: "/about",
+});
 
 export default function AboutPage() {
   return (

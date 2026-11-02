@@ -1,13 +1,15 @@
 import { Metadata } from "next";
+import { buildMetadata } from "@/lib/seo";
 import { ProductHero } from "@/components/ProductHero";
 import { LoanCalculator } from "@/components/LoanCalculator";
 import { LeadForm } from "@/components/LeadForm";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildMetadata({
   title: "EMI Savings Calculator for Salaried Borrowers",
-  description: "See how much you could save every month by combining your loans and card dues into one lower-rate loan. Free estimate.",
-  alternates: { canonical: "/emi-savings-calculator" },
-};
+  description:
+    "See how much you could save every month by combining your loans and card dues into one lower-rate loan. Free estimate.",
+  path: "/emi-savings-calculator",
+});
 
 export default function Page() {
   return (

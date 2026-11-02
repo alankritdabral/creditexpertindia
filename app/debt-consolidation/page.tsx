@@ -1,14 +1,17 @@
 import { Metadata } from "next";
+import { buildMetadata } from "@/lib/seo";
 import { DebtConsolidation } from "@/components/DebtConsolidation";
 import { LoanCalculator } from "@/components/LoanCalculator";
 import { LeadForm } from "@/components/LeadForm";
 import { FAQ } from "@/components/FAQ";
 import { ProductHero } from "@/components/ProductHero";
 
-export const metadata: Metadata = {
-  title: "Debt Consolidation Loans for Salaried Professionals | Credit Expert India",
-  description: "Combine multiple personal loans, credit card dues, and app loans into one single lower-rate EMI plan. Explore debt consolidation options with bank partners.",
-};
+export const metadata: Metadata = buildMetadata({
+  title: "Debt Consolidation Loans for Salaried Professionals",
+  description:
+    "Combine multiple personal loans, credit card dues, and app loans into one single lower-rate EMI plan. Explore debt consolidation options with bank partners.",
+  path: "/debt-consolidation",
+});
 
 export default function DebtConsolidationPage() {
   return (

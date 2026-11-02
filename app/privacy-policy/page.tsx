@@ -1,9 +1,12 @@
 import { Metadata } from "next";
+import { buildMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Privacy Policy | Credit Expert India",
-  description: "Privacy Policy for Credit Expert India",
-};
+export const metadata: Metadata = buildMetadata({
+  title: "Privacy Policy",
+  description:
+    "Privacy Policy for Credit Expert India",
+  path: "/privacy-policy",
+});
 
 export default function PrivacyPolicyPage() {
   return (

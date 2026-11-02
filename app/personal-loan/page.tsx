@@ -1,13 +1,16 @@
 import { Metadata } from "next";
+import { buildMetadata } from "@/lib/seo";
 import { LoanCalculator } from "@/components/LoanCalculator";
 import { Eligibility } from "@/components/Eligibility";
 import { LeadForm } from "@/components/LeadForm";
 import { ProductHero } from "@/components/ProductHero";
 
-export const metadata: Metadata = {
-  title: "Personal Loans for Salaried Staff from 9.95% p.a.* | Credit Expert India",
-  description: "Check personal loan options for salaried professionals. Rates starting from 9.95% p.a.* with soft profile eligibility checks and partner bank network.",
-};
+export const metadata: Metadata = buildMetadata({
+  title: "Personal Loans for Salaried Staff from 9.95% p.a.*",
+  description:
+    "Check personal loan options for salaried professionals. Rates starting from 9.95% p.a.* with soft profile eligibility checks and partner bank network.",
+  path: "/personal-loan",
+});
 
 export default function PersonalLoanPage() {
   return (

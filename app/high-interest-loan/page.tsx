@@ -1,12 +1,15 @@
 import { Metadata } from "next";
+import { buildMetadata } from "@/lib/seo";
 import { LoanCalculator } from "@/components/LoanCalculator";
 import { LeadForm } from "@/components/LeadForm";
 import { ProductHero } from "@/components/ProductHero";
 
-export const metadata: Metadata = {
-  title: "High-Interest Loan Refinancing & Advisory | Credit Expert India",
-  description: "Explore options to refinance high-rate personal loans and reduce monthly EMI burden with partner banks.",
-};
+export const metadata: Metadata = buildMetadata({
+  title: "High-Interest Loan Refinancing & Advisory",
+  description:
+    "Explore options to refinance high-rate personal loans and reduce monthly EMI burden with partner banks.",
+  path: "/high-interest-loan",
+});
 
 export default function HighInterestLoanPage() {
   return (

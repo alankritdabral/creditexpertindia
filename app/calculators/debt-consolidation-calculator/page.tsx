@@ -3,6 +3,7 @@ import Link from "next/link";
 import { DebtConsolidationCalculator } from "@/components/DebtConsolidationCalculator";
 import { AnimatedMeshBackground } from "@/components/AnimatedMeshBackground";
 import { siteConfig } from "@/lib/config";
+import { defaultOgImage } from "@/lib/seo";
 import { CheckCircle2, ShieldCheck, ArrowRight, HelpCircle, Layers3, Calculator, Percent, Clock } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -22,6 +23,13 @@ export const metadata: Metadata = {
     description: "Combine multiple loan and credit card EMIs into one single lower monthly payment. Check your potential monthly savings instantly.",
     url: `${siteConfig.url}/calculators/debt-consolidation-calculator`,
     type: "website",
+    images: [defaultOgImage],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Debt Consolidation Calculator India | Credit Expert India",
+    description: "Combine multiple loan and credit card EMIs into one single lower monthly payment.",
+    images: [defaultOgImage.url],
   },
 };
 

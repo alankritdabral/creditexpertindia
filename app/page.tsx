@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import { HeroGridBlock, HeroVisualBlock, HeroLogos } from "@/components/HeroGridBlock";
@@ -14,6 +15,10 @@ const FAQ = dynamic(() => import("@/components/FAQ").then(mod => mod.FAQ));
 const NetworkStats = dynamic(() => import("@/components/NetworkStats").then(mod => mod.NetworkStats));
 const EligibleLoansSlider = dynamic(() => import("@/components/EligibleLoansSlider").then(mod => mod.EligibleLoansSlider));
 const ContactForm = dynamic(() => import("@/components/ContactForm").then(mod => mod.ContactForm));
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
 
 export default function Home() {
   return (

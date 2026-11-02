@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { LeadForm } from "@/components/LeadForm";
+import { buildMetadata } from "@/lib/seo";
 import { articles } from "@/content/articles";
 
 export function generateStaticParams() {
@@ -12,7 +13,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const a = articles.find((x) => x.slug === slug);
   if (!a) return {};
-  return { title: a.title, description: a.summary, alternates: { canonical: `/learning-center/${a.slug}` } };
+  return buildMetadata({ title: a.title, description: a.summary, path: `/learning-center/${a.slug}`, type: "article" });
 }
 
 export default async function Page({ params }: { params: Promise<{ slug: string }> }) {

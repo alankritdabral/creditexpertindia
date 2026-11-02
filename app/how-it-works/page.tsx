@@ -1,12 +1,15 @@
 import { Metadata } from "next";
+import { buildMetadata } from "@/lib/seo";
 import { HowItWorks } from "@/components/HowItWorks";
 import { LeadForm } from "@/components/LeadForm";
 import { ProductHero } from "@/components/ProductHero";
 
-export const metadata: Metadata = {
-  title: "How It Works | Credit Expert India Workflow",
-  description: "Understand our 5-step process from soft profile assessment to lender evaluation and decision.",
-};
+export const metadata: Metadata = buildMetadata({
+  title: "How It Works",
+  description:
+    "Understand our 5-step process from soft profile assessment to lender evaluation and decision.",
+  path: "/how-it-works",
+});
 
 export default function HowItWorksPage() {
   return (
