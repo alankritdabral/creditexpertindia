@@ -3,9 +3,9 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const words = [
-  { text: "reduce", textCol: "#059669" }, // emerald-600
-  { text: "clear", textCol: "#7c3aed" },  // violet-600
-  { text: "manage", textCol: "#2563eb" }  // blue-600
+  { text: "reduce", textCol: "#15803D" }, // emerald-600
+  { text: "clear", textCol: "#0066FF" },  // violet-600
+  { text: "manage", textCol: "#0066FF" }  // blue-600
 ];
 
 export function AnimatedWord() {

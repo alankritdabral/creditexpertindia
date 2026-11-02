@@ -8,11 +8,11 @@ const typeConfig = {
   reduce: { icon: TrendingDown, color: "from-green-800 to-green-500", shadow: "rgba(34,197,94,0.4)" },
   card: { icon: CreditCard, color: "from-orange-800 to-orange-500", shadow: "rgba(249,115,22,0.4)" },
   percent: { icon: Percent, color: "from-teal-800 to-teal-500", shadow: "rgba(20,184,166,0.4)" },
-  transfer: { icon: ArrowRightLeft, color: "from-indigo-800 to-indigo-500", shadow: "rgba(99,102,241,0.4)" },
+  transfer: { icon: ArrowRightLeft, color: "from-blue-800 to-blue-500", shadow: "rgba(99,102,241,0.4)" },
   bank: { icon: Landmark, color: "from-rose-800 to-rose-500", shadow: "rgba(244,63,94,0.4)" },
   save: { icon: PiggyBank, color: "from-emerald-800 to-emerald-500", shadow: "rgba(16,185,129,0.4)" },
   app: { icon: Smartphone, color: "from-cyan-800 to-cyan-500", shadow: "rgba(6,182,212,0.4)" },
-  default: { icon: Building, color: "from-[#1E3A8A] to-[#3B82F6]", shadow: "rgba(59,130,246,0.4)" }
+  default: { icon: Building, color: "from-[#0A2540] to-[#0066FF]", shadow: "rgba(59,130,246,0.4)" }
 };
 
 export interface Transaction {
@@ -145,13 +145,13 @@ export function LoanNotification({ transaction, align = 'right', vAlign = 'top' 
         {/* Content */}
         <div className="flex-1 flex flex-col justify-center min-w-[100px]">
           <div className="flex justify-between items-center mb-0.5">
-            <span className="font-semibold text-[#0A2540] text-[13px] sm:text-[14px] md:text-[15px] truncate max-w-[130px]">{transaction.title || transaction.city}</span>
+            <span className="font-semibold text-[#0A2540] text-sm sm:text-sm md:text-base truncate max-w-[130px]">{transaction.title || transaction.city}</span>
           </div>
-          <div className="text-[15px] sm:text-[17px] md:text-[19px] font-bold text-[#0A2540] leading-none mb-1 md:mb-1.5 tracking-tight">
+          <div className="text-base sm:text-lg md:text-lg font-bold text-[#0A2540] leading-none mb-1 md:mb-1.5 tracking-tight">
             {transaction.amount}
           </div>
-          <div className="flex items-center gap-1.5 text-[12px] md:text-[13px] text-[#506480] font-medium whitespace-nowrap">
-            <span className="w-2 h-2 rounded-full bg-[#10B981] shadow-[0_0_6px_rgba(16,185,129,0.5)]"></span>
+          <div className="flex items-center gap-1.5 text-xs md:text-sm text-[#3C4F69] font-medium whitespace-nowrap">
+            <span className="w-2 h-2 rounded-full bg-[#15803D] shadow-[0_0_6px_rgba(16,185,129,0.5)]"></span>
             {transaction.status || 'Loan Disbursed'}
           </div>
         </div>

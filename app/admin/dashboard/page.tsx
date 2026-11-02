@@ -424,7 +424,7 @@ function DashboardContent() {
                   {[
                     { id: "rudrapur", name: "Rudrapur", data: activity.rudrapur, color: "text-emerald-500", bg: "bg-emerald-200" },
                     { id: "delhi", name: "Delhi", data: activity.delhi, color: "text-blue-500", bg: "bg-blue-200" },
-                    { id: "dehradun", name: "Dehradun", data: activity.dehradun, color: "text-purple-500", bg: "bg-purple-200" },
+                    { id: "dehradun", name: "Dehradun", data: activity.dehradun, color: "text-blue-500", bg: "bg-blue-200" },
                     { id: "customer", name: "Customer (Web)", data: activity.customer, color: "text-amber-500", bg: "bg-amber-200" }
                   ].map(item => (
                     <div
@@ -474,14 +474,14 @@ function DashboardContent() {
                                   <div className="font-bold text-slate-900">{r.name}</div>
                                   <div className="text-xs text-slate-500 mt-1 flex flex-col gap-0.5">
                                     <span>{r.mobile} • {r.pan || "No PAN"}</span>
-                                    <span className="text-[10px] text-slate-400">{getDisplayEmail(r)}</span>
+                                    <span className="text-[11px] text-slate-400">{getDisplayEmail(r)}</span>
                                   </div>
                                 </td>
                                 <td className="p-4">
                                   <div className="flex flex-col gap-1 items-start">
                                     <span className="px-2 py-1 bg-slate-100 rounded font-medium text-xs border border-slate-200">{r.bureau === 'v1_json' ? 'CIBIL' : r.bureau === 'crif_json' ? 'CRIF' : r.bureau}</span>
                                     {r.fallbackData?.fallback_from_experian && (
-                                      <span title={`Experian failed: ${r.fallbackData.fallback_reason}`} className="text-amber-600 flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 bg-amber-50 border border-amber-200 rounded cursor-help">
+                                      <span title={`Experian failed: ${r.fallbackData.fallback_reason}`} className="text-amber-600 flex items-center gap-1 text-[11px] font-bold px-1.5 py-0.5 bg-amber-50 border border-amber-200 rounded cursor-help">
                                         <AlertCircle className="w-3 h-3" /> Fallback
                                       </span>
                                     )}
@@ -591,7 +591,7 @@ function DashboardContent() {
                           <div className="flex flex-col gap-1 items-start">
                             <span className="px-2 py-1 bg-slate-100 rounded font-medium text-xs border border-slate-200">{r.bureau === 'v1_json' ? 'CIBIL' : r.bureau === 'crif_json' ? 'CRIF' : r.bureau}</span>
                             {r.fallbackData?.fallback_from_experian && (
-                              <span title={`Experian failed: ${r.fallbackData.fallback_reason}`} className="text-amber-600 flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 bg-amber-50 border border-amber-200 rounded cursor-help">
+                              <span title={`Experian failed: ${r.fallbackData.fallback_reason}`} className="text-amber-600 flex items-center gap-1 text-[11px] font-bold px-1.5 py-0.5 bg-amber-50 border border-amber-200 rounded cursor-help">
                                 <AlertCircle className="w-3 h-3" /> Fallback
                               </span>
                             )}
@@ -747,7 +747,7 @@ function DashboardContent() {
                             <div className="text-xs font-medium">
                               {log.provider?.requested || 'N/A'} {log.provider?.fallback ? `→ ${log.provider.fallback}` : ''}
                             </div>
-                            <div className="text-[10px] text-slate-400 mt-1">
+                            <div className="text-[11px] text-slate-400 mt-1">
                               Status: {log.provider?.http_status || '-'} | Error: {log.provider?.error_code || '-'}
                               {log.duration_ms && ` | Time: ${log.duration_ms}ms`}
                             </div>
@@ -871,23 +871,23 @@ function DashboardContent() {
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 flex items-center justify-around p-2 z-50 shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
         <button onClick={() => setActiveTab("reports")} className={`flex flex-col items-center p-2 rounded-xl ${activeTab === "reports" ? "text-blue-600 font-bold" : "text-slate-500"}`}>
           <Database className={`w-5 h-5 mb-1 ${activeTab === "reports" ? "text-blue-600" : "text-slate-500"}`} />
-          <span className="text-[10px]">Reports</span>
+          <span className="text-[11px]">Reports</span>
         </button>
         <button onClick={() => setActiveTab("activity")} className={`flex flex-col items-center p-2 rounded-xl ${activeTab === "activity" ? "text-blue-600 font-bold" : "text-slate-500"}`}>
           <Activity className={`w-5 h-5 mb-1 ${activeTab === "activity" ? "text-blue-600" : "text-slate-500"}`} />
-          <span className="text-[10px]">Activity</span>
+          <span className="text-[11px]">Activity</span>
         </button>
         <button onClick={() => setActiveTab("codes")} className={`flex flex-col items-center p-2 rounded-xl ${activeTab === "codes" ? "text-blue-600 font-bold" : "text-slate-500"}`}>
           <Users className={`w-5 h-5 mb-1 ${activeTab === "codes" ? "text-blue-600" : "text-slate-500"}`} />
-          <span className="text-[10px]">Codes</span>
+          <span className="text-[11px]">Codes</span>
         </button>
         <button onClick={() => setActiveTab("logs")} className={`flex flex-col items-center p-2 rounded-xl ${activeTab === "logs" ? "text-blue-600 font-bold" : "text-slate-500"}`}>
           <FileWarning className={`w-5 h-5 mb-1 ${activeTab === "logs" ? "text-blue-600" : "text-slate-500"}`} />
-          <span className="text-[10px]">Logs</span>
+          <span className="text-[11px]">Logs</span>
         </button>
         <Link href="/admin/whatsapp" className="flex flex-col items-center p-2 rounded-xl text-emerald-600">
           <MessageSquare className="w-5 h-5 mb-1 text-emerald-600" />
-          <span className="text-[10px] font-semibold">WhatsApp</span>
+          <span className="text-[11px] font-semibold">WhatsApp</span>
         </Link>
       </div>
     </div>

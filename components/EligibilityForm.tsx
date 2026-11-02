@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, Check, Plus, Trash2, User, Phone, Mail, MapPin, Briefcase, Building2, Shield, CreditCard, Loader2, AlertCircle, ChevronDown, ChevronUp, Download, RotateCw, X, KeyRound } from "lucide-react";
+import { ArrowRight, Check, CheckCircle2, Plus, Trash2, User, Phone, Mail, MapPin, Briefcase, Building2, Shield, CreditCard, Loader2, AlertCircle, ChevronDown, ChevronUp, Download, RotateCw, X, KeyRound } from "lucide-react";
 import dynamic from "next/dynamic";
 import { collection, doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebaseClient";
@@ -607,7 +607,7 @@ export function EligibilityForm() {
               <h3 id="credit-profile-identity" className="text-2xl font-bold text-brand-black scroll-mt-28">Credit Profile & Identity</h3>
               <div className="flex gap-2">
                 {isAdmin && (
-                  <div className="flex items-center gap-1.5 px-3 py-1 bg-purple-50 border border-purple-100 rounded-full text-purple-600 shadow-sm" title="Logged in as Admin">
+                  <div className="flex items-center gap-1.5 px-3 py-1 bg-blue-50 border border-blue-100 rounded-full text-blue-600 shadow-sm" title="Logged in as Admin">
                     <Shield className="w-4 h-4" />
                     <span className="text-xs font-bold uppercase tracking-wider">Admin</span>
                   </div>
@@ -732,34 +732,62 @@ export function EligibilityForm() {
     }
   };
 
+  const historyButton = teamBranch && step === 1 && (
+    <button
+      onClick={() => fetchBranchHistory()}
+      className="mt-6 rounded bg-white text-[#0A2540] px-4 py-2 text-sm font-bold hover:bg-[#BFDBFE] transition-colors"
+    >
+      {loadingHistory ? <Loader2 className="w-4 h-4 animate-spin inline mr-2" /> : null}
+      Customer History
+    </button>
+  );
+
   return (
-    <div id="check-eligibility" className="w-full max-w-4xl mx-auto flex flex-col justify-center h-full">
-      <div className="mb-10 text-center relative">
-        <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-brand-black mb-4">See your options</h2>
-        <p className="text-lg text-brand-black/70">Take a minute to tell us about your situation.</p>
-        {teamBranch && step === 1 && (
-          <button
-            onClick={() => fetchBranchHistory()}
-            className="md:absolute right-0 top-0 mt-4 md:mt-2 bg-white border border-slate-200 text-slate-600 px-4 py-2 rounded-lg text-sm font-bold shadow-sm hover:bg-slate-50 transition-colors"
-          >
-            {loadingHistory ? <Loader2 className="w-4 h-4 animate-spin inline mr-2" /> : null}
-            Customer History
-          </button>
+    <div id="check-eligibility" className="w-full max-w-[1220px] mx-auto flex flex-col justify-center h-full">
+      <div className={step === 1 ? "grid grid-cols-1 lg:grid-cols-[5fr_7fr] gap-10 lg:gap-16 items-start" : ""}>
+        {step === 1 ? (
+          <div className="bg-primary-hover text-white p-8 md:p-12 lg:sticky lg:top-28">
+            <h2 className="text-3xl sm:text-4xl leading-[1.15] tracking-tight font-semibold">
+              See what you could save, in about two minutes.
+            </h2>
+            <p className="mt-5 text-base leading-7 text-white/85">
+              Tell us a little about yourself. We look at your credit profile the way a lender would,
+              so what we tell you is realistic, not a sales pitch.
+            </p>
+            <ul className="mt-8 space-y-3 text-base leading-6 text-white">
+              {[
+                "We never ask you to pay anything.",
+                "Your details stay with us unless you say otherwise.",
+                "You decide what happens next.",
+              ].map((item) => (
+                <li key={item} className="flex items-start gap-3">
+                  <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-white/70" aria-hidden />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+            {historyButton}
+          </div>
+        ) : (
+          <div className="mb-8 text-center">
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-brand-black mb-2">See your options</h2>
+            <p className="text-lg text-brand-black/70">Here&apos;s what we found.</p>
+          </div>
         )}
-      </div>
 
-      <div className="w-full bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-icy-blue/60 overflow-hidden">
-        <div className="p-8 md:p-12">
-          <AnimatePresence mode="wait">
-            {renderStep()}
-          </AnimatePresence>
+        <div className={`w-full bg-white overflow-hidden card-elevated ${step === 1 ? "" : "max-w-4xl mx-auto"}`}>
+          <div className="p-8 md:p-12">
+            <AnimatePresence mode="wait">
+              {renderStep()}
+            </AnimatePresence>
 
-          {step === 1 && (
-            <div className="flex items-center justify-center gap-2 pt-8 text-xs text-slate-400">
-              <Shield className="w-3.5 h-3.5" />
-              <span>Your information is secure and never shared without consent.</span>
-            </div>
-          )}
+            {step === 1 && (
+              <div className="flex items-center gap-2 pt-8 text-sm text-slate-500">
+                <Shield className="w-4 h-4" />
+                <span>Your information is secure and never shared without consent.</span>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

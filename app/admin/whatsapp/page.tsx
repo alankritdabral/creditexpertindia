@@ -616,12 +616,12 @@ export default function WhatsAppHubPage() {
   });
 
   return (
-    <div className="min-h-screen bg-[#F6F9FC] text-[#0A2540] font-sans selection:bg-[#0066FF] selection:text-white relative">
+    <div className="min-h-screen bg-[#F8FAFC] text-[#0A2540] font-sans selection:bg-[#0066FF] selection:text-white relative">
       {/* Subtle background dot grid matching website */}
       <div className="absolute inset-0 bg-[radial-gradient(#E2E8F0_1px,transparent_1px)] [background-size:24px_24px] opacity-40 pointer-events-none" />
 
       {/* Top Header (Website Theme) */}
-      <header className="border-b border-[#D8E5F5] bg-white/95 backdrop-blur-md sticky top-0 z-30 shadow-[0_2px_12px_-3px_rgba(50,50,93,0.06)] relative">
+      <header className="border-b border-[#E2E8F0] bg-white/95 backdrop-blur-md sticky top-0 z-30 shadow-[0_2px_12px_-3px_rgba(50,50,93,0.06)] relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#0066FF] to-[#38BDF8] flex items-center justify-center text-white shadow-md shadow-blue-500/20">
@@ -632,7 +632,7 @@ export default function WhatsAppHubPage() {
                 <h1 className="text-lg font-bold tracking-tight text-[#0A2540]">
                   WhatsApp Messaging Hub
                 </h1>
-                <span className="text-[10px] font-semibold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#EAF3FF] text-[#0066FF] border border-[#BFDBFE]">
+                <span className="text-[11px] font-semibold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#EAF3FF] text-[#0066FF] border border-[#BFDBFE]">
                   MessageBot API
                 </span>
               </div>
@@ -644,10 +644,10 @@ export default function WhatsAppHubPage() {
 
           <div className="flex items-center gap-3">
             {/* Live Gateway Pill */}
-            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white border border-[#D8E5F5] text-xs shadow-sm">
+            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white border border-[#E2E8F0] text-xs shadow-sm">
               <span
                 className={`w-2 h-2 rounded-full ${
-                  status?.hasToken ? "bg-[#15BE53] animate-pulse" : "bg-amber-400"
+                  status?.hasToken ? "bg-[#15803D] animate-pulse" : "bg-amber-400"
                 }`}
               />
               <span className="text-[#3C4F69] font-medium">
@@ -674,7 +674,7 @@ export default function WhatsAppHubPage() {
 
             <Link
               href="/admin/dashboard"
-              className="px-3.5 py-1.5 text-xs font-semibold text-[#0A2540] hover:text-[#0066FF] bg-white hover:bg-slate-50 rounded-xl border border-[#D8E5F5] transition shadow-sm"
+              className="px-3.5 py-1.5 text-xs font-semibold text-[#0A2540] hover:text-[#0066FF] bg-white hover:bg-slate-50 rounded-xl border border-[#E2E8F0] transition shadow-sm"
             >
               Back to Dashboard
             </Link>
@@ -743,7 +743,7 @@ export default function WhatsAppHubPage() {
 
         {/* Live Token Override Box */}
         {showOverrideInput && (
-          <div className="p-4 rounded-2xl bg-white border border-[#D8E5F5] flex flex-col sm:flex-row items-center gap-3 shadow-sm">
+          <div className="p-4 rounded-2xl bg-white border border-[#E2E8F0] flex flex-col sm:flex-row items-center gap-3 shadow-sm">
             <Key className="w-4 h-4 text-[#0066FF] shrink-0" />
             <input
               type="text"
@@ -762,7 +762,7 @@ export default function WhatsAppHubPage() {
         )}
 
         {/* Navigation Tabs (Website Theme) */}
-        <div className="flex items-center gap-1.5 bg-white border border-[#D8E5F5] p-1.5 rounded-2xl shadow-sm overflow-x-auto">
+        <div className="flex items-center gap-1.5 bg-white border border-[#E2E8F0] p-1.5 rounded-2xl shadow-sm overflow-x-auto">
           {[
             { id: "excel", label: "Excel Bulk EMI Campaign", icon: FileSpreadsheet },
             { id: "otp", label: "Send OTP (Auth)", icon: Zap },
@@ -787,14 +787,14 @@ export default function WhatsAppHubPage() {
                 className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-200 ${
                   isActive
                     ? "bg-[#0A2540] text-white shadow-md shadow-[#0A2540]/20"
-                    : "text-[#475569] hover:text-[#0A2540] hover:bg-[#F1F5F9]"
+                    : "text-[#3C4F69] hover:text-[#0A2540] hover:bg-[#F1F5F9]"
                 }`}
               >
                 <Icon className={`w-4 h-4 ${isActive ? "text-white" : "text-[#0066FF]"}`} />
                 <span>{tab.label}</span>
                 {tab.count !== undefined && tab.count > 0 && (
                   <span
-                    className={`text-[10px] px-2 py-0.5 rounded-full font-bold transition ${
+                    className={`text-[11px] px-2 py-0.5 rounded-full font-bold transition ${
                       isActive
                         ? "bg-white/20 text-white"
                         : "bg-[#F1F5F9] text-[#64748B] border border-[#E2E8F0]"
@@ -811,7 +811,7 @@ export default function WhatsAppHubPage() {
         {/* TAB 1: SEND OTP */}
         {activeTab === "otp" && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <div className="lg:col-span-7 bg-white border border-[#D8E5F5] rounded-[24px] p-6 shadow-sm space-y-5">
+            <div className="lg:col-span-7 bg-white border border-[#E2E8F0] rounded-[24px] p-6 shadow-sm space-y-5">
               <div className="flex items-center justify-between border-b border-[#E2E8F0] pb-4">
                 <div>
                   <h3 className="text-base font-bold text-[#0A2540] flex items-center gap-2">
@@ -822,7 +822,7 @@ export default function WhatsAppHubPage() {
                     Dispatches instant WhatsApp verification OTPs using approved authentication templates
                   </p>
                 </div>
-                <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-[#EAF3FF] text-[#0066FF] border border-[#BFDBFE] font-mono font-bold">
+                <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-[#EAF3FF] text-[#0066FF] border border-[#BFDBFE] font-mono font-bold">
                   POST /whatsapp/SendOtp
                 </span>
               </div>
@@ -860,7 +860,7 @@ export default function WhatsAppHubPage() {
                         <button
                           type="button"
                           onClick={() => generateRandomOtp(4)}
-                          className="text-[10px] text-[#0066FF] hover:text-blue-700 font-semibold"
+                          className="text-[11px] text-[#0066FF] hover:text-blue-700 font-semibold"
                         >
                           4-Digit
                         </button>
@@ -868,7 +868,7 @@ export default function WhatsAppHubPage() {
                         <button
                           type="button"
                           onClick={() => generateRandomOtp(6)}
-                          className="text-[10px] text-[#0066FF] hover:text-blue-700 font-semibold"
+                          className="text-[11px] text-[#0066FF] hover:text-blue-700 font-semibold"
                         >
                           6-Digit
                         </button>
@@ -940,16 +940,16 @@ export default function WhatsAppHubPage() {
             {/* OTP Response & Preview Inspector */}
             <div className="lg:col-span-5 space-y-6">
               {/* Live Preview Card */}
-              <div className="bg-white border border-[#D8E5F5] rounded-[24px] p-6 shadow-sm space-y-3">
+              <div className="bg-white border border-[#E2E8F0] rounded-[24px] p-6 shadow-sm space-y-3">
                 <h4 className="text-xs font-bold uppercase tracking-wider text-[#64748B] flex items-center gap-2">
                   <Eye className="w-4 h-4 text-[#0066FF]" />
                   Simulated WhatsApp Bubble
                 </h4>
                 <div className="bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl p-4 relative overflow-hidden shadow-xs">
-                  <div className="absolute top-0 left-0 w-1 bg-[#15BE53] h-full" />
+                  <div className="absolute top-0 left-0 w-1 bg-[#15803D] h-full" />
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-xs font-bold text-[#0A2540]">Credit Expert India</span>
-                    <span className="text-[10px] text-[#64748B]">&bull; Just now</span>
+                    <span className="text-[11px] text-[#64748B]">&bull; Just now</span>
                   </div>
                   <p className="text-xs text-[#3C4F69] leading-relaxed">
                     Your verification code for Credit Expert India account access is{" "}
@@ -958,9 +958,9 @@ export default function WhatsAppHubPage() {
                     </span>
                     . Valid for 10 minutes. Do not share this OTP with anyone.
                   </p>
-                  <div className="mt-3 pt-2 border-t border-slate-200 flex items-center justify-between text-[10px] text-[#64748B]">
+                  <div className="mt-3 pt-2 border-t border-slate-200 flex items-center justify-between text-[11px] text-[#64748B]">
                     <span>Secured with Meta WhatsApp Cloud</span>
-                    <span className="text-[#15BE53] font-semibold flex items-center gap-1">
+                    <span className="text-[#15803D] font-semibold flex items-center gap-1">
                       <Check className="w-3 h-3" />
                       Encrypted
                     </span>
@@ -969,14 +969,14 @@ export default function WhatsAppHubPage() {
               </div>
 
               {/* Response Panel */}
-              <div className="bg-white border border-[#D8E5F5] rounded-[24px] p-6 shadow-sm space-y-3">
+              <div className="bg-white border border-[#E2E8F0] rounded-[24px] p-6 shadow-sm space-y-3">
                 <div className="flex items-center justify-between">
                   <h4 className="text-xs font-bold uppercase tracking-wider text-[#64748B]">
                     Live Gateway Response
                   </h4>
                   {otpResponse && (
                     <span
-                      className={`text-[10px] px-2.5 py-0.5 rounded-full font-bold uppercase ${
+                      className={`text-[11px] px-2.5 py-0.5 rounded-full font-bold uppercase ${
                         otpResponse.success
                           ? "bg-[#F0FDF4] text-[#15803D] border border-[#BBF7D0]"
                           : "bg-[#FEF2F2] text-[#DC2626] border border-[#FECACA]"
@@ -1029,7 +1029,7 @@ export default function WhatsAppHubPage() {
         {/* TAB 2: SEND MESSAGE */}
         {activeTab === "send" && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <div className="lg:col-span-8 bg-white border border-[#D8E5F5] rounded-[24px] p-6 shadow-sm space-y-5">
+            <div className="lg:col-span-8 bg-white border border-[#E2E8F0] rounded-[24px] p-6 shadow-sm space-y-5">
               <div className="flex items-center justify-between border-b border-[#E2E8F0] pb-4">
                 <div>
                   <h3 className="text-base font-bold text-[#0A2540] flex items-center gap-2">
@@ -1040,7 +1040,7 @@ export default function WhatsAppHubPage() {
                     Send single or scheduled template notifications with dynamic parameters and action buttons
                   </p>
                 </div>
-                <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-[#EAF3FF] text-[#0066FF] border border-[#BFDBFE] font-mono font-bold">
+                <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-[#EAF3FF] text-[#0066FF] border border-[#BFDBFE] font-mono font-bold">
                   POST /whatsapp/SendMessage
                 </span>
               </div>
@@ -1068,9 +1068,9 @@ export default function WhatsAppHubPage() {
                       </label>
                       {currentMsgTemplate && (
                         <span
-                          className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase ${
+                          className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full uppercase ${
                             isMsgMediaTemplate
-                              ? "bg-purple-50 text-purple-700 border border-purple-200"
+                              ? "bg-blue-50 text-blue-700 border border-blue-200"
                               : "bg-[#F0FDF4] text-[#15803D] border border-[#BBF7D0]"
                           }`}
                         >
@@ -1131,7 +1131,7 @@ export default function WhatsAppHubPage() {
                 <div
                   className={`p-4 rounded-2xl border transition ${
                     isMsgMediaTemplate
-                      ? "bg-purple-50/60 border-purple-200"
+                      ? "bg-blue-50/60 border-blue-200"
                       : "bg-[#F8FAFC] border-[#E2E8F0]"
                   }`}
                 >
@@ -1139,7 +1139,7 @@ export default function WhatsAppHubPage() {
                     <div className="flex items-center gap-2">
                       <ImageIcon
                         className={`w-4 h-4 ${
-                          isMsgMediaTemplate ? "text-purple-600" : "text-[#0066FF]"
+                          isMsgMediaTemplate ? "text-blue-600" : "text-[#0066FF]"
                         }`}
                       />
                       <span className="text-xs font-bold text-[#0A2540]">
@@ -1154,14 +1154,14 @@ export default function WhatsAppHubPage() {
                       </span>
                     </div>
                     {isMsgMediaTemplate && (
-                      <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-purple-100 text-purple-700 font-bold border border-purple-200">
+                      <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-700 font-bold border border-blue-200">
                         Prevents ErrorCode 34
                       </span>
                     )}
                   </div>
 
                   {isMsgMediaTemplate && (
-                    <p className="text-[11px] text-purple-800 mb-3 leading-relaxed">
+                    <p className="text-[11px] text-blue-800 mb-3 leading-relaxed">
                       ⚠️ Template #{msgTemplateId} (
                       <strong>{currentMsgTemplate?.TemplateName || "Selected"}</strong>) is configured with an <strong>Image Header</strong> on WhatsApp. Meta requires an image file (PNG, JPG) to be uploaded with this message, or it will be rejected with <em>ErrorCode 34 (&quot;Upload file for media templates&quot;)</em>.
                     </p>
@@ -1173,7 +1173,7 @@ export default function WhatsAppHubPage() {
                       <span className="text-xs font-semibold text-[#0A2540] group-hover:text-[#0066FF] transition">
                         Click to upload header image or document
                       </span>
-                      <span className="text-[10px] text-[#64748B] mt-1">
+                      <span className="text-[11px] text-[#64748B] mt-1">
                         PNG, JPG, JPEG, WEBP or PDF (up to 5MB)
                       </span>
                       <input
@@ -1184,7 +1184,7 @@ export default function WhatsAppHubPage() {
                       />
                     </label>
                   ) : (
-                    <div className="flex items-center justify-between p-3 rounded-xl bg-white border border-[#D8E5F5] shadow-xs">
+                    <div className="flex items-center justify-between p-3 rounded-xl bg-white border border-[#E2E8F0] shadow-xs">
                       <div className="flex items-center gap-3">
                         {msgFilePreview ? (
                           <img
@@ -1201,7 +1201,7 @@ export default function WhatsAppHubPage() {
                           <div className="text-xs font-semibold text-[#0A2540] truncate max-w-[220px] sm:max-w-xs">
                             {msgFile.name}
                           </div>
-                          <div className="text-[10px] text-[#64748B]">
+                          <div className="text-[11px] text-[#64748B]">
                             {(msgFile.size / 1024).toFixed(1)} KB • {msgFile.type || "file"}
                           </div>
                         </div>
@@ -1405,14 +1405,14 @@ export default function WhatsAppHubPage() {
 
             {/* Message Result */}
             <div className="lg:col-span-4 space-y-4">
-              <div className="bg-white border border-[#D8E5F5] rounded-[24px] p-6 shadow-sm space-y-4">
+              <div className="bg-white border border-[#E2E8F0] rounded-[24px] p-6 shadow-sm space-y-4">
                 <div className="flex items-center justify-between">
                   <h4 className="text-xs font-bold uppercase tracking-wider text-[#64748B]">
                     Execution Status
                   </h4>
                   {msgResponse && (
                     <span
-                      className={`text-[10px] px-2.5 py-0.5 rounded-full font-bold uppercase ${
+                      className={`text-[11px] px-2.5 py-0.5 rounded-full font-bold uppercase ${
                         msgResponse.success
                           ? "bg-[#F0FDF4] text-[#15803D] border border-[#BBF7D0]"
                           : "bg-[#FEF2F2] text-[#DC2626] border border-[#FECACA]"
@@ -1546,7 +1546,7 @@ export default function WhatsAppHubPage() {
 
             {/* Stat Cards */}
             <div className="grid grid-cols-2 lg:grid-cols-5 gap-3.5">
-              <div className="p-4 rounded-2xl bg-white border border-[#D8E5F5] shadow-sm space-y-1">
+              <div className="p-4 rounded-2xl bg-white border border-[#E2E8F0] shadow-sm space-y-1">
                 <div className="text-[11px] font-semibold text-[#64748B] uppercase tracking-wider flex items-center justify-between">
                   <span>Total Sent</span>
                   <MessageSquare className="w-4 h-4 text-[#0066FF]" />
@@ -1570,15 +1570,15 @@ export default function WhatsAppHubPage() {
                 </div>
               </div>
 
-              <div className="p-4 rounded-2xl bg-[#EFF6FF] border border-[#BFDBFE] shadow-sm space-y-1">
-                <div className="text-[11px] font-semibold text-[#1D4ED8] uppercase tracking-wider flex items-center justify-between">
+              <div className="p-4 rounded-2xl bg-[#EAF3FF] border border-[#BFDBFE] shadow-sm space-y-1">
+                <div className="text-[11px] font-semibold text-[#0052CC] uppercase tracking-wider flex items-center justify-between">
                   <span>In Transit / Submitted</span>
-                  <Clock className="w-4 h-4 text-[#1D4ED8]" />
+                  <Clock className="w-4 h-4 text-[#0052CC]" />
                 </div>
-                <div className="text-2xl font-bold font-mono text-[#1D4ED8]">
+                <div className="text-2xl font-bold font-mono text-[#0052CC]">
                   {messageStats?.totalSubmitted ?? 0}
                 </div>
-                <div className="text-[11px] text-[#2563EB]">Awaiting carrier DLR</div>
+                <div className="text-[11px] text-[#0066FF]">Awaiting carrier DLR</div>
               </div>
 
               <div className="p-4 rounded-2xl bg-[#FEF2F2] border border-[#FECACA] shadow-sm space-y-1">
@@ -1592,7 +1592,7 @@ export default function WhatsAppHubPage() {
                 <div className="text-[11px] text-[#DC2626]">Gateway or number rejects</div>
               </div>
 
-              <div className="p-4 rounded-2xl bg-gradient-to-br from-[#0A2540] to-[#1E3A8A] text-white shadow-md space-y-1 col-span-2 lg:col-span-1 border border-[#1E3A8A]">
+              <div className="p-4 rounded-2xl bg-gradient-to-br from-[#0A2540] to-[#0A2540] text-white shadow-md space-y-1 col-span-2 lg:col-span-1 border border-[#0A2540]">
                 <div className="text-[11px] font-semibold text-blue-200 uppercase tracking-wider flex items-center justify-between">
                   <span>Total Billing Cost</span>
                   <DollarSign className="w-4 h-4 text-emerald-400" />
@@ -1607,7 +1607,7 @@ export default function WhatsAppHubPage() {
             </div>
 
             {/* Search Bar & Filters */}
-            <div className="p-4 rounded-2xl bg-white border border-[#D8E5F5] shadow-sm flex flex-col sm:flex-row items-center gap-3">
+            <div className="p-4 rounded-2xl bg-white border border-[#E2E8F0] shadow-sm flex flex-col sm:flex-row items-center gap-3">
               <div className="relative flex-1 w-full">
                 <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
@@ -1676,7 +1676,7 @@ export default function WhatsAppHubPage() {
             </div>
 
             {/* Messages Table */}
-            <div className="bg-white border border-[#D8E5F5] rounded-2xl shadow-sm overflow-hidden">
+            <div className="bg-white border border-[#E2E8F0] rounded-2xl shadow-sm overflow-hidden">
               {loadingMessages ? (
                 <div className="py-20 text-center text-xs text-[#64748B]">
                   <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2 text-[#0066FF]" />
@@ -1699,7 +1699,7 @@ export default function WhatsAppHubPage() {
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs">
-                    <thead className="bg-[#F8FAFC] border-b border-[#E2E8F0] text-[#64748B] font-semibold uppercase tracking-wider text-[10px]">
+                    <thead className="bg-[#F8FAFC] border-b border-[#E2E8F0] text-[#64748B] font-semibold uppercase tracking-wider text-[11px]">
                       <tr>
                         <th className="px-4 py-3">Recipient Phone</th>
                         <th className="px-4 py-3">Campaign ID</th>
@@ -1749,7 +1749,7 @@ export default function WhatsAppHubPage() {
                                   )}
                                 </button>
                               </div>
-                              <span className="text-[10px] text-[#64748B] font-medium uppercase">
+                              <span className="text-[11px] text-[#64748B] font-medium uppercase">
                                 {msg.type || "MESSAGE"}
                               </span>
                             </td>
@@ -1757,7 +1757,7 @@ export default function WhatsAppHubPage() {
                             {/* Campaign ID */}
                             <td className="px-4 py-3.5">
                               {msg.campaignId ? (
-                                <span className="font-mono text-[#0066FF] font-bold bg-[#EFF6FF] px-2 py-0.5 rounded border border-[#BFDBFE]">
+                                <span className="font-mono text-[#0066FF] font-bold bg-[#EAF3FF] px-2 py-0.5 rounded border border-[#BFDBFE]">
                                   #{msg.campaignId}
                                 </span>
                               ) : (
@@ -1772,7 +1772,7 @@ export default function WhatsAppHubPage() {
                                   {msg.templateName || `Template #${msg.templateId}`}
                                 </span>
                                 {msg.hasMedia && (
-                                  <span className="text-[9px] px-1.5 py-0.2 rounded bg-[#FAF5FF] text-[#7E22CE] border border-[#E9D5FF] font-semibold">
+                                  <span className="text-[11px] px-1.5 py-0.2 rounded bg-[#EAF3FF] text-[#0066FF] border border-[#BFDBFE] font-semibold">
                                     IMAGE
                                   </span>
                                 )}
@@ -1792,8 +1792,8 @@ export default function WhatsAppHubPage() {
                                   <span>Delivered</span>
                                 </span>
                               ) : isSubmitted ? (
-                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-[#EFF6FF] text-[#1D4ED8] border border-[#BFDBFE]">
-                                  <Clock className="w-3 h-3 text-[#1D4ED8]" />
+                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-[#EAF3FF] text-[#0052CC] border border-[#BFDBFE]">
+                                  <Clock className="w-3 h-3 text-[#0052CC]" />
                                   <span>In Transit</span>
                                 </span>
                               ) : isFailed ? (
@@ -1813,7 +1813,7 @@ export default function WhatsAppHubPage() {
                               <div className="font-mono font-bold text-[#0A2540]">
                                 ₹{(msg.cost || 0).toFixed(2)}
                               </div>
-                              <span className="text-[10px] text-[#64748B]">
+                              <span className="text-[11px] text-[#64748B]">
                                 {msg.totalSms || 1} msg credit
                               </span>
                             </td>
@@ -1848,7 +1848,7 @@ export default function WhatsAppHubPage() {
                                 )}
                                 <button
                                   onClick={() => setSelectedMessageDetail(msg)}
-                                  className="px-2.5 py-1 rounded-lg bg-[#EFF6FF] hover:bg-[#DBEAFE] text-[#0066FF] border border-[#BFDBFE] transition flex items-center gap-1 text-[11px] font-semibold"
+                                  className="px-2.5 py-1 rounded-lg bg-[#EAF3FF] hover:bg-[#BFDBFE] text-[#0066FF] border border-[#BFDBFE] transition flex items-center gap-1 text-[11px] font-semibold"
                                   title="View message details"
                                 >
                                   <Eye className="w-3 h-3" />
@@ -1868,13 +1868,13 @@ export default function WhatsAppHubPage() {
             {/* Message Detail Modal */}
             {selectedMessageDetail && (
               <div className="fixed inset-0 z-50 bg-[#0A2540]/60 backdrop-blur-sm flex items-center justify-center p-4">
-                <div className="bg-white border border-[#D8E5F5] rounded-[24px] w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 space-y-5 shadow-2xl">
+                <div className="bg-white border border-[#E2E8F0] rounded-[24px] w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 space-y-5 shadow-2xl">
                   <div className="flex items-center justify-between pb-3 border-b border-[#E2E8F0]">
                     <div>
                       <h4 className="text-base font-bold text-[#0A2540] flex items-center gap-2">
                         <span>Message Audit Details</span>
                         {selectedMessageDetail.campaignId && (
-                          <span className="font-mono text-[#0066FF] text-sm font-bold bg-[#EFF6FF] px-2 py-0.5 rounded border border-[#BFDBFE]">
+                          <span className="font-mono text-[#0066FF] text-sm font-bold bg-[#EAF3FF] px-2 py-0.5 rounded border border-[#BFDBFE]">
                             #{selectedMessageDetail.campaignId}
                           </span>
                         )}
@@ -1894,13 +1894,13 @@ export default function WhatsAppHubPage() {
                   {/* Quick Status Bar */}
                   <div className="p-4 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
                     <div>
-                      <span className="text-[10px] text-[#64748B] block uppercase font-semibold">Recipient</span>
+                      <span className="text-[11px] text-[#64748B] block uppercase font-semibold">Recipient</span>
                       <span className="font-mono font-bold text-[#0A2540] text-sm">
                         {selectedMessageDetail.recipientPhone}
                       </span>
                     </div>
                     <div>
-                      <span className="text-[10px] text-[#64748B] block uppercase font-semibold">
+                      <span className="text-[11px] text-[#64748B] block uppercase font-semibold">
                         Delivery Status
                       </span>
                       <span className="font-bold text-[#15803D]">
@@ -1908,14 +1908,14 @@ export default function WhatsAppHubPage() {
                       </span>
                     </div>
                     <div>
-                      <span className="text-[10px] text-[#64748B] block uppercase font-semibold">Total Cost</span>
+                      <span className="text-[11px] text-[#64748B] block uppercase font-semibold">Total Cost</span>
                       <span className="font-mono font-bold text-[#0A2540] text-sm">
                         ₹{(selectedMessageDetail.cost || 0).toFixed(2)}{" "}
                         {selectedMessageDetail.currency || "INR"}
                       </span>
                     </div>
                     <div>
-                      <span className="text-[10px] text-[#64748B] block uppercase font-semibold">Credits Used</span>
+                      <span className="text-[11px] text-[#64748B] block uppercase font-semibold">Credits Used</span>
                       <span className="font-mono font-bold text-[#0A2540]">
                         {selectedMessageDetail.totalSms || 1} Unit
                       </span>
@@ -1930,13 +1930,13 @@ export default function WhatsAppHubPage() {
                     <div className="p-4 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] space-y-2 text-xs">
                       <div className="grid grid-cols-2 gap-2">
                         <div>
-                          <span className="text-[#64748B] text-[10px] block font-semibold">Template ID</span>
+                          <span className="text-[#64748B] text-[11px] block font-semibold">Template ID</span>
                           <span className="font-mono text-[#0A2540] font-bold">
                             #{selectedMessageDetail.templateId}
                           </span>
                         </div>
                         <div>
-                          <span className="text-[#64748B] text-[10px] block font-semibold">Template Name</span>
+                          <span className="text-[#64748B] text-[11px] block font-semibold">Template Name</span>
                           <span className="text-[#0A2540] font-semibold">
                             {selectedMessageDetail.templateName || "N/A"}
                           </span>
@@ -1945,8 +1945,8 @@ export default function WhatsAppHubPage() {
 
                       {selectedMessageDetail.hasMedia && (
                         <div className="pt-2 border-t border-[#E2E8F0]">
-                          <span className="text-[#64748B] text-[10px] block font-semibold">Media Header</span>
-                          <div className="flex items-center gap-2 text-[#7E22CE] font-mono text-[11px] mt-0.5 font-semibold">
+                          <span className="text-[#64748B] text-[11px] block font-semibold">Media Header</span>
+                          <div className="flex items-center gap-2 text-[#0066FF] font-mono text-[11px] mt-0.5 font-semibold">
                             <ImageIcon className="w-3.5 h-3.5" />
                             <span>
                               {selectedMessageDetail.mediaFileName ||
@@ -1958,7 +1958,7 @@ export default function WhatsAppHubPage() {
 
                       {selectedMessageDetail.sample && (
                         <div className="pt-2 border-t border-[#E2E8F0]">
-                          <span className="text-[#64748B] text-[10px] block font-semibold">
+                          <span className="text-[#64748B] text-[11px] block font-semibold">
                             Dynamic Variables Sent (Sample)
                           </span>
                           <div className="p-2.5 rounded-lg bg-white border border-[#CBD5E1] font-mono text-[11px] text-[#0066FF] mt-1 font-semibold">
@@ -2018,7 +2018,7 @@ export default function WhatsAppHubPage() {
         {/* TAB 4: DELIVERY REPORTS (DLR) */}
         {activeTab === "dlr" && (
           <div className="space-y-6">
-            <div className="bg-white border border-[#D8E5F5] rounded-[24px] p-6 shadow-sm space-y-4">
+            <div className="bg-white border border-[#E2E8F0] rounded-[24px] p-6 shadow-sm space-y-4">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
                   <h3 className="text-base font-bold text-[#0A2540] flex items-center gap-2">
@@ -2029,7 +2029,7 @@ export default function WhatsAppHubPage() {
                     Query real-time delivery status, read receipts, and billing cost by Campaign ID
                   </p>
                 </div>
-                <span className="text-[10px] font-mono font-bold px-2.5 py-1 rounded-full bg-[#EFF6FF] text-[#0066FF] border border-[#BFDBFE]">
+                <span className="text-[11px] font-mono font-bold px-2.5 py-1 rounded-full bg-[#EAF3FF] text-[#0066FF] border border-[#BFDBFE]">
                   POST /Whatsapp/GetDlrDetails
                 </span>
               </div>
@@ -2079,8 +2079,8 @@ export default function WhatsAppHubPage() {
                         {dlrData.TotalCost} {dlrData.Currency || "INR"}
                       </div>
                     </div>
-                    <div className="p-4 rounded-xl bg-[#EFF6FF] border border-[#BFDBFE] shadow-sm">
-                      <div className="text-xs text-[#1D4ED8] font-semibold">Status Breakdown</div>
+                    <div className="p-4 rounded-xl bg-[#EAF3FF] border border-[#BFDBFE] shadow-sm">
+                      <div className="text-xs text-[#0052CC] font-semibold">Status Breakdown</div>
                       <div className="flex flex-wrap gap-1.5 mt-1">
                         {dlrData.CampaignStatus?.map((item: any, idx: number) => (
                           <span
@@ -2090,7 +2090,7 @@ export default function WhatsAppHubPage() {
                                 ? "bg-[#F0FDF4] text-[#15803D] border border-[#BBF7D0]"
                                 : item.DlrStatus === "Delivered"
                                 ? "bg-[#CCFBF1] text-[#0F766E] border border-[#99F6E4]"
-                                : "bg-white text-[#1D4ED8] border border-[#BFDBFE]"
+                                : "bg-white text-[#0052CC] border border-[#BFDBFE]"
                             }`}
                           >
                             {item.DlrStatus}: {item.NumberofSms}
@@ -2101,7 +2101,7 @@ export default function WhatsAppHubPage() {
                   </div>
 
                   {/* Status table */}
-                  <div className="bg-white rounded-xl border border-[#D8E5F5] overflow-hidden shadow-sm">
+                  <div className="bg-white rounded-xl border border-[#E2E8F0] overflow-hidden shadow-sm">
                     <table className="w-full text-left text-xs">
                       <thead className="bg-[#F8FAFC] border-b border-[#E2E8F0] text-[#64748B] uppercase tracking-wider font-semibold">
                         <tr>
@@ -2142,7 +2142,7 @@ export default function WhatsAppHubPage() {
         {/* TAB 5: CAMPAIGNS */}
         {activeTab === "campaigns" && (
           <div className="space-y-6">
-            <div className="bg-white border border-[#D8E5F5] rounded-[24px] p-6 shadow-sm space-y-4">
+            <div className="bg-white border border-[#E2E8F0] rounded-[24px] p-6 shadow-sm space-y-4">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
                   <h3 className="text-base font-bold text-[#0A2540] flex items-center gap-2">
@@ -2153,7 +2153,7 @@ export default function WhatsAppHubPage() {
                     Query one or more Campaign IDs (comma separated) for scheduling, submission, and run details
                   </p>
                 </div>
-                <span className="text-[10px] font-mono font-bold px-2.5 py-1 rounded-full bg-[#EFF6FF] text-[#0066FF] border border-[#BFDBFE]">
+                <span className="text-[11px] font-mono font-bold px-2.5 py-1 rounded-full bg-[#EAF3FF] text-[#0066FF] border border-[#BFDBFE]">
                   POST /whatsapp/GetWhatsAppCampaignDetails
                 </span>
               </div>
@@ -2203,10 +2203,10 @@ export default function WhatsAppHubPage() {
                           </span>
                         </div>
                         <span
-                          className={`text-[10px] px-2.5 py-0.5 rounded-full font-bold uppercase ${
+                          className={`text-[11px] px-2.5 py-0.5 rounded-full font-bold uppercase ${
                             c.CampaignStatusName === "Completed"
                               ? "bg-[#F0FDF4] text-[#15803D] border border-[#BBF7D0]"
-                              : "bg-[#EFF6FF] text-[#0066FF] border border-[#BFDBFE]"
+                              : "bg-[#EAF3FF] text-[#0066FF] border border-[#BFDBFE]"
                           }`}
                         >
                           {c.CampaignStatusName || "Status " + c.CampaignStatus}
@@ -2215,25 +2215,25 @@ export default function WhatsAppHubPage() {
 
                       <div className="grid grid-cols-2 gap-2 text-xs pt-2 border-t border-[#E2E8F0]">
                         <div>
-                          <span className="text-[#64748B] block text-[10px] font-semibold">Audience</span>
+                          <span className="text-[#64748B] block text-[11px] font-semibold">Audience</span>
                           <span className="font-semibold text-[#0A2540]">
                             {c.TotalAudience || 1} Recipients
                           </span>
                         </div>
                         <div>
-                          <span className="text-[#64748B] block text-[10px] font-semibold">Submitted At</span>
+                          <span className="text-[#64748B] block text-[11px] font-semibold">Submitted At</span>
                           <span className="font-mono text-[#3C4F69] text-[11px]">
                             {c.SubmittedDateTime || "-"}
                           </span>
                         </div>
                         <div>
-                          <span className="text-[#64748B] block text-[10px] font-semibold">Execution Date</span>
+                          <span className="text-[#64748B] block text-[11px] font-semibold">Execution Date</span>
                           <span className="font-mono text-[#3C4F69] text-[11px]">
                             {c.FirstRunDateTime || "-"}
                           </span>
                         </div>
                         <div>
-                          <span className="text-[#64748B] block text-[10px] font-semibold">Scheduled?</span>
+                          <span className="text-[#64748B] block text-[11px] font-semibold">Scheduled?</span>
                           <span className="font-semibold text-[#0A2540]">
                             {c.IsScheduled ? "Yes" : "Immediate"}
                           </span>
@@ -2264,7 +2264,7 @@ export default function WhatsAppHubPage() {
         {/* TAB 6: TEMPLATES STUDIO */}
         {activeTab === "templates" && (
           <div className="space-y-6">
-            <div className="bg-white border border-[#D8E5F5] rounded-[24px] p-6 shadow-sm space-y-4">
+            <div className="bg-white border border-[#E2E8F0] rounded-[24px] p-6 shadow-sm space-y-4">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
                   <h3 className="text-base font-bold text-[#0A2540] flex items-center gap-2">
@@ -2339,7 +2339,7 @@ export default function WhatsAppHubPage() {
                           onClick={() => setSelectedTemplate(t)}
                           className={`p-3.5 rounded-xl border cursor-pointer transition ${
                             isSelected
-                              ? "bg-[#EFF6FF] border-[#0066FF] shadow-sm ring-1 ring-[#0066FF]/20"
+                              ? "bg-[#EAF3FF] border-[#0066FF] shadow-sm ring-1 ring-[#0066FF]/20"
                               : "bg-[#F8FAFC] border-[#E2E8F0] hover:border-[#CBD5E1] hover:bg-white"
                           }`}
                         >
@@ -2348,7 +2348,7 @@ export default function WhatsAppHubPage() {
                               {t.TemplateName}
                             </span>
                             <span
-                              className={`text-[9px] px-2 py-0.5 rounded-full font-bold uppercase ${
+                              className={`text-[11px] px-2 py-0.5 rounded-full font-bold uppercase ${
                                 t.TemplateStatusDescription === "APPROVED"
                                   ? "bg-[#F0FDF4] text-[#15803D] border border-[#BBF7D0]"
                                   : "bg-[#FEF3C7] text-[#B45309] border border-[#FDE68A]"
@@ -2403,16 +2403,16 @@ export default function WhatsAppHubPage() {
                       </div>
 
                       {/* Mockup Chat Bubble */}
-                      <div className="max-w-md mx-auto bg-white border border-[#D8E5F5] rounded-2xl p-4 shadow-md space-y-2 relative">
+                      <div className="max-w-md mx-auto bg-white border border-[#E2E8F0] rounded-2xl p-4 shadow-md space-y-2 relative">
                         {/* Image / Media Header Indicator */}
                         {(selectedTemplate.TemplateTypeDescription?.toLowerCase() === "image" ||
                           selectedTemplate.TemplateType === 2) && (
-                          <div className="w-full h-32 rounded-xl bg-[#FAF5FF] border border-[#E9D5FF] flex flex-col items-center justify-center text-[#7E22CE] gap-1.5 mb-2">
-                            <ImageIcon className="w-8 h-8 text-[#A855F7]" />
-                            <span className="text-[11px] font-semibold text-[#7E22CE]">
+                          <div className="w-full h-32 rounded-xl bg-[#EAF3FF] border border-[#BFDBFE] flex flex-col items-center justify-center text-[#0066FF] gap-1.5 mb-2">
+                            <ImageIcon className="w-8 h-8 text-[#0066FF]" />
+                            <span className="text-[11px] font-semibold text-[#0066FF]">
                               Image Header (File Upload Required)
                             </span>
-                            <span className="text-[10px] text-[#A855F7] font-mono">
+                            <span className="text-[11px] text-[#0066FF] font-mono">
                               Template #{selectedTemplate.WhatsAppTemplateId}
                             </span>
                           </div>
@@ -2433,7 +2433,7 @@ export default function WhatsAppHubPage() {
 
                         {/* Footer */}
                         {selectedTemplate.FooterText && (
-                          <div className="text-[10px] text-[#94A3B8] pt-1">
+                          <div className="text-[11px] text-[#94A3B8] pt-1">
                             {selectedTemplate.FooterText}
                           </div>
                         )}
@@ -2441,7 +2441,7 @@ export default function WhatsAppHubPage() {
                         {/* Button Action */}
                         {selectedTemplate.ButtonText && (
                           <div className="pt-2 border-t border-[#E2E8F0]">
-                            <div className="w-full py-1.5 rounded-lg bg-[#EFF6FF] border border-[#BFDBFE] text-[#0066FF] text-xs font-semibold flex items-center justify-center gap-1">
+                            <div className="w-full py-1.5 rounded-lg bg-[#EAF3FF] border border-[#BFDBFE] text-[#0066FF] text-xs font-semibold flex items-center justify-center gap-1">
                               <ExternalLink className="w-3 h-3" />
                               <span>{selectedTemplate.ButtonText}</span>
                             </div>
@@ -2452,25 +2452,25 @@ export default function WhatsAppHubPage() {
                       {/* Metadata Table */}
                       <div className="grid grid-cols-2 gap-2 text-xs pt-2">
                         <div className="p-2.5 rounded-xl bg-white border border-[#E2E8F0] shadow-2xs">
-                          <span className="text-[#64748B] block text-[10px] font-semibold">Meta FB ID</span>
+                          <span className="text-[#64748B] block text-[11px] font-semibold">Meta FB ID</span>
                           <span className="font-mono text-[#0A2540] text-[11px] truncate block font-medium">
                             {selectedTemplate.FbTemplateId || "N/A"}
                           </span>
                         </div>
                         <div className="p-2.5 rounded-xl bg-white border border-[#E2E8F0] shadow-2xs">
-                          <span className="text-[#64748B] block text-[10px] font-semibold">Language</span>
+                          <span className="text-[#64748B] block text-[11px] font-semibold">Language</span>
                           <span className="text-[#0A2540] font-medium">
                             {selectedTemplate.Language || "English"}
                           </span>
                         </div>
                         <div className="p-2.5 rounded-xl bg-white border border-[#E2E8F0] shadow-2xs">
-                          <span className="text-[#64748B] block text-[10px] font-semibold">Registered Number</span>
+                          <span className="text-[#64748B] block text-[11px] font-semibold">Registered Number</span>
                           <span className="font-mono text-[#0A2540] font-medium">
                             {selectedTemplate.WhatsAppNo || "Default Business"}
                           </span>
                         </div>
                         <div className="p-2.5 rounded-xl bg-white border border-[#E2E8F0] shadow-2xs">
-                          <span className="text-[#64748B] block text-[10px] font-semibold">Created On</span>
+                          <span className="text-[#64748B] block text-[11px] font-semibold">Created On</span>
                           <span className="font-mono text-[#0A2540] text-[11px] font-medium">
                             {selectedTemplate.CreateDateTime || "-"}
                           </span>
@@ -2491,7 +2491,7 @@ export default function WhatsAppHubPage() {
         {/* TAB 7: SETUP & THINGS TO SETUP */}
         {activeTab === "setup" && (
           <div className="space-y-6">
-            <div className="bg-white border border-[#D8E5F5] rounded-[24px] p-6 shadow-sm space-y-6">
+            <div className="bg-white border border-[#E2E8F0] rounded-[24px] p-6 shadow-sm space-y-6">
               <div>
                 <h3 className="text-base font-bold text-[#0A2540] flex items-center gap-2">
                   <Settings className="w-5 h-5 text-[#0066FF]" />
@@ -2640,7 +2640,7 @@ export default function WhatsAppHubPage() {
                     )}
                   </button>
                 </div>
-                <pre className="p-4 rounded-xl bg-[#0A2540] border border-[#1E3A8A] text-xs font-mono text-emerald-400 overflow-x-auto leading-relaxed shadow-inner">
+                <pre className="p-4 rounded-xl bg-[#0A2540] border border-[#0A2540] text-xs font-mono text-emerald-400 overflow-x-auto leading-relaxed shadow-inner">
                   {`# MessageBot WhatsApp Gateway
 MESSAGEBOT_WHATSAPP_API_TOKEN="<YOUR_MESSAGEBOT_API_TOKEN>"
 MESSAGEBOT_WHATSAPP_BASE_URL="https://papi.messagebot.in"
@@ -2693,10 +2693,10 @@ MESSAGEBOT_WHATSAPP_CALLBACK_URL="https://creditexpertindia.com/api/whatsapp/cal
                         Save Your Approved Template ID
                       </span>
                       Once approved by Meta, copy the numeric Template ID and set it as{" "}
-                      <code className="text-[#0066FF] font-semibold bg-[#EFF6FF] px-1.5 py-0.5 rounded border border-[#BFDBFE]">
+                      <code className="text-[#0066FF] font-semibold bg-[#EAF3FF] px-1.5 py-0.5 rounded border border-[#BFDBFE]">
                         MESSAGEBOT_WHATSAPP_OTP_TEMPLATE_ID
                       </code>{" "}
-                      in your <code className="text-[#0066FF] font-semibold bg-[#EFF6FF] px-1.5 py-0.5 rounded border border-[#BFDBFE]">.env</code>.
+                      in your <code className="text-[#0066FF] font-semibold bg-[#EAF3FF] px-1.5 py-0.5 rounded border border-[#BFDBFE]">.env</code>.
                     </div>
                   </div>
 
@@ -2722,7 +2722,7 @@ MESSAGEBOT_WHATSAPP_CALLBACK_URL="https://creditexpertindia.com/api/whatsapp/cal
         {/* MODAL: CREATE TEMPLATE */}
         {showAddTemplateModal && (
           <div className="fixed inset-0 z-50 bg-[#0A2540]/60 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="bg-white border border-[#D8E5F5] rounded-[24px] max-w-lg w-full max-h-[90vh] overflow-y-auto p-6 space-y-4 shadow-2xl">
+            <div className="bg-white border border-[#E2E8F0] rounded-[24px] max-w-lg w-full max-h-[90vh] overflow-y-auto p-6 space-y-4 shadow-2xl">
               <div className="flex items-center justify-between pb-3 border-b border-[#E2E8F0]">
                 <h3 className="text-sm font-bold text-[#0A2540] flex items-center gap-2">
                   <Plus className="w-4 h-4 text-[#0066FF]" />

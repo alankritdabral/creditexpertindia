@@ -57,10 +57,10 @@ export const EligibleLoansSlider = () => {
 
   return (
     <section className="relative w-full py-10 md:py-20 overflow-hidden bg-gray-50/50">
-      <div className="max-w-[1220px] mx-auto border-x border-slate-300">
+      <div className="max-w-[1220px] mx-auto">
         
         <div className="px-4 md:px-6 lg:px-12 py-6 md:py-8 mb-2 md:mb-4 text-center">
-          <p className="text-[10px] md:text-sm font-bold tracking-wider text-blue-600 uppercase mb-2 md:mb-4">
+          <p className="text-[11px] md:text-sm font-bold tracking-wider text-blue-600 uppercase mb-2 md:mb-4">
             Bring Your Eligible Loans Together
           </p>
           <h2 className="text-2xl md:text-[32px] lg:text-[42px] leading-[1.1] tracking-[-0.03em] font-semibold mx-auto text-slate-900 max-w-[280px] md:max-w-none">
@@ -68,7 +68,7 @@ export const EligibleLoansSlider = () => {
           </h2>
         </div>
 
-        <div className="relative w-full px-6 lg:px-12 overflow-hidden py-8">
+        <div className="relative w-full px-6 lg:px-12 overflow-hidden pt-10 pb-20 -mb-8">
           {/* Infinite Ticker Container using Framer Motion */}
         <motion.div 
           className="flex w-max"
@@ -94,7 +94,7 @@ export const EligibleLoansSlider = () => {
                   return (
                     <div 
                       key={`${slide.id}-${i}`} 
-                      className="relative flex-shrink-0 w-[85vw] md:w-[380px] h-[520px] rounded-[30px] overflow-hidden shadow-sm cursor-pointer group"
+                      className="relative flex-shrink-0 w-[85vw] md:w-[380px] h-[520px] rounded-[30px] overflow-hidden card-elevated card-lift cursor-pointer group"
                     >
                       <Image
                         src={slide.data.image}
@@ -112,7 +112,7 @@ export const EligibleLoansSlider = () => {
                 return (
                   <div 
                     key={`${slide.id}-${i}`} 
-                    className="relative flex-shrink-0 w-[85vw] md:w-[380px] h-[520px] rounded-[30px] overflow-hidden shadow-sm border border-gray-200 cursor-pointer"
+                    className="relative flex-shrink-0 w-[85vw] md:w-[380px] h-[520px] rounded-[30px] overflow-hidden card-elevated card-lift border border-gray-200 cursor-pointer"
                   >
                     {/* Background Image for glass effect */}
                     <Image
@@ -161,7 +161,7 @@ export const EligibleLoansSlider = () => {
             "Real-time insights",
             "Secure & compliant"
           ].map((badge, i) => (
-            <div key={i} className="px-3 md:px-5 py-1.5 md:py-2.5 bg-white/70 backdrop-blur-md rounded-full border border-gray-200 shadow-sm text-xs md:text-sm font-semibold text-slate-700">
+            <div key={i} className="px-3 md:px-5 py-1.5 md:py-2.5 bg-white/70 backdrop-blur-md rounded-full border border-gray-200 card-elevated text-xs md:text-sm font-semibold text-slate-700">
               {badge}
             </div>
           ))}

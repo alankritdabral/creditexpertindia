@@ -30,8 +30,8 @@ function SceneContent({ activeCity, highlightedCity, isReducedMotion }: { active
       {/* Lights */}
       <ambientLight intensity={0.8} color="#f0f5ff" />
       <directionalLight position={[5, 10, 5]} intensity={1.5} color="#ffffff" />
-      <directionalLight position={[-5, 5, 2]} intensity={0.5} color="#3157C7" />
-      <pointLight position={[0, 0, 2]} intensity={0.5} color="#5B5CFF" />
+      <directionalLight position={[-5, 5, 2]} intensity={0.5} color="#0066FF" />
+      <pointLight position={[0, 0, 2]} intensity={0.5} color="#0066FF" />
       
       <Center>
         {/* We tilt the map to give an isometric/3D feel */}
@@ -52,7 +52,7 @@ export function IndiaMapScene({ activeCity, highlightedCity, isReducedMotion }: 
       <Canvas
         camera={{ position: [0, 0, 5.2], fov: 45 }}
         gl={{ antialias: true, alpha: true }}
-        dpr={[1, 2]}
+        dpr={[1, 1.5]}
       >
         <Suspense fallback={null}>
           <SceneContent activeCity={activeCity} highlightedCity={highlightedCity} isReducedMotion={isReducedMotion} />

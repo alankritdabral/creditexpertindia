@@ -1,66 +1,54 @@
-import { ClipboardList, Search, Lightbulb } from "lucide-react";
-
 const steps = [
   {
-    num: "01",
-    icon: ClipboardList,
-    title: "Tell us where you stand.",
-    desc: "Share your basic loan, EMI, income and borrowing details.",
+    title: "You tell us where you stand.",
+    desc: "Your loans, your EMIs, your salary. A rough idea is fine. You don't need every document ready.",
   },
   {
-    num: "02",
-    icon: Search,
-    title: "We review your situation.",
-    desc: "We look at your current obligations, interest rates and requirements.",
+    title: "We go through it properly.",
+    desc: "We look at what you're paying now, at what rate, and what lenders could realistically offer you.",
   },
   {
-    num: "03",
-    icon: Lightbulb,
-    title: "Understand your options.",
-    desc: "We'll explain the options available to you so you can make an informed decision.",
+    title: "We explain it like a friend would.",
+    desc: "In plain rupees: what you pay now, what you could pay instead, and whether it's worth the switch.",
+  },
+  {
+    title: "Then it's your call.",
+    desc: "Apply, wait, or walk away. Nothing is pushed on you, and the final decision is always yours.",
   },
 ];
 
 export function HowItWorks() {
   return (
-    <div id="how-it-works" className="w-full h-full flex flex-col justify-between">
-      <div className="mb-10 text-center">
-        <p className="text-xs font-semibold leading-7 text-blue-energy tracking-widest uppercase">
-          A SIMPLE PROCESS
-        </p>
-        <h2 className="mt-2 text-2xl md:text-3xl font-bold tracking-tight text-brand-black">
-          First understand. <br />Then decide.
-        </h2>
-      </div>
+    <section id="how-it-works" className="w-full bg-white text-[#0A2540]">
+      <div className="max-w-[1220px] mx-auto px-4 md:px-6 lg:px-8 py-16 md:py-24 grid grid-cols-1 lg:grid-cols-[5fr_7fr] gap-10 lg:gap-20">
+        <div className="lg:sticky lg:top-28 self-start">
+          <h2 className="text-[48px] sm:text-[56px] lg:text-[68px] leading-[1.0] tracking-[-0.04em] font-bold">
+            What happens after you reach out.
+          </h2>
+          <p className="mt-6 text-lg md:text-xl leading-relaxed text-[#3C4F69] max-w-md">
+            Four simple steps. You can stop at any of them, no questions asked.
+          </p>
+        </div>
 
-      <div className="flex flex-col gap-0">
-        {steps.map((step, i) => {
-          const Icon = step.icon;
-          const isLast = i === steps.length - 1;
-          return (
-            <div key={step.num} className={`relative flex flex-col items-center text-center group cursor-default ${isLast ? '' : 'pb-10'}`}>
-              {/* Step indicator */}
-              <div className="flex flex-col items-center mb-4">
-                {/* Circle */}
-                <div className="w-12 h-12 rounded-full bg-blue-energy/10 border-2 border-blue-energy/30 flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110 group-hover:border-blue-energy group-hover:shadow-[0_0_10px_rgba(10,37,64,0.2)]">
-                  <Icon className="w-5 h-5 text-blue-energy" strokeWidth={2} />
-                </div>
+        <ol>
+          {steps.map((s, i) => (
+            <li
+              key={s.title}
+              className={`grid grid-cols-[72px_1fr] md:grid-cols-[120px_1fr] items-center gap-2 py-8 md:py-10 px-4 md:px-6 -mx-4 md:-mx-6 ${
+                i % 2 === 1 ? "bg-[#EAF3FF]" : ""
+              }`}
+            >
+              <span className="text-[56px] md:text-[96px] leading-none font-bold tracking-[-0.05em] text-[#2d6af0]">
+                {i + 1}
+              </span>
+              <div>
+                <h3 className="text-2xl md:text-[32px] leading-tight font-bold tracking-[-0.02em]">{s.title}</h3>
+                <p className="mt-2 text-base md:text-lg leading-relaxed text-[#3C4F69] max-w-lg">{s.desc}</p>
               </div>
-
-              {/* Content */}
-              <div className="transition-transform duration-300 group-hover:-translate-y-0.5">
-                <p className="text-[11px] font-bold tracking-widest text-blue-energy/60 mb-2 uppercase transition-colors duration-300 group-hover:text-blue-energy">STEP {step.num}</p>
-                <h3 className="text-lg font-bold text-brand-black mb-2 transition-colors duration-300 group-hover:text-blue-energy">
-                  {step.title}
-                </h3>
-                <p className="text-sm text-brand-black/70 leading-relaxed max-w-sm mx-auto">
-                  {step.desc}
-                </p>
-              </div>
-            </div>
-          );
-        })}
+            </li>
+          ))}
+        </ol>
       </div>
-    </div>
+    </section>
   );
 }
