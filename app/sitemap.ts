@@ -16,7 +16,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/partner-disclosures',
     '/personal-loan',
     '/privacy-policy',
-    '/team',
     '/terms-and-conditions',
     '/app-loan',
     '/calculators/debt-consolidation-calculator',

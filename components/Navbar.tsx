@@ -3,11 +3,9 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import logo from "@/public/img/logo.webp";
-import { ArrowRight, X, Mail, User, ShieldCheck, LogOut, ChevronDown, ChevronRight } from "lucide-react";
+import { ArrowRight, X, Mail, ShieldCheck, ChevronDown, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { usePathname, useRouter } from "next/navigation";
-import { onAuthStateChanged, signOut } from "firebase/auth";
-import { auth } from "@/lib/firebaseClient";
+import { usePathname } from "next/navigation";
 import { cities } from "@/lib/cities";
 
 type MenuLink = { label: string; desc?: string; href: string };
@@ -153,7 +151,6 @@ const OVERLAY_ANIMATION = {
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [active, setActive] = useState<string | null>(null);
   const [mobileGroup, setMobileGroup] = useState<string | null>(null);
   const [hoverKey, setHoverKey] = useState<string | null>(null);
@@ -167,15 +164,6 @@ export function Navbar() {
   const [panelH, setPanelH] = useState<number | null>(null);
   const panelInner = useRef<HTMLDivElement | null>(null);
   const pathname = usePathname();
-  const router = useRouter();
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      const hasCookie = document.cookie.includes('team_branch=');
-      setIsLoggedIn(!!user || hasCookie);
-    });
-    return () => unsubscribe();
-  }, []);
 
   const showPanel = useCallback((key: string) => {
     if (unmountTimer.current) clearTimeout(unmountTimer.current);
@@ -239,20 +227,6 @@ export function Navbar() {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [hidePanel]);
-
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);
-      document.cookie = 'team_branch=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-      setIsLoggedIn(false);
-      router.refresh();
-      router.push("/");
-    } catch (error) {
-      console.error("Error logging out", error);
-    }
-  };
-
-  if (pathname?.startsWith('/admin') || pathname?.startsWith('/team')) return null;
 
   const activeMenu = active ? menus.find((m) => m.key === active) || null : null;
   const renderMenu = menus.find((m) => m.key === renderKey) || null;
@@ -430,41 +404,16 @@ export function Navbar() {
                     </li>
                   );
                 })}
-                <li>
-                  <Link
-                    href="/eligibility"
-                    onMouseEnter={() => {
-                      hidePanel();
-                      setHoverKey("eligibility");
-                    }}
-                    onMouseLeave={() => setHoverKey(null)}
-                    onFocus={() => hidePanel()}
-                    className={`h-10 px-3 text-base flex items-center rounded transition-colors duration-200 ${
-                      (active || hoverKey) && (active || hoverKey) !== "eligibility" ? "text-[#64748B]" : "text-[#0A2540]"
-                    }`}
-                  >
-                    Eligibility
-                  </Link>
-                </li>
               </ul>
             </nav>
 
             <div className="hidden lg:flex items-center justify-end gap-2 shrink-0" onMouseEnter={() => hidePanel()}>
-              {isLoggedIn ? (
-                <button
-                  onClick={handleLogout}
-                  className="h-10 px-5 text-base font-medium text-[#0052CC] bg-white border border-[#E2E8F0] rounded hover:bg-[#F8FAFC] transition-colors cursor-pointer"
-                >
-                  Log out
-                </button>
-              ) : (
-                <a
-                  href="/admin/login"
-                  className="h-10 px-5 inline-flex items-center text-base font-medium text-[#0052CC] bg-white border border-[#E2E8F0] rounded hover:bg-[#F8FAFC] transition-colors"
-                >
-                  Sign in
-                </a>
-              )}
+              <Link
+                href="/eligibility"
+                className="h-10 px-5 inline-flex items-center text-base font-medium text-[#0052CC] bg-white border border-[#E2E8F0] rounded hover:bg-[#F8FAFC] transition-colors"
+              >
+                Eligibility
+              </Link>
               <Link
                 href={assessmentHref}
                 className="h-10 px-5 inline-flex items-center gap-1 text-base font-medium text-white bg-[#0052CC] hover:bg-[#1741b3] rounded transition-colors"
@@ -618,31 +567,6 @@ export function Navbar() {
                     <span className="text-base font-medium text-[#0A2540] flex-1 tracking-tight">Contact Us</span>
                     <ArrowRight className="w-3.5 h-3.5 text-slate-300 group-hover:text-slate-400 group-hover:translate-x-1 transition-all" />
                   </Link>
-
-                  {isLoggedIn ? (
-                    <button
-                      onClick={() => { setOpen(false); handleLogout(); }}
-                      className="group flex items-center p-2 rounded-xl hover:bg-red-50 transition-colors text-left"
-                    >
-                      <div className="w-9 h-9 rounded-[10px] bg-red-50 flex items-center justify-center mr-3 group-hover:bg-red-100 transition-colors">
-                        <LogOut className="w-[16px] h-[16px] text-red-600" />
-                      </div>
-                      <span className="text-base font-medium text-red-600 flex-1 tracking-tight">Log out</span>
-                      <ArrowRight className="w-3.5 h-3.5 text-red-200 group-hover:text-red-300 group-hover:translate-x-1 transition-all" />
-                    </button>
-                  ) : (
-                    <Link
-                      href="/admin/login"
-                      onClick={() => setOpen(false)}
-                      className="group flex items-center p-2 rounded-xl hover:bg-slate-50 transition-colors"
-                    >
-                      <div className="w-9 h-9 rounded-[10px] bg-slate-50 flex items-center justify-center mr-3 group-hover:bg-slate-100 transition-colors">
-                        <User className="w-[16px] h-[16px] text-[#0A2540]" />
-                      </div>
-                      <span className="text-base font-medium text-[#0A2540] flex-1 tracking-tight">Staff Login</span>
-                      <ArrowRight className="w-3.5 h-3.5 text-slate-300 group-hover:text-slate-400 group-hover:translate-x-1 transition-all" />
-                    </Link>
-                  )}
                 </div>
               </div>
 

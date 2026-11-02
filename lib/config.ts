@@ -10,7 +10,7 @@ export const claims = {
 
 export const contact = {
   whatsapp: "+91-9761471212",
-  email: "akash.tyagi@creditexpertindia.com",
+  email: "info@creditexpertindia.com",
   addresses: [
     {
       city: "Dehradun",
