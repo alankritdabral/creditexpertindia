@@ -318,8 +318,75 @@ export function EligibilityForm() {
       // 1. Check Database First
       const safePan = formData.pan ? formData.pan.toUpperCase() : "NOPAN";
       const docId = `${safePan}_${formData.mobile}_${formData.bureau}`;
+      const docRef = doc(db, "credit_reports", docId);
 
-      // TEMPORARY: DB cache read disabled (re-enable the block removed here to restore)
+      try {
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          let createdAt = new Date();
+          if (data.created_at) {
+            createdAt = typeof data.created_at.toDate === 'function' ? data.created_at.toDate() : new Date(data.created_at);
+          }
+          const daysOld = (new Date().getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24);
+
+          if (daysOld > 30) {
+            setError("Your report in our system has expired (older than 30 days). Please contact support for a new assessment.");
+            setLoading(false);
+            return;
+          } else {
+            // Less than 30 days old
+            const isPdf = formData.bureau.endsWith("_pdf");
+            if (isPdf) {
+              setError("You recently generated a PDF report. For security, PDF links expire quickly. Please contact support to retrieve it.");
+              setLoading(false);
+              return;
+            } else {
+              // Dashboard cache hit!
+              if (data.raw_api_data) {
+                const isExperianCache = formData.bureau.startsWith("experian") || data.bureau?.startsWith("experian");
+                const isExperianFailureCache = isExperianCache && !data.raw_api_data.result_json;
+
+                if (isExperianFailureCache) {
+                  console.warn("Cached Experian report is corrupted/failed. Attempting CRIF fallback.");
+                  // Try to find a CRIF report in cache
+                  const crifDocId = `${safePan}_${formData.mobile}_crif_v1`;
+                  const crifSnap = await getDoc(doc(db, "credit_reports", crifDocId));
+                  if (crifSnap.exists() && crifSnap.data().raw_api_data) {
+                    const crifData = crifSnap.data();
+                    setFormData((prev: any) => ({ 
+                      ...prev, 
+                      bureau: "crif_v1", 
+                      fallbackWarning: "Notice: Loaded cached CRIF report because Experian had previously failed."
+                    }));
+                    processFetchedReport(crifData.raw_api_data);
+                    setLoading(false);
+                    return;
+                  }
+                  // If CRIF not in cache, skip Experian live call and jump directly to CRIF live call!
+                  console.warn("CRIF not in cache. Bypassing live Experian call and directly fetching live CRIF report.");
+                  setFormData((prev: any) => ({ ...prev, bureau: "crif_v1" }));
+                  // Instead of mutating formData, we'll update the active bureau for the rest of the function
+                  activeBureau = "crif_v1";
+                } else {
+                  if (data.bureau && data.bureau !== formData.bureau) {
+                    setFormData((prev: any) => ({ ...prev, bureau: data.bureau }));
+                  }
+                  if (data.fallbackData) {
+                    setFormData((prev: any) => ({ ...prev, fallbackWarning: `Notice: Loaded cached CRIF report (Experian fallback: ${data.fallbackData.fallback_reason})` }));
+                  }
+                  processFetchedReport(data.raw_api_data);
+                  setLoading(false);
+                  return;
+                }
+              }
+            }
+          }
+        }
+      } catch (e) {
+        console.error("Error checking cache:", e);
+        // Continue to fetch if DB read fails (e.g. missing permissions)
+      }
 
       // 2. Not in DB or no cache -> Fetch from Surepass
       const currentBureau = typeof activeBureau !== "undefined" ? activeBureau : formData.bureau;
