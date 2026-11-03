@@ -6,6 +6,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { ScrollProgress } from "@/components/ScrollProgress";
 import { siteConfig } from "@/lib/config";
+import { defaultOgImage } from "@/lib/seo";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -41,11 +42,13 @@ export const metadata: Metadata = {
     siteName: siteConfig.name,
     type: "website",
     locale: "en_IN",
+    images: [defaultOgImage],
   },
   twitter: {
     card: "summary_large_image",
     title: `${siteConfig.name} — Debt Consolidation & Personal Loans`,
     description: "Explore debt consolidation, balance transfer and personal loans through our lending network. Check your options.",
+    images: [defaultOgImage.url],
   },
   icons: {
     icon: [
@@ -85,9 +88,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-full flex flex-col bg-background text-brand-black [font-feature-settings:'ss01'] overflow-x-hidden">
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-VNY6TW0ZW0"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
         />
-        <Script id="google-analytics" strategy="afterInteractive">
+        <Script id="google-analytics" strategy="lazyOnload">
           {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}

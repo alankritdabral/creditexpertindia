@@ -60,7 +60,7 @@ export const AnimatedCreditCard = () => {
   };
 
   return (
-    <div className="flex items-center justify-center w-full -mt-68">
+    <div className="flex items-center justify-center w-full">
       <motion.div
         initial="hidden"
         whileInView="visible"
@@ -76,7 +76,7 @@ export const AnimatedCreditCard = () => {
       >
         <motion.div style={{ rotateX, rotateY }} transition={springTransition} className="w-full">
           <motion.div
-            className="relative w-full aspect-[1.58] max-w-[320px] mx-auto overflow-hidden rounded-[20px] bg-gradient-to-br from-[#123E8A] to-[#2D8CFF] p-5 shadow-[0_15px_40px_rgba(45,140,255,0.3)] mb-4 flex flex-col justify-between"
+            className="relative w-full aspect-[1.58] max-w-[320px] mx-auto overflow-hidden rounded-[20px] bg-gradient-to-br from-[#0A2540] to-[#0066FF] p-5 shadow-[0_15px_40px_rgba(45,140,255,0.3)] flex flex-col justify-between"
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -117,8 +117,8 @@ export const AnimatedCreditCard = () => {
                   viewport={{ once: true }}
                   transition={{ delay: 0.8, duration: CARD_ANIMATION_DURATION }}
                 >
-                  <div className="text-[8px] md:text-[9px] opacity-70 uppercase tracking-widest mb-0.5">Card Holder</div>
-                  <div className="font-medium text-[11px] md:text-[13px] drop-shadow-sm">{cardData.holder}</div>
+                  <div className="text-[11px] md:text-[11px] opacity-70 uppercase tracking-widest mb-0.5">Card Holder</div>
+                  <div className="font-medium text-[11px] md:text-sm drop-shadow-sm">{cardData.holder}</div>
                 </motion.div>
 
                 <motion.div
@@ -127,8 +127,8 @@ export const AnimatedCreditCard = () => {
                   viewport={{ once: true }}
                   transition={{ delay: 1, duration: CARD_ANIMATION_DURATION }}
                 >
-                  <div className="text-[8px] md:text-[9px] opacity-70 uppercase tracking-widest mb-0.5">Expires</div>
-                  <div className="font-medium text-[11px] md:text-[13px] drop-shadow-sm">
+                  <div className="text-[11px] md:text-[11px] opacity-70 uppercase tracking-widest mb-0.5">Expires</div>
+                  <div className="font-medium text-[11px] md:text-sm drop-shadow-sm">
                     {cardData.expiry}
                   </div>
                 </motion.div>
@@ -145,7 +145,7 @@ export const AnimatedCreditCard = () => {
                 }}
               >
                 <span>VISA</span>
-                <div className="w-2 h-2 rounded-full bg-[#12B878] shadow-[0_0_8px_rgba(18,184,120,0.8)]" />
+                <div className="w-2 h-2 rounded-full bg-[#15803D] shadow-[0_0_8px_rgba(18,184,120,0.8)]" />
               </motion.div>
             </div>
           </motion.div>

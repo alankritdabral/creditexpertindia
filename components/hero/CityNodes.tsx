@@ -35,14 +35,14 @@ export function CityNodes({ activeCity }: { activeCity: string | null }) {
             {/* Center dot */}
             <mesh>
               <circleGeometry args={[0.02, 16]} />
-              <meshBasicMaterial color={isActive ? "#16B364" : "#35D6C7"} />
+              <meshBasicMaterial color={isActive ? "#15803D" : "#0066FF"} />
             </mesh>
             
             {/* Pulsing ring */}
             <mesh userData={{ isRing: true, cityName: city.name }} position={[0, 0, -0.01]}>
               <ringGeometry args={[0.025, 0.035, 32]} />
               <meshBasicMaterial 
-                color={isActive ? "#16B364" : "#5B5CFF"} 
+                color={isActive ? "#15803D" : "#0066FF"} 
                 transparent 
                 opacity={0.3} 
                 side={THREE.DoubleSide} 
@@ -52,7 +52,7 @@ export function CityNodes({ activeCity }: { activeCity: string | null }) {
             {/* Soft glow */}
             <mesh position={[0, 0, -0.02]}>
               <circleGeometry args={[0.06, 16]} />
-              <meshBasicMaterial color={isActive ? "#16B364" : "#5B5CFF"} transparent opacity={0.15} />
+              <meshBasicMaterial color={isActive ? "#15803D" : "#0066FF"} transparent opacity={0.15} />
             </mesh>
           </group>
         );

@@ -1,5 +1,4 @@
 'use client';
-import { motion, Variants } from 'framer-motion';
 import {
   Accordion,
   AccordionContent,
@@ -38,63 +37,41 @@ const faqs = [
   }
 ];
 
-const containerVariants: Variants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1
-    }
-  }
-};
-
-const itemVariants: Variants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.5,
-      ease: [0.22, 1, 0.36, 1]
-    }
-  }
-};
-
 export function FAQ() {
   return (
-    <div id="faq" className="w-full h-full flex flex-col">
-      <div className="mb-10 text-center">
-        <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-brand-black mb-2">
-          Questions, answered.
-        </h2>
-        <p className="text-sm text-brand-black/70">Common questions about loan consolidation and how we help.</p>
-      </div>
+    <div id="faq" className="@container w-full text-[#0A2540]">
+      <div className="grid grid-cols-1 @3xl:grid-cols-[5fr_7fr] gap-8 @3xl:gap-16">
+        <div className="@3xl:sticky @3xl:top-28 self-start">
+          <h2 className="text-[48px] sm:text-[56px] @3xl:text-[56px] leading-[1.0] tracking-[-0.04em] font-bold">
+            You&apos;re probably wondering&hellip;
+          </h2>
+          <p className="mt-5 text-lg leading-relaxed text-[#0A2540] max-w-sm">
+            These are the questions people ask us before anything else. We&apos;ve answered them
+            straight.
+          </p>
+        </div>
 
-      <motion.div 
-        variants={containerVariants}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: "-50px" }}
-      >
-        <Accordion type="single" collapsible className="w-full divide-y divide-slate-100">
+        <Accordion type="single" collapsible className="w-full">
           {faqs.map((faq, index) => (
-            <motion.div variants={itemVariants} key={index}>
-              <AccordionItem value={`item-${index}`} className="border-b-0 py-2">
-                <AccordionTrigger className="hover:no-underline [&[data-state=open]>span]:text-blue-energy group text-brand-black">
-                  <div className="flex-1 px-4 text-center">
-                    <span className="text-base font-bold leading-7 group-hover:text-blue-energy transition-colors">{faq.question}</span>
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent className="mt-2 text-center px-8">
-                  <p className="text-sm leading-relaxed text-brand-black/70 font-medium py-1 max-w-2xl mx-auto bg-slate-50 rounded-lg p-4">
-                    {faq.answer}
-                  </p>
-                </AccordionContent>
-              </AccordionItem>
-            </motion.div>
+            <AccordionItem
+              value={`item-${index}`}
+              key={index}
+              className="border-b-0 mb-2 px-4 md:px-6 data-[state=open]:bg-[#e6eefb] transition-colors"
+            >
+              <AccordionTrigger className="hover:no-underline text-left gap-6 py-5 group">
+                <span className="text-[21px] md:text-[26px] leading-snug font-semibold tracking-[-0.015em] text-[#0A2540] group-hover:text-[#0052CC] transition-colors">
+                  {faq.question}
+                </span>
+              </AccordionTrigger>
+              <AccordionContent className="pb-6 pr-8">
+                <p className="text-base md:text-lg leading-relaxed text-[#0A2540] max-w-xl">
+                  {faq.answer}
+                </p>
+              </AccordionContent>
+            </AccordionItem>
           ))}
         </Accordion>
-      </motion.div>
+      </div>
     </div>
   );
 }

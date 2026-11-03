@@ -13,10 +13,10 @@ if (typeof window !== "undefined") {
 const INJECTED_STYLES = `
   /* Realistic iPhone Mockup Hardware */
   .iphone-bezel {
-      background-color: #071B4F;
+      background-color: #0A2540;
       box-shadow: 
-          inset 0 0 0 2px #123B87, 
-          inset 0 0 0 7px #071B4F, 
+          inset 0 0 0 2px #0A2540, 
+          inset 0 0 0 7px #0A2540, 
           0 40px 80px -15px rgba(7,27,79,0.5),
           0 15px 25px -5px rgba(7,27,79,0.4);
       transform-style: preserve-3d;
@@ -35,7 +35,7 @@ const INJECTED_STYLES = `
   .ambient-gradient {
       background: 
           radial-gradient(circle at 70% 25%, rgba(45, 140, 255, 0.25), transparent 45%),
-          linear-gradient(180deg, #123B87 0%, #0c2b69 55%, #071B4F 100%);
+          linear-gradient(180deg, #0A2540 0%, #0c2b69 55%, #0A2540 100%);
   }
 
   .phone-screen {
@@ -213,7 +213,7 @@ export function AnimatedPhoneMockup({ className }: { className?: string }) {
                 </div>
                 <div className="flex flex-col">
                   <span className="font-semibold text-white text-[18px] leading-tight">Personal Loan</span>
-                  <span className="text-[12px] text-white/[0.65] font-normal leading-tight mt-0.5">HDFC Bank</span>
+                  <span className="text-xs text-white/[0.65] font-normal leading-tight mt-0.5">HDFC Bank</span>
                 </div>
               </div>
               <div className="w-[32px] h-[32px] rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center cursor-pointer">
@@ -230,16 +230,16 @@ export function AnimatedPhoneMockup({ className }: { className?: string }) {
                     <line x1="2" y1="10" x2="22" y2="10"></line>
                   </svg>
                 </div>
-                <p className="ui-fade-up text-[14px] text-white/[0.72] font-medium">Current EMI</p>
+                <p className="ui-fade-up text-sm text-white/[0.72] font-medium">Current EMI</p>
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex flex-col">
                   <p ref={currentRef} className="ui-slide-right text-[32px] font-bold text-white leading-none">₹0</p>
-                  <p className="ui-fade-up text-[13px] text-white/[0.55] font-normal mt-1">per month</p>
+                  <p className="ui-fade-up text-sm text-white/[0.55] font-normal mt-1">per month</p>
                 </div>
-                <div className="ui-scale-in bg-[rgba(45,140,255,0.15)] border border-[rgba(45,140,255,0.45)] text-[#6bb0ff] px-2.5 py-1.5 rounded-[12px] flex flex-col items-center">
-                  <span className="text-[14px] font-semibold leading-none mb-0.5">16.5%</span>
-                  <span className="text-[10px] font-medium leading-none text-[#6bb0ff]">interest rate</span>
+                <div className="ui-scale-in bg-[rgba(45,140,255,0.15)] border border-[rgba(45,140,255,0.45)] text-[#BFDBFE] px-2.5 py-1.5 rounded-[12px] flex flex-col items-center">
+                  <span className="text-sm font-semibold leading-none mb-0.5">16.5%</span>
+                  <span className="text-[11px] font-medium leading-none text-[#BFDBFE]">interest rate</span>
                 </div>
               </div>
             </div>
@@ -262,16 +262,16 @@ export function AnimatedPhoneMockup({ className }: { className?: string }) {
                     <line x1="2" y1="10" x2="22" y2="10"></line>
                   </svg>
                 </div>
-                <p className="ui-fade-up text-[14px] text-white/[0.72] font-medium">New EMI</p>
+                <p className="ui-fade-up text-sm text-white/[0.72] font-medium">New EMI</p>
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex flex-col">
                   <p ref={newRef} className="ui-slide-right text-[32px] font-bold text-white leading-none">₹0</p>
-                  <p className="ui-fade-up text-[13px] text-white/[0.55] font-normal mt-1">per month</p>
+                  <p className="ui-fade-up text-sm text-white/[0.55] font-normal mt-1">per month</p>
                 </div>
-                <div className="ui-scale-in bg-[rgba(18,184,120,0.20)] border border-[rgba(18,184,120,0.50)] text-[#12B878] px-2.5 py-1.5 rounded-[12px] flex flex-col items-center">
-                  <span className="text-[14px] font-semibold leading-none mb-0.5">9.99%</span>
-                  <span className="text-[10px] font-medium leading-none text-[#12B878]">interest rate</span>
+                <div className="ui-scale-in bg-[rgba(18,184,120,0.20)] border border-[rgba(18,184,120,0.50)] text-[#15803D] px-2.5 py-1.5 rounded-[12px] flex flex-col items-center">
+                  <span className="text-sm font-semibold leading-none mb-0.5">9.99%</span>
+                  <span className="text-[11px] font-medium leading-none text-[#15803D]">interest rate</span>
                 </div>
               </div>
             </div>
@@ -283,9 +283,9 @@ export function AnimatedPhoneMockup({ className }: { className?: string }) {
                   <Check className="w-5 h-5" />
                 </div>
                 <div className="flex flex-col">
-                  <p className="ui-fade-up text-[14px] text-white/90 font-medium mb-1">You could save</p>
+                  <p className="ui-fade-up text-sm text-white/90 font-medium mb-1">You could save</p>
                   <p ref={savingsRef} className="ui-slide-right text-[32px] font-bold text-white leading-tight mb-1">₹0</p>
-                  <p className="ui-fade-up text-[14px] text-white/70 font-medium">every month</p>
+                  <p className="ui-fade-up text-sm text-white/70 font-medium">every month</p>
                 </div>
               </div>
             </div>

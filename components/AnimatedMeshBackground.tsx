@@ -54,7 +54,7 @@ export function AnimatedMeshBackground() {
           repeat: Infinity,
           ease: "linear"
         }}
-        className="absolute top-[20%] left-[20%] w-[50%] h-[60%] rounded-full bg-[#E2D6CC] opacity-80 blur-[80px]"
+        className="absolute top-[20%] left-[20%] w-[50%] h-[60%] rounded-full bg-[#E2E8F0] opacity-80 blur-[80px]"
       />
     </div>
   );

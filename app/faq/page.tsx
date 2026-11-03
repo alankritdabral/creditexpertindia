@@ -1,13 +1,15 @@
 import { Metadata } from "next";
+import { buildMetadata } from "@/lib/seo";
 import { FAQ } from "@/components/FAQ";
 import { LeadForm } from "@/components/LeadForm";
-import { AnimatedMeshBackground } from "@/components/AnimatedMeshBackground";
+import { ProductHero } from "@/components/ProductHero";
 
-export const metadata: Metadata = {
-  title: "Frequently Asked Questions (FAQ)",
-  description: "Find answers to all common questions about debt consolidation, personal loans, interest rates, CIBIL score impact, and lender approval.",
-  alternates: { canonical: "/faq" },
-};
+export const metadata: Metadata = buildMetadata({
+  title: "Frequently Asked Questions",
+  description:
+    "Find answers to all common questions about debt consolidation, personal loans, interest rates, CIBIL score impact, and lender approval.",
+  path: "/faq",
+});
 
 const faqPageSchema = {
   "@context": "https://schema.org",
@@ -74,31 +76,25 @@ const faqPageSchema = {
 
 export default function FAQPage() {
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqPageSchema) }}
       />
       
-      <section className="relative w-full pt-32 pb-24 lg:pt-40 lg:pb-32 bg-background overflow-hidden border-b border-icy-blue">
-        <div className="absolute inset-0 -z-10 h-full w-full">
-          <AnimatedMeshBackground />
-          <div className="absolute top-0 right-0 w-full h-full max-w-[60%] transform origin-top-right -skew-y-12 bg-gradient-to-bl from-[#E2D6CC]/40 to-transparent pointer-events-none" />
-        </div>
-        <div className="container-narrow text-center relative z-10">
-          <span className="text-xs font-extrabold uppercase tracking-widest text-brand-black/80">
-            HELP CENTER
-          </span>
-          <h1 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl text-brand-black">
-            Frequently Asked Questions
-          </h1>
-          <p className="mt-3 max-w-2xl mx-auto text-sm text-brand-black/80 font-medium">
-            Clear, honest answers to the most common questions regarding loan options and debt advisory.
-          </p>
+      <ProductHero
+        title="Questions? Good. Ask away."
+        body="Clear, honest answers about loan options and how we help. If yours isn't here, just ask us directly."
+        cta="Ask us directly"
+        image="/Misty India Skyline with Orbital Arcs.webp"
+        points={["Straight answers, no jargon", "Free to ask", "A real person replies"]}
+      />
+
+      <section className="bg-white">
+        <div className="max-w-[1220px] mx-auto px-4 md:px-6 lg:px-8 py-16 md:py-24">
+          <FAQ />
         </div>
       </section>
-
-      <FAQ />
       <LeadForm />
     </div>
   );

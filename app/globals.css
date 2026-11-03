@@ -15,13 +15,13 @@
   --muted-slate: #64748d;
 
   /* Brand / Action Colors */
-  --primary-brand: #533afd;
-  --primary-strong: #635bff;
-  --primary-hover: #4434d4;
-  --secondary-border: #b9b9f9;
+  --primary-brand: #0066ff;
+  --primary-strong: #1a75ff;
+  --primary-hover: #0052cc;
+  --secondary-border: #bfdbfe;
 
   /* Accent / Status Colors */
-  --success-green: #15be53;
+  --success-green: #15803D;
   --warning-lemon: #9b6829;
   --error-ruby: #df1b41;
   --magenta-midpoint: #f96bee;
@@ -68,10 +68,11 @@
   --shadow-xl: var(--shadow-level-3);
   --shadow-2xl: var(--shadow-level-4);
 
-  /* Force font weights down to match Stripe's lightweight editorial aesthetic globally */
-  --font-weight-bold: 500;
-  --font-weight-extrabold: 500;
-  --font-weight-black: 500;
+  /* Single strong weight (600) so bold/semibold/extrabold/black render identically */
+  --font-weight-semibold: 600;
+  --font-weight-bold: 600;
+  --font-weight-extrabold: 600;
+  --font-weight-black: 600;
 
   /* Force hardcoded legacy colors in components to map to Stripe CIELAB colors globally */
   --color-slate-900: var(--ink-deep);
@@ -165,7 +166,7 @@ body {
 }
 
 .text-gradient-emerald {
-  background: linear-gradient(135deg, #10B981 0%, #34D399 100%);
+  background: linear-gradient(135deg, #15803D 0%, #34D399 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -386,3 +387,62 @@ input[type="range"]::-webkit-slider-runnable-track {
   }
 }
 
+
+/* ── Performance ── */
+.reveal-on-scroll {
+  opacity: 0;
+  transform: translate3d(0, 28px, 0);
+  transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.reveal-on-scroll[data-visible="true"] {
+  opacity: 1;
+  transform: none;
+}
+
+/* Skip rendering work for off-screen homepage sections until they near the viewport */
+.reveal-on-scroll {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 600px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal-on-scroll { opacity: 1; transform: none; transition: none; }
+  .animate-marquee, .animate-pulse-glow { animation: none; }
+}
+
+/* Backdrop blur is expensive on weak GPUs */
+@media (max-width: 1023px) {
+  .glass-card, .glass-card-dark { backdrop-filter: none; -webkit-backdrop-filter: none; }
+}
+
+/* Stripe-style layered card elevation: tight contact shadow + soft blue-tinted ambient lift */
+:root {
+  --shadow-card:
+    0 0 0 1px rgba(10, 37, 64, 0.04),
+    0 2px 5px rgba(10, 37, 64, 0.05),
+    0 12px 28px -10px rgba(50, 50, 93, 0.16),
+    0 30px 60px -30px rgba(50, 50, 93, 0.14);
+  --shadow-card-hover:
+    0 0 0 1px rgba(10, 37, 64, 0.05),
+    0 4px 8px rgba(10, 37, 64, 0.06),
+    0 20px 40px -12px rgba(50, 50, 93, 0.22),
+    0 40px 80px -32px rgba(50, 50, 93, 0.2);
+}
+
+.card-elevated {
+  box-shadow: var(--shadow-card);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .card-lift {
+    transition: transform 250ms cubic-bezier(0.23, 1, 0.32, 1), box-shadow 250ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  .card-lift:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-card-hover);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-lift, .card-lift:hover { transition: none; transform: none; }
+}

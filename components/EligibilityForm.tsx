@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, Check, Plus, Trash2, User, Phone, Mail, MapPin, Briefcase, Building2, Shield, CreditCard, Loader2, AlertCircle, ChevronDown, ChevronUp, Download, RotateCw, X, KeyRound } from "lucide-react";
+import { ArrowRight, Check, CheckCircle2, Plus, Trash2, User, Phone, Mail, MapPin, Briefcase, Building2, Shield, CreditCard, Loader2, AlertCircle, ChevronDown, ChevronUp, Download, RotateCw, X, KeyRound } from "lucide-react";
 import dynamic from "next/dynamic";
 import { collection, doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebaseClient";
@@ -22,8 +22,6 @@ const CreditReportDashboard = dynamic(
     ),
   }
 );
-import { auth } from "@/lib/firebaseClient";
-import { getTeamSession } from "@/app/team/actions";
 import { logSystemEvent } from "@/lib/logger";
 
 const getPrefixes = (str: string) => {
@@ -57,31 +55,12 @@ export function EligibilityForm() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [isAdmin, setIsAdmin] = useState(false);
-
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      setIsAdmin(!!user);
-    });
-    return () => unsubscribe();
-  }, []);
-
-  const [teamBranch, setTeamBranch] = useState<string | null>(null);
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [otpDigits, setOtpDigits] = useState<string[]>(["", "", "", ""]);
   const [otpLoading, setOtpLoading] = useState(false);
   const [otpError, setOtpError] = useState<string | null>(null);
   const [otpCooldown, setOtpCooldown] = useState(0);
   const otpInputRefs = useRef<(HTMLInputElement | null)[]>([]);
-
-  useEffect(() => {
-    getTeamSession().then(session => {
-      if (session) {
-        setTeamBranch(session);
-        setFormData(prev => ({ ...prev, bureau: "experian" }));
-      }
-    });
-  }, []);
 
   // Cooldown countdown timer for OTP resend
   useEffect(() => {
@@ -103,32 +82,6 @@ export function EligibilityForm() {
 
   const [cibilData, setCibilData] = useState<any>(null);
   const [manualLoans, setManualLoans] = useState<any[]>([]);
-
-  const [showHistoryModal, setShowHistoryModal] = useState(false);
-  const [historyReports, setHistoryReports] = useState<any[]>([]);
-  const [loadingHistory, setLoadingHistory] = useState(false);
-
-  const fetchBranchHistory = async (force = false) => {
-    setShowHistoryModal(true);
-    if (!force && historyReports.length > 0) {
-      return;
-    }
-    setLoadingHistory(true);
-    try {
-      const res = await fetch(`/api/admin/reports?branch=${teamBranch}&limit=50`);
-      const data = await res.json();
-      if (data.success) {
-        setHistoryReports(data.reports);
-      }
-    } catch (e) {
-      console.error(e);
-    }
-    setLoadingHistory(false);
-  };
-
-
-
-
 
   const processFetchedReport = (reportData: any) => {
     setCibilData(reportData);
@@ -172,11 +125,7 @@ export function EligibilityForm() {
     setError(null);
     setLoading(true);
 
-    if (!teamBranch && !isAdmin) {
-      handleRequestOtp(false);
-    } else {
-      proceedToFetchReport();
-    }
+    handleRequestOtp(false);
   };
 
   const handleRequestOtp = async (isResend = false) => {
@@ -570,7 +519,7 @@ export function EligibilityForm() {
             pdf_link: data.data?.web_token_url || data.data?.credit_report_link || null,
             raw_api_data: data.data, // Save the full response to rebuild dashboard later
             created_at: serverTimestamp(),
-            branch: teamBranch ? teamBranch : (isAdmin ? "admin" : "customer"),
+            branch: "customer",
             search_tokens: generateSearchTokens(fullName, formData.mobile, safePan),
             ...(fallbackData && { fallbackData })
           });
@@ -605,20 +554,6 @@ export function EligibilityForm() {
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
             <div className="flex items-center justify-between mb-6">
               <h3 id="credit-profile-identity" className="text-2xl font-bold text-brand-black scroll-mt-28">Credit Profile & Identity</h3>
-              <div className="flex gap-2">
-                {isAdmin && (
-                  <div className="flex items-center gap-1.5 px-3 py-1 bg-purple-50 border border-purple-100 rounded-full text-purple-600 shadow-sm" title="Logged in as Admin">
-                    <Shield className="w-4 h-4" />
-                    <span className="text-xs font-bold uppercase tracking-wider">Admin</span>
-                  </div>
-                )}
-                {teamBranch && (
-                  <div className="flex items-center gap-1.5 px-3 py-1 bg-blue-50 border border-blue-100 rounded-full text-blue-600 shadow-sm" title="Logged in as">
-                    <User className="w-4 h-4" />
-                    <span className="text-xs font-bold uppercase tracking-wider">{teamBranch}</span>
-                  </div>
-                )}
-              </div>
             </div>
             <div className="space-y-4">
               <div className="flex flex-col gap-4">
@@ -674,27 +609,6 @@ export function EligibilityForm() {
                 </div>
               )}
 
-              {/* Bureau Selection */}
-              {(teamBranch || isAdmin) && (
-                <div className="pt-2">
-                  <p className="text-sm font-semibold text-brand-black mb-3">Select Credit Bureau</p>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <label className={`flex items-center gap-2 p-3 border rounded-xl transition-all ${!isAdmin ? 'opacity-50 cursor-not-allowed bg-slate-50 border-icy-blue' : formData.bureau === 'v1_json' ? 'border-blue-energy bg-blue-50/50 cursor-pointer' : 'border-icy-blue hover:bg-slate-50 cursor-pointer'}`}>
-                      <input type="radio" name="bureau" value="v1_json" disabled={!isAdmin} checked={formData.bureau === 'v1_json'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className={`w-4 h-4 ${!isAdmin ? 'text-slate-400 cursor-not-allowed' : 'text-blue-energy accent-blue-energy'}`} />
-                      <span className={`text-sm font-medium ${!isAdmin ? 'text-slate-500' : 'text-brand-black/90'}`}>CIBIL</span>
-                    </label>
-                    <label className={`flex items-center gap-2 p-3 border rounded-xl transition-all ${!isAdmin ? 'opacity-50 cursor-not-allowed bg-slate-50 border-icy-blue' : formData.bureau === 'crif_json' ? 'border-blue-energy bg-blue-50/50 cursor-pointer' : 'border-icy-blue hover:bg-slate-50 cursor-pointer'}`}>
-                      <input type="radio" name="bureau" value="crif_json" disabled={!isAdmin} checked={formData.bureau === 'crif_json'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className={`w-4 h-4 ${!isAdmin ? 'disabled:opacity-50' : ''} text-blue-energy accent-blue-energy`} />
-                      <span className={`text-sm font-medium ${!isAdmin ? 'text-slate-500' : 'text-brand-black/90'}`}>CRIF</span>
-                    </label>
-                    <label className={`flex items-center gap-2 p-3 border rounded-xl cursor-pointer transition-all ${formData.bureau === 'experian' ? 'border-blue-energy bg-blue-50/50' : 'border-icy-blue hover:bg-slate-50'}`}>
-                      <input type="radio" name="bureau" value="experian" checked={formData.bureau === 'experian'} onChange={e => setFormData({ ...formData, bureau: e.target.value })} className="w-4 h-4 text-blue-energy accent-blue-energy" />
-                      <span className="text-sm font-medium text-brand-black/90">Experian</span>
-                    </label>
-                  </div>
-                </div>
-              )}
-
               <label className="flex items-start gap-3 p-4 border border-icy-blue rounded-xl cursor-pointer hover:bg-slate-50 transition-colors mt-4">
                 <input
                   type="checkbox"
@@ -733,112 +647,53 @@ export function EligibilityForm() {
   };
 
   return (
-    <div id="check-eligibility" className="w-full max-w-4xl mx-auto flex flex-col justify-center h-full">
-      <div className="mb-10 text-center relative">
-        <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-brand-black mb-4">See your options</h2>
-        <p className="text-lg text-brand-black/70">Take a minute to tell us about your situation.</p>
-        {teamBranch && step === 1 && (
-          <button
-            onClick={() => fetchBranchHistory()}
-            className="md:absolute right-0 top-0 mt-4 md:mt-2 bg-white border border-slate-200 text-slate-600 px-4 py-2 rounded-lg text-sm font-bold shadow-sm hover:bg-slate-50 transition-colors"
-          >
-            {loadingHistory ? <Loader2 className="w-4 h-4 animate-spin inline mr-2" /> : null}
-            Customer History
-          </button>
+    <div id="check-eligibility" className="w-full max-w-[1220px] mx-auto flex flex-col justify-center h-full">
+      <div className={step === 1 ? "grid grid-cols-1 lg:grid-cols-[5fr_7fr] gap-10 lg:gap-16 items-start" : ""}>
+        {step === 1 ? (
+          <div className="bg-primary-hover text-white p-8 md:p-12 lg:sticky lg:top-28">
+            <h2 className="text-3xl sm:text-4xl leading-[1.15] tracking-tight font-semibold">
+              See what you could save, in about two minutes.
+            </h2>
+            <p className="mt-5 text-base leading-7 text-white/85">
+              Tell us a little about yourself. We look at your credit profile the way a lender would,
+              so what we tell you is realistic, not a sales pitch.
+            </p>
+            <ul className="mt-8 space-y-3 text-base leading-6 text-white">
+              {[
+                "We never ask you to pay anything.",
+                "Your details stay with us unless you say otherwise.",
+                "You decide what happens next.",
+              ].map((item) => (
+                <li key={item} className="flex items-start gap-3">
+                  <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-white/70" aria-hidden />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : (
+          <div className="mb-8 text-center">
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-brand-black mb-2">See your options</h2>
+            <p className="text-lg text-brand-black/70">Here&apos;s what we found.</p>
+          </div>
         )}
-      </div>
 
-      <div className="w-full bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-icy-blue/60 overflow-hidden">
-        <div className="p-8 md:p-12">
-          <AnimatePresence mode="wait">
-            {renderStep()}
-          </AnimatePresence>
+        <div className={`w-full bg-white overflow-hidden card-elevated ${step === 1 ? "" : "max-w-4xl mx-auto"}`}>
+          <div className="p-8 md:p-12">
+            <AnimatePresence mode="wait">
+              {renderStep()}
+            </AnimatePresence>
 
-          {step === 1 && (
-            <div className="flex items-center justify-center gap-2 pt-8 text-xs text-slate-400">
-              <Shield className="w-3.5 h-3.5" />
-              <span>Your information is secure and never shared without consent.</span>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {showHistoryModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-4xl max-h-[85vh] flex flex-col">
-            <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50 rounded-t-2xl">
-              <div className="flex items-center gap-2">
-                <h3 className="font-bold text-lg text-slate-800">Recently Accessed Reports ({teamBranch})</h3>
-                <button
-                  onClick={() => fetchBranchHistory(true)}
-                  title="Refresh branch reports from database"
-                  className="p-1 hover:bg-slate-200 rounded-md text-slate-600 transition-colors"
-                >
-                  <RotateCw className={`w-4 h-4 ${loadingHistory ? "animate-spin" : ""}`} />
-                </button>
+            {step === 1 && (
+              <div className="flex items-center gap-2 pt-8 text-sm text-slate-500">
+                <Shield className="w-4 h-4" />
+                <span>Your information is secure and never shared without consent.</span>
               </div>
-              <button onClick={() => setShowHistoryModal(false)} className="p-1 hover:bg-slate-200 rounded-md text-slate-500 transition-colors">
-                <span className="text-xl leading-none">&times;</span>
-              </button>
-            </div>
-            <div className="p-4 overflow-y-auto">
-              {loadingHistory ? (
-                <div className="flex items-center justify-center p-12">
-                  <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
-                </div>
-              ) : historyReports.length === 0 ? (
-                <div className="p-12 text-center text-slate-500">No reports found for this branch.</div>
-              ) : (
-                <table className="w-full text-left text-sm">
-                  <thead>
-                    <tr className="border-b border-slate-200 text-slate-500 font-bold uppercase text-xs">
-                      <th className="pb-3">Name</th>
-                      <th className="pb-3">PAN</th>
-                      <th className="pb-3">Score</th>
-                      <th className="pb-3">Date</th>
-                      <th className="pb-3 text-right">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    {historyReports.map((r, i) => (
-                      <tr key={i} className="hover:bg-slate-50 transition-colors">
-                        <td className="py-4 font-bold text-slate-800">{r.name}</td>
-                        <td className="py-4 text-slate-600">
-                          <div>{r.pan || "No PAN"}</div>
-                        </td>
-                        <td className="py-4 font-bold text-lg">{r.credit_score || "-"}</td>
-                        <td className="py-4 text-slate-500">
-                          {r.created_at ? new Date(r.created_at.seconds * 1000).toLocaleDateString() : "-"}
-                        </td>
-                        <td className="py-4 text-right">
-                          <button
-                            onClick={async () => {
-                              setShowHistoryModal(false);
-                              try {
-                                const res = await fetch(`/api/admin/reports/${r.id}`);
-                                const apiData = await res.json();
-                                if (apiData.success) {
-                                  setFormData({ ...formData, bureau: apiData.report.bureau, pan: apiData.report.pan, mobile: apiData.report.mobile });
-                                  processFetchedReport(apiData.report.raw_api_data);
-                                }
-                              } catch (e) {
-                                console.error(e);
-                              }
-                            }}
-                            className="text-xs font-bold px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
-                          >
-                            Open Report
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
-            </div>
+            )}
           </div>
         </div>
-      )}
+      </div>
+
       {/* MessageBot SMS OTP Verification Modal */}
       <AnimatePresence>
         {showOtpModal && (

@@ -343,7 +343,7 @@ function CreditReportDashboardInner({ bureau, cibilData, formData }: any) {
           {/* CIBIL Dashboard */}
           <div className="mb-10">
             {isDownloadingSection === 'basic' && (
-              <h3 className="text-xl font-bold bg-[#382F2A] text-white p-3 rounded-lg mb-6 uppercase tracking-wider text-center">Section 1: Basic Details</h3>
+              <h3 className="text-xl font-bold bg-[#0A2540] text-white p-3 rounded-lg mb-6 uppercase tracking-wider text-center">Section 1: Basic Details</h3>
             )}
             {formData?.fallbackWarning && !isPreparingDownload && (
               <div className="mb-6 p-4 rounded-xl bg-amber-50 border border-amber-200 flex items-start gap-3">
@@ -381,26 +381,26 @@ function CreditReportDashboardInner({ bureau, cibilData, formData }: any) {
                         Save Changes
                       </button>
                     )}
-                    <div className="flex items-center gap-1 bg-indigo-50 p-1 rounded-full border border-indigo-100">
-                      <button onClick={() => handleDownloadImage('basic')} disabled={isDownloadingImage} className="text-[10px] font-bold px-3 py-1 bg-white text-indigo-700 rounded-full hover:bg-indigo-600 hover:text-white transition-colors shadow-sm flex items-center gap-1 disabled:opacity-50">
+                    <div className="flex items-center gap-1 bg-blue-50 p-1 rounded-full border border-blue-100">
+                      <button onClick={() => handleDownloadImage('basic')} disabled={isDownloadingImage} className="text-[11px] font-bold px-3 py-1 bg-white text-blue-700 rounded-full hover:bg-blue-600 hover:text-white transition-colors shadow-sm flex items-center gap-1 disabled:opacity-50">
                         {isDownloadingSection === 'basic' ? <Loader2 className="w-3 h-3 animate-spin" /> : <Download className="w-3 h-3" />} Basic
                       </button>
-                      <button onClick={() => handleDownloadImage('loans')} disabled={isDownloadingImage} className="text-[10px] font-bold px-3 py-1 bg-white text-indigo-700 rounded-full hover:bg-indigo-600 hover:text-white transition-colors shadow-sm flex items-center gap-1 disabled:opacity-50">
+                      <button onClick={() => handleDownloadImage('loans')} disabled={isDownloadingImage} className="text-[11px] font-bold px-3 py-1 bg-white text-blue-700 rounded-full hover:bg-blue-600 hover:text-white transition-colors shadow-sm flex items-center gap-1 disabled:opacity-50">
                         {isDownloadingSection === 'loans' ? <Loader2 className="w-3 h-3 animate-spin" /> : <Download className="w-3 h-3" />} Loans
                       </button>
-                      <button onClick={() => handleDownloadImage('eligibility')} disabled={isDownloadingImage} className="text-[10px] font-bold px-3 py-1 bg-white text-indigo-700 rounded-full hover:bg-indigo-600 hover:text-white transition-colors shadow-sm flex items-center gap-1 disabled:opacity-50">
+                      <button onClick={() => handleDownloadImage('eligibility')} disabled={isDownloadingImage} className="text-[11px] font-bold px-3 py-1 bg-white text-blue-700 rounded-full hover:bg-blue-600 hover:text-white transition-colors shadow-sm flex items-center gap-1 disabled:opacity-50">
                         {isDownloadingSection === 'eligibility' ? <Loader2 className="w-3 h-3 animate-spin" /> : <Download className="w-3 h-3" />} Elig.
                       </button>
                     </div>
                   </>
                 )}
-                <span className="text-xs font-semibold px-3 py-1.5 bg-[#F1EFE7] text-[#4A3D36] rounded-full">Updated: {new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
+                <span className="text-xs font-semibold px-3 py-1.5 bg-[#F8FAFC] text-[#0A2540] rounded-full">Updated: {new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
               </div>
             </div>
 
             {/* Score Hero Card */}
-            <div className="bg-gradient-to-br from-[#FAF8F5] to-[#F1EFE7] rounded-3xl p-6 border border-[#EBE6DD] mb-6 shadow-sm flex flex-col items-center justify-center text-center">
-              <h4 className="text-xs font-extrabold tracking-widest uppercase text-[#8B7C73] mb-4">Your Credit Score</h4>
+            <div className="bg-gradient-to-br from-[#F8FAFC] to-[#F8FAFC] rounded-3xl p-6 border border-[#E2E8F0] mb-6 shadow-sm flex flex-col items-center justify-center text-center">
+              <h4 className="text-xs font-extrabold tracking-widest uppercase text-[#64748B] mb-4">Your Credit Score</h4>
 
               <div className="relative w-40 h-40 flex flex-col items-center justify-center">
                 <svg viewBox="0 0 36 36" className="absolute top-0 left-0 w-full h-full transform -rotate-90">
@@ -423,17 +423,17 @@ function CreditReportDashboardInner({ bureau, cibilData, formData }: any) {
                     />
                   )}
                 </svg>
-                <span className="text-4xl font-extrabold text-[#382F2A] relative z-10">{score || "N/A"}</span>
+                <span className="text-4xl font-extrabold text-[#0A2540] relative z-10">{score || "N/A"}</span>
                 {score && <span className={`text-sm font-bold mt-1 ${scoreColor} relative z-10`}>{scoreLabel}</span>}
               </div>
 
               {parsed.personalInfo?.scoreName && (
                 <div className="mt-4 flex flex-col items-center">
-                  <span className="text-xs font-semibold text-[#8B7C73] bg-[#EBE6DD] px-3 py-1 rounded-full uppercase tracking-wider">
+                  <span className="text-xs font-semibold text-[#64748B] bg-[#E2E8F0] px-3 py-1 rounded-full uppercase tracking-wider">
                     {parsed.personalInfo.scoreName}
                   </span>
                   {parsed.personalInfo.scoreDescription && (
-                    <span className="text-xs font-bold text-[#382F2A] mt-2">
+                    <span className="text-xs font-bold text-[#0A2540] mt-2">
                       Grade: {parsed.personalInfo.scoreDescription}
                     </span>
                   )}
@@ -443,15 +443,15 @@ function CreditReportDashboardInner({ bureau, cibilData, formData }: any) {
 
             {/* Score Factors */}
             {parsed.personalInfo?.factors && parsed.personalInfo.factors.length > 0 && (
-              <div className="bg-white border border-[#EBE6DD] rounded-3xl p-5 mb-6 shadow-sm">
-                <h4 className="text-sm font-extrabold text-[#382F2A] mb-4">Credit Score Factors</h4>
+              <div className="bg-white border border-[#E2E8F0] rounded-3xl p-5 mb-6 card-elevated">
+                <h4 className="text-sm font-extrabold text-[#0A2540] mb-4">Credit Score Factors</h4>
                 <div className="space-y-3">
                   {parsed.personalInfo.factors.map((factor: any, idx: number) => (
-                    <div key={idx} className="flex items-start gap-3 bg-[#FAF8F5] p-3 rounded-xl border border-[#EBE6DD]">
-                      <div className="bg-[#EBE6DD] text-[#8B7C73] text-[10px] font-bold px-2 py-1 rounded">
+                    <div key={idx} className="flex items-start gap-3 bg-[#F8FAFC] p-3 rounded-xl border border-[#E2E8F0]">
+                      <div className="bg-[#E2E8F0] text-[#64748B] text-[11px] font-bold px-2 py-1 rounded">
                         {factor.TYPE}
                       </div>
-                      <p className="text-xs font-medium text-[#382F2A] leading-relaxed flex-1">
+                      <p className="text-xs font-medium text-[#0A2540] leading-relaxed flex-1">
                         {factor.DESC}
                       </p>
                     </div>
@@ -462,16 +462,16 @@ function CreditReportDashboardInner({ bureau, cibilData, formData }: any) {
 
 
             {/* Contact Information */}
-            <div className="bg-white border border-[#EBE6DD] rounded-3xl p-5 mb-6 shadow-sm">
-              <h4 className="text-lg font-bold text-[#382F2A] mb-4">Contact Information</h4>
+            <div className="bg-white border border-[#E2E8F0] rounded-3xl p-5 mb-6 card-elevated">
+              <h4 className="text-lg font-bold text-[#0A2540] mb-4">Contact Information</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-[#FAF8F5] border border-[#EBE6DD] rounded-2xl p-4">
-                  <p className="text-[#8B7C73] text-xs font-semibold mb-1 uppercase tracking-wider">Latest Email</p>
-                  <p className="text-[#382F2A] font-medium text-sm break-all">{contactInfo.latestEmail}</p>
+                <div className="bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl p-4">
+                  <p className="text-[#64748B] text-xs font-semibold mb-1 uppercase tracking-wider">Latest Email</p>
+                  <p className="text-[#0A2540] font-medium text-sm break-all">{contactInfo.latestEmail}</p>
                 </div>
-                <div className="bg-[#FAF8F5] border border-[#EBE6DD] rounded-2xl p-4">
-                  <p className="text-[#8B7C73] text-xs font-semibold mb-1 uppercase tracking-wider">Latest Address</p>
-                  <p className="text-[#382F2A] font-medium text-sm">{contactInfo.latestAddress}</p>
+                <div className="bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl p-4">
+                  <p className="text-[#64748B] text-xs font-semibold mb-1 uppercase tracking-wider">Latest Address</p>
+                  <p className="text-[#0A2540] font-medium text-sm">{contactInfo.latestAddress}</p>
                 </div>
               </div>
             </div>
@@ -479,7 +479,7 @@ function CreditReportDashboardInner({ bureau, cibilData, formData }: any) {
             {/* Credit Overview */}
             {accountSummary && (
               <>
-                <h4 className="text-lg font-bold text-[#382F2A] mb-4">Credit Overview</h4>
+                <h4 className="text-lg font-bold text-[#0A2540] mb-4">Credit Overview</h4>
                 <div className="grid grid-cols-2 gap-3 mb-6">
                   {[
                     { label: "Total Accounts", value: accountSummary?.totalAccounts || 0 },
@@ -489,9 +489,9 @@ function CreditReportDashboardInner({ bureau, cibilData, formData }: any) {
                     { label: "Overdue Accounts", value: accountSummary?.overdueAccounts || 0 },
                     { label: "Closed Accounts", value: accountSummary?.zeroBalanceAccounts || 0 }
                   ].map((stat, i) => (
-                    <div key={i} className="bg-[#FAF8F5] border border-[#EBE6DD] rounded-2xl p-4">
-                      <p className="text-[#8B7C73] text-xs font-semibold mb-1">{stat.label}</p>
-                      <p className="text-[#382F2A] font-extrabold text-sm">{stat.value}</p>
+                    <div key={i} className="bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl p-4">
+                      <p className="text-[#64748B] text-xs font-semibold mb-1">{stat.label}</p>
+                      <p className="text-[#0A2540] font-extrabold text-sm">{stat.value}</p>
                     </div>
                   ))}
                 </div>
@@ -523,43 +523,43 @@ function CreditReportDashboardInner({ bureau, cibilData, formData }: any) {
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                 {/* Enquiries Summary */}
                 {inquirySummary && (
-                  <div className="bg-[#FAF8F5] border border-[#EBE6DD] rounded-3xl p-5 mb-6">
-                    <h4 className="text-sm font-extrabold text-[#382F2A] mb-4">Credit Enquiries</h4>
-                    <div className="flex items-center justify-between gap-2 text-center border-b border-[#EBE6DD] pb-4 mb-4">
+                  <div className="bg-[#F8FAFC] border border-[#E2E8F0] rounded-3xl p-5 mb-6">
+                    <h4 className="text-sm font-extrabold text-[#0A2540] mb-4">Credit Enquiries</h4>
+                    <div className="flex items-center justify-between gap-2 text-center border-b border-[#E2E8F0] pb-4 mb-4">
                       <div>
-                        <p className="text-xl font-bold text-[#382F2A]">{inquirySummary?.totalInquiry || 0}</p>
-                        <p className="text-[10px] uppercase tracking-wider font-semibold text-[#8B7C73]">Total</p>
+                        <p className="text-xl font-bold text-[#0A2540]">{inquirySummary?.totalInquiry || 0}</p>
+                        <p className="text-[11px] uppercase tracking-wider font-semibold text-[#64748B]">Total</p>
                       </div>
                       {inquirySummary?.inquiryPast30Days !== undefined && (
                         <>
-                          <div className="w-px h-8 bg-[#EBE6DD]"></div>
+                          <div className="w-px h-8 bg-[#E2E8F0]"></div>
                           <div>
-                            <p className="text-xl font-bold text-[#382F2A]">{inquirySummary?.inquiryPast30Days || 0}</p>
-                            <p className="text-[10px] uppercase tracking-wider font-semibold text-[#8B7C73]">30 Days</p>
+                            <p className="text-xl font-bold text-[#0A2540]">{inquirySummary?.inquiryPast30Days || 0}</p>
+                            <p className="text-[11px] uppercase tracking-wider font-semibold text-[#64748B]">30 Days</p>
                           </div>
                         </>
                       )}
                       {inquirySummary?.inquiryPast12Months !== undefined && (
                         <>
-                          <div className="w-px h-8 bg-[#EBE6DD]"></div>
+                          <div className="w-px h-8 bg-[#E2E8F0]"></div>
                           <div>
-                            <p className="text-xl font-bold text-[#382F2A]">{inquirySummary?.inquiryPast12Months || 0}</p>
-                            <p className="text-[10px] uppercase tracking-wider font-semibold text-[#8B7C73]">12 Mos</p>
+                            <p className="text-xl font-bold text-[#0A2540]">{inquirySummary?.inquiryPast12Months || 0}</p>
+                            <p className="text-[11px] uppercase tracking-wider font-semibold text-[#64748B]">12 Mos</p>
                           </div>
                         </>
                       )}
                       {inquirySummary?.inquiryPast24Months !== undefined && (
                         <>
-                          <div className="w-px h-8 bg-[#EBE6DD]"></div>
+                          <div className="w-px h-8 bg-[#E2E8F0]"></div>
                           <div>
-                            <p className="text-xl font-bold text-[#382F2A]">{inquirySummary?.inquiryPast24Months || 0}</p>
-                            <p className="text-[10px] uppercase tracking-wider font-semibold text-[#8B7C73]">24 Mos</p>
+                            <p className="text-xl font-bold text-[#0A2540]">{inquirySummary?.inquiryPast24Months || 0}</p>
+                            <p className="text-[11px] uppercase tracking-wider font-semibold text-[#64748B]">24 Mos</p>
                           </div>
                         </>
                       )}
                     </div>
-                    <p className="text-[11px] text-[#8B7C73] leading-relaxed">
-                      <span className="font-bold text-[#382F2A]">Note:</span> Frequent credit enquiries can be one factor considered in credit assessment. The impact depends on the overall credit profile.
+                    <p className="text-[11px] text-[#64748B] leading-relaxed">
+                      <span className="font-bold text-[#0A2540]">Note:</span> Frequent credit enquiries can be one factor considered in credit assessment. The impact depends on the overall credit profile.
                     </p>
                   </div>
                 )}
@@ -568,19 +568,19 @@ function CreditReportDashboardInner({ bureau, cibilData, formData }: any) {
                 {/* Enquiries List */}
                 {enquiries && enquiries.length > 0 && (
                   <div className="mb-6">
-                    <h4 className="text-lg font-bold text-[#382F2A] mb-4">Recent Enquiries</h4>
+                    <h4 className="text-lg font-bold text-[#0A2540] mb-4">Recent Enquiries</h4>
                     <div className="space-y-3">
                       {enquiries.map((enq: any, i: number) => (
-                        <div key={i} className="bg-white border border-[#EBE6DD] rounded-2xl p-4 shadow-sm flex items-center justify-between">
+                        <div key={i} className="bg-white border border-[#E2E8F0] rounded-2xl p-4 card-elevated flex items-center justify-between">
                           <div className="text-left">
-                            <p className="text-sm font-bold text-[#382F2A]">{enq.memberShortName || 'Unknown Lender'}</p>
-                            <p className="text-xs font-semibold text-[#8B7C73] mt-0.5">Date: {enq.enquiryDate || 'N/A'}</p>
+                            <p className="text-sm font-bold text-[#0A2540]">{enq.memberShortName || 'Unknown Lender'}</p>
+                            <p className="text-xs font-semibold text-[#64748B] mt-0.5">Date: {enq.enquiryDate || 'N/A'}</p>
                           </div>
                           <div className="text-right">
                             {Number(enq.enquiryAmount) > 0 && (
                               <>
-                                <p className="text-sm font-bold text-[#382F2A]">₹{Number(enq.enquiryAmount).toLocaleString('en-IN')}</p>
-                                <p className="text-[10px] font-semibold text-[#8B7C73] uppercase tracking-wider mt-0.5">Amount</p>
+                                <p className="text-sm font-bold text-[#0A2540]">₹{Number(enq.enquiryAmount).toLocaleString('en-IN')}</p>
+                                <p className="text-[11px] font-semibold text-[#64748B] uppercase tracking-wider mt-0.5">Amount</p>
                               </>
                             )}
                           </div>
@@ -601,49 +601,49 @@ function CreditReportDashboardInner({ bureau, cibilData, formData }: any) {
                 {/* Accounts List */}
                 {activeAccounts && activeAccounts.length > 0 && (
                   <div>
-                    <h4 className="text-lg font-bold text-[#382F2A] mb-4">Ongoing Loans</h4>
+                    <h4 className="text-lg font-bold text-[#0A2540] mb-4">Ongoing Loans</h4>
                     <div className="space-y-3">
                       {activeAccounts.map((acc: any, i: number) => {
                         const isExpanded = expandedAccount === acc.accountNumber;
                         return (
-                          <div key={i} className="bg-white border border-[#EBE6DD] rounded-2xl overflow-hidden transition-all shadow-sm">
-                            <div className="w-full flex items-center justify-between p-4 bg-[#FAF8F5] border-b border-[#EBE6DD]">
+                          <div key={i} className="bg-white border border-[#E2E8F0] rounded-2xl overflow-hidden transition-all card-elevated">
+                            <div className="w-full flex items-center justify-between p-4 bg-[#F8FAFC] border-b border-[#E2E8F0]">
                               <div className="text-left">
-                                <p className="text-sm font-bold text-[#382F2A]">{acc.memberShortName || 'Unknown Lender'}</p>
-                                <p className="text-xs font-semibold text-[#8B7C73] mt-0.5">{acc.accountType || 'Unknown Type'}</p>
+                                <p className="text-sm font-bold text-[#0A2540]">{acc.memberShortName || 'Unknown Lender'}</p>
+                                <p className="text-xs font-semibold text-[#64748B] mt-0.5">{acc.accountType || 'Unknown Type'}</p>
                               </div>
                               <div className="flex items-center gap-3">
                                 <div className="text-right">
-                                  <p className="text-sm font-bold text-[#382F2A]">₹{Number(acc.currentBalance || 0).toLocaleString('en-IN')}</p>
-                                  <p className="text-[10px] font-semibold text-[#8B7C73] uppercase tracking-wider mt-0.5">Balance</p>
+                                  <p className="text-sm font-bold text-[#0A2540]">₹{Number(acc.currentBalance || 0).toLocaleString('en-IN')}</p>
+                                  <p className="text-[11px] font-semibold text-[#64748B] uppercase tracking-wider mt-0.5">Balance</p>
                                 </div>
                               </div>
                             </div>
 
                             <div className="p-4 grid grid-cols-2 gap-y-4 gap-x-2 bg-white">
                               <div>
-                                <p className="text-[10px] font-bold text-[#8B7C73] uppercase">Account Number</p>
-                                <p className="text-sm font-semibold text-[#382F2A]">{acc.accountNumber || 'N/A'}</p>
+                                <p className="text-[11px] font-bold text-[#64748B] uppercase">Account Number</p>
+                                <p className="text-sm font-semibold text-[#0A2540]">{acc.accountNumber || 'N/A'}</p>
                               </div>
                               <div>
-                                <p className="text-[10px] font-bold text-[#8B7C73] uppercase">High Credit</p>
-                                <p className="text-sm font-semibold text-[#382F2A]">₹{Number(acc.highCreditAmount || 0).toLocaleString('en-IN')}</p>
+                                <p className="text-[11px] font-bold text-[#64748B] uppercase">High Credit</p>
+                                <p className="text-sm font-semibold text-[#0A2540]">₹{Number(acc.highCreditAmount || 0).toLocaleString('en-IN')}</p>
                               </div>
                               <div>
-                                <p className="text-[10px] font-bold text-[#8B7C73] uppercase">EMI</p>
-                                <p className="text-sm font-semibold text-[#382F2A]">{acc.emiAmount ? `₹${Number(acc.emiAmount).toLocaleString('en-IN')}` : 'N/A'}</p>
+                                <p className="text-[11px] font-bold text-[#64748B] uppercase">EMI</p>
+                                <p className="text-sm font-semibold text-[#0A2540]">{acc.emiAmount ? `₹${Number(acc.emiAmount).toLocaleString('en-IN')}` : 'N/A'}</p>
                               </div>
                               <div>
-                                <p className="text-[10px] font-bold text-[#8B7C73] uppercase">Interest Rate</p>
-                                <p className="text-sm font-semibold text-[#382F2A]">{acc.interest_rate ? `${acc.interest_rate}%` : 'N/A'}</p>
+                                <p className="text-[11px] font-bold text-[#64748B] uppercase">Interest Rate</p>
+                                <p className="text-sm font-semibold text-[#0A2540]">{acc.interest_rate ? `${acc.interest_rate}%` : 'N/A'}</p>
                               </div>
                               <div>
-                                <p className="text-[10px] font-bold text-[#8B7C73] uppercase">Date Opened</p>
-                                <p className="text-sm font-semibold text-[#382F2A]">{acc.dateOpened || 'N/A'}</p>
+                                <p className="text-[11px] font-bold text-[#64748B] uppercase">Date Opened</p>
+                                <p className="text-sm font-semibold text-[#0A2540]">{acc.dateOpened || 'N/A'}</p>
                               </div>
                               <div>
-                                <p className="text-[10px] font-bold text-[#8B7C73] uppercase">Date Reported</p>
-                                <p className="text-sm font-semibold text-[#382F2A]">{acc.dateReported || 'N/A'}</p>
+                                <p className="text-[11px] font-bold text-[#64748B] uppercase">Date Reported</p>
+                                <p className="text-sm font-semibold text-[#0A2540]">{acc.dateReported || 'N/A'}</p>
                               </div>
                             </div>
                           </div>
@@ -667,26 +667,26 @@ function CreditReportDashboardInner({ bureau, cibilData, formData }: any) {
                 {/* Accounts List */}
                 {closedAccounts && closedAccounts.length > 0 && (
                   <div>
-                    <h4 className="text-lg font-bold text-[#382F2A] mb-4">Closed Loans</h4>
+                    <h4 className="text-lg font-bold text-[#0A2540] mb-4">Closed Loans</h4>
                     <div className="space-y-3">
                       {closedAccounts.map((acc: any, i: number) => {
                         const isExpanded = expandedAccount === acc.accountNumber;
                         return (
-                          <div key={i} className="bg-white border border-[#EBE6DD] rounded-2xl overflow-hidden transition-all shadow-sm">
+                          <div key={i} className="bg-white border border-[#E2E8F0] rounded-2xl overflow-hidden transition-all card-elevated">
                             <button
                               onClick={() => setExpandedAccount(isExpanded ? null : acc.accountNumber)}
-                              className="w-full flex items-center justify-between p-4 hover:bg-[#FAF8F5] transition-colors"
+                              className="w-full flex items-center justify-between p-4 hover:bg-[#F8FAFC] transition-colors"
                             >
                               <div className="text-left">
-                                <p className="text-sm font-bold text-[#382F2A]">{acc.memberShortName || 'Unknown Lender'}</p>
-                                <p className="text-xs font-semibold text-[#8B7C73] mt-0.5">{acc.accountType || 'Unknown Type'}</p>
+                                <p className="text-sm font-bold text-[#0A2540]">{acc.memberShortName || 'Unknown Lender'}</p>
+                                <p className="text-xs font-semibold text-[#64748B] mt-0.5">{acc.accountType || 'Unknown Type'}</p>
                               </div>
                               <div className="flex items-center gap-3">
                                 <div className="text-right">
-                                  <p className="text-sm font-bold text-[#382F2A]">₹{Number(acc.currentBalance || 0).toLocaleString('en-IN')}</p>
-                                  <p className="text-[10px] font-semibold text-[#8B7C73] uppercase tracking-wider mt-0.5">Balance</p>
+                                  <p className="text-sm font-bold text-[#0A2540]">₹{Number(acc.currentBalance || 0).toLocaleString('en-IN')}</p>
+                                  <p className="text-[11px] font-semibold text-[#64748B] uppercase tracking-wider mt-0.5">Balance</p>
                                 </div>
-                                {isExpanded ? <ChevronUp className="w-4 h-4 text-[#8B7C73]" /> : <ChevronDown className="w-4 h-4 text-[#8B7C73]" />}
+                                {isExpanded ? <ChevronUp className="w-4 h-4 text-[#64748B]" /> : <ChevronDown className="w-4 h-4 text-[#64748B]" />}
                               </div>
                             </button>
 
@@ -696,32 +696,32 @@ function CreditReportDashboardInner({ bureau, cibilData, formData }: any) {
                                   initial={{ height: 0, opacity: 0 }}
                                   animate={{ height: "auto", opacity: 1 }}
                                   exit={{ height: 0, opacity: 0 }}
-                                  className="border-t border-[#EBE6DD]"
+                                  className="border-t border-[#E2E8F0]"
                                 >
-                                  <div className="p-4 grid grid-cols-2 gap-y-4 gap-x-2 bg-[#FAF8F5]">
+                                  <div className="p-4 grid grid-cols-2 gap-y-4 gap-x-2 bg-[#F8FAFC]">
                                     <div>
-                                      <p className="text-[10px] font-bold text-[#8B7C73] uppercase">Account Number</p>
-                                      <p className="text-sm font-semibold text-[#382F2A]">{acc.accountNumber || 'N/A'}</p>
+                                      <p className="text-[11px] font-bold text-[#64748B] uppercase">Account Number</p>
+                                      <p className="text-sm font-semibold text-[#0A2540]">{acc.accountNumber || 'N/A'}</p>
                                     </div>
                                     <div>
-                                      <p className="text-[10px] font-bold text-[#8B7C73] uppercase">High Credit</p>
-                                      <p className="text-sm font-semibold text-[#382F2A]">₹{Number(acc.highCreditAmount || 0).toLocaleString('en-IN')}</p>
+                                      <p className="text-[11px] font-bold text-[#64748B] uppercase">High Credit</p>
+                                      <p className="text-sm font-semibold text-[#0A2540]">₹{Number(acc.highCreditAmount || 0).toLocaleString('en-IN')}</p>
                                     </div>
                                     <div>
-                                      <p className="text-[10px] font-bold text-[#8B7C73] uppercase">EMI</p>
-                                      <p className="text-sm font-semibold text-[#382F2A]">{acc.emiAmount ? `₹${Number(acc.emiAmount).toLocaleString('en-IN')}` : 'N/A'}</p>
+                                      <p className="text-[11px] font-bold text-[#64748B] uppercase">EMI</p>
+                                      <p className="text-sm font-semibold text-[#0A2540]">{acc.emiAmount ? `₹${Number(acc.emiAmount).toLocaleString('en-IN')}` : 'N/A'}</p>
                                     </div>
                                     <div>
-                                      <p className="text-[10px] font-bold text-[#8B7C73] uppercase">Interest Rate</p>
-                                      <p className="text-sm font-semibold text-[#382F2A]">{acc.interest_rate ? `${acc.interest_rate}%` : 'N/A'}</p>
+                                      <p className="text-[11px] font-bold text-[#64748B] uppercase">Interest Rate</p>
+                                      <p className="text-sm font-semibold text-[#0A2540]">{acc.interest_rate ? `${acc.interest_rate}%` : 'N/A'}</p>
                                     </div>
                                     <div>
-                                      <p className="text-[10px] font-bold text-[#8B7C73] uppercase">Date Opened</p>
-                                      <p className="text-sm font-semibold text-[#382F2A]">{acc.dateOpened || 'N/A'}</p>
+                                      <p className="text-[11px] font-bold text-[#64748B] uppercase">Date Opened</p>
+                                      <p className="text-sm font-semibold text-[#0A2540]">{acc.dateOpened || 'N/A'}</p>
                                     </div>
                                     <div>
-                                      <p className="text-[10px] font-bold text-[#8B7C73] uppercase">Date Reported</p>
-                                      <p className="text-sm font-semibold text-[#382F2A]">{acc.dateReported || 'N/A'}</p>
+                                      <p className="text-[11px] font-bold text-[#64748B] uppercase">Date Reported</p>
+                                      <p className="text-sm font-semibold text-[#0A2540]">{acc.dateReported || 'N/A'}</p>
                                     </div>
                                   </div>
                                 </motion.div>
@@ -748,22 +748,22 @@ function CreditReportDashboardInner({ bureau, cibilData, formData }: any) {
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
               {/* Equifax Personal Info (Fallback) */}
               {(!isPreparingDownload || isDownloadingSection === 'eligibility') && (isEquifax || isCrif) && (
-                <div className="bg-[#FAF8F5] border border-[#EBE6DD] rounded-3xl p-5 mb-6">
-                  <h4 className="text-sm font-extrabold text-[#382F2A] mb-4">{isEquifax ? 'Equifax' : 'CRIF'} Profile Data</h4>
+                <div className="bg-[#F8FAFC] border border-[#E2E8F0] rounded-3xl p-5 mb-6">
+                  <h4 className="text-sm font-extrabold text-[#0A2540] mb-4">{isEquifax ? 'Equifax' : 'CRIF'} Profile Data</h4>
                   {equifaxPersonalInfo && (
                     <div className="grid grid-cols-2 gap-4 mb-4">
                       <div>
-                        <p className="text-[10px] uppercase tracking-wider font-bold text-[#8B7C73]">Name</p>
-                        <p className="text-sm font-bold text-[#382F2A]">{equifaxPersonalInfo.Name?.FullName || 'N/A'}</p>
+                        <p className="text-[11px] uppercase tracking-wider font-bold text-[#64748B]">Name</p>
+                        <p className="text-sm font-bold text-[#0A2540]">{equifaxPersonalInfo.Name?.FullName || 'N/A'}</p>
                       </div>
                       <div>
-                        <p className="text-[10px] uppercase tracking-wider font-bold text-[#8B7C73]">Date of Birth</p>
-                        <p className="text-sm font-bold text-[#382F2A]">{equifaxPersonalInfo.DateOfBirth || 'N/A'}</p>
+                        <p className="text-[11px] uppercase tracking-wider font-bold text-[#64748B]">Date of Birth</p>
+                        <p className="text-sm font-bold text-[#0A2540]">{equifaxPersonalInfo.DateOfBirth || 'N/A'}</p>
                       </div>
                     </div>
                   )}
-                  <div className="p-3 bg-white border border-[#EBE6DD] rounded-xl text-center">
-                    <p className="text-xs text-[#8B7C73] leading-relaxed">
+                  <div className="p-3 bg-white border border-[#E2E8F0] rounded-xl text-center">
+                    <p className="text-xs text-[#64748B] leading-relaxed">
                       {isEquifax ? 'Equifax' : 'CRIF'} does not return detailed credit accounts in their JSON response.
                       <br />Please use the <strong>{isEquifax ? 'Equifax' : 'CRIF'} (PDF)</strong> option to view full account details.
                     </p>
@@ -777,16 +777,16 @@ function CreditReportDashboardInner({ bureau, cibilData, formData }: any) {
               {(!isPreparingDownload || isDownloadingSection === 'loans') && (
                 <div ref={loansRef} className={`mb-6 ${isDownloadingSection === 'loans' ? 'bg-white p-4 mb-4' : ''}`}>
                   {isDownloadingSection === 'loans' && (
-                    <h3 className="text-xl font-bold bg-[#382F2A] text-white p-3 rounded-lg mt-8 mb-6 uppercase tracking-wider text-center">Section 2: Loans (Overrides)</h3>
+                    <h3 className="text-xl font-bold bg-[#0A2540] text-white p-3 rounded-lg mt-8 mb-6 uppercase tracking-wider text-center">Section 2: Loans (Overrides)</h3>
                   )}
-                  <h4 className="text-lg font-bold text-[#382F2A] mb-4">Complete Profile for Accurate Eligibility</h4>
+                  <h4 className="text-lg font-bold text-[#0A2540] mb-4">Complete Profile for Accurate Eligibility</h4>
 
                   <div className="bg-slate-50 border border-icy-blue rounded-2xl p-5 mb-6">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div>
                         <label className="text-xs font-semibold text-brand-black/80 mb-1 flex justify-between items-center">
                           <span>Net Monthly Salary</span>
-                          <div className="flex items-center gap-2 text-[10px] font-bold">
+                          <div className="flex items-center gap-2 text-[11px] font-bold">
                             <span className={`px-2 py-0.5 rounded-full ${totalCurrentEMI > maxEmiCapacity ? 'bg-red-50 text-red-600' : 'bg-slate-100 text-brand-black/80'}`}>
                               Used EMI: ₹{totalCurrentEMI.toLocaleString('en-IN')}
                             </span>
@@ -820,7 +820,7 @@ function CreditReportDashboardInner({ bureau, cibilData, formData }: any) {
                         <label className="text-xs font-semibold text-brand-black/80 mb-1 flex justify-between items-center">
                           <span>Employer</span>
                           {userOverrides.companyCategory && userOverrides.companyCategory !== 'Unknown' && (
-                            <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
+                            <span className="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
                               Tier: {userOverrides.companyCategory}
                             </span>
                           )}
@@ -871,7 +871,7 @@ function CreditReportDashboardInner({ bureau, cibilData, formData }: any) {
                                     >
                                       <span>{e.name}</span>
                                       {e.tier !== 'Unknown' && (
-                                        <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
+                                        <span className="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
                                           Tier: {e.tier}
                                         </span>
                                       )}
@@ -1109,18 +1109,18 @@ function CreditReportDashboardInner({ bureau, cibilData, formData }: any) {
                     )}
                   </div>
 
-                  <h4 className="text-lg font-bold text-[#382F2A] mb-4">Review Open Loans</h4>
+                  <h4 className="text-lg font-bold text-[#0A2540] mb-4">Review Open Loans</h4>
                   <div className="space-y-4 mb-8">
                     {mappedAccounts.length === 0 && <p className="text-sm text-brand-black/70">No active loans found to evaluate.</p>}
                     {mappedAccounts.map((loan: any, idx: number) => {
                       const l = loanOverrides[loan.id] || {};
                       return (
-                        <div key={`${loan.id}-${idx}`} className="bg-white border border-[#EBE6DD] rounded-2xl p-4 shadow-sm">
+                        <div key={`${loan.id}-${idx}`} className="bg-white border border-[#E2E8F0] rounded-2xl p-4 card-elevated">
                           <div className="flex justify-between items-center mb-3 border-b border-slate-100 pb-2">
                             <div className="flex items-center gap-2">
-                              <p className="font-bold text-sm text-[#382F2A]">Loan #{idx + 1} - {loan.originalType}</p>
+                              <p className="font-bold text-sm text-[#0A2540]">Loan #{idx + 1} - {loan.originalType}</p>
                               {loan.pastDueAmount > 0 && (
-                                <span className="bg-red-100 text-red-600 px-2 py-0.5 rounded-full text-[10px] font-bold border border-red-200">
+                                <span className="bg-red-100 text-red-600 px-2 py-0.5 rounded-full text-[11px] font-bold border border-red-200">
                                   Overdue: ₹{loan.pastDueAmount.toLocaleString('en-IN')}
                                 </span>
                               )}
@@ -1148,27 +1148,27 @@ function CreditReportDashboardInner({ bureau, cibilData, formData }: any) {
                           </div>
                           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                             <div>
-                              <label className="text-[10px] uppercase font-bold text-[#8B7C73]">Bank / NBFC</label>
+                              <label className="text-[11px] uppercase font-bold text-[#64748B]">Bank / NBFC</label>
                               {isDownloadingSection === 'loans' ? (
-                                <p className="text-sm font-semibold text-[#382F2A] px-2 py-1.5">{l.bankName !== undefined ? l.bankName : (loan.bankName || "")}</p>
+                                <p className="text-sm font-semibold text-[#0A2540] px-2 py-1.5">{l.bankName !== undefined ? l.bankName : (loan.bankName || "")}</p>
                               ) : (
                                 <input
                                   type="text"
                                   value={l.bankName !== undefined ? l.bankName : (loan.bankName || "")}
                                   onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), bankName: e.target.value } }))}
-                                  className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-energy"
+                                  className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-energy"
                                 />
                               )}
                             </div>
                             <div>
-                              <label className="text-[10px] uppercase font-bold text-[#8B7C73]">Type</label>
+                              <label className="text-[11px] uppercase font-bold text-[#64748B]">Type</label>
                               {isDownloadingSection === 'loans' ? (
-                                <p className="text-sm font-semibold text-[#382F2A] px-2 py-1.5">{l.type !== undefined ? l.type : (loan.type || "Personal Loan")}</p>
+                                <p className="text-sm font-semibold text-[#0A2540] px-2 py-1.5">{l.type !== undefined ? l.type : (loan.type || "Personal Loan")}</p>
                               ) : (
                                 <select
                                   value={l.type !== undefined ? l.type : (loan.type || "Personal Loan")}
                                   onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), type: e.target.value } }))}
-                                  className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-energy"
+                                  className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-energy"
                                 >
                                   <optgroup label="Generally Non-Transferable (Category A)">
                                     {['Car Loan', 'Home Loan', 'LAP', 'Gold Loan', 'Consumer Loan', 'Education Loan'].map(t => <option key={t} value={t}>{t}</option>)}
@@ -1181,48 +1181,48 @@ function CreditReportDashboardInner({ bureau, cibilData, formData }: any) {
                               )}
                             </div>
                             <div>
-                              <label className="text-[10px] uppercase font-bold text-[#8B7C73]">{loan.type === 'Overdraft' ? 'Amount Drawn' : 'Orig. Amount'}</label>
+                              <label className="text-[11px] uppercase font-bold text-[#64748B]">{loan.type === 'Overdraft' ? 'Amount Drawn' : 'Orig. Amount'}</label>
                               {isDownloadingSection === 'loans' ? (
-                                <p className="text-sm font-semibold text-[#382F2A] px-2 py-1.5">{l.originalAmount !== undefined ? l.originalAmount : (loan.originalAmount || "")}</p>
+                                <p className="text-sm font-semibold text-[#0A2540] px-2 py-1.5">{l.originalAmount !== undefined ? l.originalAmount : (loan.originalAmount || "")}</p>
                               ) : (
                                 <input
                                   type="number"
                                   value={l.originalAmount !== undefined ? l.originalAmount : (loan.originalAmount || "")}
                                   onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), originalAmount: e.target.value } }))}
-                                  className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-energy"
+                                  className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-energy"
                                 />
                               )}
                             </div>
                             <div>
-                              <label className="text-[10px] uppercase font-bold text-[#8B7C73]">Current Bal.</label>
+                              <label className="text-[11px] uppercase font-bold text-[#64748B]">Current Bal.</label>
                               {isDownloadingSection === 'loans' ? (
-                                <p className="text-sm font-semibold text-[#382F2A] px-2 py-1.5">{l.currentOutstanding !== undefined ? l.currentOutstanding : (loan.currentOutstanding || "")}</p>
+                                <p className="text-sm font-semibold text-[#0A2540] px-2 py-1.5">{l.currentOutstanding !== undefined ? l.currentOutstanding : (loan.currentOutstanding || "")}</p>
                               ) : (
                                 <input
                                   type="number"
                                   value={l.currentOutstanding !== undefined ? l.currentOutstanding : (loan.currentOutstanding || "")}
                                   onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), currentOutstanding: e.target.value } }))}
-                                  className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-energy"
+                                  className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-energy"
                                 />
                               )}
                             </div>
                             <div>
-                              <label className="text-[10px] uppercase font-bold text-[#8B7C73]">Date Issue</label>
+                              <label className="text-[11px] uppercase font-bold text-[#64748B]">Date Issue</label>
                               {isDownloadingSection === 'loans' ? (
-                                <p className="text-sm font-semibold text-[#382F2A] px-2 py-1.5">{l.dateOpened !== undefined ? l.dateOpened : (loan.dateOpened || "")}</p>
+                                <p className="text-sm font-semibold text-[#0A2540] px-2 py-1.5">{l.dateOpened !== undefined ? l.dateOpened : (loan.dateOpened || "")}</p>
                               ) : (
                                 <input
                                   type="text"
                                   value={l.dateOpened !== undefined ? l.dateOpened : (loan.dateOpened || "")}
                                   onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), dateOpened: e.target.value } }))}
-                                  className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-energy"
+                                  className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-energy"
                                 />
                               )}
                             </div>
                             <div>
-                              <label className="text-[10px] uppercase font-bold text-[#8B7C73]">{loan.type === 'Overdraft' ? 'OD Plan' : 'Tenure (Mos)'}</label>
+                              <label className="text-[11px] uppercase font-bold text-[#64748B]">{loan.type === 'Overdraft' ? 'OD Plan' : 'Tenure (Mos)'}</label>
                               {isDownloadingSection === 'loans' ? (
-                                <p className="text-sm font-semibold text-[#382F2A] px-2 py-1.5">
+                                <p className="text-sm font-semibold text-[#0A2540] px-2 py-1.5">
                                   {loan.type === 'Overdraft' ?
                                     (l.odPlan !== undefined ? l.odPlan : (loan.odPlan || "2yr"))
                                     : (l.tenure !== undefined ? l.tenure : (loan.tenure || ""))}
@@ -1232,7 +1232,7 @@ function CreditReportDashboardInner({ bureau, cibilData, formData }: any) {
                                   <select
                                     value={l.odPlan !== undefined ? l.odPlan : (loan.odPlan || "2yr")}
                                     onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), odPlan: e.target.value } }))}
-                                    className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-energy"
+                                    className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-energy"
                                   >
                                     <option value="2yr">2 Years</option>
                                     <option value="3yr">3 Years</option>
@@ -1242,34 +1242,34 @@ function CreditReportDashboardInner({ bureau, cibilData, formData }: any) {
                                     type="number"
                                     value={l.tenure !== undefined ? l.tenure : (loan.tenure || "")}
                                     onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), tenure: e.target.value } }))}
-                                    className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-energy"
+                                    className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-energy"
                                   />
                                 )
                               )}
                             </div>
                             <div>
-                              <label className="text-[10px] uppercase font-bold text-[#8B7C73]">EMI</label>
+                              <label className="text-[11px] uppercase font-bold text-[#64748B]">EMI</label>
                               {isDownloadingSection === 'loans' ? (
-                                <p className="text-sm font-semibold text-[#382F2A] px-2 py-1.5">{l.emi !== undefined ? l.emi : (loan.emi || "")}</p>
+                                <p className="text-sm font-semibold text-[#0A2540] px-2 py-1.5">{l.emi !== undefined ? l.emi : (loan.emi || "")}</p>
                               ) : (
                                 <input
                                   type="number"
                                   value={l.emi !== undefined ? l.emi : (loan.emi || "")}
                                   onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), emi: e.target.value } }))}
-                                  className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-energy"
+                                  className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-energy"
                                 />
                               )}
                             </div>
                             <div>
-                              <label className="text-[10px] uppercase font-bold text-[#8B7C73]">Rate %</label>
+                              <label className="text-[11px] uppercase font-bold text-[#64748B]">Rate %</label>
                               {isDownloadingSection === 'loans' ? (
-                                <p className="text-sm font-semibold text-[#382F2A] px-2 py-1.5">{l.rate !== undefined ? l.rate : (loan.rate || "")}</p>
+                                <p className="text-sm font-semibold text-[#0A2540] px-2 py-1.5">{l.rate !== undefined ? l.rate : (loan.rate || "")}</p>
                               ) : (
                                 <input
                                   type="number"
                                   value={l.rate !== undefined ? l.rate : (loan.rate || "")}
                                   onChange={e => setLoanOverrides((prev: any) => ({ ...prev, [loan.id]: { ...(prev[loan.id] || {}), rate: e.target.value } }))}
-                                  className="w-full bg-[#FAF8F5] border border-[#EBE6DD] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-energy"
+                                  className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-energy"
                                 />
                               )}
                             </div>
@@ -1293,9 +1293,9 @@ function CreditReportDashboardInner({ bureau, cibilData, formData }: any) {
               {(!isPreparingDownload || isDownloadingSection === 'eligibility') && (
                 <div ref={eligRef} className={`mb-6 ${isDownloadingSection === 'eligibility' ? 'bg-white p-4 mb-4' : ''}`}>
                   {isDownloadingSection === 'eligibility' && (
-                    <h3 className="text-xl font-bold bg-[#382F2A] text-white p-3 rounded-lg mt-8 mb-6 uppercase tracking-wider text-center">Section 3: Eligibility Results</h3>
+                    <h3 className="text-xl font-bold bg-[#0A2540] text-white p-3 rounded-lg mt-8 mb-6 uppercase tracking-wider text-center">Section 3: Eligibility Results</h3>
                   )}
-                  <h4 className="text-lg font-bold text-[#382F2A] mb-4">Eligible Consolidation Options</h4>
+                  <h4 className="text-lg font-bold text-[#0A2540] mb-4">Eligible Consolidation Options</h4>
                   {eligibleLenders.length > 0 ? (
                     <div className="space-y-4">
                       {(() => {
@@ -1354,8 +1354,8 @@ function CreditReportDashboardInner({ bureau, cibilData, formData }: any) {
                           );
                         }
                         return (
-                          <div className="bg-[#FAF8F5] border border-[#EBE6DD] rounded-2xl p-5 mb-2 shadow-sm">
-                            <h4 className="text-sm font-extrabold text-[#382F2A] mb-4 flex items-center justify-between">
+                          <div className="bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl p-5 mb-2 shadow-sm">
+                            <h4 className="text-sm font-extrabold text-[#0A2540] mb-4 flex items-center justify-between">
                               <span>Consolidation Estimate (Best Option: {bestLender.name})</span>
                               <span className="text-xs font-semibold text-blue-energy bg-blue-50 px-2 py-1 rounded-md">{bestLender.headlineRate}% p.a.</span>
                             </h4>
@@ -1363,16 +1363,16 @@ function CreditReportDashboardInner({ bureau, cibilData, formData }: any) {
                             {/* Details of consolidating loans */}
                             {catBLoans.length > 0 && (
                               <div className="mb-5 bg-white border border-icy-blue rounded-xl p-3 shadow-sm">
-                                <p className="text-[10px] uppercase font-bold text-brand-black/70 mb-2">Loans Being Consolidated</p>
+                                <p className="text-[11px] uppercase font-bold text-brand-black/70 mb-2">Loans Being Consolidated</p>
                                 <div className="space-y-2 mb-3">
                                   {catBLoans.map((l: any, idx: number) => (
                                     <div key={idx} className="flex justify-between items-center text-xs">
                                       <div className="flex items-center gap-2">
-                                        <span className="font-semibold text-[#382F2A]">{l.bankName || 'Lender'}</span>
+                                        <span className="font-semibold text-[#0A2540]">{l.bankName || 'Lender'}</span>
                                         <span className="text-slate-400">({l.type})</span>
                                       </div>
                                       <div className="text-right">
-                                        <span className="font-semibold text-[#382F2A]">₹{Number(l.currentOutstanding || 0).toLocaleString('en-IN')}</span>
+                                        <span className="font-semibold text-[#0A2540]">₹{Number(l.currentOutstanding || 0).toLocaleString('en-IN')}</span>
                                         <span className="text-slate-400 ml-2">EMI: ₹{Number(l.emi || 0).toLocaleString('en-IN')}</span>
                                       </div>
                                     </div>
@@ -1381,7 +1381,7 @@ function CreditReportDashboardInner({ bureau, cibilData, formData }: any) {
                                 <div className="flex justify-between items-center pt-2 border-t border-slate-100">
                                   <span className="text-xs font-bold text-brand-black/90">Total</span>
                                   <div className="text-right text-xs">
-                                    <span className="font-bold text-[#382F2A]">₹{consolidationAmount.toLocaleString('en-IN')}</span>
+                                    <span className="font-bold text-[#0A2540]">₹{consolidationAmount.toLocaleString('en-IN')}</span>
                                     <span className="font-bold text-blue-energy ml-2">EMI: ₹{currentEmiToConsolidate.toLocaleString('en-IN')}</span>
                                   </div>
                                 </div>
@@ -1390,27 +1390,27 @@ function CreditReportDashboardInner({ bureau, cibilData, formData }: any) {
 
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                               <div className="bg-white border border-slate-100 p-3 rounded-xl relative">
-                                <p className="text-[10px] uppercase tracking-wider font-bold text-brand-black/70">Total New Loan</p>
-                                <p className="text-xl font-black text-[#382F2A] mt-1">
+                                <p className="text-[11px] uppercase tracking-wider font-bold text-brand-black/70">Total New Loan</p>
+                                <p className="text-xl font-black text-[#0A2540] mt-1">
                                   ₹{amountForEmi.toLocaleString('en-IN')}
                                 </p>
                                 {isCapped && (
-                                  <p className="text-[9px] text-amber-600 mt-1 font-semibold">Capped by lender policy</p>
+                                  <p className="text-[11px] text-amber-600 mt-1 font-semibold">Capped by lender policy</p>
                                 )}
                                 {userOverrides.wantsTopUp === 'yes' && Number(userOverrides.topUpAmount || 0) > 0 && !isCapped && (
-                                  <p className="text-[10px] text-brand-black/70 mt-1">Includes ₹{Number(userOverrides.topUpAmount).toLocaleString('en-IN')} Top-up</p>
+                                  <p className="text-[11px] text-brand-black/70 mt-1">Includes ₹{Number(userOverrides.topUpAmount).toLocaleString('en-IN')} Top-up</p>
                                 )}
                               </div>
                               <div className="bg-white border border-slate-100 p-3 rounded-xl">
-                                <p className="text-[10px] uppercase tracking-wider font-bold text-brand-black/70">Est. New EMI</p>
-                                <p className="text-xl font-black text-[#382F2A] mt-1">₹{newEmi.toLocaleString('en-IN')}</p>
+                                <p className="text-[11px] uppercase tracking-wider font-bold text-brand-black/70">Est. New EMI</p>
+                                <p className="text-xl font-black text-[#0A2540] mt-1">₹{newEmi.toLocaleString('en-IN')}</p>
                                 {hasTopUp && consolidationAmount > 0 && canFullyConsolidate && (
-                                  <p className="text-[10px] text-brand-black/70 mt-1 font-semibold">
+                                  <p className="text-[11px] text-brand-black/70 mt-1 font-semibold">
                                     Consolidation only: ₹{consolidationOnlyEmi.toLocaleString('en-IN')} ({tenureMonths}m)
                                   </p>
                                 )}
                                 <div className="mt-2 flex items-center gap-2">
-                                  <label className="text-[10px] text-brand-black/70 font-semibold whitespace-nowrap">Tenure (Mos):</label>
+                                  <label className="text-[11px] text-brand-black/70 font-semibold whitespace-nowrap">Tenure (Mos):</label>
                                   <select
                                     value={tenureMonths}
                                     onChange={(e) => setUserOverrides({ ...userOverrides, consolidationTenure: e.target.value })}
@@ -1423,13 +1423,13 @@ function CreditReportDashboardInner({ bureau, cibilData, formData }: any) {
                                 </div>
                               </div>
                               <div className={`border p-3 rounded-xl ${emiSavings >= 0 ? 'bg-emerald-50 border-emerald-100' : 'bg-red-50 border-red-100'}`}>
-                                <p className={`text-[10px] uppercase tracking-wider font-bold ${emiSavings >= 0 ? 'text-emerald-700' : 'text-red-700'}`}>
+                                <p className={`text-[11px] uppercase tracking-wider font-bold ${emiSavings >= 0 ? 'text-emerald-700' : 'text-red-700'}`}>
                                   {emiSavings >= 0 ? 'EMI Savings' : 'Extra EMI'}
                                 </p>
                                 <p className={`text-xl font-black mt-1 ${emiSavings >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
                                   {emiSavings >= 0 ? '↓' : '↑'} ₹{Math.abs(emiSavings).toLocaleString('en-IN')}
                                 </p>
-                                <p className={`text-[10px] mt-1 ${emiSavings >= 0 ? 'text-emerald-600/80' : 'text-red-600/80'}`}>
+                                <p className={`text-[11px] mt-1 ${emiSavings >= 0 ? 'text-emerald-600/80' : 'text-red-600/80'}`}>
                                   vs current consolidated EMI
                                 </p>
                               </div>
@@ -1493,7 +1493,7 @@ function CreditReportDashboardInner({ bureau, cibilData, formData }: any) {
                                 <p className="text-xs font-semibold text-emerald-700 mt-0.5">Est. Rate: {lender.headlineRate}%</p>
                               </div>
                               <div className="text-right">
-                                <span className="text-[10px] font-bold px-2 py-1 bg-emerald-100 text-emerald-800 rounded-full uppercase">
+                                <span className="text-[11px] font-bold px-2 py-1 bg-emerald-100 text-emerald-800 rounded-full uppercase">
                                   {lender.outcome === 'ELIGIBLE' ? 'High Match' : 'Conditional'}
                                 </span>
                               </div>
@@ -1503,9 +1503,9 @@ function CreditReportDashboardInner({ bureau, cibilData, formData }: any) {
                             <div className="bg-emerald-100/50 rounded-lg p-3 mt-1">
                               <p className="text-[11px] font-bold text-emerald-800 mb-2 border-b border-emerald-200/50 pb-1 flex items-center justify-between">
                                 Calculation Breakdown
-                                {lender.cibilMinus1MaxFunding > 0 && <span className="text-[9px] bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded uppercase">CIBIL -1 Allowed</span>}
+                                {lender.cibilMinus1MaxFunding > 0 && <span className="text-[11px] bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded uppercase">CIBIL -1 Allowed</span>}
                               </p>
-                              <div className="grid grid-cols-2 gap-3 text-[10px]">
+                              <div className="grid grid-cols-2 gap-3 text-[11px]">
                                 <div>
                                   <p className="text-emerald-700/80 font-semibold mb-0.5 uppercase tracking-wider">Bank-Specific Category</p>
                                   <p className="font-bold text-emerald-900">{lender.employerCategory || lender.employerTier || 'Unknown'}</p>
@@ -1526,26 +1526,26 @@ function CreditReportDashboardInner({ bureau, cibilData, formData }: any) {
                                 </div>
                                 <div>
                                   <p className="text-emerald-700/80 font-semibold mb-0.5 uppercase tracking-wider">Est. Max New Loan</p>
-                                  <p className="font-black text-blue-700 text-[13px]">
+                                  <p className="font-black text-blue-700 text-sm">
                                     ₹{dynamicMaxLoan.toLocaleString('en-IN')}
                                   </p>
                                 </div>
                                 <div>
                                   <p className="text-emerald-700/80 font-semibold mb-0.5 uppercase tracking-wider">Est. New EMI</p>
                                   <p className="font-bold text-emerald-900">
-                                    ₹{newEmi.toLocaleString('en-IN')} <span className="font-normal text-[9px]">({tenureMonths}m{isCapped ? ' on partial loan' : ''})</span>
+                                    ₹{newEmi.toLocaleString('en-IN')} <span className="font-normal text-[11px]">({tenureMonths}m{isCapped ? ' on partial loan' : ''})</span>
                                   </p>
                                   {hasTopUp && consolidationAmount > 0 && canFullyConsolidate && (
-                                    <p className="text-[9px] text-emerald-700 mt-0.5 font-semibold">
+                                    <p className="text-[11px] text-emerald-700 mt-0.5 font-semibold">
                                       Consolidation only: ₹{consolidationOnlyEmi.toLocaleString('en-IN')} ({tenureMonths}m)
                                     </p>
                                   )}
                                   <div className="mt-1.5 flex items-center gap-1.5">
-                                    <label className="text-[9px] text-emerald-700/80 font-semibold">Tenure (Mos):</label>
+                                    <label className="text-[11px] text-emerald-700/80 font-semibold">Tenure (Mos):</label>
                                     <select
                                       value={tenureMonths}
                                       onChange={(e) => setUserOverrides({ ...userOverrides, consolidationTenure: e.target.value })}
-                                      className="bg-emerald-50/50 border border-emerald-200/50 rounded px-1 py-0.5 text-[9px] outline-none text-emerald-900 font-medium"
+                                      className="bg-emerald-50/50 border border-emerald-200/50 rounded px-1 py-0.5 text-[11px] outline-none text-emerald-900 font-medium"
                                     >
                                       {[12, 24, 36, 48, 60, 72, 84].filter(t => t <= maxLenderTenure).map(t => (
                                         <option key={t} value={t}>{t}</option>
@@ -1578,7 +1578,7 @@ function CreditReportDashboardInner({ bureau, cibilData, formData }: any) {
                             {lender.id === 'axis' && lender.axisMaxLoan !== undefined && (
                               <div className="bg-white rounded-lg p-3 border border-emerald-100 mt-1 shadow-sm">
                                 <p className="text-[11px] font-bold text-emerald-800 mb-2 border-b border-emerald-50 pb-1">Axis Specific Policy Estimate</p>
-                                <div className="grid grid-cols-2 gap-3 text-[10px]">
+                                <div className="grid grid-cols-2 gap-3 text-[11px]">
                                   <div>
                                     <p className="text-emerald-700/70 font-semibold mb-0.5 uppercase tracking-wider">Max Eligible Loan</p>
                                     <p className="font-black text-emerald-900 text-sm">₹{lender.axisMaxLoan.toLocaleString('en-IN')}</p>
@@ -1602,7 +1602,7 @@ function CreditReportDashboardInner({ bureau, cibilData, formData }: any) {
                             {lender.id === 'indusind' && lender.indusindMaxLoan !== undefined && (
                               <div className="bg-white rounded-lg p-3 border border-emerald-100 mt-1 shadow-sm">
                                 <p className="text-[11px] font-bold text-emerald-800 mb-2 border-b border-emerald-50 pb-1">IndusInd Specific Policy Estimate</p>
-                                <div className="grid grid-cols-2 gap-3 text-[10px]">
+                                <div className="grid grid-cols-2 gap-3 text-[11px]">
                                   <div>
                                     <p className="text-emerald-700/70 font-semibold mb-0.5 uppercase tracking-wider">Max Eligible Loan</p>
                                     <p className="font-black text-emerald-900 text-sm">₹{lender.indusindMaxLoan.toLocaleString('en-IN')}</p>
@@ -1626,7 +1626,7 @@ function CreditReportDashboardInner({ bureau, cibilData, formData }: any) {
                             {lender.id === 'kotak' && lender.kotakEffectiveNTH !== undefined && (
                               <div className="bg-white rounded-lg p-3 border border-emerald-100 mt-1 shadow-sm">
                                 <p className="text-[11px] font-bold text-emerald-800 mb-2 border-b border-emerald-50 pb-1">Kotak OD Specific Policy Estimate</p>
-                                <div className="grid grid-cols-2 gap-3 text-[10px]">
+                                <div className="grid grid-cols-2 gap-3 text-[11px]">
                                   <div>
                                     <p className="text-emerald-700/70 font-semibold mb-0.5 uppercase tracking-wider">Effective Net Income</p>
                                     <p className="font-black text-emerald-900 text-sm">₹{lender.kotakEffectiveNTH.toLocaleString('en-IN')}</p>
@@ -1642,7 +1642,7 @@ function CreditReportDashboardInner({ bureau, cibilData, formData }: any) {
                             {lender.id === 'abfl' && lender.abflMaxLoan !== undefined && (
                               <div className="bg-white rounded-lg p-3 border border-emerald-100 mt-1 shadow-sm">
                                 <p className="text-[11px] font-bold text-emerald-800 mb-2 border-b border-emerald-50 pb-1">Aditya Birla Specific Policy Estimate</p>
-                                <div className="grid grid-cols-2 gap-3 text-[10px]">
+                                <div className="grid grid-cols-2 gap-3 text-[11px]">
                                   <div>
                                     <p className="text-emerald-700/70 font-semibold mb-0.5 uppercase tracking-wider">High Limit Eligibility</p>
                                     <p className="font-black text-emerald-900 text-sm">₹{lender.abflMaxLoan.toLocaleString('en-IN')}</p>
@@ -1654,7 +1654,7 @@ function CreditReportDashboardInner({ bureau, cibilData, formData }: any) {
                             {lender.id === 'poonawalla' && lender.poonawallaMaxLoan !== undefined && (
                               <div className="bg-white rounded-lg p-3 border border-emerald-100 mt-1 shadow-sm">
                                 <p className="text-[11px] font-bold text-emerald-800 mb-2 border-b border-emerald-50 pb-1">Poonawalla Specific Policy Estimate</p>
-                                <div className="grid grid-cols-2 gap-3 text-[10px]">
+                                <div className="grid grid-cols-2 gap-3 text-[11px]">
                                   <div>
                                     <p className="text-emerald-700/70 font-semibold mb-0.5 uppercase tracking-wider">Max Eligible Loan</p>
                                     <p className="font-black text-emerald-900 text-sm">₹{lender.poonawallaMaxLoan.toLocaleString('en-IN')}</p>
@@ -1674,7 +1674,7 @@ function CreditReportDashboardInner({ bureau, cibilData, formData }: any) {
                             {lender.id === 'chola' && lender.cholaEffectiveNTH !== undefined && (
                               <div className="bg-white rounded-lg p-3 border border-emerald-100 mt-1 shadow-sm">
                                 <p className="text-[11px] font-bold text-emerald-800 mb-2 border-b border-emerald-50 pb-1">Chola Specific Policy Estimate</p>
-                                <div className="grid grid-cols-2 gap-3 text-[10px]">
+                                <div className="grid grid-cols-2 gap-3 text-[11px]">
                                   <div>
                                     <p className="text-emerald-700/70 font-semibold mb-0.5 uppercase tracking-wider">Effective Net Income</p>
                                     <p className="font-black text-emerald-900 text-sm">₹{lender.cholaEffectiveNTH.toLocaleString('en-IN')}</p>
@@ -1700,7 +1700,7 @@ function CreditReportDashboardInner({ bureau, cibilData, formData }: any) {
 
                   {ineligibleLenders.length > 0 && (
                     <div className="mt-8">
-                      <h4 className="text-sm font-bold text-[#382F2A] mb-3">Lenders Not Currently Eligible</h4>
+                      <h4 className="text-sm font-bold text-[#0A2540] mb-3">Lenders Not Currently Eligible</h4>
                       <div className="space-y-3">
                         {ineligibleLenders.map((lender: any, i: number) => (
                           <div key={i} className="bg-red-50/50 border border-red-100 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -1735,7 +1735,7 @@ function CreditReportDashboardInner({ bureau, cibilData, formData }: any) {
         <button className="w-full py-4 bg-blue-energy text-white rounded-xl font-medium hover:bg-blue-800 transition-all duration-300 active:scale-95 shadow-sm hover:shadow-md">
           Speak with a Consolidation Expert
         </button>
-        <p className="text-[10px] text-slate-400 text-center mt-4 leading-tight">
+        <p className="text-[11px] text-slate-400 text-center mt-4 leading-tight">
           *These figures are indicative estimates. Final eligibility, rate, amount, tenure and approval are determined by the lender.
         </p>
       </div>

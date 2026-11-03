@@ -1,7 +1,6 @@
 "use client";
 import { useState } from "react";
-import { ArrowRight, Check, Info, TrendingDown, ArrowDown } from "lucide-react";
-import { claims } from "@/lib/config";
+import { ArrowRight } from "lucide-react";
 
 const SCENARIOS = [
   {
@@ -53,30 +52,27 @@ export function DebtConsolidation() {
   const [activeScenario, setActiveScenario] = useState(SCENARIOS[0]);
 
   return (
-    <section id="debt-consolidation" className="bg-slate-50 py-16 sm:py-24 border-b border-icy-blue">
-      <div className="container-narrow">
-        <div className="mx-auto max-w-3xl text-center">
-          <span className="text-xs font-extrabold uppercase tracking-widest text-emerald-600">
-            BEFORE → AFTER TRANSFORMATION
-          </span>
-          <h2 className="mt-2 text-3xl sm:text-4xl font-extrabold tracking-tight text-brand-black">
-            Before → After Debt Consolidation Example
-          </h2>
-          <p className="mt-3 text-sm sm:text-base text-brand-black/80 leading-7 max-w-2xl mx-auto">
-            See how combining multiple scattered high-interest loans, credit cards and app loan EMIs into a single structured loan simplifies your finances.
-          </p>
-        </div>
+    <section id="debt-consolidation" className="bg-white text-[#0A2540]">
+      <div className="max-w-[1220px] mx-auto px-4 md:px-6 lg:px-8 py-16 md:py-24">
+        <h2 className="text-[40px] sm:text-[56px] leading-[1.02] tracking-[-0.04em] font-bold max-w-3xl">
+          Here&apos;s what it could look like.
+        </h2>
+        <p className="mt-5 text-lg md:text-xl leading-relaxed text-[#3C4F69] max-w-2xl">
+          Pick the situation closest to yours. These are examples, not offers, but they show how
+          scattered payments can become one.
+        </p>
 
-        {/* Scenario Tabs */}
-        <div className="mt-8 flex flex-wrap justify-center gap-2">
+        <div className="mt-8 flex flex-wrap gap-2" role="tablist">
           {SCENARIOS.map((s) => (
             <button
               key={s.id}
+              role="tab"
+              aria-selected={activeScenario.id === s.id}
               onClick={() => setActiveScenario(s)}
-              className={`rounded-lg px-4 py-2 text-xs font-bold transition-all cursor-pointer ${
+              className={`rounded px-5 py-3 text-base font-semibold transition-colors cursor-pointer ${
                 activeScenario.id === s.id
-                  ? "bg-[#091328] text-white shadow-sm"
-                  : "bg-white text-brand-black/90 border border-icy-blue hover:bg-slate-100"
+                  ? "bg-[#0052CC] text-white"
+                  : "bg-[#EAF3FF] text-[#0A2540] hover:bg-[#d6e4fa]"
               }`}
             >
               {s.name}
@@ -84,110 +80,50 @@ export function DebtConsolidation() {
           ))}
         </div>
 
-        {/* Comparison Table Grid */}
-        <div className="mx-auto mt-8 grid max-w-5xl gap-6 lg:grid-cols-[1fr_auto_1fr] lg:items-center">
-          {/* Current Status Box */}
-          <div className="rounded-2xl border border-slate-300 bg-white p-6 shadow-md">
-            <div className="flex items-center justify-between border-b border-icy-blue pb-3">
-              <div>
-                <span className="text-[11px] font-bold text-red-600 uppercase tracking-wider">BEFORE CONSOLIDATION</span>
-                <p className="text-sm font-bold text-brand-black">3 Scattered High-Cost EMIs</p>
-              </div>
-              <span className="rounded bg-red-50 px-2.5 py-1 text-[10px] font-bold text-red-700 border border-red-200">
-                🔴 3 EMIs
-              </span>
-            </div>
-
-            <div className="mt-4 space-y-2.5">
+        <div className="mt-8 grid gap-6 lg:grid-cols-2">
+          <div className="bg-[#EAF3FF] p-7 md:p-9">
+            <h3 className="text-2xl md:text-[32px] font-bold tracking-[-0.02em]">Today, you juggle:</h3>
+            <ul className="mt-6 divide-y divide-[#E2E8F0]">
               {activeScenario.before.map((item) => (
-                <div key={item.name} className="flex items-center justify-between rounded-lg bg-slate-50 p-3 border border-icy-blue">
-                  <div>
-                    <div className="text-xs font-bold text-brand-black">{item.name}</div>
-                    <div className="text-[10px] text-red-600 font-semibold">{item.rate}</div>
-                  </div>
-                  <span className="text-xs font-bold text-brand-black">{item.emi}</span>
-                </div>
+                <li key={item.name} className="flex items-baseline justify-between gap-4 py-3.5">
+                  <span className="text-lg">
+                    {item.name} <span className="text-[#3C4F69]">({item.rate})</span>
+                  </span>
+                  <span className="text-lg font-bold">{item.emi}</span>
+                </li>
               ))}
-
-              <div className="mt-4 rounded-xl bg-slate-900 p-4 text-white">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="font-medium text-slate-300">Total Monthly Outflow</span>
-                  <span className="text-base font-extrabold text-red-400">{activeScenario.beforeTotal} / mo</span>
-                </div>
-                <div className="mt-1 text-[10px] text-slate-400 font-medium">
-                  • {activeScenario.beforeDates}
-                </div>
-              </div>
-            </div>
+            </ul>
+            <p className="mt-6 text-lg">
+              That&apos;s <b>{activeScenario.beforeTotal}</b> a month, with {activeScenario.beforeDates.toLowerCase()}.
+            </p>
           </div>
 
-          {/* Conversion Indicator */}
-          <div className="flex flex-col items-center justify-center gap-1.5 py-2 lg:py-0">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#091328] text-emerald-400 shadow-md">
-              <ArrowRight className="hidden lg:block h-6 w-6" />
-              <ArrowDown className="lg:hidden h-6 w-6" />
-            </div>
-            <span className="text-[10px] font-extrabold uppercase tracking-widest text-brand-black/70">
-              CONSOLIDATE
-            </span>
-          </div>
-
-          {/* Optimized Consolidated Box */}
-          <div className="rounded-2xl border-2 border-emerald-500 bg-white p-6 shadow-xl">
-            <div className="flex items-center justify-between border-b border-emerald-100 pb-3">
-              <div>
-                <span className="text-[11px] font-bold text-emerald-700 uppercase tracking-wider">AFTER CONSOLIDATION</span>
-                <p className="text-sm font-bold text-brand-black">One Consolidated Eligible Loan</p>
-              </div>
-              <span className="rounded bg-emerald-600 px-2.5 py-1 text-[10px] font-bold text-white">
-                🟢 1 EMI
-              </span>
-            </div>
-
-            <div className="mt-4 space-y-4">
-              <div className="rounded-xl bg-emerald-50/70 p-4 text-center border border-emerald-200">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800">
-                  ESTIMATED CONSOLIDATED EMI
-                </span>
-                <div className="mt-1 text-2xl font-extrabold text-emerald-700">
-                  {activeScenario.afterEmi} <span className="text-xs font-normal text-brand-black/80">/ month*</span>
-                </div>
-                <div className="mt-1.5 inline-flex items-center gap-1 text-xs font-extrabold text-emerald-800">
-                  <TrendingDown className="h-4 w-4" /> Potential Difference: Save ~{activeScenario.savingsMo} / mo*
-                </div>
-              </div>
-
-              <div className="space-y-2 text-xs text-brand-black/90 font-medium">
-                {[
-                  "One single due date every month — easy tracking",
-                  `Lower annual interest rate down to ~${activeScenario.afterRate}`,
-                  "Protects credit score by lowering high revolving credit balances",
-                ].map((benefit) => (
-                  <div key={benefit} className="flex items-start gap-2">
-                    <Check className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
-                    <span>{benefit}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
+          <div className="bg-[#0A2540] text-white p-7 md:p-9">
+            <h3 className="text-2xl md:text-[32px] font-bold tracking-[-0.02em]">As one loan, maybe:</h3>
+            <p className="mt-6 text-[56px] md:text-[56px] font-bold tracking-[-0.04em] leading-none">
+              {activeScenario.afterEmi}
+              <span className="text-xl font-medium text-[#BFDBFE] tracking-normal"> a month*</span>
+            </p>
+            <p className="mt-4 text-lg text-[#BFDBFE]">
+              That&apos;s about <b className="text-[#BFDBFE]">{activeScenario.savingsMo}</b> less every month, at a rate around {activeScenario.afterRate}
+            </p>
+            <ul className="mt-6 space-y-2 text-lg text-[#BFDBFE]">
+              <li>One due date every month, easy to track.</li>
+              <li>A lower yearly interest rate.</li>
+              <li>Less pressure on your credit score from high card balances.</li>
+            </ul>
           </div>
         </div>
 
-        {/* Disclaimer */}
-        <div className="mx-auto mt-6 flex max-w-3xl items-start gap-2.5 rounded-xl bg-white p-4 border border-icy-blue text-brand-black/80">
-          <Info className="h-4 w-4 shrink-0 text-brand-black/70 mt-0.5" />
-          <p className="text-xs leading-5">
-            <span className="font-semibold text-brand-black">Illustrative Example:</span> Figures above are example scenarios for salaried profiles clearly marked as illustrative. Final terms are set by partner lenders.
+        <div className="mt-8 flex flex-col sm:flex-row sm:items-center gap-6 justify-between">
+          <p className="text-sm text-[#3C4F69] max-w-xl">
+            Illustrative examples only. Final terms are set by partner lenders after checking your profile.
           </p>
-        </div>
-
-        <div className="mt-8 text-center">
           <a
             href="#lead-form"
-            className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-[#091328] px-8 text-xs font-extrabold uppercase tracking-wider text-white shadow-md hover:bg-slate-800 transition-all"
+            className="inline-flex items-center justify-center gap-2 rounded bg-[#0052CC] hover:bg-[#0A2540] transition-colors text-white font-bold text-lg px-7 py-4"
           >
-            <span>Check My Options</span>
-            <ArrowRight className="h-4 w-4 text-emerald-400" />
+            Check my options <ArrowRight className="h-5 w-5" />
           </a>
         </div>
       </div>

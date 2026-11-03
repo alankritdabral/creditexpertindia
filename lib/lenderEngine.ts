@@ -556,8 +556,8 @@ const LENDERS: LenderConfig[] = [
     maxTenure: 84,
     maxFoir: 70,
     employerBankId: "tataCapital",
-    minSalary: 20000,          // Will be updated when full policy is available
-    minCibil: null,            // Will be updated when full policy is available
+    minSalary: 20000,
+    minCibil: null,
     cibilMinus1Accepted: false,
     cibilMinus1MaxFunding: 0,
     bt: {
@@ -872,7 +872,6 @@ export function analyzeLenderEligibility({
   catBLoans: any[];
   allLoans?: any[];
 }) {
-  const companyName = profile.employer || "";
   const cibilScore = Number(profile.cibilScore) || 0;
   const age = Number(profile.age) || 0;
 
@@ -906,7 +905,7 @@ export function analyzeLenderEligibility({
 
     // ─── Global FOIR Logic ──────────────────────────────────────────────
     const hasRunningHL = allLoans.some((l: any) => l.type === "Home Loan" && Number(l.currentOutstanding || 0) > 0);
-    const effectiveMaxFoir = hasRunningHL ? Math.max(70, lender.maxFoir) : 70;
+    let effectiveMaxFoir = hasRunningHL ? Math.max(70, lender.maxFoir) : 70;
     customOutput.maxFOIR = `${effectiveMaxFoir}%`;
 
     // ─── Location warning ──────────────────────────────────────────────
@@ -1482,13 +1481,48 @@ export function analyzeLenderEligibility({
         }
       }
 
-      // FOIR & capacity
+      // FOIR grid: risk segment × company category × NTH segment (policy §2–3)
+      const isHighRisk = profile.riskSegment === "high";
+      const catIdx =
+        employerTier === "A+" || employerTier === "A" ? 0 :
+        employerTier === "B" || employerTier === "GOVT" ? 1 :
+        employerTier === "C" || employerTier === "D" ? 2 : 3; // Unknown → Cat E (conservative)
+      const incIdx =
+        nth > 250000 ? 0 : nth > 150000 ? 1 : nth > 75000 ? 2 : nth >= 50000 ? 3 : 4;
+      const grid: (number | null)[][] = isHighRisk
+        ? [
+            [75, 75, 70, 65, 60],
+            [70, 70, 65, 60, 50],
+            [65, 60, 55, 55, 50],
+            [60, 55, 50, null, null],
+          ]
+        : [
+            [80, 80, 75, 70, 65],
+            [75, 70, 65, 65, 60],
+            [70, 65, 60, 60, 55],
+            [65, 60, 55, 50, 50],
+          ];
+      const gridFoir = grid[catIdx][incIdx];
+
+      if (gridFoir === null) {
+        isEligible = false;
+        rejectionReasons.push("High-risk Cat E applicants with Prime or Others income are not allowed");
+      } else {
+        effectiveMaxFoir = gridFoir;
+        customOutput.maxFOIR = `${gridFoir}%`;
+        customOutput.poonawallaFOIR = gridFoir;
+      }
+      if (profile.cityTier !== "Metro") {
+        warnings.push("FOIR grid is defined only for Metro, Tier 1 and Tier 2 cities");
+      }
+
+      // FOIR & capacity (CC 5% / gold 1% obligation rules via calculateObligation)
       let totalEmi = 0;
       allLoans.forEach((l: any) => {
-        totalEmi += Number(l.emi || 0);
+        totalEmi += calculateObligation(l, lender);
       });
       const maxEmi = nth * (effectiveMaxFoir / 100);
-      const unusedCap = Math.max(0, maxEmi - totalEmi);
+      const unusedCap = isEligible ? Math.max(0, maxEmi - totalEmi) : 0;
       customOutput.poonawallaUnusedCapacity = Math.floor(unusedCap);
 
       if (unusedCap > 0) {
@@ -1500,6 +1534,9 @@ export function analyzeLenderEligibility({
       } else {
         customOutput.poonawallaMaxLoan = 0;
       }
+      if (isHighRisk) {
+        customOutput.poonawallaMaxLoan = Math.min(customOutput.poonawallaMaxLoan, 3000000);
+      }
 
       // Geo limit warning
       if (isEligible) {
@@ -1509,7 +1546,71 @@ export function analyzeLenderEligibility({
 
     // ── TATA CAPITAL specific ───────────────────────────────────────────
     if (lender.id === "tatacapital" && isEligible) {
-      // Already handled by minBTFinancedAmount in BT checks above
+      // BT financed amount > ₹5L is handled by minBTFinancedAmount in BT checks above.
+      // Multiplier grid: rows = tenure bucket (months), cols = NTH band (<50K / 50–75K / >75K).
+      // null = not available.
+      type Row = [number | null, number | null, number | null];
+      const TATA_GRID: Record<string, Record<number, Row>> = {
+        TGE: {
+          12: [6, 7, 7], 24: [10, 13, 13], 36: [16, 18, 18], 48: [18, 22, 23], 60: [21, 24, 27],
+        },
+        A: {
+          12: [6, 7, 7], 24: [10, 13, 13], 36: [14, 18, 18], 48: [17, 22, 23], 60: [20, 23, 27],
+        },
+        B: {
+          12: [5, 7, 7], 24: [9, 13, 13], 36: [13, 18, 18], 48: [15, 20, 22], 60: [19, 22, 25],
+        },
+        C: {
+          12: [5, 7, 7], 24: [7, 13, 13], 36: [9, 18, 18], 48: [9, 18, 18], 60: [null, null, null],
+        },
+        UNAPPROVED: {
+          12: [5, 7, 7], 24: [7, 13, 13], 36: [9, 15, 15], 48: [null, null, null], 60: [null, null, null],
+        },
+      };
+      const gridKey =
+        employerTier === "A+" ? "TGE" :
+        employerTier === "A" || employerTier === "GOVT" ? "A" :
+        employerTier === "B" ? "B" :
+        employerTier === "C" || employerTier === "D" ? "C" : "UNAPPROVED";
+      const bandIdx = nth > 75000 ? 2 : nth >= 50000 ? 1 : 0;
+
+      // FOIR grid by salary (Max FOIR applied to total obligations)
+      const tataFoir = nth > 75000 ? 75 : nth > 50000 ? 65 : nth > 25000 ? 60 : 50;
+      effectiveMaxFoir = tataFoir;
+      customOutput.maxFOIR = `${tataFoir}%`;
+
+      let totalEmi = 0;
+      allLoans.forEach((l) => {
+        totalEmi += calculateObligation(l, lender);
+      });
+      const unusedCap = Math.max(0, nth * (tataFoir / 100) - totalEmi);
+      const r = lender.headlineRate / 12 / 100;
+
+      // Best result across tenure buckets: min(multiplier eligibility, FOIR eligibility at that tenure)
+      let best = 0;
+      let bestTenure = 0;
+      let anyMultiplier = false;
+      for (const t of [12, 24, 36, 48, 60]) {
+        const mult = TATA_GRID[gridKey][t][bandIdx];
+        if (mult === null) continue;
+        anyMultiplier = true;
+        const foirLoan = unusedCap * (Math.pow(1 + r, t) - 1) / (r * Math.pow(1 + r, t));
+        const amt = Math.min(nth * mult, foirLoan);
+        if (amt > best) { best = amt; bestTenure = t; }
+      }
+
+      if (!anyMultiplier) {
+        isEligible = false;
+        rejectionReasons.push(`No multiplier available for employer category '${employerTier}' at this salary band`);
+      } else {
+        customOutput.tataMaxLoan = Math.floor(best);
+        customOutput.tataBestTenure = bestTenure;
+        customOutput.tataFOIR = tataFoir;
+        if (best <= 0) {
+          isEligible = false;
+          rejectionReasons.push("No FOIR capacity available after existing obligations");
+        }
+      }
     }
 
     // ── SMFG specific ───────────────────────────────────────────────────
@@ -1550,6 +1651,7 @@ export function analyzeLenderEligibility({
       if (lender.id === 'chola' && customOutput.cholaMaxLoan !== undefined) customOutput.universalMaxLoan = customOutput.cholaMaxLoan;
       if (lender.id === 'indusind' && customOutput.indusindMaxLoan !== undefined) customOutput.universalMaxLoan = customOutput.indusindMaxLoan;
       if (lender.id === 'poonawalla' && customOutput.poonawallaMaxLoan !== undefined) customOutput.universalMaxLoan = customOutput.poonawallaMaxLoan;
+      if (lender.id === 'tatacapital' && customOutput.tataMaxLoan !== undefined) customOutput.universalMaxLoan = customOutput.tataMaxLoan;
       if (customOutput.cibilMinus1MaxLoan !== undefined) customOutput.universalMaxLoan = customOutput.cibilMinus1MaxLoan;
 
       // Apply cap

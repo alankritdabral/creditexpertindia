@@ -18,7 +18,7 @@ const escapeHtml = (unsafe: string) => {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { name, phone, email, requirement, message, consent, netSalary, ongoingEmi } = body;
+    const { name, phone, requirement, consent, netSalary, ongoingEmi } = body;
 
     if (!name || !phone || !requirement || !netSalary || !ongoingEmi) {
       return NextResponse.json(
@@ -42,11 +42,9 @@ export async function POST(request: Request) {
       await adminDb.collection("leads").add({
         name,
         phone,
-        email: email || "",
         requirement,
         netSalary: salary,
         ongoingEmi: emi,
-        message: message || "",
         consent: !!consent,
         source: "Credit Expert India Contact Form",
         status: "NEW",
@@ -60,7 +58,6 @@ export async function POST(request: Request) {
     const { data, error } = await resend.emails.send({
       from: "alankrit.dabral@creditexpertindia.com",
       to: ["btyagi419@gmail.com"],
-      replyTo: email || undefined,
       subject: `New Lead — ${name} — ${requirement}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto;">
@@ -76,10 +73,6 @@ export async function POST(request: Request) {
               <td style="padding: 8px 0; border-bottom: 1px solid #eee;">${escapeHtml(phone)}</td>
             </tr>
             <tr>
-              <td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Email:</strong></td>
-              <td style="padding: 8px 0; border-bottom: 1px solid #eee;">${escapeHtml(email) || "Not provided"}</td>
-            </tr>
-            <tr>
               <td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Net Salary:</strong></td>
               <td style="padding: 8px 0; border-bottom: 1px solid #eee;">₹${escapeHtml(String(netSalary))}</td>
             </tr>
@@ -93,13 +86,6 @@ export async function POST(request: Request) {
             </tr>
           </table>
 
-          <div style="margin-top: 20px;">
-            <strong>Message:</strong>
-            <div style="background:#f5f5f5; padding:15px; border-radius:8px; margin-top: 8px; white-space: pre-wrap;">
-              ${escapeHtml(message) || "No message provided"}
-            </div>
-          </div>
-          
           <div style="margin-top: 25px; display: flex; gap: 10px;">
             <a href="tel:+91${escapeHtml(phone).replace(/[^0-9]/g, '')}" style="background-color: #0F172A; color: white; padding: 10px 20px; text-decoration: none; border-radius: 6px; display: inline-block;">📞 Call Customer</a>
             <a href="https://wa.me/91${escapeHtml(phone).replace(/[^0-9]/g, '')}" style="background-color: #25D366; color: white; padding: 10px 20px; text-decoration: none; border-radius: 6px; display: inline-block;">💬 WhatsApp Customer</a>

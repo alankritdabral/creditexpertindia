@@ -155,7 +155,7 @@ export function DebtConsolidationCalculator() {
     <div className="w-full max-w-7xl mx-auto space-y-10">
       
       {/* Preset Scenario Selector */}
-      <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white rounded-2xl p-5 border border-slate-200 card-elevated flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <span className="text-xs font-bold uppercase tracking-wider text-blue-600 block mb-1">
             Quick Start Scenarios
@@ -191,7 +191,7 @@ export function DebtConsolidationCalculator() {
         
         {/* Left Column: Input Debt Obligations (7 Cols) */}
         <div className="lg:col-span-7 space-y-6">
-          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
+          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 card-elevated space-y-6">
             <div className="flex items-center justify-between border-b border-slate-100 pb-4">
               <div>
                 <h2 className="text-lg font-bold text-slate-900">Step 1: Your Active Debts & EMIs</h2>
@@ -314,7 +314,7 @@ export function DebtConsolidationCalculator() {
           </div>
 
           {/* Step 2: Proposed Consolidation Loan Parameters */}
-          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
+          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 card-elevated space-y-6">
             <div className="border-b border-slate-100 pb-4">
               <h2 className="text-lg font-bold text-slate-900">Step 2: Proposed Consolidation Loan Terms</h2>
               <p className="text-xs text-slate-500 mt-0.5">Adjust tenure and estimated interest rate to view your new single EMI</p>
@@ -428,7 +428,7 @@ export function DebtConsolidationCalculator() {
                     <p className="text-xl sm:text-2xl font-black text-rose-400 mt-1 line-through decoration-rose-500/50">
                       {formatINR(result.existingMonthlyOutflow)}
                     </p>
-                    <span className="text-[10px] text-slate-400 block mt-0.5">Across {debts.length} separate dues</span>
+                    <span className="text-[11px] text-slate-400 block mt-0.5">Across {debts.length} separate dues</span>
                   </div>
 
                   <div className="p-3.5 rounded-2xl bg-emerald-950/40 border border-emerald-500/40">
@@ -438,7 +438,7 @@ export function DebtConsolidationCalculator() {
                     <p className="text-xl sm:text-2xl font-black text-emerald-400 mt-1">
                       {formatINR(result.proposedEMI)}
                     </p>
-                    <span className="text-[10px] text-emerald-300 block mt-0.5">1 Payment Date</span>
+                    <span className="text-[11px] text-emerald-300 block mt-0.5">1 Payment Date</span>
                   </div>
                 </div>
 
@@ -522,7 +522,7 @@ export function DebtConsolidationCalculator() {
           </div>
 
           {/* Trust Highlights */}
-          <div className="rounded-2xl bg-white p-5 border border-slate-200 space-y-3">
+          <div className="rounded-2xl bg-white p-5 border border-slate-200 space-y-3 card-elevated">
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900">
               Why Consolidate With Credit Expert India?
             </h3>
@@ -665,7 +665,7 @@ export function DebtConsolidationCalculator() {
                 <button
                   type="submit"
                   disabled={leadStatus === "loading"}
-                  className="w-full py-3.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-md transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                  className="w-full py-3.5 px-4 rounded bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-md transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                 >
                   {leadStatus === "loading" ? "Submitting..." : "Get My Free Pre-Approval Options"}
                 </button>

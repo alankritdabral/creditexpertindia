@@ -1,10 +1,12 @@
 import { Metadata } from "next";
+import { buildMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Partner Disclosures & Lending Affiliations",
-  description: "Lending partner disclosures, banking network affiliations, and facilitation terms for Credit Expert India.",
-  alternates: { canonical: "/partner-disclosures" },
-};
+export const metadata: Metadata = buildMetadata({
+  title: "Partner Disclosures",
+  description:
+    "Partner Disclosures for Credit Expert India",
+  path: "/partner-disclosures",
+});
 
 export default function PartnerDisclosuresPage() {
   return (

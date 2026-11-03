@@ -1,14 +1,15 @@
 import { Metadata } from "next";
-import Image from "next/image";
+import { buildMetadata } from "@/lib/seo";
+import { ProductHero } from "@/components/ProductHero";
 import { ContactForm } from "@/components/ContactForm";
 import { contact } from "@/lib/config";
-import { MapPin, Phone, Mail, ArrowRight } from "lucide-react";
 
-export const metadata: Metadata = {
-  title: "Contact Our Financial & Loan Advisory Team",
-  description: "Get in touch with Credit Expert India debt specialists for assistance with personal loans and debt consolidation.",
-  alternates: { canonical: "/contact" },
-};
+export const metadata: Metadata = buildMetadata({
+  title: "Contact Us",
+  description:
+    "Get in touch with Credit Expert India debt specialists for assistance with personal loans and debt consolidation.",
+  path: "/contact",
+});
 
 const localBusinessSchema = {
   "@context": "https://schema.org",
@@ -29,83 +30,47 @@ const localBusinessSchema = {
 
 export default function ContactPage() {
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
       />
       
-      <section className="relative isolate w-full pt-32 pb-24 lg:pt-40 lg:pb-32 overflow-hidden border-b border-icy-blue">
-        <div className="absolute inset-0 pointer-events-none z-0">
-          <Image
-            src="/contact.png"
-            alt="Contact Hero Background"
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover object-right sm:object-[75%_center] opacity-75"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-white/80 via-white/30 to-transparent" />
-        </div>
-        <div className="container-narrow text-center relative z-10">
-          <span className="text-xs font-extrabold uppercase tracking-widest text-brand-black/80">
-            CONTACT & SUPPORT
-          </span>
-          <h1 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl text-brand-black">
-            Speak With a Credit Specialist
-          </h1>
-          <p className="mt-3 max-w-2xl mx-auto text-sm text-brand-black/80 font-medium">
-            Have questions about your debt consolidation or loan options? We are here to assist.
-          </p>
-          <div className="mt-8 flex justify-center">
-            <a
-              href="#contact-form"
-              className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-slate-900 px-8 text-sm font-semibold text-white hover:bg-slate-800 transition-colors shadow-lg"
-            >
-              <span>Get in Touch</span>
-              <ArrowRight className="h-4 w-4" />
-            </a>
-          </div>
-        </div>
-      </section>
-
-      <section className="py-12 lg:py-20 bg-white border-b border-icy-blue">
-        <div className="container-narrow px-4">
+      <section id="contact-form" className="bg-[#EAF3FF]">
+        <div className="max-w-[1220px] mx-auto px-4 md:px-6 lg:px-8 pt-28 md:pt-36 pb-16 md:pb-24">
           <ContactForm />
         </div>
       </section>
 
-      <section className="py-12 bg-slate-50 border-b border-icy-blue">
-        <div className="container-narrow grid gap-6 sm:grid-cols-3 text-center">
-          <div className="rounded-2xl bg-white p-6 border border-icy-blue shadow-sm">
-            <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600">
-              <MapPin className="h-5 w-5" />
-            </div>
-            <h3 className="mt-3 text-sm font-extrabold text-brand-black">Office Locations</h3>
-            <div className="mt-1 flex flex-col gap-3">
-              {contact.addresses.map((addr, idx) => (
-                <p key={idx} className="text-xs text-brand-black/80 font-medium">
-                  <strong className="text-brand-black block mb-1">{addr.city} Office:</strong>
-                  {addr.fullAddress}
-                </p>
-              ))}
-            </div>
-          </div>
+      <ProductHero
+        title="Want to talk to a real person? Here we are."
+        body="Questions about your loans or consolidation options? Call, message or fill in the form and one of our credit specialists will get back to you."
+        cta="Leave my details"
+        image="/contact.png"
+        points={["Offices in Dehradun, Delhi and Rudrapur", "Usually a reply within 24 hours", "Free to ask"]}
+        href="#contact-form"
+      />
 
-          <div className="rounded-2xl bg-white p-6 border border-icy-blue shadow-sm">
-            <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600">
-              <Phone className="h-5 w-5" />
+      <section className="bg-white">
+        <div className="max-w-[1220px] mx-auto px-4 md:px-6 lg:px-8 py-16 md:py-24 grid gap-12 lg:grid-cols-[5fr_7fr]">
+          <h2 className="text-[40px] sm:text-[56px] leading-[1.02] tracking-[-0.04em] font-bold text-[#0A2540]">
+            Or come and see us.
+          </h2>
+          <div className="grid gap-10 sm:grid-cols-2 text-[#0A2540]">
+            {contact.addresses.map((addr, idx) => (
+              <div key={idx}>
+                <h3 className="text-2xl font-bold tracking-[-0.02em]">{addr.city}</h3>
+                <p className="mt-2 text-lg leading-relaxed text-[#3C4F69]">{addr.fullAddress}</p>
+              </div>
+            ))}
+            <div>
+              <h3 className="text-2xl font-bold tracking-[-0.02em]">Call or WhatsApp</h3>
+              <p className="mt-2 text-lg text-[#3C4F69]">{contact.whatsapp}</p>
             </div>
-            <h3 className="mt-3 text-sm font-extrabold text-brand-black">Phone Support</h3>
-            <p className="mt-1 text-xs text-brand-black/80 font-medium">{contact.whatsapp}</p>
-          </div>
-
-          <div className="rounded-2xl bg-white p-6 border border-icy-blue shadow-sm">
-            <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600">
-              <Mail className="h-5 w-5" />
+            <div>
+              <h3 className="text-2xl font-bold tracking-[-0.02em]">Email</h3>
+              <p className="mt-2 text-lg text-[#3C4F69] break-all">{contact.email}</p>
             </div>
-            <h3 className="mt-3 text-sm font-extrabold text-brand-black">Email Inquiry</h3>
-            <p className="mt-1 text-xs text-brand-black/80 font-medium">{contact.email}</p>
           </div>
         </div>
       </section>

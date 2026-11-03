@@ -76,9 +76,9 @@ export function HeroGridBlock() {
 
   const [isMounted, setIsMounted] = React.useState(false);
   const words = [
-    { text: "reduce", color: "#2563EB" },
-    { text: "manage", color: "#7C3AED" },
-    { text: "clear", color: "#16A34A" }
+    { text: "reduce", color: "#0066FF" },
+    { text: "manage", color: "#0066FF" },
+    { text: "clear", color: "#15803D" }
   ];
   const [wordIndex, setWordIndex] = React.useState(0);
   const shouldReduceMotion = useReducedMotion();
@@ -133,11 +133,11 @@ export function HeroGridBlock() {
         {/* Stripe-style Pill */}
         <div className="inline-flex items-center gap-1.5 h-[34px] text-brand-black text-[11px] font-medium mb-5 whitespace-nowrap w-fit">
           <span className="opacity-80">Interest Saved By Customers:</span>
-          <span className="text-[#16A34A] font-semibold"><AnimatedCurrency amount={displayAmount} isMounted={isMounted} /></span>
+          <span className="text-[#15803D] font-semibold"><AnimatedCurrency amount={displayAmount} isMounted={isMounted} /></span>
         </div>
 
         {/* Stripe-style Heading */}
-        <h1 className="hero-title text-brand-black mb-6 font-medium tracking-[-0.04em] text-[clamp(36px,10vw,44px)] leading-[1.02] sm:text-5xl lg:text-[64px] lg:leading-[1.02]">
+        <h1 className="hero-title text-brand-black mb-6 font-medium tracking-[-0.04em] text-[clamp(36px,10vw,44px)] leading-[1.02] sm:text-5xl lg:text-[56px] lg:leading-[1.02]">
           A smarter way to <br className="hidden md:block" />
           <span className="inline-flex items-center flex-nowrap whitespace-nowrap">
             <motion.span layout transition={{ type: "spring", stiffness: 400, damping: 30 }} className="relative inline-flex items-center overflow-hidden h-[1.2em] mr-2 lg:mr-3 pb-1">
@@ -159,17 +159,17 @@ export function HeroGridBlock() {
           </span>
         </h1>
 
-        <p className="hero-description text-brand-black/70 mb-8 sm:mb-10 text-[16px] leading-[1.5] sm:text-lg lg:text-xl max-w-[340px] sm:max-w-none">
+        <p className="hero-description text-brand-black/70 mb-8 sm:mb-10 text-base leading-[1.5] sm:text-lg lg:text-xl max-w-[340px] sm:max-w-none">
           Combine multiple EMIs into one. Explore lower-rate financing options designed around your profile.
         </p>
 
         {/* Stripe-style CTAs */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 mb-8">
-          <Link href="#check-eligibility" className="flex w-full sm:w-auto px-[22px] h-[48px] bg-[#1769D1] text-white rounded-[10px] sm:rounded-full text-[15px] font-semibold hover:bg-[#071B4F] transition-all items-center justify-center gap-2 group shadow-sm">
+          <Link href="#check-eligibility" className="flex w-full sm:w-auto px-[22px] h-[48px] bg-[#0052CC] text-white rounded text-base font-semibold hover:bg-[#0A2540] transition-all items-center justify-center gap-2 group shadow-sm">
             Check My Eligibility
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </Link>
-          <Link href="#calculator" className="flex w-full sm:w-auto px-[22px] h-[48px] bg-white text-brand-black border border-slate-200 rounded-[10px] sm:rounded-full text-[15px] font-semibold hover:bg-slate-50 transition-all items-center justify-center gap-2 group shadow-sm">
+          <Link href="#calculator" className="flex w-full sm:w-auto px-[22px] h-[48px] bg-white text-brand-black border border-slate-200 rounded text-base font-semibold hover:bg-slate-50 transition-all items-center justify-center gap-2 group shadow-sm">
             <Calculator className="w-4 h-4 text-slate-600" />
             See Potential Savings
           </Link>

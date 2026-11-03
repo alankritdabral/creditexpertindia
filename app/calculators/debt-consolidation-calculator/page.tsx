@@ -3,6 +3,7 @@ import Link from "next/link";
 import { DebtConsolidationCalculator } from "@/components/DebtConsolidationCalculator";
 import { AnimatedMeshBackground } from "@/components/AnimatedMeshBackground";
 import { siteConfig } from "@/lib/config";
+import { defaultOgImage } from "@/lib/seo";
 import { CheckCircle2, ShieldCheck, ArrowRight, HelpCircle, Layers3, Calculator, Percent, Clock } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -22,6 +23,13 @@ export const metadata: Metadata = {
     description: "Combine multiple loan and credit card EMIs into one single lower monthly payment. Check your potential monthly savings instantly.",
     url: `${siteConfig.url}/calculators/debt-consolidation-calculator`,
     type: "website",
+    images: [defaultOgImage],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Debt Consolidation Calculator India | Credit Expert India",
+    description: "Combine multiple loan and credit card EMIs into one single lower monthly payment.",
+    images: [defaultOgImage.url],
   },
 };
 
@@ -126,7 +134,7 @@ export default function DebtConsolidationCalculatorPage() {
       <section className="relative w-full pt-32 pb-16 lg:pt-36 lg:pb-20 bg-background overflow-hidden border-b border-icy-blue">
         <div className="absolute inset-0 -z-10 h-full w-full">
           <AnimatedMeshBackground />
-          <div className="absolute top-0 right-0 w-full h-full max-w-[60%] transform origin-top-right -skew-y-12 bg-gradient-to-bl from-[#E2D6CC]/40 to-transparent pointer-events-none" />
+          <div className="absolute top-0 right-0 w-full h-full max-w-[60%] transform origin-top-right -skew-y-12 bg-gradient-to-bl from-[#E2E8F0]/40 to-transparent pointer-events-none" />
         </div>
 
         <div className="container-narrow text-center relative z-10 px-4">
@@ -193,7 +201,7 @@ export default function DebtConsolidationCalculatorPage() {
             </p>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-              <div className="p-4 rounded-2xl bg-white border border-slate-200">
+              <div className="p-4 rounded-2xl bg-white border border-slate-200 card-elevated">
                 <span className="text-xs font-bold uppercase text-slate-500 block mb-1">
                   1. Standard Amortizing EMI Formula
                 </span>
@@ -205,7 +213,7 @@ export default function DebtConsolidationCalculatorPage() {
                 </p>
               </div>
 
-              <div className="p-4 rounded-2xl bg-white border border-slate-200">
+              <div className="p-4 rounded-2xl bg-white border border-slate-200 card-elevated">
                 <span className="text-xs font-bold uppercase text-slate-500 block mb-1">
                   2. Weighted Average Interest Rate
                 </span>
@@ -289,7 +297,7 @@ export default function DebtConsolidationCalculatorPage() {
               4 Things to Evaluate Before Taking a Debt Consolidation Loan
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="p-5 rounded-2xl border border-slate-200 bg-white space-y-1">
+              <div className="p-5 rounded-2xl border border-slate-200 bg-white space-y-1 card-elevated">
                 <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
                   <Percent className="w-4 h-4 text-blue-600" /> 1. Total Repayment, Not Just Monthly EMI
                 </h3>
@@ -298,7 +306,7 @@ export default function DebtConsolidationCalculatorPage() {
                 </p>
               </div>
 
-              <div className="p-5 rounded-2xl border border-slate-200 bg-white space-y-1">
+              <div className="p-5 rounded-2xl border border-slate-200 bg-white space-y-1 card-elevated">
                 <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
                   <Layers3 className="w-4 h-4 text-blue-600" /> 2. Foreclosure & Processing Charges
                 </h3>
@@ -307,7 +315,7 @@ export default function DebtConsolidationCalculatorPage() {
                 </p>
               </div>
 
-              <div className="p-5 rounded-2xl border border-slate-200 bg-white space-y-1">
+              <div className="p-5 rounded-2xl border border-slate-200 bg-white space-y-1 card-elevated">
                 <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
                   <Clock className="w-4 h-4 text-blue-600" /> 3. Strict Card Closure Discipline
                 </h3>
@@ -316,7 +324,7 @@ export default function DebtConsolidationCalculatorPage() {
                 </p>
               </div>
 
-              <div className="p-5 rounded-2xl border border-slate-200 bg-white space-y-1">
+              <div className="p-5 rounded-2xl border border-slate-200 bg-white space-y-1 card-elevated">
                 <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
                   <ShieldCheck className="w-4 h-4 text-blue-600" /> 4. Lender Credibility
                 </h3>

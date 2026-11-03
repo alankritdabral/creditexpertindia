@@ -1,38 +1,33 @@
 import { Metadata } from "next";
+import { buildMetadata } from "@/lib/seo";
 import { WhyUs } from "@/components/WhyUs";
 import { LeadForm } from "@/components/LeadForm";
-import { AnimatedMeshBackground } from "@/components/AnimatedMeshBackground";
+import { ProductHero } from "@/components/ProductHero";
+import { PageIntro, PageProof } from "@/components/page-sections/PageSections";
 
-export const metadata: Metadata = {
-  title: "About Our Mission & Debt Advisory Services",
-  description: "Learn about Credit Expert India's mission to provide transparent debt advisory and consolidation assistance for salaried Indian professionals.",
-  alternates: { canonical: "/about" },
-};
+export const metadata: Metadata = buildMetadata({
+  title: "About Us",
+  description:
+    "Learn about Credit Expert India's mission to provide transparent debt advisory and consolidation assistance for salaried Indian professionals.",
+  path: "/about",
+});
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       
-      <section className="relative w-full pt-32 pb-24 lg:pt-40 lg:pb-32 bg-background overflow-hidden border-b border-icy-blue">
-        <div className="absolute inset-0 -z-10 h-full w-full">
-          <AnimatedMeshBackground />
-          <div className="absolute top-0 right-0 w-full h-full max-w-[60%] transform origin-top-right -skew-y-12 bg-gradient-to-bl from-[#E2D6CC]/40 to-transparent pointer-events-none" />
-        </div>
-        <div className="container-narrow text-center relative z-10">
-          <span className="text-xs font-extrabold uppercase tracking-widest text-brand-black/80">
-            OUR MISSION
-          </span>
-          <h1 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-5xl leading-tight text-brand-black">
-            Empowering Salaried Indians <br className="hidden sm:inline" />
-            <span className="text-brand-black/80">To Overcome Debt Traps</span>
-          </h1>
-          <p className="mt-4 max-w-2xl mx-auto text-base text-brand-black/80 font-medium leading-7">
-            Credit Expert India is a financial service platform facilitating debt consolidation and personal loan inquiries. We focus on conservative claims, transparent communication, and human guidance.
-          </p>
-        </div>
-      </section>
+      <ProductHero
+        title="We help salaried Indians out of debt traps."
+        body="Credit Expert India helps people review their loans and explore consolidation and personal-loan options. We keep our claims modest and our communication honest, and there's always a human to talk to."
+        cta="Talk to us"
+        image="/Misty India Skyline with Orbital Arcs.webp"
+        points={["Human guidance", "Clear, jargon-free advice", "Your information handled responsibly"]}
+      />
+
+      <PageIntro page="about" />
 
       <WhyUs />
+      <PageProof page="about" />
       <LeadForm />
     </div>
   );

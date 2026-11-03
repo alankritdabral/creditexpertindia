@@ -40,7 +40,7 @@ export function LoanConnections({ activeCity }: { activeCity: string | null }) {
           <primitive key={i} object={new THREE.Line(
             curveInfo.geometry,
             new THREE.LineBasicMaterial({
-              color: isActive ? "#35D6C7" : "#5B5CFF",
+              color: isActive ? "#0066FF" : "#0066FF",
               transparent: true,
               opacity: isActive ? 0.6 : 0.2
             })
