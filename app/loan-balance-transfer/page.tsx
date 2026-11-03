@@ -3,6 +3,7 @@ import { buildMetadata } from "@/lib/seo";
 import { LoanCalculator } from "@/components/LoanCalculator";
 import { LeadForm } from "@/components/LeadForm";
 import { ProductHero } from "@/components/ProductHero";
+import { PageIntro, PageProof } from "@/components/page-sections/PageSections";
 
 export const metadata: Metadata = buildMetadata({
   title: "Personal Loan Balance Transfer",
@@ -23,7 +24,10 @@ export default function BalanceTransferPage() {
         points={["Free to check", "We compare partner banks for you", "No pressure to switch"]}
       />
 
+      <PageIntro page="balance-transfer" />
+
       <LoanCalculator />
+      <PageProof page="balance-transfer" />
       <LeadForm />
     </div>
   );

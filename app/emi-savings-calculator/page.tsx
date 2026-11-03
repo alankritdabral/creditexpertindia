@@ -3,6 +3,7 @@ import { buildMetadata } from "@/lib/seo";
 import { ProductHero } from "@/components/ProductHero";
 import { LoanCalculator } from "@/components/LoanCalculator";
 import { LeadForm } from "@/components/LeadForm";
+import { PageIntro, PageProof } from "@/components/page-sections/PageSections";
 
 export const metadata: Metadata = buildMetadata({
   title: "EMI Savings Calculator for Salaried Borrowers",
@@ -21,7 +22,10 @@ export default function Page() {
         image="/img/multipleloans.webp"
         points={["Free and instant", "Built for salaried borrowers", "Honest, even if the saving is small"]}
       />
+
+      <PageIntro page="emi-calculator" />
       <LoanCalculator />
+      <PageProof page="emi-calculator" />
       <LeadForm />
     </div>
   );

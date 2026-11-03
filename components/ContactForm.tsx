@@ -302,7 +302,7 @@ export function ContactForm() {
   return (
     <div className="w-full">
       <div className="grid grid-cols-1 lg:grid-cols-[5fr_6fr] gap-10 lg:gap-16 items-start">
-        <div className="lg:sticky lg:top-28">
+        <div className="order-2 lg:order-1 lg:sticky lg:top-28">
           <h2 className="text-[40px] sm:text-[56px] lg:text-[58px] leading-[1.02] tracking-[-0.04em] font-bold text-[#0A2540]">
             Rather have someone call you?
           </h2>
@@ -353,7 +353,7 @@ export function ContactForm() {
           </ul>
         </div>
 
-        <div className="relative w-full lg:ml-auto max-w-[560px]">
+        <div className="order-1 lg:order-2 relative w-full lg:ml-auto max-w-[560px]">
           {renderRightColumn()}
         </div>
       </div>

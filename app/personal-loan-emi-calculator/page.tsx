@@ -3,6 +3,7 @@ import { buildMetadata } from "@/lib/seo";
 import { ProductHero } from "@/components/ProductHero";
 import { SmartCalculator } from "@/components/SmartCalculator";
 import { LeadForm } from "@/components/LeadForm";
+import { PageIntro, PageProof } from "@/components/page-sections/PageSections";
 
 export const metadata: Metadata = buildMetadata({
   title: "Personal Loan EMI Calculator",
@@ -21,6 +22,8 @@ export default function Page() {
         image="/img/marraige.webp"
         points={["Free and instant", "No sign-up needed", "Compare with a lower rate"]}
       />
+
+      <PageIntro page="emi-calculator" />
       <SmartCalculator />
       <section className="bg-white text-[#0A2540]">
         <div className="max-w-[1220px] mx-auto px-4 md:px-6 lg:px-8 py-16 md:py-24 grid gap-12 lg:grid-cols-[5fr_7fr] lg:gap-20">
@@ -42,6 +45,7 @@ export default function Page() {
           </div>
         </div>
       </section>
+      <PageProof page="emi-calculator" />
       <LeadForm />
     </div>
   );

@@ -222,11 +222,34 @@ export function Navbar() {
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") hidePanel();
+      if (e.key === "Escape") {
+        hidePanel();
+        setOpen(false);
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [hidePanel]);
+
+  // close the mobile drawer after navigating
+  useEffect(() => {
+    setOpen(false);
+    setMobileGroup(null);
+  }, [pathname]);
+
+  // lock page scroll while the mobile drawer is open; close it if the viewport grows to desktop
+  useEffect(() => {
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const onChange = (e: MediaQueryListEvent) => e.matches && setOpen(false);
+    mq.addEventListener("change", onChange);
+    return () => {
+      document.body.style.overflow = prev;
+      mq.removeEventListener("change", onChange);
+    };
+  }, [open]);
 
   const activeMenu = active ? menus.find((m) => m.key === active) || null : null;
   const renderMenu = menus.find((m) => m.key === renderKey) || null;
@@ -426,8 +449,9 @@ export function Navbar() {
             <button
               type="button"
               aria-label="Open menu"
+              aria-expanded={open}
               onClick={() => setOpen(!open)}
-              className="relative w-[40px] h-[40px] rounded-md bg-[#0052CC] hover:bg-[#0A2540] flex items-center justify-center cursor-pointer lg:hidden z-50 transition-colors shadow-sm"
+              className="relative w-[44px] h-[44px] rounded-md bg-[#0052CC] hover:bg-[#0A2540] flex items-center justify-center cursor-pointer lg:hidden z-50 transition-colors shadow-sm"
             >
               <div className="relative w-5 h-[14px] flex flex-col justify-between items-center">
                 <span className={`block h-[2px] w-5 bg-white transition-transform duration-300 ${open ? "rotate-45 translate-y-[6px]" : ""}`}></span>
@@ -459,17 +483,25 @@ export function Navbar() {
               initial="initial"
               animate="enter"
               exit="exit"
-              className="absolute top-0 right-0 h-[100dvh] w-screen max-w-none bg-white shadow-2xl overflow-y-auto flex flex-col"
+              data-lenis-prevent
+              role="dialog"
+              aria-modal="true"
+              aria-label="Menu"
+              className="absolute top-0 right-0 h-[100dvh] w-full bg-white shadow-2xl overflow-y-auto overscroll-contain flex flex-col pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]"
             >
               {/* Header */}
-              <div className="h-[60px] sm:h-auto sm:py-5 px-4 md:px-6 lg:px-8 flex items-center justify-between">
-                <Image src={logo} alt="Credit Expert" className="h-[34px] sm:h-10 w-auto object-contain" priority />
-                <div
+              <div className="h-[60px] shrink-0 sticky top-0 z-10 bg-white px-4 md:px-6 flex items-center justify-between">
+                <Link href="/" onClick={() => setOpen(false)}>
+                  <Image src={logo} alt="Credit Expert" className="h-[34px] sm:h-10 w-auto object-contain" priority />
+                </Link>
+                <button
+                  type="button"
+                  aria-label="Close menu"
                   onClick={() => setOpen(false)}
-                  className="relative w-[40px] h-[40px] rounded-md bg-[#0052CC] hover:bg-[#0A2540] flex items-center justify-center cursor-pointer transition-colors shadow-sm"
+                  className="relative w-[44px] h-[44px] rounded-md bg-[#0052CC] hover:bg-[#0A2540] flex items-center justify-center cursor-pointer transition-colors shadow-sm"
                 >
                   <X className="w-5 h-5 text-white" />
-                </div>
+                </button>
               </div>
 
               {/* Primary Navigation */}

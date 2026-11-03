@@ -4,7 +4,7 @@ import { ProductHero } from "@/components/ProductHero";
 import { Eligibility } from "@/components/Eligibility";
 import { LoanCalculator } from "@/components/LoanCalculator";
 import { LeadForm } from "@/components/LeadForm";
-import { FAQ } from "@/components/FAQ";
+import { PageIntro, PageProof } from "@/components/page-sections/PageSections";
 
 export const metadata: Metadata = buildMetadata({
   title: "Overdraft Options for Salaried Employees",
@@ -30,6 +30,8 @@ export default function Page() {
         points={["Free assessment", "For salaried professionals", "No pressure to go ahead"]}
       />
 
+      <PageIntro page="overdraft" />
+
       <section className="bg-white text-[#0A2540]">
         <div className="max-w-[1220px] mx-auto px-4 md:px-6 lg:px-8 py-16 md:py-24 grid gap-12 lg:grid-cols-[5fr_7fr] lg:gap-20">
           <h2 className="text-[40px] sm:text-[56px] leading-[1.02] tracking-[-0.04em] font-bold">
@@ -48,12 +50,8 @@ export default function Page() {
 
       <Eligibility />
       <LoanCalculator />
+      <PageProof page="overdraft" />
       <LeadForm />
-      <section className="bg-white">
-        <div className="max-w-[1220px] mx-auto px-4 md:px-6 lg:px-8 py-16 md:py-24">
-          <FAQ />
-        </div>
-      </section>
     </div>
   );
 }

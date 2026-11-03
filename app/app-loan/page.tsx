@@ -3,6 +3,7 @@ import { buildMetadata } from "@/lib/seo";
 import { LoanCalculator } from "@/components/LoanCalculator";
 import { LeadForm } from "@/components/LeadForm";
 import { ProductHero } from "@/components/ProductHero";
+import { PageIntro, PageProof } from "@/components/page-sections/PageSections";
 
 export const metadata: Metadata = buildMetadata({
   title: "App Loan & Fintech Loan Consolidation",
@@ -23,7 +24,10 @@ export default function AppLoanPage() {
         points={["Free to check", "One EMI, one due date", "No pressure, no upfront fees"]}
       />
 
+      <PageIntro page="app-loan" />
+
       <LoanCalculator />
+      <PageProof page="app-loan" />
       <LeadForm />
     </div>
   );

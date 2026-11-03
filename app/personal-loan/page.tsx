@@ -4,6 +4,7 @@ import { LoanCalculator } from "@/components/LoanCalculator";
 import { Eligibility } from "@/components/Eligibility";
 import { LeadForm } from "@/components/LeadForm";
 import { ProductHero } from "@/components/ProductHero";
+import { PageIntro, PageProof } from "@/components/page-sections/PageSections";
 
 export const metadata: Metadata = buildMetadata({
   title: "Personal Loans for Salaried Staff from 9.95% p.a.*",
@@ -24,8 +25,11 @@ export default function PersonalLoanPage() {
         points={["Free to check, no obligation", "Soft profile check, no impact on your score*", "You decide if you go ahead"]}
       />
 
+      <PageIntro page="personal-loan" />
+
       <Eligibility />
       <LoanCalculator />
+      <PageProof page="personal-loan" />
       <LeadForm />
     </div>
   );

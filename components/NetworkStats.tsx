@@ -6,9 +6,9 @@ import { AnimatedNumber } from "./ui/AnimatedNumber";
 
 type Stat = { id: string; value: number; format: (n: number) => string; description: string };
 
-// Figures come from the partner-lender data in lib/lenderEngine.ts (13 lenders, max amount and tenure).
+// Figures come from the partner-lender data in lib/lenderEngine.ts (max amount and tenure).
 const STATS: Stat[] = [
-  { id: "lenders", value: 13, format: (n) => String(Math.round(n)), description: "partner banks and NBFCs compared in one place" },
+  { id: "lenders", value: 50, format: (n) => Math.round(n) + "+", description: "partner banks and NBFCs compared in one place" },
   { id: "debts", value: 5, format: (n) => String(Math.round(n)), description: "kinds of debt you can bring into one EMI" },
   { id: "amount", value: 1, format: (n) => "₹" + Math.round(n) + " Cr", description: "maximum loan amount from select partner lenders*" },
   { id: "tenure", value: 84, format: (n) => String(Math.round(n)), description: "months of maximum repayment tenure*" },

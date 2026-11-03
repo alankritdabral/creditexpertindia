@@ -4,6 +4,7 @@ import { Eligibility } from "@/components/Eligibility";
 import { LoanCalculator } from "@/components/LoanCalculator";
 import { LeadForm } from "@/components/LeadForm";
 import { FAQ } from "@/components/FAQ";
+import { PageIntro, PageProof } from "@/components/page-sections/PageSections";
 import { cities, type City } from "@/lib/cities";
 
 export function CityLoanPage({ city }: { city: City }) {
@@ -17,6 +18,8 @@ export function CityLoanPage({ city }: { city: City }) {
         image="/img/marraige.webp"
         points={["Free to check, from anywhere in " + city.name, "Made for salaried professionals", "You decide whether to go ahead"]}
       />
+
+      <PageIntro page="city" />
 
       <section className="bg-white text-[#0A2540]">
         <div className="max-w-[1220px] mx-auto px-4 md:px-6 lg:px-8 py-16 md:py-24 grid gap-12 lg:grid-cols-[5fr_7fr] lg:gap-20">
@@ -40,13 +43,8 @@ export function CityLoanPage({ city }: { city: City }) {
 
       <Eligibility />
       <LoanCalculator />
+      <PageProof page="city" />
       <LeadForm />
-
-      <section className="bg-white">
-        <div className="max-w-[1220px] mx-auto px-4 md:px-6 lg:px-8 py-16 md:py-24">
-          <FAQ />
-        </div>
-      </section>
 
       <section className="bg-[#EAF3FF] text-[#0A2540]">
         <div className="max-w-[1220px] mx-auto px-4 md:px-6 lg:px-8 py-14 md:py-20">

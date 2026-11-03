@@ -3,6 +3,7 @@ import { buildMetadata } from "@/lib/seo";
 import { HowItWorks } from "@/components/HowItWorks";
 import { LeadForm } from "@/components/LeadForm";
 import { ProductHero } from "@/components/ProductHero";
+import { PageIntro, PageProof } from "@/components/page-sections/PageSections";
 
 export const metadata: Metadata = buildMetadata({
   title: "How It Works",
@@ -23,7 +24,10 @@ export default function HowItWorksPage() {
         points={["Four simple steps", "You can stop at any point", "Nothing is pushed on you"]}
       />
 
+      <PageIntro page="how-it-works" />
+
       <HowItWorks />
+      <PageProof page="how-it-works" />
       <LeadForm />
     </div>
   );

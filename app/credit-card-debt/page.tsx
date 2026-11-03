@@ -2,8 +2,8 @@ import { Metadata } from "next";
 import { buildMetadata } from "@/lib/seo";
 import { LoanCalculator } from "@/components/LoanCalculator";
 import { LeadForm } from "@/components/LeadForm";
-import { FAQ } from "@/components/FAQ";
 import { ProductHero } from "@/components/ProductHero";
+import { PageIntro, PageProof } from "@/components/page-sections/PageSections";
 
 export const metadata: Metadata = buildMetadata({
   title: "Credit Card Debt Relief & Payoff Options",
@@ -24,13 +24,11 @@ export default function CreditCardDebtPage() {
         points={["Free assessment", "We never ask for money upfront", "Your final lender makes the decision"]}
       />
 
+      <PageIntro page="credit-card-debt" />
+
       <LoanCalculator />
+      <PageProof page="credit-card-debt" />
       <LeadForm />
-      <section className="bg-white">
-        <div className="max-w-[1220px] mx-auto px-4 md:px-6 lg:px-8 py-16 md:py-24">
-          <FAQ />
-        </div>
-      </section>
     </div>
   );
 }

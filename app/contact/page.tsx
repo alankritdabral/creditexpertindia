@@ -36,6 +36,12 @@ export default function ContactPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
       />
       
+      <section id="contact-form" className="bg-[#EAF3FF]">
+        <div className="max-w-[1220px] mx-auto px-4 md:px-6 lg:px-8 pt-28 md:pt-36 pb-16 md:pb-24">
+          <ContactForm />
+        </div>
+      </section>
+
       <ProductHero
         title="Want to talk to a real person? Here we are."
         body="Questions about your loans or consolidation options? Call, message or fill in the form and one of our credit specialists will get back to you."
@@ -44,12 +50,6 @@ export default function ContactPage() {
         points={["Offices in Dehradun, Delhi and Rudrapur", "Usually a reply within 24 hours", "Free to ask"]}
         href="#contact-form"
       />
-
-      <section className="bg-[#EAF3FF]">
-        <div className="max-w-[1220px] mx-auto px-4 md:px-6 lg:px-8 py-16 md:py-24">
-          <ContactForm />
-        </div>
-      </section>
 
       <section className="bg-white">
         <div className="max-w-[1220px] mx-auto px-4 md:px-6 lg:px-8 py-16 md:py-24 grid gap-12 lg:grid-cols-[5fr_7fr]">

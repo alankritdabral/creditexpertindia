@@ -3,6 +3,7 @@ import { buildMetadata } from "@/lib/seo";
 import { LoanCalculator } from "@/components/LoanCalculator";
 import { LeadForm } from "@/components/LeadForm";
 import { ProductHero } from "@/components/ProductHero";
+import { PageIntro, PageProof } from "@/components/page-sections/PageSections";
 
 export const metadata: Metadata = buildMetadata({
   title: "High-Interest Loan Refinancing & Advisory",
@@ -23,7 +24,10 @@ export default function HighInterestLoanPage() {
         points={["Free assessment", "Honest answer, even if switching isn't worth it", "You stay in control"]}
       />
 
+      <PageIntro page="high-interest-loan" />
+
       <LoanCalculator />
+      <PageProof page="high-interest-loan" />
       <LeadForm />
     </div>
   );

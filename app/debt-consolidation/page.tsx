@@ -3,8 +3,8 @@ import { buildMetadata } from "@/lib/seo";
 import { DebtConsolidation } from "@/components/DebtConsolidation";
 import { LoanCalculator } from "@/components/LoanCalculator";
 import { LeadForm } from "@/components/LeadForm";
-import { FAQ } from "@/components/FAQ";
 import { ProductHero } from "@/components/ProductHero";
+import { PageIntro, PageProof } from "@/components/page-sections/PageSections";
 
 export const metadata: Metadata = buildMetadata({
   title: "Debt Consolidation Loans for Salaried Professionals",
@@ -24,14 +24,12 @@ export default function DebtConsolidationPage() {
         points={["Free assessment", "One due date, one payment", "Honest answer, even if it isn't worth it"]}
       />
 
+      <PageIntro page="debt-consolidation" />
+
       <DebtConsolidation />
       <LoanCalculator />
+      <PageProof page="debt-consolidation" />
       <LeadForm />
-      <section className="bg-white">
-        <div className="max-w-[1220px] mx-auto px-4 md:px-6 lg:px-8 py-16 md:py-24">
-          <FAQ />
-        </div>
-      </section>
     </div>
   );
 }
