@@ -13,6 +13,45 @@ export const metadata: Metadata = buildMetadata({
   path: "/debt-consolidation",
 });
 
+const debtConsolidationFaqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "Can you help with multiple loans?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Yes. We can review multiple loans and EMIs together and help you understand whether consolidation or another option may be suitable."
+      }
+    },
+    {
+      "@type": "Question",
+      name: "Can you help with credit-card debt?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "We can review your credit-card dues and help you understand potential repayment or consolidation options available based on your situation."
+      }
+    },
+    {
+      "@type": "Question",
+      name: "Do you guarantee loan approval or lower interest rates?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "No. Final approval, interest rate, loan amount and tenure are decided by the respective lender based on its eligibility criteria."
+      }
+    },
+    {
+      "@type": "Question",
+      name: "Is the loan assessment free?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "The initial assessment can be offered without obligation. Any applicable lender charges are always communicated clearly before proceeding."
+      }
+    }
+  ]
+};
+
 export default function DebtConsolidationPage() {
   return (
     <div className="min-h-screen bg-white">
@@ -26,6 +65,10 @@ export default function DebtConsolidationPage() {
 
       <PageIntro page="debt-consolidation" />
 
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(debtConsolidationFaqSchema) }}
+      />
       <DebtConsolidation />
       <LoanCalculator />
       <PageProof page="debt-consolidation" />
