@@ -1,23 +1,20 @@
 "use client";
 
-import React, { useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { ArrowRight, Banknote, CreditCard, Landmark, Layers, Plus, Smartphone, type LucideIcon } from "lucide-react";
+import React from "react";
+import { ArrowRight, Banknote, ChevronRight, CreditCard, Landmark, Layers, Smartphone, type LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { LoanStage, type StageScene } from "./LoanStage";
 
+type Stat = { lead: string; text: string };
 type Solution = {
   id: string;
   label: string;
   icon: LucideIcon;
   headline: string;
-  quote: string;
-  points: string[];
+  stats: [Stat, Stat, Stat];
   cta: { label: string; href: string };
   scene: StageScene;
 };
-
-const AUTOPLAY_MS = 6000;
 
 const SOLUTIONS: Solution[] = [
   {
@@ -25,11 +22,10 @@ const SOLUTIONS: Solution[] = [
     label: "Personal Loan",
     icon: Smartphone,
     headline: "Make your monthly repayments more manageable.",
-    quote: "Get a better rate and a more manageable EMI, without the complexity.",
-    points: [
-      "Compare options from partner lenders in one place",
-      "Choose a tenure that fits your monthly budget",
-      "No obligation to proceed after you see your options",
+    stats: [
+      { lead: "Compare options", text: "from partner lenders in one place" },
+      { lead: "Choose a tenure", text: "that fits your monthly budget" },
+      { lead: "No obligation", text: "to proceed after you see your options" },
     ],
     cta: { label: "Check your EMI options", href: "#calculator" },
     scene: { kind: "phone", tint: "rgba(0,102,255,0.08)" },
@@ -39,11 +35,10 @@ const SOLUTIONS: Solution[] = [
     label: "Credit Card",
     icon: CreditCard,
     headline: "Reduce the burden of expensive credit-card debt.",
-    quote: "Take control of high-interest credit-card debt.",
-    points: [
-      "Card dues can carry rates of 40% p.a. or more",
-      "A personal loan may bring that rate down",
-      "One fixed EMI instead of a revolving balance",
+    stats: [
+      { lead: "40% p.a. or more", text: "can be charged on card dues" },
+      { lead: "A personal loan", text: "may bring that rate down" },
+      { lead: "One fixed EMI", text: "instead of a revolving balance" },
     ],
     cta: { label: "Explore card debt options", href: "/credit-card-debt" },
     scene: { kind: "card", tint: "rgba(0,102,255,0.06)", rate: { from: 45, to: 11 } },
@@ -53,11 +48,10 @@ const SOLUTIONS: Solution[] = [
     label: "App Loans",
     icon: Smartphone,
     headline: "Bring scattered app loans into a clearer plan.",
-    quote: "Simplify multiple app loans into one manageable payment.",
-    points: [
-      "Short-term app loans often come with steep rates",
-      "Combine eligible ones into a single EMI",
-      "One due date to remember instead of several",
+    stats: [
+      { lead: "Steep rates", text: "are common on short-term app loans" },
+      { lead: "Combine eligible ones", text: "into a single EMI" },
+      { lead: "One due date", text: "to remember instead of several" },
     ],
     cta: { label: "See app loan options", href: "/app-loan" },
     scene: {
@@ -77,11 +71,10 @@ const SOLUTIONS: Solution[] = [
     label: "Multiple Loans",
     icon: Layers,
     headline: "Replace multiple payments with one simpler repayment.",
-    quote: "I had four different payments to keep track of every month…",
-    points: [
-      "Mix personal loans, cards, overdrafts and app loans",
-      "Track one EMI and one due date each month",
-      "Illustrative figures; actual terms depend on your profile",
+    stats: [
+      { lead: "Mix loan types", text: "personal loans, cards, overdrafts and app loans" },
+      { lead: "One EMI", text: "and one due date each month" },
+      { lead: "Illustrative figures;", text: "actual terms depend on your profile" },
     ],
     cta: { label: "Explore debt consolidation", href: "/debt-consolidation" },
     scene: {
@@ -101,148 +94,114 @@ const SOLUTIONS: Solution[] = [
     label: "Overdraft",
     icon: Landmark,
     headline: "Explore options for expensive overdraft debt.",
-    quote: "Take control of high-cost overdraft debt.",
-    points: [
-      "Overdraft interest adds up when balances linger",
-      "A fixed-tenure loan can make repayment predictable",
-      "See what you may qualify for before you decide",
+    stats: [
+      { lead: "Interest adds up", text: "when overdraft balances linger" },
+      { lead: "A fixed-tenure loan", text: "can make repayment predictable" },
+      { lead: "See what you may qualify for", text: "before you decide" },
     ],
     cta: { label: "Check overdraft options", href: "/personal-loan-overdraft" },
     scene: { kind: "rate", tint: "rgba(15,118,110,0.07)", rate: { from: 14, to: 11.75 } },
   },
 ];
 
-const subscribeNoop = () => () => {};
-
-function canAutoplay() {
-  const nav = navigator as Navigator & { deviceMemory?: number; connection?: { saveData?: boolean } };
-  if (nav.connection?.saveData) return false;
-  if (nav.deviceMemory !== undefined && nav.deviceMemory < 4) return false;
-  if (nav.hardwareConcurrency !== undefined && nav.hardwareConcurrency < 4) return false;
-  return true;
-}
+// As on stripe.com/in: every card stays open and sticks STACK_STEP below the previous one;
+// later cards slide over earlier ones, leaving only each earlier card's header strip showing.
+const STACK_TOP = 16;
+const STACK_STEP = 44;
 
 export const LoanSolutionsSection = () => {
-  const [openId, setOpenId] = useState(SOLUTIONS[0].id);
-  const [stopped, setStopped] = useState(false);
-  const [hovering, setHovering] = useState(false);
-  const [inView, setInView] = useState(false);
-  const reduceMotion = useReducedMotion() === true;
-  const gridRef = useRef<HTMLDivElement>(null);
-  const openIndex = Math.max(0, SOLUTIONS.findIndex((s) => s.id === openId));
-
-  // Autoplay is decorative: skip it for reduced motion, data-saver and low-end hardware.
-  const capable = useSyncExternalStore(subscribeNoop, canAutoplay, () => false);
-  const autoplay = capable && !reduceMotion && !stopped;
-
-  useEffect(() => {
-    const el = gridRef.current;
-    if (!el) return;
-    const io = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting), { threshold: 0.35 });
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
-
-  const select = (id: string) => {
-    if (id === openId) return;
-    setStopped(true); // a manual choice ends autoplay for good
-    setOpenId(id);
+  // Clicking a strip brings that card forward: scroll until its natural top sits on its pinned slot.
+  const bringForward = (idx: number) => {
+    const rows = document.querySelectorAll<HTMLElement>("[data-row]");
+    const row = rows[idx];
+    if (!row) return;
+    // Pinned rows report their pinned position, so derive the natural one from the container and the rows above.
+    let naturalTop = (row.parentElement as HTMLElement).getBoundingClientRect().top;
+    for (let i = 0; i < idx; i++) naturalTop += rows[i].offsetHeight;
+    window.scrollBy({ top: naturalTop - (STACK_TOP + idx * STACK_STEP), behavior: "smooth" });
   };
 
-  const advance = () => setOpenId(SOLUTIONS[(openIndex + 1) % SOLUTIONS.length].id);
-  const progressPaused = hovering || !inView;
-
   return (
-    <section className="w-full bg-[#F8FAFC]">
+    <section className="w-full bg-white">
       <div className="max-w-[1220px] mx-auto px-4 md:px-6 lg:px-8 py-16 md:py-24">
-        <div className="max-w-2xl">
-          <p className="text-base font-semibold tracking-wide text-[#0052CC] uppercase mb-4">Bring your eligible loans together</p>
-          <h2 className="text-[32px] sm:text-[48px] leading-[1.05] tracking-[-0.03em] font-semibold text-[#0A2540]">
-            One simpler way to manage multiple <span className="text-[#0052CC]">debts.</span>
-          </h2>
-          <p className="mt-5 text-lg md:text-xl text-[#3C4F69]">Different debts. Different stories. One smarter way forward.</p>
-        </div>
+        {/* Header: title + action on the left, description on the right (Stripe's section-header) */}
+        <header className="grid gap-6 lg:grid-cols-12 lg:gap-8 lg:items-start">
+          <div className="lg:col-span-5">
+            <h2 className="text-[32px] sm:text-[44px] leading-[1.08] tracking-[-0.03em] font-semibold text-[#0A2540]">
+              Bring your eligible loans <span className="text-[#0052CC]">together</span>
+            </h2>
+            <Link
+              href="/eligibility"
+              className="mt-6 inline-flex items-center gap-1.5 rounded-full bg-[#0052CC] px-5 py-2.5 text-base font-semibold text-white transition-colors hover:bg-[#0A2540]"
+            >
+              Check your eligibility <ChevronRight className="w-4 h-4" />
+            </Link>
+          </div>
+          <p className="lg:col-span-6 lg:col-start-7 text-lg md:text-xl text-[#3C4F69] lg:pt-2">
+            One simpler way to manage multiple debts. Different debts. Different stories. One smarter way forward.
+          </p>
+        </header>
 
-        {/* On mobile the single stage is ordered to sit right under the open row, so it never remounts. */}
-        <div
-          ref={gridRef}
-          onMouseEnter={() => setHovering(true)}
-          onMouseLeave={() => setHovering(false)}
-          className="mt-12 flex flex-col lg:grid lg:grid-cols-[1fr_1.1fr] lg:gap-14 lg:items-start"
-        >
-          <ul className="contents lg:block lg:divide-y lg:divide-[#E2E8F0] lg:border-y lg:border-[#E2E8F0]">
-            {SOLUTIONS.map((s, idx) => {
-              const isOpen = s.id === openId;
-              const Icon = s.icon;
-              return (
-                <li key={s.id} style={{ order: idx * 2 }} className="max-lg:border-b max-lg:border-[#E2E8F0] max-lg:first:border-t">
+        <div className="mt-12 md:mt-16">
+          {SOLUTIONS.map((s, idx) => {
+            const Icon = s.icon;
+            return (
+              <div
+                key={s.id}
+                data-row
+                // Later cards sit above earlier ones, so each slides over the one before it.
+                style={{ ["--slot" as string]: `${STACK_TOP + idx * STACK_STEP}px`, zIndex: idx + 1 }}
+                className="sticky top-[var(--slot)] bg-white border-t border-dashed border-[#E2E8F0] first:border-t-0 shadow-[0_-6px_10px_-8px_rgba(10,37,64,0.22)]"
+              >
+                <div onClick={() => bringForward(idx)} className="flex items-center gap-0 py-2 cursor-pointer group">
+                  <span aria-hidden className="w-10 h-10 shrink-0 rounded-md flex items-center justify-center bg-[#0052CC] text-white">
+                    <Icon className="w-5 h-5" />
+                  </span>
+
                   <button
                     type="button"
                     id={`sol-btn-${s.id}`}
-                    aria-expanded={isOpen}
-                    aria-controls={`sol-panel-${s.id}`}
-                    onClick={() => select(s.id)}
-                    className="relative w-full flex items-center justify-between gap-4 py-5 text-left cursor-pointer group"
+                    className="flex-1 min-w-0 px-4 text-left bg-transparent border-0 appearance-none cursor-pointer focus-visible:outline-none"
                   >
-                    <span className="flex items-center gap-3">
-                      <span className={`w-9 h-9 rounded-lg flex items-center justify-center transition-colors ${isOpen ? "bg-[#0052CC] text-white" : "bg-[#BFDBFE] text-[#0052CC] group-hover:bg-[#c9defa]"}`}>
-                        <Icon className="w-[18px] h-[18px]" />
-                      </span>
-                      <span className={`text-[20px] md:text-[22px] font-semibold tracking-[-0.01em] transition-colors ${isOpen ? "text-[#0A2540]" : "text-[#3C4F69] group-hover:text-[#0A2540]"}`}>
-                        {s.label}
-                      </span>
-                    </span>
-                    <Plus className={`w-5 h-5 shrink-0 text-[#0052CC] transition-transform duration-200 ${isOpen ? "rotate-45" : ""}`} />
-                    {isOpen && autoplay && (
-                      <span
-                        key={openId}
-                        aria-hidden
-                        onAnimationEnd={advance}
-                        className="absolute left-0 right-0 bottom-0 h-[2px] origin-left bg-[#0052CC]"
-                        style={{ animation: `sol-progress ${AUTOPLAY_MS}ms linear forwards`, animationPlayState: progressPaused ? "paused" : "running" }}
-                      />
-                    )}
+                    <h3 className="text-base sm:text-lg leading-10 font-semibold text-[#0052CC] transition-colors group-hover:text-[#0A2540]">{s.label}</h3>
                   </button>
-                  <AnimatePresence initial={false}>
-                    {isOpen && (
-                      <motion.div
-                        id={`sol-panel-${s.id}`}
-                        role="region"
-                        aria-labelledby={`sol-btn-${s.id}`}
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.25, ease: [0.45, 0.05, 0.55, 0.95] }}
-                        className="overflow-hidden"
-                      >
-                        <div className="pb-7 pl-0 md:pl-12">
-                          <h3 className="text-[24px] md:text-[32px] leading-[1.15] tracking-[-0.02em] font-semibold text-[#0A2540]">{s.headline}</h3>
-                          <p className="mt-3 pl-4 border-l-2 border-[#0066FF] text-lg italic text-[#0A2540] opacity-80">{s.quote}</p>
-                          <ul className="mt-5 space-y-2.5">
-                            {s.points.map((p) => (
-                              <li key={p} className="flex gap-2.5 text-base text-[#3C4F69]">
-                                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0052CC]" />
-                                {p}
-                              </li>
-                            ))}
-                          </ul>
-                          <Link href={s.cta.href} className="mt-6 inline-flex items-center gap-1.5 text-base font-semibold text-[#0052CC] hover:text-[#0A2540] transition-colors">
-                            {s.cta.label} <ArrowRight className="w-4 h-4" />
-                          </Link>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </li>
-              );
-            })}
-          </ul>
 
-          <LoanStage
-            scene={SOLUTIONS[openIndex].scene}
-            style={{ order: openIndex * 2 + 1 }}
-            className="mb-6 lg:mb-0 lg:sticky lg:top-8"
-          />
+                  <Link
+                    href={s.cta.href}
+                    aria-label={s.cta.label}
+                    onClick={(e) => e.stopPropagation()}
+                    className="ml-auto shrink-0 inline-flex h-10 items-center gap-1 rounded-md border border-[#BFDBFE] bg-white px-3 sm:px-4 text-sm sm:text-base font-semibold text-[#0052CC] transition-colors hover:border-[#0052CC]"
+                  >
+                    <span className="sm:hidden">Explore</span>
+                    <span className="hidden sm:inline">Learn more</span>
+                    <ArrowRight className="w-4 h-4 sm:hidden" />
+                    <ChevronRight className="w-4 h-4 hidden sm:block" />
+                  </Link>
+                </div>
+
+                <div
+                  id={`sol-panel-${s.id}`}
+                  className="grid pt-1 pb-8 lg:grid-cols-[5fr_7fr] lg:gap-x-12 lg:grid-rows-[auto_auto_1fr] lg:pb-12"
+                >
+                  <p className="pb-3 text-[18px] lg:text-[32px] leading-[1.3] lg:leading-[1.15] tracking-[-0.01em] lg:tracking-[-0.02em] lg:font-semibold text-[#0A2540] lg:col-start-1 lg:row-start-1 lg:pt-4">
+                    {s.headline}
+                  </p>
+
+                  <div className="lg:col-start-2 lg:row-start-1 lg:row-span-3">
+                    <LoanStage scene={s.scene} still className="max-sm:h-[300px] lg:!h-[440px]" />
+                  </div>
+
+                  <div className="grid gap-4 pt-4 pb-2 lg:col-start-1 lg:row-start-2 lg:pt-6">
+                    {s.stats.map((st) => (
+                      <p key={st.lead} className="text-base text-[#3C4F69] [text-wrap:pretty]">
+                        <strong className="font-semibold text-[#0A2540]">{st.lead}</strong> {st.text}
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
 
         <p className="mt-8 text-sm text-[#3C4F69]">*Illustrative figures only. Final rates and terms are set by partner lenders after checking your profile.</p>

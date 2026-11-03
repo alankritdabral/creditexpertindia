@@ -1,8 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
-import { Loader2, ArrowRight, CheckCircle2, AlertCircle, ChevronDown, Lock, Check } from "lucide-react";
+import { Loader2, ArrowRight, CheckCircle2, AlertCircle, ChevronDown, Lock, Check, CheckCheck } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
+import logo from "@/public/img/logo.webp";
 import { contact } from "@/lib/config";
 
 const REQUIREMENTS = [
@@ -21,9 +23,7 @@ export function ContactForm() {
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
-    email: "",
     requirement: "",
-    message: "",
     netSalary: "",
     ongoingEmi: "",
     consent: false,
@@ -32,7 +32,7 @@ export function ContactForm() {
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
     if (type === "checkbox") {
       const checked = (e.target as HTMLInputElement).checked;
@@ -90,10 +90,8 @@ export function ContactForm() {
       setFormData({
         name: "",
         phone: "",
-        email: "",
-        requirement: "",
-        message: "",
-        netSalary: "",
+            requirement: "",
+            netSalary: "",
         ongoingEmi: "",
         consent: false,
       });
@@ -197,21 +195,6 @@ export function ContactForm() {
           </div>
 
           <div className="space-y-1.5">
-            <label htmlFor="email" className="text-sm font-bold text-[#0A2540]">
-              Email Address
-            </label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="e.g. rahul@example.com"
-              className="w-full bg-slate-50 border border-slate-50 focus:border-slate-200 rounded-xl px-4 py-3 text-[#0A2540] text-sm focus:ring-4 focus:ring-blue-50 outline-none transition-all placeholder:text-[#3C4F69]/50"
-            />
-          </div>
-
-          <div className="space-y-1.5">
             <label htmlFor="requirement" className="text-sm font-bold text-[#0A2540]">
               What can we help you with? <span className="text-red-500">*</span>
             </label>
@@ -268,21 +251,6 @@ export function ContactForm() {
                 required
               />
             </div>
-          </div>
-
-          <div className="space-y-1.5 flex flex-col">
-            <label htmlFor="message" className="text-sm font-bold text-[#0A2540]">
-              Message
-            </label>
-            <textarea
-              id="message"
-              name="message"
-              value={formData.message}
-              onChange={handleChange}
-              placeholder="Tell us a bit more about your situation..."
-              rows={2}
-              className="w-full bg-slate-50 border border-slate-50 focus:border-slate-200 rounded-xl px-4 py-3 text-[#0A2540] text-sm focus:ring-4 focus:ring-blue-50 outline-none transition-all resize-none placeholder:text-[#3C4F69]/50"
-            />
           </div>
 
           <div className="mt-4 pt-4 shrink-0">
@@ -343,13 +311,37 @@ export function ContactForm() {
             back and walk through it with you.
           </p>
 
-          <div className="mt-9 flex flex-col gap-3 max-w-md">
-            <div className="self-end bg-[#bcd5ff] text-[#0A2540] rounded-[20px] rounded-br-[6px] px-5 py-3.5 text-lg leading-snug">
-              I have a few EMIs. Can I pay less every month?
+          <div className="mt-9 max-w-md overflow-hidden rounded-2xl card-elevated bg-[#efeae2]">
+            <div className="flex items-center gap-3 bg-[#008069] px-4 py-3 text-white">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white">
+                <Image src={logo} alt="" className="h-[18px] w-auto object-contain" />
+              </div>
+              <div className="leading-tight">
+                <p className="text-[15px] font-semibold">Credit Expert India</p>
+                <p className="text-xs text-white/80">online</p>
+              </div>
             </div>
-            <div className="self-start bg-white text-[#0A2540] rounded-[20px] rounded-bl-[6px] px-5 py-3.5 card-elevated text-lg leading-relaxed">
-              Maybe. Share a few details and we&apos;ll go through them with you. It&apos;s free, and
-              there&apos;s no pressure to go ahead.
+
+            <div className="flex flex-col gap-2 px-4 py-5">
+              <span className="self-center rounded-md bg-white/80 px-2.5 py-1 text-[11px] font-medium uppercase tracking-wide text-[#54656f] shadow-sm">
+                Today
+              </span>
+
+              <div className="self-end max-w-[85%] rounded-lg rounded-tr-none bg-[#d9fdd3] px-3 pt-2 pb-1.5 text-[#111b21] shadow-sm">
+                <p className="text-[15px] leading-snug">I have a few EMIs. Can I pay less every month?</p>
+                <p className="mt-0.5 flex items-center justify-end gap-1 text-[11px] text-[#667781]">
+                  10:42
+                  <CheckCheck className="h-3.5 w-3.5 text-[#53bdeb]" strokeWidth={2.5} />
+                </p>
+              </div>
+
+              <div className="self-start max-w-[85%] rounded-lg rounded-tl-none bg-white px-3 pt-2 pb-1.5 text-[#111b21] shadow-sm">
+                <p className="text-[15px] leading-snug">
+                  Maybe. Share a few details and we&apos;ll go through them with you. It&apos;s free, and
+                  there&apos;s no pressure to go ahead.
+                </p>
+                <p className="mt-0.5 text-right text-[11px] text-[#667781]">10:43</p>
+              </div>
             </div>
           </div>
 

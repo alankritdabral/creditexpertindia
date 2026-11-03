@@ -165,8 +165,8 @@ function useStageMemory(scene: StageScene): StageMemory {
   return next;
 }
 
-export function LoanStage({ scene, className, style }: { scene: StageScene; className?: string; style?: React.CSSProperties }) {
-  const instant = useReducedMotion() === true;
+export function LoanStage({ scene, className, style, still }: { scene: StageScene; className?: string; style?: React.CSSProperties; still?: boolean }) {
+  const instant = useReducedMotion() === true || still === true;
   const uid = useId().replace(/:/g, "");
   const kind = scene.kind;
   const focal = FOCAL[kind];
@@ -195,7 +195,7 @@ export function LoanStage({ scene, className, style }: { scene: StageScene; clas
     <div
       aria-hidden="true"
       style={style}
-      className={`relative rounded-2xl bg-[linear-gradient(160deg,#eaf3ff,#f7fbff_55%,#dcebff)] border border-[#E2E8F0] overflow-hidden flex items-center justify-center h-[400px] sm:h-[520px] lg:h-[640px] ${className ?? ""}`}
+      className={`relative rounded-md bg-[linear-gradient(160deg,#eaf3ff,#f7fbff_55%,#dcebff)] border border-[#E2E8F0] overflow-hidden flex items-center justify-center h-[340px] sm:h-[420px] ${className ?? ""}`}
     >
       <motion.div
         initial={false}
@@ -204,7 +204,10 @@ export function LoanStage({ scene, className, style }: { scene: StageScene; clas
         className="absolute inset-0 pointer-events-none"
       />
 
-      <div className="relative shrink-0 w-[440px] h-[600px] scale-[0.66] sm:scale-[0.85] lg:scale-100">
+      {/* Phone needs the full canvas height; the other scenes are shorter, so on mobile they scale up to fill the box. */}
+      <div
+        className={`relative shrink-0 w-[440px] h-[600px] ${kind === "phone" ? "scale-[0.55] lg:scale-[0.74]" : kind === "card" ? "scale-[0.62] lg:scale-[0.85]" : "scale-[0.74] lg:scale-[0.95]"} sm:scale-[0.68] motion-safe:transition-transform motion-safe:duration-500`}
+      >
         {/* Connectors: dashed lines revealed through a pathLength-driven mask */}
         <svg className="absolute inset-0 w-full h-full opacity-60 pointer-events-none" viewBox={`0 0 ${W} ${H}`} aria-hidden>
           <defs>

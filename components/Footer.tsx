@@ -143,7 +143,7 @@ export function Footer() {
             <h3 className="text-xs font-bold uppercase tracking-wider text-brand-black mb-5">Contact</h3>
             <ul role="list" className="space-y-3">
               <li>
-                <a href={`mailto:${contact.email}`} className={`${linkClass} flex items-start gap-2 break-all`}>
+                <a href={`mailto:${contact.email}`} className={`${linkClass} flex items-start gap-2 whitespace-nowrap`}>
                   <Mail className="w-4 h-4 mt-0.5 shrink-0" />
                   {contact.email}
                 </a>
