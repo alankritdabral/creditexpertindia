@@ -125,7 +125,7 @@ export const LoanSolutionsSection = () => {
     <section className="w-full bg-white">
       <div className="max-w-[1220px] mx-auto px-4 md:px-6 lg:px-8 py-16 md:py-24">
         {/* Header: title + action on the left, description on the right (Stripe's section-header) */}
-        <header className="grid gap-6 lg:grid-cols-12 lg:gap-8 lg:items-start">
+        <header className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:gap-8 lg:items-start">
           <div className="lg:col-span-5">
             <h2 className="text-[32px] sm:text-[44px] leading-[1.08] tracking-[-0.03em] font-semibold text-[#0A2540]">
               Bring your eligible loans <span className="text-[#0052CC]">together</span>
@@ -181,13 +181,13 @@ export const LoanSolutionsSection = () => {
 
                 <div
                   id={`sol-panel-${s.id}`}
-                  className="grid pt-1 pb-8 lg:grid-cols-[5fr_7fr] lg:gap-x-12 lg:grid-rows-[auto_auto_1fr] lg:pb-12"
+                  className="grid grid-cols-1 min-w-0 pt-1 pb-8 lg:grid-cols-[5fr_7fr] lg:gap-x-12 lg:grid-rows-[auto_auto_1fr] lg:pb-12"
                 >
                   <p className="pb-3 text-[18px] lg:text-[32px] leading-[1.3] lg:leading-[1.15] tracking-[-0.01em] lg:tracking-[-0.02em] lg:font-semibold text-[#0A2540] lg:col-start-1 lg:row-start-1 lg:pt-4">
                     {s.headline}
                   </p>
 
-                  <div className="lg:col-start-2 lg:row-start-1 lg:row-span-3">
+                  <div className="min-w-0 lg:col-start-2 lg:row-start-1 lg:row-span-3">
                     <LoanStage scene={s.scene} still className="max-sm:h-[300px] lg:!h-[440px]" />
                   </div>
 
