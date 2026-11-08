@@ -6,6 +6,8 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { ScrollProgress } from "@/components/ScrollProgress";
 import { ConsentBanner } from "@/components/consent/ConsentBanner";
+import { ClickTracker } from "@/components/analytics/ClickTracker";
+import { WebVitals } from "@/components/analytics/WebVitals";
 import { siteConfig } from "@/lib/config";
 import { defaultOgImage } from "@/lib/seo";
 
@@ -136,6 +138,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <main className="flex-1">{children}</main>
         <Footer />
         <ConsentBanner />
+        <ClickTracker />
+        <WebVitals />
       </body>
     </html>
   );
