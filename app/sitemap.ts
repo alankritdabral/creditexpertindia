@@ -17,10 +17,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       ...(r.lastModified ? { lastModified: r.lastModified } : {}),
     }));
 
-  const cityPages: MetadataRoute.Sitemap = cities.map((c) => ({
-    url: `${siteConfig.url}/personal-loan-in-${c.slug}`,
-    lastModified: c.lastModified,
-  }));
+  const cityPages: MetadataRoute.Sitemap = cities
+    .filter((c) => !c.noindex)
+    .map((c) => ({
+      url: `${siteConfig.url}/personal-loan-in-${c.slug}`,
+      lastModified: c.lastModified,
+    }));
 
   const articlePages: MetadataRoute.Sitemap = articles.map((a) => ({
     url: `${siteConfig.url}/learning-center/${a.slug}`,

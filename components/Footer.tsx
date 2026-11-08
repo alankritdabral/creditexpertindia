@@ -51,13 +51,17 @@ const linkGroups = [
       ...articles.slice(0, 5).map((a) => ({ label: a.title, href: `/learning-center/${a.slug}` })),
     ],
   },
-  {
-    // TODO(Phase 9): once the city pages are triaged per decision D5
-    // (rewritten with real local content, or set noindex until they are),
-    // drop any noindex'd city from this list too.
-    title: 'Personal Loans by City',
-    links: cities.map((c) => ({ label: c.name, href: `/personal-loan-in-${c.slug}` })),
-  },
+  // Phase 9 (decision D5): only indexed city pages get a footer link, so
+  // this group shrinks to just Delhi today and grows back as more city
+  // pages get real local content and are un-noindexed in lib/cities.ts.
+  ...(cities.some((c) => !c.noindex)
+    ? [
+        {
+          title: 'Personal Loans by City',
+          links: cities.filter((c) => !c.noindex).map((c) => ({ label: c.name, href: `/personal-loan-in-${c.slug}` })),
+        },
+      ]
+    : []),
 ];
 
 const legalLinks = [

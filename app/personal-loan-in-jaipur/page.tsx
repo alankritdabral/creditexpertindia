@@ -6,8 +6,9 @@ import { cities } from "@/lib/cities";
 export const metadata: Metadata = buildMetadata({
   title: "Personal Loan in Jaipur",
   description:
-    "Personal loan and EMI consolidation options for salaried staff in Jaipur. Rates from 9.95% p.a.* for eligible applicants. Free assessment.",
+    "Personal loan and EMI consolidation options for salaried staff in Jaipur. Rates from 9.99% p.a.* for eligible applicants. Free assessment.",
   path: "/personal-loan-in-jaipur",
+  noindex: true, // not yet rewritten with real local content -- plan decision D5
 });
 
 export default function Page() {

@@ -117,10 +117,10 @@ export function PageIntro({ page }: { page: PageKey }) {
 
 /** Testimonials + FAQ, placed before the closing lead form. */
 export function PageProof({ page }: { page: PageKey }) {
-  return (
-    <>
-      <Testimonials />
-      <PageFAQ page={page} />
-    </>
-  );
+  // Testimonials used to render here, sourced from lib/pageContent.ts's
+  // `testimonials` array. That array was placeholder copy ("replace with
+  // real, consented customer quotes before launch") attributed to invented
+  // people — removed rather than shown as if real. Add a real, consented
+  // Testimonials section back in once some exist.
+  return <PageFAQ page={page} />;
 }

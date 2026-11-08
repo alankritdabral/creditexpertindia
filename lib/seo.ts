@@ -35,9 +35,15 @@ type PageSeo = {
    * Pass this for a route with its own opengraph-image.tsx, e.g. an
    * article: `${siteConfig.url}${path}/opengraph-image`. */
   image?: OgImage;
+  /** Set true for a page kept reachable for visitors but excluded from
+   * search results — e.g. the templated city pages not yet rewritten with
+   * real local content (plan decision D5). Still crawlable (follow: true),
+   * so links from it still pass through; pair with leaving it out of
+   * app/sitemap.ts. */
+  noindex?: boolean;
 };
 
-export function buildMetadata({ title, description, path, keywords, type = "website", image }: PageSeo): Metadata {
+export function buildMetadata({ title, description, path, keywords, type = "website", image, noindex }: PageSeo): Metadata {
   const socialTitle = `${title} | ${siteConfig.name}`;
   const resolvedImage = image ?? DEFAULT_OG_IMAGE;
   return {
@@ -45,6 +51,7 @@ export function buildMetadata({ title, description, path, keywords, type = "webs
     description,
     keywords,
     alternates: { canonical: path },
+    ...(noindex ? { robots: { index: false, follow: true } } : {}),
     openGraph: {
       title: socialTitle,
       description,

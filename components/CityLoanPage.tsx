@@ -6,9 +6,16 @@ import { LeadForm } from "@/components/LeadForm";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { PageIntro, PageProof } from "@/components/page-sections/PageSections";
 import { cities, type City } from "@/lib/cities";
+import { contact } from "@/lib/config";
+import { MapPin } from "lucide-react";
 
 export function CityLoanPage({ city }: { city: City }) {
-  const others = cities.filter((c) => c.slug !== city.slug);
+  const others = cities.filter((c) => c.slug !== city.slug && !c.noindex);
+  // Only Delhi currently matches a real office (lib/config.ts's
+  // contact.addresses) — the other 12 city pages share one generic
+  // template with no local office to show, which is exactly why they're
+  // noindexed (lib/cities.ts) until they have real local content.
+  const office = contact.addresses.find((a) => a.city === city.name);
   return (
     <div className="min-h-screen bg-white">
       <Breadcrumbs
@@ -20,7 +27,7 @@ export function CityLoanPage({ city }: { city: City }) {
       />
       <ProductHero
         title={`Salaried in ${city.name}? Let's find you a better loan.`}
-        body={`Whether you want a fresh personal loan or to bring several EMIs into one, we'll check your options with partner banks. Rates start from 9.95% p.a.* for eligible salaried applicants.`}
+        body={`Whether you want a fresh personal loan or to bring several EMIs into one, we'll check your options with partner banks. Rates start from 9.99% p.a.* for eligible salaried applicants.`}
         cta="Check my eligibility"
         image="/img/marraige.webp"
         imageAlt={`A salaried professional in ${city.name} reviewing loan options`}
@@ -49,34 +56,50 @@ export function CityLoanPage({ city }: { city: City }) {
         </div>
       </section>
 
+      {office && (
+        <section className="bg-white text-[#0A2540] border-t border-[#E2E8F0]">
+          <div className="max-w-[1220px] mx-auto px-4 md:px-6 lg:px-8 py-14 md:py-20">
+            <h2 className="text-[32px] md:text-[40px] leading-[1.05] tracking-[-0.03em] font-bold">
+              Visit us in {city.name}.
+            </h2>
+            <div className="mt-6 flex items-start gap-3 max-w-2xl">
+              <MapPin className="h-6 w-6 shrink-0 text-[#0052CC] mt-0.5" />
+              <p className="text-lg text-[#3C4F69] leading-relaxed">{office.fullAddress}</p>
+            </div>
+          </div>
+        </section>
+      )}
+
       <Eligibility />
       <LoanCalculator />
       <PageProof page="city" />
       <LeadForm />
 
-      <section className="bg-[#EAF3FF] text-[#0A2540]">
-        <div className="max-w-[1220px] mx-auto px-4 md:px-6 lg:px-8 py-14 md:py-20">
-          <h2 className="text-[32px] md:text-[40px] leading-[1.05] tracking-[-0.03em] font-bold">
-            Personal loans in other cities
-          </h2>
-          <ul className="mt-6 flex flex-wrap gap-3">
-            {others.map((c) => (
-              <li key={c.slug}>
-                <Link
-                  href={`/personal-loan-in-${c.slug}`}
-                  className="inline-block rounded bg-white hover:bg-[#0052CC] hover:text-white transition-colors px-5 py-3 text-base font-semibold"
-                >
-                  {c.name}
-                </Link>
-              </li>
-            ))}
-          </ul>
-          <p className="mt-8 text-sm text-[#3C4F69] max-w-3xl">
-            *Rates depend on credit profile, income, employer, existing obligations, loan amount, tenure and
-            lender policy. For eligible salaried applicants only. Approval is decided by the lender.
-          </p>
-        </div>
-      </section>
+      {others.length > 0 && (
+        <section className="bg-[#EAF3FF] text-[#0A2540]">
+          <div className="max-w-[1220px] mx-auto px-4 md:px-6 lg:px-8 py-14 md:py-20">
+            <h2 className="text-[32px] md:text-[40px] leading-[1.05] tracking-[-0.03em] font-bold">
+              Personal loans in other cities
+            </h2>
+            <ul className="mt-6 flex flex-wrap gap-3">
+              {others.map((c) => (
+                <li key={c.slug}>
+                  <Link
+                    href={`/personal-loan-in-${c.slug}`}
+                    className="inline-block rounded bg-white hover:bg-[#0052CC] hover:text-white transition-colors px-5 py-3 text-base font-semibold"
+                  >
+                    {c.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            <p className="mt-8 text-sm text-[#3C4F69] max-w-3xl">
+              *Rates depend on credit profile, income, employer, existing obligations, loan amount, tenure and
+              lender policy. For eligible salaried applicants only. Approval is decided by the lender.
+            </p>
+          </div>
+        </section>
+      )}
     </div>
   );
 }

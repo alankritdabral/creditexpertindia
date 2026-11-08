@@ -123,7 +123,7 @@ const DEFAULT_OBLIGATIONS: ObligationRules = {
 
 // ─── Lender Configurations (from MD files) ──────────────────────────────────
 
-const LENDERS: LenderConfig[] = [
+export const LENDERS: LenderConfig[] = [
   // ═══════════════════════════════════════════════════════════════════════════
   // AXIS BANK — Source: axis bank.md
   // ═══════════════════════════════════════════════════════════════════════════

@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     template: `%s | ${siteConfig.name}`,
   },
   description:
-    "Paying too much interest on loans or card dues? Explore debt consolidation, balance transfer and personal loans from 9.95% p.a.*, for eligible applicants.",
+    "Paying too much interest on loans or card dues? Explore debt consolidation, balance transfer and personal loans from 9.99% p.a.*, for eligible applicants.",
   // No `keywords`: Google has ignored the meta keywords tag since 2009
   // (developers.google.com/search/blog/2009/09/google-does-not-use-keywords-meta-tag).
   metadataBase: new URL(siteConfig.url),

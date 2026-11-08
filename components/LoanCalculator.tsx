@@ -86,7 +86,7 @@ export function LoanCalculator() {
                 className="mt-3 w-full h-2 appearance-none bg-[#E2E8F0] accent-[#0052CC] cursor-pointer"
                 aria-label="Rate you might get"
               />
-              <p className="mt-2 text-sm text-[#3C4F69]">Partner banks start from 9.95% p.a.* for eligible salaried applicants.</p>
+              <p className="mt-2 text-sm text-[#3C4F69]">Partner banks start from 9.99% p.a.* for eligible salaried applicants.</p>
             </div>
           </div>
 

@@ -18,7 +18,7 @@ export default function BalanceTransferPage() {
       
       <ProductHero
         title="Paying 16–24% on a loan? Let's move it somewhere cheaper."
-        body="If you qualify, you could transfer your existing loan to a partner bank at rates starting from 9.95% p.a.*"
+        body="If you qualify, you could transfer your existing loan to a partner bank at rates starting from 9.99% p.a.*"
         cta="Check my transfer rate"
         image="/img/multipleloans.webp"
         imageAlt="Several loan documents being consolidated into a single lower-rate loan"

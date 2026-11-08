@@ -41,7 +41,7 @@ const menus: Menu[] = [
         title: "Personal loans",
         gradient: G1,
         links: [
-          { label: "Personal loan", desc: "From 9.95% p.a.* for salaried", href: "/personal-loan" },
+          { label: "Personal loan", desc: "From 9.99% p.a.* for salaried", href: "/personal-loan" },
           { label: "Balance transfer", desc: "Move a loan to a lower rate", href: "/loan-balance-transfer" },
           { label: "High-interest loans", desc: "Refinance expensive EMIs", href: "/high-interest-loan" },
           { label: "Overdraft options", desc: "Flexible credit for salaried", href: "/personal-loan-overdraft" },

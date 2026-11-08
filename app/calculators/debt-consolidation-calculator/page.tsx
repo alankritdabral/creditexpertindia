@@ -80,7 +80,7 @@ const calculatorSchema = {
           "name": "What interest rate can I expect for debt consolidation in India?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "For salaried professionals with a CIBIL score of 720+ and stable employment, personal loan consolidation rates typically start from 9.95% to 14.5% p.a. from top partner banks like HDFC, ICICI, Axis, and Kotak. This represents a massive interest reduction compared to credit card finance charges (36% to 42% p.a.)."
+            "text": "For salaried professionals with a CIBIL score of 720+ and stable employment, personal loan consolidation rates typically start from 9.99% to 14.5% p.a. from top partner banks like HDFC, ICICI, Axis, and Kotak. This represents a massive interest reduction compared to credit card finance charges (36% to 42% p.a.)."
           }
         },
         {
@@ -124,7 +124,7 @@ export default function DebtConsolidationCalculatorPage() {
         <div className="container-narrow text-center relative z-10 px-4">
           <div className="inline-flex items-center gap-2 rounded-full bg-blue-50 border border-blue-200/80 px-4 py-1.5 text-xs font-bold text-blue-700 mb-4">
             <Calculator className="w-3.5 h-3.5" />
-            <span>FREE PUBLIC TOOL • 100% TRANSPARENT • NO LOGIN REQUIRED</span>
+            <span>FREE PUBLIC TOOL • NO LOGIN REQUIRED</span>
           </div>
 
           <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-brand-black leading-tight">
@@ -171,7 +171,7 @@ export default function DebtConsolidationCalculatorPage() {
               Debt consolidation is a financial strategy where a borrower combines several active loans—such as high-interest credit card outstandings (often charging 36% to 42% p.a.), personal loans, and short-term instant app loans—into a <strong>single new loan</strong> from a scheduled bank or RBI-regulated NBFC at a lower interest rate.
             </p>
             <p className="text-sm sm:text-base text-slate-700 leading-relaxed">
-              Instead of juggling 3 to 6 scattered payment dates and paying interest on interest, the borrower makes <strong>one predictable payment each month</strong> on a single set date. For salaried professionals earning over ₹45,000/month with stable employment, partner banks often approve consolidation loans starting around 9.95% to 12.5% p.a.
+              Instead of juggling 3 to 6 scattered payment dates and paying interest on interest, the borrower makes <strong>one predictable payment each month</strong> on a single set date. For salaried professionals earning over ₹45,000/month with stable employment, partner banks often approve consolidation loans starting around 9.99% to 12.5% p.a.
             </p>
           </div>
 
@@ -181,7 +181,7 @@ export default function DebtConsolidationCalculatorPage() {
               The Math Behind the Calculator: Formulas & Definitions
             </h2>
             <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-              Our calculator uses standard actuarial formulas endorsed by banking institutions to evaluate your current versus proposed positions:
+              Our calculator uses the standard loan amortization formula lenders use to evaluate your current versus proposed positions:
             </p>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
@@ -349,7 +349,7 @@ export default function DebtConsolidationCalculatorPage() {
                   What interest rate can I expect for debt consolidation in India?
                 </h3>
                 <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                  For salaried professionals with a CIBIL score of 720+ and stable employment, personal loan consolidation rates typically start from 9.95% to 14.5% p.a. from top partner banks like HDFC, ICICI, Axis, and Kotak. This represents a massive interest reduction compared to credit card finance charges (36% to 42% p.a.).
+                  For salaried professionals with a CIBIL score of 720+ and stable employment, personal loan consolidation rates typically start from 9.99% to 14.5% p.a. from top partner banks like HDFC, ICICI, Axis, and Kotak. This represents a massive interest reduction compared to credit card finance charges (36% to 42% p.a.).
                 </p>
               </div>
 
@@ -367,10 +367,10 @@ export default function DebtConsolidationCalculatorPage() {
           {/* Bottom CTA Banner */}
           <div className="p-8 sm:p-10 rounded-3xl bg-slate-900 text-white text-center space-y-4">
             <h3 className="text-xl sm:text-2xl font-bold">
-              Ready to Explore Real Pre-Approved Options?
+              Ready to Explore Your Real Options?
             </h3>
             <p className="text-xs sm:text-sm text-slate-400 max-w-xl mx-auto">
-              Get an unpressured, confidential assessment from Credit Expert India's senior debt advisors. We work with 50+ RBI-regulated lenders to find the optimal consolidation structure for your profile.
+              Get an unpressured, confidential assessment from Credit Expert India's senior debt advisors. We work with 13 RBI-regulated lenders to find the optimal consolidation structure for your profile.
             </p>
             <div className="pt-2 flex flex-col sm:flex-row justify-center gap-3">
               <Link
