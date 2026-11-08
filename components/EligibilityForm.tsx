@@ -9,6 +9,7 @@ import { collection, doc, getDoc, setDoc, serverTimestamp } from "firebase/fires
 import { db } from "@/lib/firebaseClient";
 import { searchEmployers, EmployerResult } from "@/lib/employerLookup";
 import { parseBureauData } from "@/lib/bureauParsers";
+import { NOTICE_VERSION } from "@/lib/consent";
 
 const CreditReportDashboard = dynamic(
   () => import("./CreditReportDashboard").then((mod) => mod.CreditReportDashboard),
@@ -51,7 +52,7 @@ export function EligibilityForm() {
     firstName: "", lastName: "", mobile: "", email: "", city: "", employmentType: "Salaried",
     monthlyIncome: "", employer: "", salaryMode: "Bank Transfer",
     requirement: "",
-    pan: "", dob: "", gender: "male", consent: false, bureau: "experian"
+    pan: "", dob: "", gender: "male", consent: false, consentContact: false, consentShareWithLenders: false, bureau: "experian"
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -94,6 +95,10 @@ export function EligibilityForm() {
   const handleFetchReport = async () => {
     if (!formData.consent) {
       setError("Please accept the credit report consent.");
+      return;
+    }
+    if (!formData.consentContact) {
+      setError("Please agree to being contacted about this enquiry.");
       return;
     }
     if (!formData.firstName.trim() || !formData.lastName.trim()) {
@@ -521,6 +526,13 @@ export function EligibilityForm() {
             created_at: serverTimestamp(),
             branch: "customer",
             search_tokens: generateSearchTokens(fullName, formData.mobile, safePan),
+            consent: {
+              bureauFetch: formData.consent,
+              contact: formData.consentContact,
+              shareWithLenders: formData.consentShareWithLenders,
+              noticeVersion: NOTICE_VERSION,
+              recordedAt: serverTimestamp(),
+            },
             ...(fallbackData && { fallbackData })
           });
         } catch (e) {
@@ -618,7 +630,33 @@ export function EligibilityForm() {
                 />
                 <span className="text-xs text-brand-black/70 leading-relaxed">
                   <strong>Credit Report Consent</strong><br />
-                  By continuing, I consent and authorize Credit Expert India to securely retrieve my credit report from the credit bureau.
+                  I confirm I am 18 or older and I consent and authorize Credit Expert India to securely retrieve my credit report from the credit bureau.
+                </span>
+              </label>
+
+              <label className="flex items-start gap-3 p-4 border border-icy-blue rounded-xl cursor-pointer hover:bg-slate-50 transition-colors">
+                <input
+                  type="checkbox"
+                  checked={formData.consentContact}
+                  onChange={e => setFormData({ ...formData, consentContact: e.target.checked })}
+                  className="w-5 h-5 mt-0.5 text-blue-energy accent-blue-energy shrink-0 rounded"
+                />
+                <span className="text-xs text-brand-black/70 leading-relaxed">
+                  <strong>Contact Consent</strong><br />
+                  I agree that Credit Expert India may contact me about this enquiry.
+                </span>
+              </label>
+
+              <label className="flex items-start gap-3 p-4 border border-icy-blue rounded-xl cursor-pointer hover:bg-slate-50 transition-colors">
+                <input
+                  type="checkbox"
+                  checked={formData.consentShareWithLenders}
+                  onChange={e => setFormData({ ...formData, consentShareWithLenders: e.target.checked })}
+                  className="w-5 h-5 mt-0.5 text-blue-energy accent-blue-energy shrink-0 rounded"
+                />
+                <span className="text-xs text-brand-black/70 leading-relaxed">
+                  I'm also open to being contacted by partner lenders (see{" "}
+                  <Link href="/partner-disclosures" className="underline">partner disclosures</Link>). Optional.
                 </span>
               </label>
 

@@ -5,6 +5,8 @@ import { Plus, Trash2, CheckCircle2, AlertTriangle, ArrowRight, TrendingDown, Sh
 import { DebtItem, DebtType, calculateMultiDebtConsolidation } from "@/lib/calculator";
 import { formatINR } from "@/lib/utils";
 import { claims } from "@/lib/config";
+import { NOTICE_VERSION } from "@/lib/consent";
+import Link from "next/link";
 
 const DEBT_TYPE_LABELS: Record<DebtType, string> = {
   personal_loan: "Personal Loan",
@@ -57,7 +59,11 @@ export function DebtConsolidationCalculator() {
     phone: "",
     netSalary: "",
     city: "",
-    consent: true,
+    // Was defaulted to true and never validated — a pre-ticked box isn't a
+    // "clear affirmative action" (DPDP Act s.6), so it now defaults false
+    // and is required before submit (see handleLeadSubmit below).
+    consentContact: false,
+    consentShareWithLenders: false,
   });
   const [leadStatus, setLeadStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [leadError, setLeadError] = useState("");
@@ -108,6 +114,12 @@ export function DebtConsolidationCalculator() {
       return;
     }
 
+    if (!leadForm.consentContact) {
+      setLeadError("Please agree to being contacted about this assessment.");
+      setLeadStatus("error");
+      return;
+    }
+
     const salary = Number(leadForm.netSalary);
     if (isNaN(salary) || salary <= 25000) {
       setLeadError("Monthly take-home salary must be greater than ₹25,000 for eligibility.");
@@ -130,7 +142,11 @@ export function DebtConsolidationCalculator() {
         estimatedMonthlySavings: result.monthlyCashflowSavings,
         debtsCount: debts.length,
         debtsSummary: debts.map(d => `${d.name} (${DEBT_TYPE_LABELS[d.type]}): ${formatINR(d.balance)} @ ${d.interestRate}%`).join("; "),
-        consent: leadForm.consent,
+        consent: {
+          contact: leadForm.consentContact,
+          shareWithLenders: leadForm.consentShareWithLenders,
+          noticeVersion: NOTICE_VERSION,
+        },
       };
 
       const res = await fetch("/api/calculator-lead", {
@@ -648,16 +664,29 @@ export function DebtConsolidationCalculator() {
                   </div>
                 </div>
 
-                <div className="pt-2">
+                <div className="pt-2 space-y-2">
                   <label className="flex items-start gap-2 cursor-pointer text-[11px] text-slate-500 leading-snug">
                     <input
                       type="checkbox"
-                      checked={leadForm.consent}
-                      onChange={(e) => setLeadForm({ ...leadForm, consent: e.target.checked })}
+                      checked={leadForm.consentContact}
+                      onChange={(e) => setLeadForm({ ...leadForm, consentContact: e.target.checked })}
+                      className="mt-0.5 rounded text-blue-600 accent-blue-600"
+                      required
+                    />
+                    <span>
+                      I authorize Credit Expert India to contact me via phone, WhatsApp or email about this assessment. <span className="text-red-500">*</span>
+                    </span>
+                  </label>
+                  <label className="flex items-start gap-2 cursor-pointer text-[11px] text-slate-500 leading-snug">
+                    <input
+                      type="checkbox"
+                      checked={leadForm.consentShareWithLenders}
+                      onChange={(e) => setLeadForm({ ...leadForm, consentShareWithLenders: e.target.checked })}
                       className="mt-0.5 rounded text-blue-600 accent-blue-600"
                     />
                     <span>
-                      I authorize Credit Expert India to contact me via phone, WhatsApp or email to provide loan and debt consolidation options.
+                      I'm also open to being contacted by partner lenders (see{" "}
+                      <Link href="/partner-disclosures" className="underline">partner disclosures</Link>). Optional.
                     </span>
                   </label>
                 </div>

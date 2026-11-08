@@ -5,8 +5,11 @@ import "./globals.css";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { ScrollProgress } from "@/components/ScrollProgress";
+import { ConsentBanner } from "@/components/consent/ConsentBanner";
 import { siteConfig } from "@/lib/config";
 import { defaultOgImage } from "@/lib/seo";
+
+const GA_ID = process.env.NEXT_PUBLIC_GA_ID || "G-VNY6TW0ZW0";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -86,24 +89,53 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en-IN" className={`${inter.variable} ${manrope.variable} h-full antialiased font-sans scroll-smooth`}>
       <body className="min-h-full flex flex-col bg-background text-brand-black [font-feature-settings:'ss01'] overflow-x-hidden">
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-VNY6TW0ZW0"
-          strategy="lazyOnload"
-        />
-        <Script id="google-analytics" strategy="lazyOnload">
+        {/*
+          Consent Mode v2 ordering (developers.google.com/tag-platform/security/guides/consent):
+          the default must be set, and any already-stored choice applied,
+          BEFORE any `config` or `event` command. This runs `beforeInteractive`
+          (in <head>, before hydration — Next's docs list "Cookie consent
+          managers" as a supported use of this strategy) so it always wins
+          the race against the gtag.js loader below, which is `afterInteractive`.
+          lib/consent.ts's ANALYTICS_DEFAULT and STORAGE_KEY are duplicated
+          here as literals: this has to be plain inline JS, not a module
+          import, since it must run before any bundle is hydrated.
+        */}
+        <Script id="gtag-consent-init" strategy="beforeInteractive">
           {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
+            window.gtag = gtag;
 
-            gtag('config', 'G-VNY6TW0ZW0');
+            var consentDefault = {
+              ad_storage: 'denied',
+              ad_user_data: 'denied',
+              ad_personalization: 'denied',
+              analytics_storage: 'denied', // must match lib/consent.ts's ANALYTICS_DEFAULT
+              wait_for_update: 500
+            };
+            gtag('consent', 'default', consentDefault);
+
+            try {
+              var stored = JSON.parse(window.localStorage.getItem('cei_consent'));
+              if (stored && (stored.analytics === 'granted' || stored.analytics === 'denied')) {
+                gtag('consent', 'update', { analytics_storage: stored.analytics });
+              }
+            } catch (e) {}
+
+            gtag('js', new Date());
+            gtag('config', '${GA_ID}');
           `}
         </Script>
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
+          strategy="afterInteractive"
+        />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
         <ScrollProgress />
         <Navbar />
         <main className="flex-1">{children}</main>
         <Footer />
+        <ConsentBanner />
       </body>
     </html>
   );

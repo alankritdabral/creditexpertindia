@@ -27,11 +27,22 @@ export async function POST(request: Request) {
       );
     }
 
+    // "Being contacted about this enquiry" consent is mandatory — without it
+    // we have no lawful basis to call the person back. Sharing the lead with
+    // partner lenders is a separate, optional choice (RBI Digital Lending
+    // Directions 2025, para 12(iv): explicit consent per third party).
+    if (!consent?.contact) {
+      return NextResponse.json(
+        { error: "Please agree to being contacted about your enquiry." },
+        { status: 400 }
+      );
+    }
+
     const salary = Number(netSalary);
     if (isNaN(salary) || salary <= 45000) {
       return NextResponse.json({ error: "Net salary must be greater than ₹45,000." }, { status: 400 });
     }
-    
+
     const emi = Number(ongoingEmi);
     if (isNaN(emi) || emi > salary * 0.8) {
       return NextResponse.json({ error: "Ongoing EMI cannot be greater than 80% of net salary." }, { status: 400 });
@@ -45,7 +56,12 @@ export async function POST(request: Request) {
         requirement,
         netSalary: salary,
         ongoingEmi: emi,
-        consent: !!consent,
+        consent: {
+          contact: true,
+          shareWithLenders: !!consent.shareWithLenders,
+          noticeVersion: consent.noticeVersion || null,
+          recordedAt: new Date(),
+        },
         source: "Credit Expert India Contact Form",
         status: "NEW",
         createdAt: new Date(),

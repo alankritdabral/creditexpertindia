@@ -38,6 +38,13 @@ export async function POST(request: Request) {
       );
     }
 
+    if (!consent?.contact) {
+      return NextResponse.json(
+        { error: "Please agree to being contacted about this assessment." },
+        { status: 400 }
+      );
+    }
+
     const salary = Number(netSalary);
     if (isNaN(salary) || salary < 25000) {
       return NextResponse.json(
@@ -61,7 +68,12 @@ export async function POST(request: Request) {
         debtsCount: Number(debtsCount) || 1,
         debtsSummary: debtsSummary || "",
         requirement: "Debt Consolidation Calculator Assessment",
-        consent: !!consent,
+        consent: {
+          contact: true,
+          shareWithLenders: !!consent.shareWithLenders,
+          noticeVersion: consent.noticeVersion || null,
+          recordedAt: new Date(),
+        },
         source: "Debt Consolidation Calculator",
         status: "NEW",
         createdAt: new Date(),
