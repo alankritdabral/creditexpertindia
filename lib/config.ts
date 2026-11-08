@@ -45,5 +45,8 @@ export const lendingPartners = {
 export const siteConfig = {
   name: "Credit Expert India",
   tagline: "Paying Too Much Interest on Your Loans? Let's Find a Better Way Forward.",
-  url: "https://creditexpertindia.com",
+  // Must match the primary domain in Vercel (Project → Settings → Domains).
+  // Vercel 308-redirects the apex (creditexpertindia.com) to www, so canonicals,
+  // og:url, sitemap <loc> and the robots Sitemap: line must all use www.
+  url: "https://www.creditexpertindia.com",
 };
