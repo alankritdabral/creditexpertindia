@@ -8,6 +8,9 @@ import logo from "@/public/img/logo.webp";
 import { contact } from "@/lib/config";
 import { NOTICE_VERSION } from "@/lib/consent";
 import { track } from "@/lib/analytics/track";
+import { getAttribution } from "@/lib/analytics/attribution";
+import { getGaIds } from "@/lib/analytics/ids";
+import { GA_ID } from "@/lib/analytics/gaId";
 
 const REQUIREMENTS = [
   "Reduce my EMI",
@@ -97,6 +100,11 @@ export function ContactForm() {
     setErrorMessage("");
 
     try {
+      const [attribution, ga] = await Promise.all([
+        Promise.resolve(getAttribution()),
+        getGaIds(GA_ID),
+      ]);
+
       const response = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -107,6 +115,8 @@ export function ContactForm() {
             shareWithLenders: formData.consentShareWithLenders,
             noticeVersion: NOTICE_VERSION,
           },
+          attribution,
+          ga,
         }),
       });
 

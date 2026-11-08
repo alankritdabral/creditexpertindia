@@ -10,8 +10,7 @@ import { ClickTracker } from "@/components/analytics/ClickTracker";
 import { WebVitals } from "@/components/analytics/WebVitals";
 import { siteConfig } from "@/lib/config";
 import { defaultOgImage } from "@/lib/seo";
-
-const GA_ID = process.env.NEXT_PUBLIC_GA_ID || "G-VNY6TW0ZW0";
+import { GA_ID } from "@/lib/analytics/gaId";
 
 const inter = Inter({
   variable: "--font-inter",

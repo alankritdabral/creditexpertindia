@@ -8,6 +8,9 @@ import { claims } from "@/lib/config";
 import { NOTICE_VERSION } from "@/lib/consent";
 import { track } from "@/lib/analytics/track";
 import { bandAmount, bandRate, bandSavings } from "@/lib/analytics/events";
+import { getAttribution } from "@/lib/analytics/attribution";
+import { getGaIds } from "@/lib/analytics/ids";
+import { GA_ID } from "@/lib/analytics/gaId";
 import Link from "next/link";
 
 const DEBT_TYPE_LABELS: Record<DebtType, string> = {
@@ -162,6 +165,11 @@ export function DebtConsolidationCalculator() {
     setLeadError("");
 
     try {
+      const [attribution, ga] = await Promise.all([
+        Promise.resolve(getAttribution()),
+        getGaIds(GA_ID),
+      ]);
+
       const payload = {
         name: leadForm.name,
         phone: leadForm.phone,
@@ -178,6 +186,8 @@ export function DebtConsolidationCalculator() {
           shareWithLenders: leadForm.consentShareWithLenders,
           noticeVersion: NOTICE_VERSION,
         },
+        attribution,
+        ga,
       };
 
       const res = await fetch("/api/calculator-lead", {

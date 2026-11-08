@@ -13,6 +13,9 @@ import { NOTICE_VERSION } from "@/lib/consent";
 import { track } from "@/lib/analytics/track";
 import { bandDuration } from "@/lib/analytics/events";
 import type { Bureau } from "@/lib/analytics/events";
+import { getAttribution } from "@/lib/analytics/attribution";
+import { getGaIds } from "@/lib/analytics/ids";
+import { GA_ID } from "@/lib/analytics/gaId";
 
 const CreditReportDashboard = dynamic(
   () => import("./CreditReportDashboard").then((mod) => mod.CreditReportDashboard),
@@ -284,6 +287,27 @@ export function EligibilityForm() {
       if (data.success) {
         track({ name: "otp_verified", params: {} });
         track({ name: "generate_lead", params: { lead_source: "eligibility", currency: "INR" } });
+        // A PII-free analytics copy, written server-side (contact and
+        // calculator-lead already get theirs from their own API routes —
+        // this flow writes its credit_reports doc straight from the client,
+        // so it has no other server step to piggyback this on).
+        Promise.all([Promise.resolve(getAttribution()), getGaIds(GA_ID)])
+          .then(([attribution, ga]) =>
+            fetch("/api/lead-event", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                attribution,
+                ga,
+                consent: {
+                  contact: formData.consentContact,
+                  shareWithLenders: formData.consentShareWithLenders,
+                  noticeVersion: NOTICE_VERSION,
+                },
+              }),
+            })
+          )
+          .catch((e) => console.warn("[lead-event] failed", e));
         setShowOtpModal(false);
         proceedToFetchReport();
       } else {
@@ -600,6 +624,7 @@ export function EligibilityForm() {
               noticeVersion: NOTICE_VERSION,
               recordedAt: serverTimestamp(),
             },
+            attribution: getAttribution(),
             ...(fallbackData && { fallbackData })
           });
         } catch (e) {
