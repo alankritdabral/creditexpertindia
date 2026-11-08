@@ -40,3 +40,22 @@ export function track(event: AnalyticsEvent): void {
     // Analytics must never break the page it's instrumenting.
   }
 }
+
+export type JourneyStage = "lead" | "report_viewed";
+
+/**
+ * Sets the `journey_stage` user property in GA4 (gtag's `user_properties`,
+ * NOT an event parameter — see developers.google.com/tag-platform/gtagjs/
+ * reference) and mirrors it as a Clarity session tag, in one call. Used at
+ * the two points in Appendix A that define this property: a saved lead, and
+ * a viewed credit report.
+ */
+export function setJourneyStage(stage: JourneyStage): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.gtag?.("set", "user_properties", { journey_stage: stage });
+    window.clarity?.("set", "journey_stage", stage);
+  } catch {
+    // never let this break the page
+  }
+}

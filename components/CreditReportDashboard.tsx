@@ -341,7 +341,12 @@ function CreditReportDashboardInner({ bureau, cibilData, formData }: any) {
   const dashArray = `${scorePercent} 100`;
 
   return (
-    <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="py-2">
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className="py-2"
+      data-clarity-mask="true"
+    >
       <div ref={captureRef} className="bg-white">
         <div ref={basicRef} className={isDownloadingSection === 'basic' ? "bg-white p-4 mb-4" : ""}>
           {/* CIBIL Dashboard */}

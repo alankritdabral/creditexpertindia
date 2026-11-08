@@ -6,11 +6,12 @@ import { DebtItem, DebtType, calculateMultiDebtConsolidation } from "@/lib/calcu
 import { formatINR } from "@/lib/utils";
 import { claims } from "@/lib/config";
 import { NOTICE_VERSION } from "@/lib/consent";
-import { track } from "@/lib/analytics/track";
+import { track, setJourneyStage } from "@/lib/analytics/track";
 import { bandAmount, bandRate, bandSavings } from "@/lib/analytics/events";
 import { getAttribution } from "@/lib/analytics/attribution";
 import { getGaIds } from "@/lib/analytics/ids";
 import { GA_ID } from "@/lib/analytics/gaId";
+import { setClarityTag } from "@/lib/analytics/clarityTags";
 import Link from "next/link";
 
 const DEBT_TYPE_LABELS: Record<DebtType, string> = {
@@ -200,9 +201,13 @@ export function DebtConsolidationCalculator() {
         const errData = await res.json().catch(() => ({}));
         throw new Error(errData.error || "Failed to submit assessment request.");
       }
+      const resData = await res.json().catch(() => ({}));
 
       setLeadStatus("success");
       track({ name: "generate_lead", params: { lead_source: "calculator_lead", currency: "INR" } });
+      setJourneyStage("lead");
+      if (ga.clientId) setClarityTag("ga_client_id", ga.clientId);
+      if (resData.leadId) setClarityTag("lead_ref", resData.leadId);
     } catch (err: any) {
       setLeadError(err.message || "Something went wrong. Please try again.");
       setLeadStatus("error");

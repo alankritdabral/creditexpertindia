@@ -8,6 +8,7 @@
  */
 import { captureAttribution } from "@/lib/analytics/attribution";
 import { contentGroupFor } from "@/lib/analytics/contentGroup";
+import { setClarityTag } from "@/lib/analytics/clarityTags";
 
 declare global {
   interface Window {
@@ -38,10 +39,11 @@ if (typeof window !== "undefined" && window.gtag) {
  * didn't exist until this phase.
  */
 export function onRouterTransitionStart(url: string) {
-  if (typeof window === "undefined" || !window.gtag) return;
   try {
     const pathname = new URL(url, window.location.href).pathname;
-    window.gtag("set", { content_group: contentGroupFor(pathname) });
+    const group = contentGroupFor(pathname);
+    window.gtag?.("set", { content_group: group });
+    setClarityTag("content_group", group);
   } catch {
     // A malformed url should never break navigation.
   }

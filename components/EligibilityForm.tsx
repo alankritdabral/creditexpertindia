@@ -10,12 +10,13 @@ import { db } from "@/lib/firebaseClient";
 import { searchEmployers, EmployerResult } from "@/lib/employerLookup";
 import { parseBureauData } from "@/lib/bureauParsers";
 import { NOTICE_VERSION } from "@/lib/consent";
-import { track } from "@/lib/analytics/track";
+import { track, setJourneyStage } from "@/lib/analytics/track";
 import { bandDuration } from "@/lib/analytics/events";
 import type { Bureau } from "@/lib/analytics/events";
 import { getAttribution } from "@/lib/analytics/attribution";
 import { getGaIds } from "@/lib/analytics/ids";
 import { GA_ID } from "@/lib/analytics/gaId";
+import { setClarityTag } from "@/lib/analytics/clarityTags";
 
 const CreditReportDashboard = dynamic(
   () => import("./CreditReportDashboard").then((mod) => mod.CreditReportDashboard),
@@ -110,6 +111,7 @@ export function EligibilityForm() {
       window.open(reportData.credit_report_link, "_blank");
     }
     track({ name: "credit_report_view", params: { bureau: formData.bureau as Bureau } });
+    setJourneyStage("report_viewed");
     setStep(6);
   };
 
@@ -292,8 +294,10 @@ export function EligibilityForm() {
         // this flow writes its credit_reports doc straight from the client,
         // so it has no other server step to piggyback this on).
         Promise.all([Promise.resolve(getAttribution()), getGaIds(GA_ID)])
-          .then(([attribution, ga]) =>
-            fetch("/api/lead-event", {
+          .then(async ([attribution, ga]) => {
+            setJourneyStage("lead");
+            if (ga.clientId) setClarityTag("ga_client_id", ga.clientId);
+            const res = await fetch("/api/lead-event", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
@@ -305,8 +309,10 @@ export function EligibilityForm() {
                   noticeVersion: NOTICE_VERSION,
                 },
               }),
-            })
-          )
+            });
+            const data = await res.json().catch(() => ({}));
+            if (data.leadAnalyticsRef) setClarityTag("lead_ref", data.leadAnalyticsRef);
+          })
           .catch((e) => console.warn("[lead-event] failed", e));
         setShowOtpModal(false);
         proceedToFetchReport();
@@ -839,6 +845,7 @@ export function EligibilityForm() {
               exit={{ opacity: 0, scale: 0.95, y: 15 }}
               transition={{ duration: 0.25, ease: "easeOut" }}
               className="bg-white rounded-3xl shadow-2xl border border-slate-100 max-w-md w-full p-6 sm:p-8 relative overflow-hidden text-center"
+              data-clarity-mask="true"
             >
               {/* Background ambient accents */}
               <div className="absolute -top-16 -right-16 w-36 h-36 bg-blue-100/60 rounded-full blur-2xl pointer-events-none" />

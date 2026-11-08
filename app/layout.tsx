@@ -8,6 +8,7 @@ import { ScrollProgress } from "@/components/ScrollProgress";
 import { ConsentBanner } from "@/components/consent/ConsentBanner";
 import { ClickTracker } from "@/components/analytics/ClickTracker";
 import { WebVitals } from "@/components/analytics/WebVitals";
+import { ClarityLoader } from "@/components/analytics/Clarity";
 import { siteConfig } from "@/lib/config";
 import { defaultOgImage } from "@/lib/seo";
 import { GA_ID } from "@/lib/analytics/gaId";
@@ -139,6 +140,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ConsentBanner />
         <ClickTracker />
         <WebVitals />
+        <ClarityLoader />
       </body>
     </html>
   );

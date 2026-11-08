@@ -7,10 +7,11 @@ import Image from "next/image";
 import logo from "@/public/img/logo.webp";
 import { contact } from "@/lib/config";
 import { NOTICE_VERSION } from "@/lib/consent";
-import { track } from "@/lib/analytics/track";
+import { track, setJourneyStage } from "@/lib/analytics/track";
 import { getAttribution } from "@/lib/analytics/attribution";
 import { getGaIds } from "@/lib/analytics/ids";
 import { GA_ID } from "@/lib/analytics/gaId";
+import { setClarityTag } from "@/lib/analytics/clarityTags";
 
 const REQUIREMENTS = [
   "Reduce my EMI",
@@ -137,6 +138,9 @@ export function ContactForm() {
         consentShareWithLenders: false,
       });
       track({ name: "generate_lead", params: { lead_source: "contact", currency: "INR" } });
+      setJourneyStage("lead");
+      if (ga.clientId) setClarityTag("ga_client_id", ga.clientId);
+      if (result.leadRef) setClarityTag("lead_ref", result.leadRef);
     } catch (error: any) {
       console.error("Form submission error:", error);
       setErrorMessage(error.message || "An unexpected error occurred. Please try again.");
@@ -148,7 +152,7 @@ export function ContactForm() {
   const renderRightColumn = () => {
     if (status === "success") {
       return (
-        <div className="bg-emerald-50 border border-emerald-200 rounded-[24px] p-8 text-center shadow-sm h-full flex flex-col justify-center">
+        <div className="bg-emerald-50 border border-emerald-200 rounded-[24px] p-8 text-center shadow-sm h-full flex flex-col justify-center" data-clarity-mask="true">
           <div className="flex justify-center mb-4">
             <CheckCircle2 className="w-12 h-12 text-emerald-500" />
           </div>
