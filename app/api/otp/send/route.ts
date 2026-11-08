@@ -112,6 +112,7 @@ export async function POST(req: Request) {
       success: true,
       message: "OTP sent successfully",
       messageId: dispatchResult.messageId,
+      channel: dispatchResult.channel,
     });
   } catch (error: any) {
     console.error("[OTP Send] Unhandled error:", error);

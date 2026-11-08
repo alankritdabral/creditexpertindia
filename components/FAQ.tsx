@@ -1,10 +1,11 @@
 'use client';
+import { usePathname } from "next/navigation";
 import {
-  Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { TrackedAccordion } from "@/components/analytics/TrackedAccordion";
 
 const faqs = [
   {
@@ -38,6 +39,8 @@ const faqs = [
 ];
 
 export function FAQ() {
+  const pathname = usePathname();
+  const faqSet = pathname === "/faq" ? "faq" : "home";
   return (
     <div id="faq" className="@container w-full text-[#0A2540]">
       <div className="grid grid-cols-1 @3xl:grid-cols-[5fr_7fr] gap-8 @3xl:gap-16">
@@ -51,7 +54,7 @@ export function FAQ() {
           </p>
         </div>
 
-        <Accordion type="single" collapsible className="w-full">
+        <TrackedAccordion faqSet={faqSet} type="single" collapsible className="w-full">
           {faqs.map((faq, index) => (
             <AccordionItem
               value={`item-${index}`}
@@ -70,7 +73,7 @@ export function FAQ() {
               </AccordionContent>
             </AccordionItem>
           ))}
-        </Accordion>
+        </TrackedAccordion>
       </div>
     </div>
   );

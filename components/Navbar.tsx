@@ -7,6 +7,7 @@ import { ArrowRight, X, Mail, ShieldCheck, ChevronDown, ChevronRight } from "luc
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
 import { cities } from "@/lib/cities";
+import { track } from "@/lib/analytics/track";
 
 type MenuLink = { label: string; desc?: string; href: string };
 type Column = { title: string; links: MenuLink[]; gradient?: string };
@@ -167,6 +168,9 @@ export function Navbar() {
 
   const showPanel = useCallback((key: string) => {
     if (unmountTimer.current) clearTimeout(unmountTimer.current);
+    if (key === "loans" || key === "calculators" || key === "cities" || key === "resources") {
+      track({ name: "nav_menu_open", params: { menu_id: key } });
+    }
     setRenderKey(key);
     setActive(key);
     if (!mounted.current) {
@@ -433,12 +437,16 @@ export function Navbar() {
             <div className="hidden lg:flex items-center justify-end gap-2 shrink-0" onMouseEnter={() => hidePanel()}>
               <Link
                 href="/eligibility"
+                data-analytics-cta="navbar_eligibility"
+                data-analytics-location="navbar"
                 className="h-10 px-5 inline-flex items-center text-base font-medium text-[#0052CC] bg-white border border-[#E2E8F0] rounded hover:bg-[#F8FAFC] transition-colors"
               >
                 Eligibility
               </Link>
               <Link
                 href={assessmentHref}
+                data-analytics-cta="navbar_get_assessment"
+                data-analytics-location="navbar"
                 className="h-10 px-5 inline-flex items-center gap-1 text-base font-medium text-white bg-[#0052CC] hover:bg-[#1741b3] rounded transition-colors"
               >
                 Get assessment <ChevronRight className="h-4 w-4" />
@@ -523,7 +531,13 @@ export function Navbar() {
                         <button
                           type="button"
                           aria-expanded={isOpen}
-                          onClick={() => setMobileGroup(isOpen ? null : m.key)}
+                          onClick={() => {
+                            const next = isOpen ? null : m.key;
+                            setMobileGroup(next);
+                            if (next === "loans" || next === "calculators" || next === "cities" || next === "resources") {
+                              track({ name: "nav_menu_open", params: { menu_id: next } });
+                            }
+                          }}
                           className="w-full flex items-center justify-between py-3.5 px-2 text-lg font-semibold text-[#0A2540] tracking-tight cursor-pointer"
                         >
                           {m.label}

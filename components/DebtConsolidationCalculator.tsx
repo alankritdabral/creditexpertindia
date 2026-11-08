@@ -1,11 +1,13 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 import { Plus, Trash2, CheckCircle2, AlertTriangle, ArrowRight, TrendingDown, ShieldCheck, Sparkles, RefreshCw, Calculator, HelpCircle, Phone, Lock } from "lucide-react";
 import { DebtItem, DebtType, calculateMultiDebtConsolidation } from "@/lib/calculator";
 import { formatINR } from "@/lib/utils";
 import { claims } from "@/lib/config";
 import { NOTICE_VERSION } from "@/lib/consent";
+import { track } from "@/lib/analytics/track";
+import { bandAmount, bandRate, bandSavings } from "@/lib/analytics/events";
 import Link from "next/link";
 
 const DEBT_TYPE_LABELS: Record<DebtType, string> = {
@@ -78,6 +80,29 @@ export function DebtConsolidationCalculator() {
     });
   }, [debts, proposedRate, proposedTenure, processingFeePercent]);
 
+  // calculator_result, debounced on idle like the other two calculators.
+  const resultTrackedOnceRef = useRef(false);
+  useEffect(() => {
+    if (!resultTrackedOnceRef.current) {
+      resultTrackedOnceRef.current = true;
+      track({ name: "calculator_start", params: { calculator_id: "debt_consolidation" } });
+    }
+    const timer = setTimeout(() => {
+      track({
+        name: "calculator_result",
+        params: {
+          calculator_id: "debt_consolidation",
+          loan_amount_band: bandAmount(result.totalPrincipal),
+          rate_band: bandRate(proposedRate),
+          tenure_months: proposedTenure,
+          savings_band: bandSavings(result.monthlyCashflowSavings),
+          debts_count: debts.length,
+        },
+      });
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, [result, proposedRate, proposedTenure, debts.length]);
+
   // Debt list mutations
   const handleAddDebt = () => {
     const newDebt: DebtItem = {
@@ -90,6 +115,7 @@ export function DebtConsolidationCalculator() {
       remainingMonths: 36,
     };
     setDebts([...debts, newDebt]);
+    track({ name: "debt_row_add", params: { debt_type: newDebt.type } });
   };
 
   const handleUpdateDebt = (id: string, field: keyof DebtItem, value: any) => {
@@ -108,15 +134,19 @@ export function DebtConsolidationCalculator() {
   // Lead submission
   const handleLeadSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    track({ name: "lead_form_submit", params: { form_id: "calculator_lead" } });
+
     if (!leadForm.name || !leadForm.phone || !leadForm.netSalary) {
       setLeadError("Please complete all required fields.");
       setLeadStatus("error");
+      track({ name: "lead_form_error", params: { form_id: "calculator_lead", error_code: "name_missing" } });
       return;
     }
 
     if (!leadForm.consentContact) {
       setLeadError("Please agree to being contacted about this assessment.");
       setLeadStatus("error");
+      track({ name: "lead_form_error", params: { form_id: "calculator_lead", error_code: "consent_missing" } });
       return;
     }
 
@@ -124,6 +154,7 @@ export function DebtConsolidationCalculator() {
     if (isNaN(salary) || salary <= 25000) {
       setLeadError("Monthly take-home salary must be greater than ₹25,000 for eligibility.");
       setLeadStatus("error");
+      track({ name: "lead_form_error", params: { form_id: "calculator_lead", error_code: "salary_below_min" } });
       return;
     }
 
@@ -161,9 +192,11 @@ export function DebtConsolidationCalculator() {
       }
 
       setLeadStatus("success");
+      track({ name: "generate_lead", params: { lead_source: "calculator_lead", currency: "INR" } });
     } catch (err: any) {
       setLeadError(err.message || "Something went wrong. Please try again.");
       setLeadStatus("error");
+      track({ name: "lead_form_error", params: { form_id: "calculator_lead", error_code: "server" } });
     }
   };
 
@@ -185,7 +218,13 @@ export function DebtConsolidationCalculator() {
             <button
               key={idx}
               type="button"
-              onClick={() => handleApplyPreset(preset.debts)}
+              onClick={() => {
+                handleApplyPreset(preset.debts);
+                track({
+                  name: "debt_preset_apply",
+                  params: { preset_id: preset.name.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "") },
+                });
+              }}
               className="text-xs font-semibold px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-700 border border-slate-200 transition-colors cursor-pointer"
             >
               {preset.name}
@@ -522,7 +561,12 @@ export function DebtConsolidationCalculator() {
               <div className="pt-2">
                 <button
                   type="button"
-                  onClick={() => setIsModalOpen(true)}
+                  onClick={() => {
+                    setIsModalOpen(true);
+                    track({ name: "lead_form_view", params: { form_id: "calculator_lead", form_location: "calculator" } });
+                  }}
+                  data-analytics-cta="debt_calculator_explore_offers"
+                  data-analytics-location="debt_calculator"
                   className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold text-sm shadow-lg shadow-blue-500/25 flex items-center justify-center gap-2 transition-all cursor-pointer group"
                 >
                   <span>Explore Pre-Approved Lender Options</span>

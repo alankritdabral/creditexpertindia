@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Loader2, ArrowRight, CheckCircle2, AlertCircle, ChevronDown, Lock, Check, CheckCheck } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import logo from "@/public/img/logo.webp";
 import { contact } from "@/lib/config";
 import { NOTICE_VERSION } from "@/lib/consent";
+import { track } from "@/lib/analytics/track";
 
 const REQUIREMENTS = [
   "Reduce my EMI",
@@ -33,8 +34,22 @@ export function ContactForm() {
 
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
+  const hasStartedRef = useRef(false);
+
+  // Approximates the plan's "50% visible" lead_form_view with a mount-time
+  // fire: both pages that render this form put it close to the viewport
+  // (the homepage's #lead-form section, or above the fold on /contact), and
+  // a full IntersectionObserver per form instance was judged not worth the
+  // added complexity for this phase.
+  useEffect(() => {
+    track({ name: "lead_form_view", params: { form_id: "contact", form_location: "contact_form" } });
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    if (!hasStartedRef.current) {
+      hasStartedRef.current = true;
+      track({ name: "lead_form_start", params: { form_id: "contact" } });
+    }
     const { name, value, type } = e.target;
     if (type === "checkbox") {
       const checked = (e.target as HTMLInputElement).checked;
@@ -46,9 +61,12 @@ export function ContactForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    track({ name: "lead_form_submit", params: { form_id: "contact" } });
+
     if (!formData.name || !formData.phone || !formData.requirement || !formData.netSalary || !formData.ongoingEmi) {
       setErrorMessage("Please fill all required fields.");
       setStatus("error");
+      track({ name: "lead_form_error", params: { form_id: "contact", error_code: "name_missing" } });
       return;
     }
 
@@ -56,19 +74,22 @@ export function ContactForm() {
     if (isNaN(salary) || salary <= 45000) {
       setErrorMessage("Net salary must be greater than ₹45,000.");
       setStatus("error");
+      track({ name: "lead_form_error", params: { form_id: "contact", error_code: "salary_below_min" } });
       return;
     }
-    
+
     const emi = Number(formData.ongoingEmi);
     if (isNaN(emi) || emi > salary * 0.8) {
       setErrorMessage("Ongoing EMI cannot be greater than 80% of net salary.");
       setStatus("error");
+      track({ name: "lead_form_error", params: { form_id: "contact", error_code: "emi_too_high" } });
       return;
     }
 
     if (!formData.consentContact) {
       setErrorMessage("Please agree to being contacted about your enquiry.");
       setStatus("error");
+      track({ name: "lead_form_error", params: { form_id: "contact", error_code: "consent_missing" } });
       return;
     }
 
@@ -105,9 +126,11 @@ export function ContactForm() {
         consentContact: false,
         consentShareWithLenders: false,
       });
+      track({ name: "generate_lead", params: { lead_source: "contact", currency: "INR" } });
     } catch (error: any) {
       console.error("Form submission error:", error);
       setErrorMessage(error.message || "An unexpected error occurred. Please try again.");
+      track({ name: "lead_form_error", params: { form_id: "contact", error_code: "server" } });
       setStatus("error");
     }
   };
@@ -131,12 +154,15 @@ export function ContactForm() {
               href={`https://wa.me/${contact.whatsapp.replace(/[^0-9]/g, "")}`}
               target="_blank"
               rel="noopener noreferrer"
+              data-analytics-location="contact_form_success"
               className="flex-1 px-6 py-3 bg-[#25D366] text-white hover:bg-emerald-600 rounded font-bold transition-all shadow-md shadow-green-600/20 hover:-translate-y-0.5 text-sm sm:text-base flex items-center justify-center gap-2"
             >
               Chat on WhatsApp
             </Link>
             <Link
               href="/eligibility"
+              data-analytics-cta="contact_form_success_check_eligibility"
+              data-analytics-location="contact_form_success"
               className="flex-1 px-6 py-3 bg-[#0052CC] text-white hover:bg-[#0052CC]/90 rounded font-bold transition-all shadow-md shadow-[#0052CC]/20 hover:-translate-y-0.5 text-sm sm:text-base flex items-center justify-center gap-2"
             >
               Check Eligibility
@@ -154,7 +180,7 @@ export function ContactForm() {
     }
 
     return (
-      <div className="bg-white p-6 sm:p-10 relative z-20 flex flex-col scroll-mt-24 rounded-2xl card-elevated" id="contact-form">
+      <div className="bg-white p-6 sm:p-10 relative z-20 flex flex-col scroll-mt-24 rounded-2xl card-elevated" id="contact-form-card">
         <div className="mb-6 md:mb-8 shrink-0">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-2">
             <h2 className="text-[32px] font-bold tracking-[-0.02em] text-[#0A2540]">Leave your details</h2>

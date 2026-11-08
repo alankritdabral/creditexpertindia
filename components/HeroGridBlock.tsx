@@ -165,11 +165,21 @@ export function HeroGridBlock() {
 
         {/* Stripe-style CTAs */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 mb-8">
-          <Link href="#check-eligibility" className="flex w-full sm:w-auto px-[22px] h-[48px] bg-[#0052CC] text-white rounded text-base font-semibold hover:bg-[#0A2540] transition-all items-center justify-center gap-2 group shadow-sm">
+          <Link
+            href="#check-eligibility"
+            data-analytics-cta="hero_check_eligibility"
+            data-analytics-location="hero"
+            className="flex w-full sm:w-auto px-[22px] h-[48px] bg-[#0052CC] text-white rounded text-base font-semibold hover:bg-[#0A2540] transition-all items-center justify-center gap-2 group shadow-sm"
+          >
             Check My Eligibility
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </Link>
-          <Link href="#calculator" className="flex w-full sm:w-auto px-[22px] h-[48px] bg-white text-brand-black border border-slate-200 rounded text-base font-semibold hover:bg-slate-50 transition-all items-center justify-center gap-2 group shadow-sm">
+          <Link
+            href="#calculator"
+            data-analytics-cta="hero_see_savings"
+            data-analytics-location="hero"
+            className="flex w-full sm:w-auto px-[22px] h-[48px] bg-white text-brand-black border border-slate-200 rounded text-base font-semibold hover:bg-slate-50 transition-all items-center justify-center gap-2 group shadow-sm"
+          >
             <Calculator className="w-4 h-4 text-slate-600" />
             See Potential Savings
           </Link>

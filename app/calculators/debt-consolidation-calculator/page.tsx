@@ -385,6 +385,8 @@ export default function DebtConsolidationCalculatorPage() {
             <div className="pt-2 flex flex-col sm:flex-row justify-center gap-3">
               <Link
                 href="/eligibility"
+                data-analytics-cta="debt_calc_page_check_eligibility"
+                data-analytics-location="debt_calc_page"
                 className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md transition-colors"
               >
                 <span>Check Eligibility Online</span>
@@ -392,6 +394,8 @@ export default function DebtConsolidationCalculatorPage() {
               </Link>
               <Link
                 href="/contact"
+                data-analytics-cta="debt_calc_page_speak_advisor"
+                data-analytics-location="debt_calc_page"
                 className="inline-flex items-center justify-center px-6 py-3.5 rounded-full bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs border border-slate-700 transition-colors"
               >
                 Speak with an Advisor

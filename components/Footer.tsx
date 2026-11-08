@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import logoWithName from '@/public/img/logo_with_name.webp';
 import { siteConfig, contact } from '@/lib/config';
-import { ArrowRight, MessageCircle, Facebook, Instagram, Linkedin, Mail, MapPin } from 'lucide-react';
+import { ArrowRight, MessageCircle, Facebook, Instagram, Linkedin, Mail, MapPin, Phone } from 'lucide-react';
 import { clearConsent } from '@/lib/consent';
 
 const linkGroups = [
@@ -71,6 +71,8 @@ export function Footer() {
             <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
               <Link
                 href="/eligibility#credit-profile"
+                data-analytics-cta="footer_get_free_assessment"
+                data-analytics-location="footer"
                 className="flex items-center gap-2 rounded bg-white px-6 py-3 text-sm font-bold text-brand-black hover:bg-slate-100 transition-colors whitespace-nowrap"
               >
                 Get Free Assessment
@@ -80,6 +82,7 @@ export function Footer() {
                 href={`https://wa.me/${whatsappDigits}?text=Hi%2C%20I%20would%20like%20help%20with%20my%20loans.`}
                 target="_blank"
                 rel="noopener noreferrer"
+                data-analytics-location="footer"
                 className="flex items-center gap-2 rounded bg-[#25D366] px-6 py-3 text-sm font-bold text-white hover:bg-[#1DA851] transition-colors whitespace-nowrap"
               >
                 <MessageCircle className="w-4 h-4" />
@@ -144,13 +147,19 @@ export function Footer() {
             <h3 className="text-xs font-bold uppercase tracking-wider text-brand-black mb-5">Contact</h3>
             <ul role="list" className="space-y-3">
               <li>
-                <a href={`mailto:${contact.email}`} className={`${linkClass} flex items-start gap-2 whitespace-nowrap`}>
+                <a href={`tel:+${whatsappDigits}`} data-analytics-location="footer" className={`${linkClass} flex items-start gap-2 whitespace-nowrap`}>
+                  <Phone className="w-4 h-4 mt-0.5 shrink-0" />
+                  {contact.whatsapp}
+                </a>
+              </li>
+              <li>
+                <a href={`mailto:${contact.email}`} data-analytics-location="footer" className={`${linkClass} flex items-start gap-2 whitespace-nowrap`}>
                   <Mail className="w-4 h-4 mt-0.5 shrink-0" />
                   {contact.email}
                 </a>
               </li>
               <li>
-                <a href={`https://wa.me/${whatsappDigits}`} className={`${linkClass} flex items-start gap-2`}>
+                <a href={`https://wa.me/${whatsappDigits}`} data-analytics-location="footer" className={`${linkClass} flex items-start gap-2`}>
                   <MessageCircle className="w-4 h-4 mt-0.5 shrink-0" />
                   {contact.whatsapp}
                 </a>

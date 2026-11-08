@@ -2,7 +2,8 @@ import {
   Users, ShieldCheck, Lock, MapPin, Clock, FileText, Scale, CheckCircle2, Percent,
   CalendarCheck, TrendingUp, Wallet, Quote, type LucideIcon,
 } from "lucide-react";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { TrackedAccordion } from "@/components/analytics/TrackedAccordion";
 import { pageContent, stats, testimonials, type PageKey } from "@/lib/pageContent";
 
 const icons: Record<string, LucideIcon> = {
@@ -82,7 +83,7 @@ export function PageFAQ({ page }: { page: PageKey }) {
         <h2 className="text-[40px] sm:text-[56px] leading-[1.02] tracking-[-0.04em] font-bold lg:sticky lg:top-28 self-start">
           Common questions.
         </h2>
-        <Accordion type="single" collapsible className="w-full">
+        <TrackedAccordion faqSet={`page:${page}`} type="single" collapsible className="w-full">
           {faqs.map((f, i) => (
             <AccordionItem value={`f-${i}`} key={f.q} className="border-b-0 mb-2 px-4 md:px-6 data-[state=open]:bg-[#e6eefb] transition-colors">
               <AccordionTrigger className="hover:no-underline text-left gap-6 py-5">
@@ -93,7 +94,7 @@ export function PageFAQ({ page }: { page: PageKey }) {
               </AccordionContent>
             </AccordionItem>
           ))}
-        </Accordion>
+        </TrackedAccordion>
       </div>
     </section>
   );

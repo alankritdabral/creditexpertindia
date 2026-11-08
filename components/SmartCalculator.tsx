@@ -1,13 +1,46 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import { ArrowRight } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
+import { track } from "@/lib/analytics/track";
+import { bandAmount, bandRate, bandSavings } from "@/lib/analytics/events";
 
 export function SmartCalculator() {
   const [principal, setPrincipal] = useState(500000);
   const [rate, setRate] = useState(10.5);
   const [tenure, setTenure] = useState(60); // months
+  const hasStartedRef = useRef(false);
+  const resultTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const trackStart = useCallback(() => {
+    if (hasStartedRef.current) return;
+    hasStartedRef.current = true;
+    track({ name: "calculator_start", params: { calculator_id: "smart_emi" } });
+  }, []);
+
+  // Takes the exact values the handler just computed, rather than reading
+  // component state back, so a slider that's still mid-drag never reports a
+  // one-tick-stale band once the debounce timer finally fires.
+  const scheduleResultTrack = useCallback(
+    (snapshot: { principal: number; rate: number; tenure: number; savings: number }) => {
+      if (resultTimerRef.current) clearTimeout(resultTimerRef.current);
+      resultTimerRef.current = setTimeout(() => {
+        track({
+          name: "calculator_result",
+          params: {
+            calculator_id: "smart_emi",
+            loan_amount_band: bandAmount(snapshot.principal),
+            rate_band: bandRate(snapshot.rate),
+            tenure_months: snapshot.tenure,
+            savings_band: bandSavings(snapshot.savings),
+            debts_count: 1,
+          },
+        });
+      }, 1500);
+    },
+    []
+  );
 
   // Calculate EMI
   const monthlyRate = (rate / 12) / 100;
@@ -71,6 +104,8 @@ export function SmartCalculator() {
         </p>
         <a
           href="#lead-form"
+          data-analytics-cta="smart_calculator_talk_to_us"
+          data-analytics-location="smart_calculator"
           className="mt-9 inline-flex items-center gap-2 rounded bg-white text-[#0052CC] font-bold text-lg px-7 py-4 hover:bg-[#0A2540] hover:text-white transition-colors"
         >
           Talk to us instead <ArrowRight className="w-5 h-5" />
@@ -88,7 +123,12 @@ export function SmartCalculator() {
           inr(principal),
           <Slider
             min={50000} max={10000000} step={50000}
-            value={[principal]} onValueChange={(val) => setPrincipal(val[0])}
+            value={[principal]}
+            onValueChange={(val) => {
+              trackStart();
+              setPrincipal(val[0]);
+              scheduleResultTrack({ principal: val[0], rate, tenure, savings });
+            }}
             className="py-2 cursor-pointer"
             showTooltip
             tooltipContent={(val) => inr(val)}
@@ -101,7 +141,12 @@ export function SmartCalculator() {
           `${rate.toFixed(1)}%`,
           <Slider
             min={5} max={30} step={0.1}
-            value={[rate]} onValueChange={(val) => setRate(val[0])}
+            value={[rate]}
+            onValueChange={(val) => {
+              trackStart();
+              setRate(val[0]);
+              scheduleResultTrack({ principal, rate: val[0], tenure, savings });
+            }}
             className="py-2 cursor-pointer"
             showTooltip
             tooltipContent={(val) => `${val}%`}
@@ -114,7 +159,12 @@ export function SmartCalculator() {
           tenure >= 24 && tenure % 12 === 0 ? `${tenure / 12} years` : `${tenure} months`,
           <Slider
             min={6} max={360} step={1}
-            value={[tenure]} onValueChange={(val) => setTenure(val[0])}
+            value={[tenure]}
+            onValueChange={(val) => {
+              trackStart();
+              setTenure(val[0]);
+              scheduleResultTrack({ principal, rate, tenure: val[0], savings });
+            }}
             className="py-2 cursor-pointer"
             showTooltip
             tooltipContent={(val) => `${val} mo`}
