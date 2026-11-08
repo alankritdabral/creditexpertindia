@@ -492,7 +492,6 @@ export function Navbar() {
               initial="initial"
               animate="enter"
               exit="exit"
-              data-lenis-prevent
               role="dialog"
               aria-modal="true"
               aria-label="Menu"

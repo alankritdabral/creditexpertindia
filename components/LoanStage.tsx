@@ -1,11 +1,21 @@
 "use client";
 
 import React, { useEffect, useId, useState } from "react";
+import dynamic from "next/dynamic";
 import { AnimatePresence, motion, useAnimationControls, useReducedMotion } from "framer-motion";
 import { ArrowRight, type LucideIcon } from "lucide-react";
-import { AnimatedPhoneMockup } from "./ui/AnimatedPhoneMockup";
 import { AnimatedCreditCard } from "./ui/AnimatedCreditCard";
 import { AnimatedNumber } from "./ui/AnimatedNumber";
+
+// AnimatedPhoneMockup registers gsap's ScrollTrigger at module scope, which
+// previously pulled gsap into the homepage's initial bundle even though
+// this one "phone" scene is just one of several LoanSolutionsSection rows
+// (plans/01-visibility-and-analytics.md Phase 10). Loaded only when this
+// scene is actually the active one.
+const AnimatedPhoneMockup = dynamic(
+  () => import("./ui/AnimatedPhoneMockup").then((m) => m.AnimatedPhoneMockup),
+  { ssr: false }
+);
 
 export type StageChip = { amount: number; name: string; icon: LucideIcon };
 export type StageRate = { from: number; to: number };

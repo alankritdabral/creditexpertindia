@@ -101,13 +101,13 @@ export function HeroLogos() {
           <div className="flex w-max animate-marquee opacity-100 transition-all duration-500 items-center">
             {[...Array(2)].map((_, i) => (
               <div key={i} className="flex shrink-0 items-center gap-8 sm:gap-14 pr-8 sm:pr-14">
-                <Image src={axisFinanceLogo} alt="Axis Finance" priority className="shrink-0 h-[25px] sm:h-10 w-auto object-contain opacity-100 mix-blend-multiply" />
-                <Image src={hdfcLogo} alt="HDFC Bank" priority className="shrink-0 h-[25px] sm:h-10 w-auto object-contain opacity-100 mix-blend-multiply" />
-                <Image src={tataLogo} alt="Tata Capital" priority className="shrink-0 h-[25px] sm:h-10 w-auto object-contain opacity-100 mix-blend-multiply" />
-                <Image src={ltFinanceLogo} alt="L&T Finance" priority className="shrink-0 h-[25px] sm:h-10 w-auto object-contain opacity-100 mix-blend-multiply" />
-                <Image src={smfgLogo} alt="SMFG India Credit" priority className="shrink-0 h-[25px] sm:h-10 w-auto object-contain opacity-100 mix-blend-multiply" />
-                <Image src={kotakBankLogo} alt="Kotak Mahindra Bank" priority className="shrink-0 h-[25px] sm:h-10 w-auto object-contain opacity-100 mix-blend-multiply" />
-                <Image src={iciciBankLogo} alt="ICICI Bank" priority className="shrink-0 h-[25px] sm:h-10 w-auto object-contain opacity-100 mix-blend-multiply" />
+                <Image src={axisFinanceLogo} alt="Axis Finance" className="shrink-0 h-[25px] sm:h-10 w-auto object-contain opacity-100 mix-blend-multiply" />
+                <Image src={hdfcLogo} alt="HDFC Bank" className="shrink-0 h-[25px] sm:h-10 w-auto object-contain opacity-100 mix-blend-multiply" />
+                <Image src={tataLogo} alt="Tata Capital" className="shrink-0 h-[25px] sm:h-10 w-auto object-contain opacity-100 mix-blend-multiply" />
+                <Image src={ltFinanceLogo} alt="L&T Finance" className="shrink-0 h-[25px] sm:h-10 w-auto object-contain opacity-100 mix-blend-multiply" />
+                <Image src={smfgLogo} alt="SMFG India Credit" className="shrink-0 h-[25px] sm:h-10 w-auto object-contain opacity-100 mix-blend-multiply" />
+                <Image src={kotakBankLogo} alt="Kotak Mahindra Bank" className="shrink-0 h-[25px] sm:h-10 w-auto object-contain opacity-100 mix-blend-multiply" />
+                <Image src={iciciBankLogo} alt="ICICI Bank" className="shrink-0 h-[25px] sm:h-10 w-auto object-contain opacity-100 mix-blend-multiply" />
               </div>
             ))}
           </div>
@@ -116,5 +116,3 @@ export function HeroLogos() {
     </div>
   );
 }
-
-export { HeroVisualBlock } from "./hero/HeroVisualBlock";

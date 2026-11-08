@@ -1,20 +1,20 @@
 import type { Metadata } from "next";
-import dynamic from "next/dynamic";
 import Image from "next/image";
-import { HeroGridBlock, HeroVisualBlock, HeroLogos } from "@/components/HeroGridBlock";
+import { HeroGridBlock, HeroLogos } from "@/components/HeroGridBlock";
 import { AnimatedSection } from "@/components/AnimatedSection";
 import { LoanSolutionsSection } from "@/components/LoanSolutionsSection";
 import { SectionRules, SectionDivider } from "@/components/SectionRules";
-
-// Lazy load below-the-fold components
-const SmartCalculator = dynamic(() => import("@/components/SmartCalculator").then(mod => mod.SmartCalculator));
-const EligibilityForm = dynamic(() => import("@/components/EligibilityForm").then(mod => mod.EligibilityForm));
-const HowItWorks = dynamic(() => import("@/components/HowItWorks").then(mod => mod.HowItWorks));
-const ScamProtection = dynamic(() => import("@/components/ScamProtection").then(mod => mod.ScamProtection));
-const FAQ = dynamic(() => import("@/components/FAQ").then(mod => mod.FAQ));
-const NetworkStats = dynamic(() => import("@/components/NetworkStats").then(mod => mod.NetworkStats));
-const EligibleLoansSlider = dynamic(() => import("@/components/EligibleLoansSlider").then(mod => mod.EligibleLoansSlider));
-const ContactForm = dynamic(() => import("@/components/ContactForm").then(mod => mod.ContactForm));
+import {
+  HeroVisualBlock,
+  SmartCalculator,
+  EligibilityForm,
+  HowItWorks,
+  ScamProtection,
+  FAQ,
+  NetworkStats,
+  EligibleLoansSlider,
+  ContactForm,
+} from "@/components/home/LazyHomeSections";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/" },
