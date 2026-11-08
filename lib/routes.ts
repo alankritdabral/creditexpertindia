@@ -37,6 +37,7 @@ export const staticRoutes: RouteEntry[] = [
   { path: '/privacy-policy', lastModified: '2026-11-02T17:16:19+05:30' },
   { path: '/terms-and-conditions', lastModified: '2026-11-02T17:16:19+05:30' },
   { path: '/app-loan', lastModified: '2026-11-03T18:19:56+05:30' },
+  { path: '/calculators', lastModified: '2026-11-08T21:31:00+05:30' },
   { path: '/calculators/debt-consolidation-calculator', lastModified: '2026-11-02T17:16:19+05:30' },
   { path: '/personal-loan-overdraft', lastModified: '2026-11-03T18:19:56+05:30' },
   { path: '/personal-loan-emi-calculator', lastModified: '2026-11-03T18:19:56+05:30' },

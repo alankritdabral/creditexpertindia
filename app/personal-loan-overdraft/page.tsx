@@ -27,6 +27,7 @@ export default function Page() {
         body="If your salary doesn't always stretch to month-end, an overdraft or credit line can help. We'll also check if another route would cost you less."
         cta="Check my overdraft options"
         image="/img/od.webp"
+        imageAlt="A salaried professional checking an overdraft credit line on a phone"
         points={["Free assessment", "For salaried professionals", "No pressure to go ahead"]}
       />
 

@@ -10,8 +10,8 @@ import { ClickTracker } from "@/components/analytics/ClickTracker";
 import { WebVitals } from "@/components/analytics/WebVitals";
 import { ClarityLoader } from "@/components/analytics/Clarity";
 import { siteConfig } from "@/lib/config";
-import { defaultOgImage } from "@/lib/seo";
 import { GA_ID } from "@/lib/analytics/gaId";
+import { jsonLd, organizationSchema, websiteSchema } from "@/lib/structuredData";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -47,22 +47,21 @@ export const metadata: Metadata = {
     siteName: siteConfig.name,
     type: "website",
     locale: "en_IN",
-    images: [defaultOgImage],
+    // No explicit `images`: app/opengraph-image.tsx (file convention) is the
+    // site-wide default; a route with its own opengraph-image.tsx (the
+    // learning-center articles) gets that one instead.
   },
   twitter: {
     card: "summary_large_image",
     title: `${siteConfig.name} — Debt Consolidation & Personal Loans`,
     description: "Explore debt consolidation, balance transfer and personal loans through our lending network. Check your options.",
-    images: [defaultOgImage.url],
   },
-  icons: {
-    icon: [
-      { url: "/favicon.ico", type: "image/x-icon", sizes: "any" },
-      { url: "/favicon.ico", type: "image/x-icon", sizes: "48x48" },
-    ],
-    shortcut: "/favicon.ico",
-    apple: "/favicon.ico",
-  },
+  // No manual `icons` here: app/favicon.ico, app/icon.png and
+  // app/apple-icon.png are Next's file-convention icons and are picked up
+  // automatically (and take precedence over a metadata `icons` object) —
+  // see node_modules/next/dist/docs/.../app-icons.md. The previous object
+  // pointed `apple` at a .ico file, which the apple-icon convention doesn't
+  // even accept (only .jpg/.jpeg/.png).
   robots: { 
     index: true, 
     follow: true, 
@@ -79,14 +78,15 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "FinancialService",
-    name: siteConfig.name,
-    url: siteConfig.url,
-    description: "Helps borrowers explore debt consolidation, balance transfer and personal loan options.",
-    areaServed: "IN",
-  };
+  // Organization + WebSite, not the old bare FinancialService (it had no
+  // address, logo or sameAs — Google's LocalBusiness/FinancialService
+  // feature needs a real PostalAddress; that now lives on /contact's
+  // per-branch schema instead). Rendered site-wide: cheap, and Google's own
+  // guidance just says this doesn't need to be on EVERY page, not that it
+  // mustn't be. Two separate documents, each with its own @context, rather
+  // than one @graph — simpler than stripping the nested @context keys.
+  const organization = organizationSchema();
+  const website = websiteSchema();
 
   return (
     <html lang="en-IN" className={`${inter.variable} ${manrope.variable} h-full antialiased font-sans scroll-smooth`}>
@@ -132,7 +132,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
           strategy="afterInteractive"
         />
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(organization) }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(website) }} />
         <ScrollProgress />
         <Navbar />
         <main className="flex-1">{children}</main>

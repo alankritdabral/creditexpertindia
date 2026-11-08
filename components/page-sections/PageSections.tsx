@@ -5,6 +5,7 @@ import {
 import { AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { TrackedAccordion } from "@/components/analytics/TrackedAccordion";
 import { pageContent, stats, testimonials, type PageKey } from "@/lib/pageContent";
+import { jsonLd, pageFaqSchema } from "@/lib/structuredData";
 
 const icons: Record<string, LucideIcon> = {
   users: Users, shield: ShieldCheck, lock: Lock, map: MapPin, clock: Clock, file: FileText,
@@ -79,6 +80,10 @@ export function PageFAQ({ page }: { page: PageKey }) {
   const { faqs } = pageContent[page];
   return (
     <section className="bg-white text-[#0A2540]">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLd(pageFaqSchema(faqs)) }}
+      />
       <div className="max-w-[1220px] mx-auto px-4 md:px-6 lg:px-8 py-16 md:py-24 grid grid-cols-1 lg:grid-cols-[5fr_7fr] gap-8 lg:gap-16">
         <h2 className="text-[40px] sm:text-[56px] leading-[1.02] tracking-[-0.04em] font-bold lg:sticky lg:top-28 self-start">
           Common questions.

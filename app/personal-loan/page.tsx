@@ -22,6 +22,7 @@ export default function PersonalLoanPage() {
         body="Rates start from 9.95% p.a.* for salaried applicants. We check your options with partner banks, based on your income, employer and credit score."
         cta="Check my eligibility"
         image="/img/marraige.webp"
+        imageAlt="A couple reviewing a personal loan offer together"
         points={["Free to check, no obligation", "Soft profile check, no impact on your score*", "You decide if you go ahead"]}
       />
 

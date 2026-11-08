@@ -20,6 +20,7 @@ export default function Page() {
         body="Short, honest guides to help you understand your options before you borrow, consolidate or switch."
         cta="Ask us a question"
         image="/Misty India Skyline with Orbital Arcs.webp"
+        imageAlt="An Indian city skyline, representing Credit Expert India's nationwide service"
         points={["Written for salaried borrowers", "General information, not advice", "Free to read"]}
       />
       <section className="bg-white text-[#0A2540]">

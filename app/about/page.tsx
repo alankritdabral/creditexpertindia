@@ -21,6 +21,7 @@ export default function AboutPage() {
         body="Credit Expert India helps people review their loans and explore consolidation and personal-loan options. We keep our claims modest and our communication honest, and there's always a human to talk to."
         cta="Talk to us"
         image="/Misty India Skyline with Orbital Arcs.webp"
+        imageAlt="An Indian city skyline, representing Credit Expert India's nationwide service"
         points={["Human guidance", "Clear, jargon-free advice", "Your information handled responsibly"]}
       />
 

@@ -30,7 +30,7 @@ export default function Home() {
         <div className="hero-skyline pointer-events-none">
           <Image
             src="/Misty India Skyline with Orbital Arcs.webp"
-            alt="Hero Background"
+            alt=""
             fill
             sizes="100vw"
             className="object-cover object-bottom sm:object-center opacity-80"

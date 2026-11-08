@@ -21,6 +21,7 @@ export default function CreditCardDebtPage() {
         body="Cards charge 36–42% a year, and minimum dues keep you stuck. Moving that balance to a lower-rate loan can change that."
         cta="See my card options"
         image="/img/creditcard.webp"
+        imageAlt="A credit card next to a calculator, representing card-debt repayment planning"
         points={["Free assessment", "We never ask for money upfront", "Your final lender makes the decision"]}
       />
 

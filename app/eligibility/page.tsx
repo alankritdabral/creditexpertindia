@@ -21,6 +21,7 @@ export default function EligibilityPage() {
         body="Here's what lenders usually look at: age, income, employment and documents. Then check your own profile in a couple of minutes."
         cta="Check my eligibility"
         image="/eligibility.png"
+        imageAlt="A salaried professional checking their loan eligibility online"
         points={["Free to check", "No upload needed to start", "You decide what happens next"]}
         href="#credit-profile"
       />

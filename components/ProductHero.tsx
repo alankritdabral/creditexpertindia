@@ -6,11 +6,15 @@ type Props = {
   body: string;
   cta: string;
   image: string;
+  /** A real, page-specific description. Falls back to "" (decorative) only
+   * when a caller genuinely has nothing more specific to say than the
+   * title already does. */
+  imageAlt?: string;
   points?: string[];
   href?: string;
 };
 
-export function ProductHero({ title, body, cta, image, points = [], href = "#lead-form" }: Props) {
+export function ProductHero({ title, body, cta, image, imageAlt = "", points = [], href = "#lead-form" }: Props) {
   return (
     <>
     <div className="h-[84px] bg-white" aria-hidden="true" />
@@ -35,7 +39,7 @@ export function ProductHero({ title, body, cta, image, points = [], href = "#lea
         </ul>
       </div>
       <div className="relative min-h-[320px] lg:min-h-full">
-        <Image src={image} alt="" fill priority sizes="(min-width:1024px) 45vw, 100vw" className="object-cover" />
+        <Image src={image} alt={imageAlt} fill priority sizes="(min-width:1024px) 45vw, 100vw" className="object-cover" />
       </div>
     </section>
     </>

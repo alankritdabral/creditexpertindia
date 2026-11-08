@@ -3,7 +3,7 @@ import { ProductHero } from "@/components/ProductHero";
 import { Eligibility } from "@/components/Eligibility";
 import { LoanCalculator } from "@/components/LoanCalculator";
 import { LeadForm } from "@/components/LeadForm";
-import { FAQ } from "@/components/FAQ";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { PageIntro, PageProof } from "@/components/page-sections/PageSections";
 import { cities, type City } from "@/lib/cities";
 
@@ -11,11 +11,19 @@ export function CityLoanPage({ city }: { city: City }) {
   const others = cities.filter((c) => c.slug !== city.slug);
   return (
     <div className="min-h-screen bg-white">
+      <Breadcrumbs
+        items={[
+          { name: "Home", path: "/" },
+          { name: "Personal Loans by City", path: "/personal-loan" },
+          { name: city.name },
+        ]}
+      />
       <ProductHero
         title={`Salaried in ${city.name}? Let's find you a better loan.`}
         body={`Whether you want a fresh personal loan or to bring several EMIs into one, we'll check your options with partner banks. Rates start from 9.95% p.a.* for eligible salaried applicants.`}
         cta="Check my eligibility"
         image="/img/marraige.webp"
+        imageAlt={`A salaried professional in ${city.name} reviewing loan options`}
         points={["Free to check, from anywhere in " + city.name, "Made for salaried professionals", "You decide whether to go ahead"]}
       />
 

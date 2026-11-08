@@ -21,6 +21,7 @@ export default function HowItWorksPage() {
         body="A step-by-step look at how we go through your debt profile and help you apply with RBI-regulated lenders."
         cta="Start my free assessment"
         image="/Misty India Skyline with Orbital Arcs.webp"
+        imageAlt="An Indian city skyline, representing Credit Expert India's nationwide service"
         points={["Four simple steps", "You can stop at any point", "Nothing is pushed on you"]}
       />
 

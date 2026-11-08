@@ -6,13 +6,22 @@ import logoWithName from '@/public/img/logo_with_name.webp';
 import { siteConfig, contact } from '@/lib/config';
 import { ArrowRight, MessageCircle, Facebook, Instagram, Linkedin, Mail, MapPin, Phone } from 'lucide-react';
 import { clearConsent } from '@/lib/consent';
+import { cities } from '@/lib/cities';
+import { articles } from '@/content/articles';
 
+// Every loan/product and calculator route lives in a footer link so Google
+// can reach it by following a link, not just through the hover-only navbar
+// menu (plans/01-visibility-and-analytics.md Phase 8).
 const linkGroups = [
   {
     title: 'Solutions',
     links: [
       { label: 'Debt Consolidation', href: '/debt-consolidation' },
       { label: 'Personal Loans', href: '/personal-loan' },
+      { label: 'Loan Balance Transfer', href: '/loan-balance-transfer' },
+      { label: 'Credit Card Debt', href: '/credit-card-debt' },
+      { label: 'High-Interest Loans', href: '/high-interest-loan' },
+      { label: 'App Loans', href: '/app-loan' },
       { label: 'Overdraft Options', href: '/personal-loan-overdraft' },
       { label: 'Check Eligibility', href: '/eligibility#credit-profile' },
     ],
@@ -20,6 +29,7 @@ const linkGroups = [
   {
     title: 'Calculators',
     links: [
+      { label: 'All Calculators', href: '/calculators' },
       { label: 'Debt Consolidation Calculator', href: '/calculators/debt-consolidation-calculator' },
       { label: 'Personal Loan EMI Calculator', href: '/personal-loan-emi-calculator' },
       { label: 'EMI Savings Calculator', href: '/emi-savings-calculator' },
@@ -30,9 +40,23 @@ const linkGroups = [
     links: [
       { label: 'About us', href: '/about' },
       { label: 'Contact us', href: '/contact' },
-      { label: 'Learning Center', href: '/learning-center' },
+      { label: 'How it works', href: '/how-it-works' },
       { label: 'FAQ', href: '/faq' },
     ],
+  },
+  {
+    title: 'Guides',
+    links: [
+      { label: 'Learning Center', href: '/learning-center' },
+      ...articles.slice(0, 5).map((a) => ({ label: a.title, href: `/learning-center/${a.slug}` })),
+    ],
+  },
+  {
+    // TODO(Phase 9): once the city pages are triaged per decision D5
+    // (rewritten with real local content, or set noindex until they are),
+    // drop any noindex'd city from this list too.
+    title: 'Personal Loans by City',
+    links: cities.map((c) => ({ label: c.name, href: `/personal-loan-in-${c.slug}` })),
   },
 ];
 
@@ -130,12 +154,23 @@ export function Footer() {
 
           {/* Link groups */}
           {linkGroups.map((group) => (
-            <nav key={group.title} aria-label={group.title} className="lg:col-span-2">
+            <nav
+              key={group.title}
+              aria-label={group.title}
+              className={group.links.length > 6 ? 'col-span-2 lg:col-span-4' : 'lg:col-span-2'}
+            >
               <h3 className="text-xs font-bold uppercase tracking-wider text-brand-black mb-5">{group.title}</h3>
-              <ul role="list" className="space-y-3">
+              <ul
+                role="list"
+                className={
+                  group.links.length > 6
+                    ? 'grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-3'
+                    : 'space-y-3'
+                }
+              >
                 {group.links.map((link) => (
                   <li key={link.href}>
-                    <Link href={link.href} className={linkClass}>{link.label}</Link>
+                    <Link href={link.href} className={`${linkClass} line-clamp-1`}>{link.label}</Link>
                   </li>
                 ))}
               </ul>

@@ -20,6 +20,7 @@ export default function Page() {
         body="Set the amount, the rate and the tenure, and see your monthly EMI, the total interest and the total you'd repay."
         cta="Talk to us about my loan"
         image="/img/marraige.webp"
+        imageAlt="A couple planning a personal loan EMI budget together"
         points={["Free and instant", "No sign-up needed", "Compare with a lower rate"]}
       />
 

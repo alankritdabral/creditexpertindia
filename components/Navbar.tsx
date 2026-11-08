@@ -92,6 +92,7 @@ const menus: Menu[] = [
       },
     ],
     sidebar: { title: "Next step", links: [{ label: "Check eligibility", desc: "Free and quick", href: "/eligibility" }], promo: promoAssessment },
+    footer: { label: "See all calculators", href: "/calculators" },
   },
   {
     key: "cities",
@@ -393,7 +394,7 @@ export function Navbar() {
             <Link href="/" className="flex items-center gap-2 group shrink-0">
               <Image
                 src={logo}
-                alt="Credit Expert"
+                alt="Credit Expert India"
                 width={160}
                 height={40}
                 className="h-[34px] sm:h-10 w-auto object-contain group-hover:opacity-80 transition-opacity"
@@ -500,7 +501,7 @@ export function Navbar() {
               {/* Header */}
               <div className="h-[60px] shrink-0 sticky top-0 z-10 bg-white px-4 md:px-6 flex items-center justify-between">
                 <Link href="/" onClick={() => setOpen(false)}>
-                  <Image src={logo} alt="Credit Expert" className="h-[34px] sm:h-10 w-auto object-contain" priority />
+                  <Image src={logo} alt="Credit Expert India" className="h-[34px] sm:h-10 w-auto object-contain" priority />
                 </Link>
                 <button
                   type="button"

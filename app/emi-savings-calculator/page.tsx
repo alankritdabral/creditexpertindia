@@ -20,6 +20,7 @@ export default function Page() {
         body="Add up what you pay today and see what it might look like as one loan at a lower rate. It's a quick estimate to start the conversation."
         cta="Get my free assessment"
         image="/img/multipleloans.webp"
+        imageAlt="Several loan EMIs being combined to estimate monthly savings"
         points={["Free and instant", "Built for salaried borrowers", "Honest, even if the saving is small"]}
       />
 

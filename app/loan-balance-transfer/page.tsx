@@ -21,6 +21,7 @@ export default function BalanceTransferPage() {
         body="If you qualify, you could transfer your existing loan to a partner bank at rates starting from 9.95% p.a.*"
         cta="Check my transfer rate"
         image="/img/multipleloans.webp"
+        imageAlt="Several loan documents being consolidated into a single lower-rate loan"
         points={["Free to check", "We compare partner banks for you", "No pressure to switch"]}
       />
 

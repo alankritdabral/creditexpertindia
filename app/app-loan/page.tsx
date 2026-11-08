@@ -21,6 +21,7 @@ export default function AppLoanPage() {
         body="App loans often come with steep fees and high interest. Roll them into one bank loan with a single EMI."
         cta="Combine my app loans"
         image="/img/teenager.webp"
+        imageAlt="A young professional managing multiple app-based loans on a phone"
         points={["Free to check", "One EMI, one due date", "No pressure, no upfront fees"]}
       />
 

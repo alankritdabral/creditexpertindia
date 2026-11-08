@@ -6,37 +6,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { TrackedAccordion } from "@/components/analytics/TrackedAccordion";
-
-const faqs = [
-  {
-    question: "What does Credit Expert India do?",
-    answer: "We help customers understand their existing debt or borrowing requirements and explore suitable loan, consolidation or repayment options based on their situation."
-  },
-  {
-    question: "Can you help with multiple loans?",
-    answer: "Yes. We can review multiple loans and EMIs together and help you understand whether consolidation or another option may be suitable."
-  },
-  {
-    question: "Can you help with credit-card debt?",
-    answer: "We can review your credit-card dues and help you understand potential repayment or consolidation options available based on your situation."
-  },
-  {
-    question: "Do you guarantee loan approval?",
-    answer: "No. Final approval, interest rate, loan amount and tenure are decided by the respective lender based on its eligibility criteria."
-  },
-  {
-    question: "Do you guarantee lower interest rates?",
-    answer: "No. Rates depend on your profile, lender policies and prevailing terms. We help you explore suitable options."
-  },
-  {
-    question: "Is the assessment free?",
-    answer: "The initial assessment can be offered without obligation. Any applicable charges, if any, should always be communicated clearly before proceeding."
-  },
-  {
-    question: "Will taking another loan always help?",
-    answer: "No. A new loan isn't always the right solution. We first look at the existing situation and then discuss relevant options."
-  }
-];
+import { siteFaqs as faqs } from "@/content/faq";
 
 export function FAQ() {
   const pathname = usePathname();

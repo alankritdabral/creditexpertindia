@@ -117,7 +117,7 @@ export const EligibleLoansSlider = () => {
                     {/* Background Image for glass effect */}
                     <Image
                       src={slide.data.image}
-                      alt="Background"
+                      alt=""
                       fill
                       sizes="(max-width: 768px) 85vw, 380px"
                       className="object-cover opacity-80"
