@@ -6,7 +6,7 @@ import { ProductHero } from "@/components/ProductHero";
 import { PageIntro, PageProof } from "@/components/page-sections/PageSections";
 
 export const metadata: Metadata = buildMetadata({
-  title: "Credit Card Debt Relief & Payoff Options",
+  title: "Credit Card Debt Relief Options",
   description:
     "Replace expensive 36%-42% p.a. revolving credit card interest with a structured lower-rate personal loan. Explore credit card debt payoff options.",
   path: "/credit-card-debt",

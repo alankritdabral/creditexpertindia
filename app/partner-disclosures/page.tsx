@@ -4,7 +4,7 @@ import { buildMetadata } from "@/lib/seo";
 export const metadata: Metadata = buildMetadata({
   title: "Partner Disclosures",
   description:
-    "Partner Disclosures for Credit Expert India",
+    "How Credit Expert India works with lending partners, how we are compensated, and what we never guarantee about loan approval.",
   path: "/partner-disclosures",
 });
 

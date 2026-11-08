@@ -7,7 +7,7 @@ import { ProductHero } from "@/components/ProductHero";
 import { PageIntro, PageProof } from "@/components/page-sections/PageSections";
 
 export const metadata: Metadata = buildMetadata({
-  title: "Personal Loans for Salaried Staff from 9.95% p.a.*",
+  title: "Personal Loans for Salaried Staff",
   description:
     "Check personal loan options for salaried professionals. Rates starting from 9.95% p.a.* with soft profile eligibility checks and partner bank network.",
   path: "/personal-loan",

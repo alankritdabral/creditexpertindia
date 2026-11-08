@@ -7,7 +7,7 @@ import { ProductHero } from "@/components/ProductHero";
 import { PageIntro, PageProof } from "@/components/page-sections/PageSections";
 
 export const metadata: Metadata = buildMetadata({
-  title: "Debt Consolidation Loans for Salaried Professionals",
+  title: "Debt Consolidation for Salaried Staff",
   description:
     "Combine multiple personal loans, credit card dues, and app loans into one single lower-rate EMI plan. Explore debt consolidation options with bank partners.",
   path: "/debt-consolidation",

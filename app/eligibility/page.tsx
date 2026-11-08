@@ -6,7 +6,7 @@ import { WhoWeHelp } from "@/components/WhoWeHelp";
 import { EligibilityForm } from "@/components/EligibilityForm";
 
 export const metadata: Metadata = buildMetadata({
-  title: "Loan Eligibility Criteria & Document Requirements",
+  title: "Loan Eligibility Criteria & Documents",
   description:
     "Check eligibility criteria and document requirements for salaried debt consolidation and personal loans.",
   path: "/eligibility",

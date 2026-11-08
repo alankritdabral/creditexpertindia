@@ -4,9 +4,9 @@ import { CityLoanPage } from "@/components/CityLoanPage";
 import { cities } from "@/lib/cities";
 
 export const metadata: Metadata = buildMetadata({
-  title: "Personal Loan for Salaried Employees in Bangalore",
+  title: "Personal Loan in Bangalore",
   description:
-    "Check personal loan and EMI consolidation options for salaried professionals in Bangalore. Rates from 9.95% p.a.* for eligible applicants. Free assessment.",
+    "Personal loan and EMI consolidation options for salaried staff in Bangalore. Rates from 9.95% p.a.* for eligible applicants. Free assessment.",
   path: "/personal-loan-in-bangalore",
 });
 

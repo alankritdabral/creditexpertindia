@@ -4,7 +4,7 @@ import { buildMetadata } from "@/lib/seo";
 export const metadata: Metadata = buildMetadata({
   title: "Privacy Policy",
   description:
-    "Privacy Policy for Credit Expert India",
+    "What personal information Credit Expert India collects from visitors and how it is used, including for loan enquiries.",
   path: "/privacy-policy",
 });
 

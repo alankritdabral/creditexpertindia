@@ -24,21 +24,16 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
+  // Rendered as-is on the homepage (the title template only applies to child
+  // segments), so this must itself be ≤60 chars for Google not to truncate it.
   title: {
-    default: `${siteConfig.name} — Debt Consolidation & Personal Loans for Salaried Professionals`,
+    default: `${siteConfig.name} — Debt Consolidation & Personal Loans`,
     template: `%s | ${siteConfig.name}`,
   },
   description:
-    "Paying too much interest on loans, credit-card dues or multiple EMIs? Credit Expert India helps you explore debt consolidation, balance transfer and personal loan options starting from 9.95% p.a.* for eligible salaried applicants.",
-  keywords: [
-    "debt consolidation India",
-    "debt consolidation loan",
-    "personal loan",
-    "personal loan for salaried",
-    "loan balance transfer",
-    "reduce loan interest",
-    "credit card debt consolidation",
-  ],
+    "Paying too much interest on loans or card dues? Explore debt consolidation, balance transfer and personal loans from 9.95% p.a.*, for eligible applicants.",
+  // No `keywords`: Google has ignored the meta keywords tag since 2009
+  // (developers.google.com/search/blog/2009/09/google-does-not-use-keywords-meta-tag).
   metadataBase: new URL(siteConfig.url),
   openGraph: {
     title: `${siteConfig.name} — Paying Too Much Interest?`,
@@ -89,7 +84,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   };
 
   return (
-    <html lang="en" className={`${inter.variable} ${manrope.variable} h-full antialiased font-sans scroll-smooth`}>
+    <html lang="en-IN" className={`${inter.variable} ${manrope.variable} h-full antialiased font-sans scroll-smooth`}>
       <body className="min-h-full flex flex-col bg-background text-brand-black [font-feature-settings:'ss01'] overflow-x-hidden">
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-VNY6TW0ZW0"

@@ -1,53 +1,31 @@
 import { MetadataRoute } from 'next';
 import { siteConfig } from '@/lib/config';
+import { staticRoutes } from '@/lib/routes';
+import { cities } from '@/lib/cities';
+import { articles } from '@/content/articles';
 
+// Google ignores <changefreq> and <priority> (developers.google.com/search/
+// docs/crawling-indexing/sitemaps/build-sitemap), so neither field is set
+// here. <lastmod> is included only where the source data has a real content
+// date; Google only trusts it when it is "consistently and verifiably
+// accurate", so a build-time `new Date()` is never used.
 export default function sitemap(): MetadataRoute.Sitemap {
-  const routes = [
-    '',
-    '/about',
-    '/contact',
-    '/credit-card-debt',
-    '/debt-consolidation',
-    '/eligibility',
-    '/faq',
-    '/high-interest-loan',
-    '/how-it-works',
-    '/loan-balance-transfer',
-    '/partner-disclosures',
-    '/personal-loan',
-    '/privacy-policy',
-    '/terms-and-conditions',
-    '/app-loan',
-    '/calculators/debt-consolidation-calculator',
-    '/personal-loan-overdraft',
-    '/personal-loan-emi-calculator',
-    '/emi-savings-calculator',
-    '/learning-center',
-    '/personal-loan-in-bangalore',
-    '/personal-loan-in-mumbai',
-    '/personal-loan-in-delhi',
-    '/personal-loan-in-noida',
-    '/personal-loan-in-gurgaon',
-    '/personal-loan-in-chennai',
-    '/personal-loan-in-hyderabad',
-    '/personal-loan-in-pune',
-    '/personal-loan-in-kolkata',
-    '/personal-loan-in-ahmedabad',
-    '/personal-loan-in-jaipur',
-    '/personal-loan-in-surat',
-    '/personal-loan-in-lucknow',
-    '/learning-center/what-is-emi-and-how-is-it-calculated',
-    '/learning-center/debt-consolidation-explained-for-salaried-borrowers',
-    '/learning-center/credit-card-interest-vs-personal-loan-interest',
-    '/learning-center/personal-loan-balance-transfer-when-it-makes-sense',
-    '/learning-center/salaried-personal-loan-eligibility-checklist',
-    '/learning-center/overdraft-vs-personal-loan',
-  ].map((route) => ({
-    url: `${siteConfig.url}${route}`,
-    lastModified: new Date().toISOString(),
-    changeFrequency: 'weekly' as const,
-    priority: route === '' ? 1 : route.startsWith('/calculators') ? 0.9 : 0.8,
+  const pages: MetadataRoute.Sitemap = staticRoutes
+    .filter((r) => !r.noindex)
+    .map((r) => ({
+      url: `${siteConfig.url}${r.path}`,
+      ...(r.lastModified ? { lastModified: r.lastModified } : {}),
+    }));
+
+  const cityPages: MetadataRoute.Sitemap = cities.map((c) => ({
+    url: `${siteConfig.url}/personal-loan-in-${c.slug}`,
+    lastModified: c.lastModified,
   }));
 
-  return [...routes];
+  const articlePages: MetadataRoute.Sitemap = articles.map((a) => ({
+    url: `${siteConfig.url}/learning-center/${a.slug}`,
+    lastModified: a.updatedAt,
+  }));
+
+  return [...pages, ...cityPages, ...articlePages];
 }

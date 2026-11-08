@@ -8,7 +8,7 @@ import { PageIntro, PageProof } from "@/components/page-sections/PageSections";
 export const metadata: Metadata = buildMetadata({
   title: "How It Works",
   description:
-    "Understand our 5-step process from soft profile assessment to lender evaluation and decision.",
+    "Understand our 4-step process from soft profile assessment to lender evaluation and decision.",
   path: "/how-it-works",
 });
 

@@ -4,7 +4,7 @@ import { buildMetadata } from "@/lib/seo";
 export const metadata: Metadata = buildMetadata({
   title: "Terms & Conditions",
   description:
-    "Terms and Conditions for Credit Expert India",
+    "The terms governing your use of the Credit Expert India website, our loan advisory service, and this disclaimer of liability.",
   path: "/terms-and-conditions",
 });
 

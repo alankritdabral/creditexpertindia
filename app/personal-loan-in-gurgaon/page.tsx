@@ -4,9 +4,9 @@ import { CityLoanPage } from "@/components/CityLoanPage";
 import { cities } from "@/lib/cities";
 
 export const metadata: Metadata = buildMetadata({
-  title: "Personal Loan for Salaried Employees in Gurgaon",
+  title: "Personal Loan in Gurgaon",
   description:
-    "Check personal loan and EMI consolidation options for salaried professionals in Gurgaon. Rates from 9.95% p.a.* for eligible applicants. Free assessment.",
+    "Personal loan and EMI consolidation options for salaried staff in Gurgaon. Rates from 9.95% p.a.* for eligible applicants. Free assessment.",
   path: "/personal-loan-in-gurgaon",
 });
 

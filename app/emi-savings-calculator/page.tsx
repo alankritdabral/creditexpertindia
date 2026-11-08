@@ -6,7 +6,7 @@ import { LeadForm } from "@/components/LeadForm";
 import { PageIntro, PageProof } from "@/components/page-sections/PageSections";
 
 export const metadata: Metadata = buildMetadata({
-  title: "EMI Savings Calculator for Salaried Borrowers",
+  title: "EMI Savings Calculator",
   description:
     "See how much you could save every month by combining your loans and card dues into one lower-rate loan. Free estimate.",
   path: "/emi-savings-calculator",

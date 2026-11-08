@@ -7,7 +7,7 @@ import { LeadForm } from "@/components/LeadForm";
 import { PageIntro, PageProof } from "@/components/page-sections/PageSections";
 
 export const metadata: Metadata = buildMetadata({
-  title: "Overdraft Options for Salaried Employees",
+  title: "Overdraft Options for Salaried Staff",
   description:
     "Explore overdraft and credit-line options for salaried professionals, and see whether a personal loan or consolidation would cost you less.",
   path: "/personal-loan-overdraft",

@@ -6,7 +6,7 @@ import { LeadForm } from "@/components/LeadForm";
 import { articles } from "@/content/articles";
 
 export const metadata: Metadata = buildMetadata({
-  title: "Learning Center: Loans & EMIs Explained Simply",
+  title: "Learning Center: Loans & EMIs",
   description:
     "Plain-language guides on EMIs, debt consolidation, credit-card interest, balance transfers and salaried loan eligibility.",
   path: "/learning-center",

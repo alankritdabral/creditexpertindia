@@ -6,7 +6,7 @@ import { ProductHero } from "@/components/ProductHero";
 import { PageIntro, PageProof } from "@/components/page-sections/PageSections";
 
 export const metadata: Metadata = buildMetadata({
-  title: "High-Interest Loan Refinancing & Advisory",
+  title: "High-Interest Loan Refinancing",
   description:
     "Explore options to refinance high-rate personal loans and reduce monthly EMI burden with partner banks.",
   path: "/high-interest-loan",
