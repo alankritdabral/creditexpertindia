@@ -158,23 +158,12 @@ export function Footer() {
 
           {/* Link groups */}
           {linkGroups.map((group) => (
-            <nav
-              key={group.title}
-              aria-label={group.title}
-              className={group.links.length > 6 ? 'col-span-2 lg:col-span-4' : 'lg:col-span-2'}
-            >
+            <nav key={group.title} aria-label={group.title} className="lg:col-span-2">
               <h3 className="text-xs font-bold uppercase tracking-wider text-brand-black mb-5">{group.title}</h3>
-              <ul
-                role="list"
-                className={
-                  group.links.length > 6
-                    ? 'grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-3'
-                    : 'space-y-3'
-                }
-              >
+              <ul role="list" className="space-y-3">
                 {group.links.map((link) => (
                   <li key={link.href}>
-                    <Link href={link.href} className={`${linkClass} line-clamp-1`}>{link.label}</Link>
+                    <Link href={link.href} className={linkClass}>{link.label}</Link>
                   </li>
                 ))}
               </ul>
