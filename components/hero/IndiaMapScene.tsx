@@ -1,15 +1,21 @@
-import React, { Suspense, useRef } from 'react';
+import React, { Suspense, useRef, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import { IndiaMap } from './IndiaMap';
+import { IndiaMap, StateAnchors } from './IndiaMap';
 import { CityNodes } from './CityNodes';
 import { LoanConnections } from './LoanConnections';
 import { LoanParticles } from './LoanParticles';
-import { Center } from '@react-three/drei';
+import { Center, Html } from '@react-three/drei';
+import { LoanNotification, Transaction } from './LoanNotification';
 
-function SceneContent({ activeCity, highlightedCity, isReducedMotion }: { activeCity: string | null, highlightedCity: string | null, isReducedMotion: boolean }) {
+function SceneContent({ activeCity, highlightedCity, transaction, isReducedMotion }: { activeCity: string | null, highlightedCity: string | null, transaction: Transaction | null, isReducedMotion: boolean }) {
   const groupRef = useRef<THREE.Group>(null);
-  
+  const [stateAnchors, setStateAnchors] = useState<StateAnchors | null>(null);
+
+  const activeAnchor = transaction && stateAnchors ? stateAnchors.anchors[transaction.city] : null;
+  const align: 'left' | 'right' = activeAnchor && stateAnchors ? (activeAnchor[0] < stateAnchors.splitX ? 'right' : 'left') : 'right';
+  const vAlign: 'top' | 'bottom' = activeAnchor && stateAnchors ? (activeAnchor[1] > stateAnchors.splitY ? 'bottom' : 'top') : 'top';
+
   useFrame(({ clock, mouse, camera }) => {
     if (!isReducedMotion && groupRef.current) {
       // Subtle vertical floating
@@ -36,17 +42,22 @@ function SceneContent({ activeCity, highlightedCity, isReducedMotion }: { active
       <Center>
         {/* We tilt the map to give an isometric/3D feel */}
         <group rotation={[-Math.PI / 10, 0, 0]} position={[0, 0, 0]}>
-          <IndiaMap activeCity={activeCity} highlightedCity={highlightedCity} />
+          <IndiaMap activeCity={activeCity} highlightedCity={highlightedCity} onAnchorsChange={setStateAnchors} />
           <CityNodes activeCity={activeCity} />
           {!isReducedMotion && <LoanConnections activeCity={activeCity} />}
           {!isReducedMotion && <LoanParticles activeCity={activeCity} />}
+          {activeAnchor && (
+            <Html position={activeAnchor} center={false} zIndexRange={[50, 0]} style={{ pointerEvents: 'none' }}>
+              <LoanNotification transaction={transaction} align={align} vAlign={vAlign} />
+            </Html>
+          )}
         </group>
       </Center>
     </group>
   );
 }
 
-export function IndiaMapScene({ activeCity, highlightedCity, isReducedMotion }: { activeCity: string | null, highlightedCity: string | null, isReducedMotion: boolean }) {
+export function IndiaMapScene({ activeCity, highlightedCity, transaction, isReducedMotion }: { activeCity: string | null, highlightedCity: string | null, transaction: Transaction | null, isReducedMotion: boolean }) {
   return (
     <div className="absolute inset-0 z-10 w-full h-full pointer-events-auto">
       <Canvas
@@ -55,7 +66,7 @@ export function IndiaMapScene({ activeCity, highlightedCity, isReducedMotion }: 
         dpr={[1, 1.5]}
       >
         <Suspense fallback={null}>
-          <SceneContent activeCity={activeCity} highlightedCity={highlightedCity} isReducedMotion={isReducedMotion} />
+          <SceneContent activeCity={activeCity} highlightedCity={highlightedCity} transaction={transaction} isReducedMotion={isReducedMotion} />
         </Suspense>
       </Canvas>
     </div>

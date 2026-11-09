@@ -71,7 +71,13 @@ function StateShape({ shape, id, isActive, isHighlighted, isPrimary, splitX, spl
   );
 }
 
-export function IndiaMap({ activeCity, highlightedCity }: { activeCity?: string | null; highlightedCity?: string | null }) {
+export interface StateAnchors {
+  anchors: Record<string, [number, number, number]>;
+  splitX: number;
+  splitY: number;
+}
+
+export function IndiaMap({ activeCity, highlightedCity, onAnchorsChange }: { activeCity?: string | null; highlightedCity?: string | null; onAnchorsChange?: (anchors: StateAnchors) => void }) {
   const [data, setData] = useState<any>(null);
 
   useEffect(() => {
@@ -81,8 +87,8 @@ export function IndiaMap({ activeCity, highlightedCity }: { activeCity?: string 
       .catch(e => console.error("Failed to load geojson", e));
   }, []);
   
-  const { shapesData, splitX, splitY } = useMemo(() => {
-    if (!data) return { shapesData: [], splitX: 0, splitY: 0 };
+  const { shapesData, anchors, splitX, splitY } = useMemo(() => {
+    if (!data) return { shapesData: [], anchors: {} as Record<string, [number, number, number]>, splitX: 0, splitY: 0 };
 
     const shapesByState: Record<string, { id: string; shape: THREE.Shape; isPrimary: boolean }[]> = {};
 
@@ -134,12 +140,13 @@ export function IndiaMap({ activeCity, highlightedCity }: { activeCity?: string 
     });
 
     const result: { id: string; shape: THREE.Shape; isPrimary: boolean }[] = [];
+    const anchors: Record<string, [number, number, number]> = {};
     let minX = Infinity;
     let maxX = -Infinity;
     let minY = Infinity;
     let maxY = -Infinity;
 
-    Object.values(shapesByState).forEach(shapes => {
+    Object.entries(shapesByState).forEach(([stateId, shapes]) => {
       // Find the shape with the maximum number of points in its first ring to mark as primary
       let maxPoints = -1;
       let primaryIndex = 0;
@@ -158,16 +165,28 @@ export function IndiaMap({ activeCity, highlightedCity }: { activeCity?: string 
       });
       if (shapes[primaryIndex]) {
         shapes[primaryIndex].isPrimary = true;
+        const pts = shapes[primaryIndex].shape.getPoints();
+        const cx = pts.reduce((sum, p) => sum + p.x, 0) / pts.length;
+        const cy = pts.reduce((sum, p) => sum + p.y, 0) / pts.length;
+        anchors[stateId] = [cx, cy, 0.2];
       }
       result.push(...shapes);
     });
 
-    return { 
-      shapesData: result, 
+    return {
+      shapesData: result,
+      anchors,
       splitX: minX + (maxX - minX) * 0.50,
       splitY: minY + (maxY - minY) * 0.50
     };
   }, [data]);
+
+  useEffect(() => {
+    if (onAnchorsChange && Object.keys(anchors).length > 0) {
+      onAnchorsChange({ anchors, splitX, splitY });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [anchors, splitX, splitY]);
 
   return (
     <group>

@@ -5,10 +5,11 @@ import { transactions } from './utils';
 interface Props {
   onActiveCityChange: (city: string | null) => void;
   onHighlightCityChange?: (city: string | null) => void;
+  onTransactionChange?: (transaction: Transaction | null) => void;
   isReducedMotion: boolean;
 }
 
-export function LoanNotificationManager({ onActiveCityChange, onHighlightCityChange, isReducedMotion }: Props) {
+export function LoanNotificationManager({ onActiveCityChange, onHighlightCityChange, onTransactionChange, isReducedMotion }: Props) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
 
@@ -24,6 +25,7 @@ export function LoanNotificationManager({ onActiveCityChange, onHighlightCityCha
         setIsVisible(true);
         onActiveCityChange(currentCity);
         if (onHighlightCityChange) onHighlightCityChange(currentCity);
+        if (onTransactionChange) onTransactionChange(transactions[i]);
         
         await new Promise(r => setTimeout(r, 3000)); // Visible duration for highlight
         
@@ -39,6 +41,7 @@ export function LoanNotificationManager({ onActiveCityChange, onHighlightCityCha
         // Hide notification
         setIsVisible(false);
         onActiveCityChange(null);
+        if (onTransactionChange) onTransactionChange(null);
 
         await new Promise(r => setTimeout(r, 3500)); // Gap before next state
 
@@ -54,7 +57,7 @@ export function LoanNotificationManager({ onActiveCityChange, onHighlightCityCha
     return () => {
       isMounted = false;
     };
-  }, [isReducedMotion, onActiveCityChange, onHighlightCityChange]);
+  }, [isReducedMotion, onActiveCityChange, onHighlightCityChange, onTransactionChange]);
 
   // The manager just controls state/rotation. Rendering happens in IndiaMap.tsx
   return null;

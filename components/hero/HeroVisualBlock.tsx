@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useReducedMotion } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import { LoanNotificationManager } from './LoanNotificationManager';
+import { Transaction } from './LoanNotification';
 
 const IndiaMapScene = dynamic(() => import('./IndiaMapScene').then(mod => mod.IndiaMapScene), { ssr: false });
 
@@ -21,6 +22,7 @@ export function HeroVisualBlock() {
   const [sceneEnabled, setSceneEnabled] = useState(false);
   const [activeCity, setActiveCity] = useState<string | null>(null);
   const [highlightedCity, setHighlightedCity] = useState<string | null>(null);
+  const [activeTransaction, setActiveTransaction] = useState<Transaction | null>(null);
   const shouldReduceMotion = useReducedMotion();
   const isReducedMotion = shouldReduceMotion === true;
 
@@ -42,8 +44,8 @@ export function HeroVisualBlock() {
       <div className="relative w-full h-[500px] lg:h-[600px] lg:w-[600px] xl:w-[700px] lg:ml-auto">
         {sceneEnabled && (
           <>
-            <IndiaMapScene activeCity={activeCity} highlightedCity={highlightedCity} isReducedMotion={isReducedMotion} />
-            <LoanNotificationManager onActiveCityChange={setActiveCity} onHighlightCityChange={setHighlightedCity} isReducedMotion={isReducedMotion} />
+            <IndiaMapScene activeCity={activeCity} highlightedCity={highlightedCity} transaction={activeTransaction} isReducedMotion={isReducedMotion} />
+            <LoanNotificationManager onActiveCityChange={setActiveCity} onHighlightCityChange={setHighlightedCity} onTransactionChange={setActiveTransaction} isReducedMotion={isReducedMotion} />
           </>
         )}
       </div>
