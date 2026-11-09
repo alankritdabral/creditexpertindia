@@ -6,9 +6,9 @@ import { ProductHero } from "@/components/ProductHero";
 import { PageIntro, PageProof } from "@/components/page-sections/PageSections";
 
 export const metadata: Metadata = buildMetadata({
-  title: "Personal Loan Balance Transfer",
+  title: "Personal Loan Balance Transfer Calculator",
   description:
-    "Transfer your high-interest personal loan to partner banks with lower interest rates. Calculate monthly EMI savings and apply for balance transfer.",
+    "Calculate your personal loan balance transfer savings: compare your current interest rate and charges against partner banks' rates starting from 9.99% p.a.*",
   path: "/loan-balance-transfer",
 });
 

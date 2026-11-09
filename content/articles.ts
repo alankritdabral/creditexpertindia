@@ -26,20 +26,20 @@ export const articles: Article[] = [
   {
     slug: "what-is-emi-and-how-is-it-calculated",
     title: "What is an EMI, and how is it calculated?",
-    seoTitle: "What is an EMI? How It Works",
-    summary: "The simple maths behind your monthly loan payment, and why a small change in rate or tenure moves it so much.",
+    seoTitle: "EMI Meaning, Full Form & Formula",
+    summary: "EMI meaning, full form and the formula lenders use, plus the simple maths behind your monthly loan payment.",
     publishedAt: ARTICLES_ADDED,
     updatedAt: ARTICLES_ADDED,
     sections: [
       {
-        heading: "EMI in one line",
+        heading: "EMI meaning and full form",
         paragraphs: [
-          "EMI stands for equated monthly instalment. It is the fixed amount you pay your lender every month until the loan is cleared. Each EMI has two parts: some repays the principal you borrowed, and the rest is interest.",
+          "EMI full form is Equated Monthly Instalment. It is the fixed amount you pay your lender every month until the loan is cleared. Each EMI has two parts: some repays the principal you borrowed, and the rest is interest.",
           "In the early months most of your EMI goes towards interest. As the balance falls, more of it goes towards principal.",
         ],
       },
       {
-        heading: "The formula",
+        heading: "The formula: how EMI is calculated",
         paragraphs: [
           "EMI = P × r × (1 + r)^n ÷ ((1 + r)^n − 1), where P is the loan amount, r is the monthly interest rate (annual rate ÷ 12 ÷ 100) and n is the number of months.",
           "You don't need to do this by hand. Our EMI calculator does it for you as you move the sliders.",
@@ -50,6 +50,14 @@ export const articles: Article[] = [
         paragraphs: [
           "A longer tenure lowers your monthly EMI but increases the total interest you pay. A shorter tenure does the opposite. The interest rate matters a lot too: on the same amount and tenure, a few percentage points can change your total cost by a large amount.",
           "That is why it is worth comparing your current rate with what you might be eligible for before you decide anything.",
+        ],
+      },
+      {
+        heading: "Common EMI questions",
+        paragraphs: [
+          "What is the full form of EMI? Equated Monthly Instalment — the same fixed amount repaid each month for the life of the loan.",
+          "How does EMI payment work? Your lender splits every instalment between interest and principal, debiting it automatically from your bank account on a fixed date each month.",
+          "Is EMI the same as a monthly instalment? Yes, but unlike a plain instalment an EMI stays fixed for the whole tenure, so the interest-to-principal split shifts over time instead of the payment amount changing.",
         ],
       },
     ],
@@ -86,15 +94,15 @@ export const articles: Article[] = [
   {
     slug: "credit-card-interest-vs-personal-loan-interest",
     title: "Credit-card interest vs personal-loan interest",
-    seoTitle: "Card Interest vs Loan Interest",
-    summary: "Why carrying a card balance usually costs far more than a personal loan, and what you can do about it.",
+    seoTitle: "Personal Loan vs Card Interest Rate",
+    summary: "Personal loan interest rate vs credit card interest rate compared, and why carrying a card balance usually costs far more.",
     publishedAt: ARTICLES_ADDED,
     updatedAt: ARTICLES_ADDED,
     sections: [
       {
         heading: "Why cards cost more",
         paragraphs: [
-          "Credit cards often charge interest of 3 to 3.5% a month on unpaid balances, which works out to roughly 36 to 42% a year. Personal loans for salaried borrowers usually carry much lower annual rates, depending on your profile and the lender.",
+          "Credit cards often charge a credit card loan interest rate of 3 to 3.5% a month on unpaid balances, which works out to roughly 36 to 42% a year. A personal loan interest rate for salaried borrowers is usually far lower, depending on your profile and the lender.",
         ],
       },
       {
@@ -114,8 +122,8 @@ export const articles: Article[] = [
   {
     slug: "personal-loan-balance-transfer-when-it-makes-sense",
     title: "Personal-loan balance transfer: when does it make sense?",
-    seoTitle: "Personal Loan Balance Transfer",
-    summary: "Moving an existing loan to a cheaper lender can save money, but only if the numbers work. Here is how to check.",
+    seoTitle: "Balance Transfer vs Prepayment",
+    summary: "Balance transfer vs prepayment, and the charges and interest rate to check before you move an existing loan to a cheaper lender.",
     publishedAt: ARTICLES_ADDED,
     updatedAt: ARTICLES_ADDED,
     sections: [
@@ -126,9 +134,15 @@ export const articles: Article[] = [
         ],
       },
       {
+        heading: "Balance transfer vs prepayment",
+        paragraphs: [
+          "Prepayment means paying down your existing loan faster with your own lump sum, with no new lender involved. A balance transfer instead moves the outstanding amount to a new lender at a lower interest rate. If you have spare cash and no prepayment penalty, prepayment is usually simpler; if the rate gap is large and you don't have a lump sum, a transfer can save more.",
+        ],
+      },
+      {
         heading: "Check these before you switch",
         paragraphs: [
-          "Look at the rate difference, the processing fee on the new loan, any foreclosure charge on the old loan, and how many months remain on your current tenure. A bigger rate gap and a longer remaining tenure usually mean more savings.",
+          "Look at the rate difference, the processing fee and other charges on the new loan, any foreclosure charge on the old loan, and how many months remain on your current tenure. A bigger rate gap and a longer remaining tenure usually mean more savings.",
         ],
       },
       {
@@ -142,15 +156,15 @@ export const articles: Article[] = [
   {
     slug: "salaried-personal-loan-eligibility-checklist",
     title: "Salaried personal-loan eligibility: a simple checklist",
-    seoTitle: "Salaried Loan Eligibility Checklist",
-    summary: "The things lenders usually look at, and how to prepare before you apply.",
+    seoTitle: "Loan Eligibility Criteria & Checklist",
+    summary: "Personal loan eligibility criteria and income requirements lenders check for salaried employees, and how to prepare before you apply.",
     publishedAt: ARTICLES_ADDED,
     updatedAt: ARTICLES_ADDED,
     sections: [
       {
-        heading: "What lenders usually look at",
+        heading: "Personal loan eligibility criteria",
         paragraphs: [
-          "Most lenders check your age, your employment type and employer category, your net monthly income, your credit score and your existing EMIs compared with your income.",
+          "Most lenders check your age, your employment type and employer category, your net monthly income, your credit score and your existing EMIs compared with your income. The income requirements for a personal loan vary by lender, but a stable salaried income is the main one.",
           "Each lender sets its own criteria, so meeting the general benchmarks improves your chances of being shortlisted but does not guarantee approval.",
         ],
       },
