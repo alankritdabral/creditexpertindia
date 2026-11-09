@@ -18,6 +18,11 @@ export function CityLoanPage({ city }: { city: City }) {
   const office = contact.addresses.find((a) => a.city === city.name);
   return (
     <div className="min-h-screen bg-white">
+      {/* Clears the Navbar, which is absolutely positioned over page content
+          (components/Navbar.tsx). ProductHero has its own matching spacer
+          before its section, but only when it's the first thing on the
+          page — here Breadcrumbs comes first, so it needs its own. */}
+      <div className="h-[84px]" aria-hidden="true" />
       <Breadcrumbs
         items={[
           { name: "Home", path: "/" },

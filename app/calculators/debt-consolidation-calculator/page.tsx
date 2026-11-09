@@ -100,6 +100,7 @@ export default function DebtConsolidationCalculatorPage() {
   return (
     <div className="min-h-screen bg-slate-50">
 
+      <div className="h-[84px]" aria-hidden="true" />
       <Breadcrumbs
         items={[
           { name: "Home", path: "/" },

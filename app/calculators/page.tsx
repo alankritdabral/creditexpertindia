@@ -32,6 +32,7 @@ const calculators = [
 export default function CalculatorsPage() {
   return (
     <div className="min-h-screen bg-white">
+      <div className="h-[84px]" aria-hidden="true" />
       <Breadcrumbs items={[{ name: "Home", path: "/" }, { name: "Calculators" }]} />
       <section className="bg-white">
         <div className="max-w-[1220px] mx-auto px-4 md:px-6 lg:px-8 py-14 md:py-20">

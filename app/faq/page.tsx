@@ -35,6 +35,7 @@ export default function FAQPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLd(faqPageSchema) }}
       />
+      <div className="h-[84px]" aria-hidden="true" />
       <Breadcrumbs items={[{ name: "Home", path: "/" }, { name: "FAQ" }]} />
       <ProductHero
         title="Questions? Good. Ask away."
