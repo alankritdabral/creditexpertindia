@@ -121,6 +121,8 @@ export function DebtConsolidation() {
           </p>
           <a
             href="#lead-form"
+            data-analytics-cta="debt_consolidation_check_options"
+            data-analytics-location="debt_consolidation_scenarios"
             className="inline-flex items-center justify-center gap-2 rounded bg-[#0052CC] hover:bg-[#0A2540] transition-colors text-white font-bold text-lg px-7 py-4"
           >
             Check my options <ArrowRight className="h-5 w-5" />

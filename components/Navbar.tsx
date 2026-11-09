@@ -7,6 +7,7 @@ import { ArrowRight, X, Mail, ShieldCheck, ChevronDown, ChevronRight } from "luc
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
 import { cities } from "@/lib/cities";
+import { track } from "@/lib/analytics/track";
 
 type MenuLink = { label: string; desc?: string; href: string };
 type Column = { title: string; links: MenuLink[]; gradient?: string };
@@ -40,7 +41,7 @@ const menus: Menu[] = [
         title: "Personal loans",
         gradient: G1,
         links: [
-          { label: "Personal loan", desc: "From 9.95% p.a.* for salaried", href: "/personal-loan" },
+          { label: "Personal loan", desc: "From 9.99% p.a.* for salaried", href: "/personal-loan" },
           { label: "Balance transfer", desc: "Move a loan to a lower rate", href: "/loan-balance-transfer" },
           { label: "High-interest loans", desc: "Refinance expensive EMIs", href: "/high-interest-loan" },
           { label: "Overdraft options", desc: "Flexible credit for salaried", href: "/personal-loan-overdraft" },
@@ -91,6 +92,7 @@ const menus: Menu[] = [
       },
     ],
     sidebar: { title: "Next step", links: [{ label: "Check eligibility", desc: "Free and quick", href: "/eligibility" }], promo: promoAssessment },
+    footer: { label: "See all calculators", href: "/calculators" },
   },
   {
     key: "cities",
@@ -167,6 +169,9 @@ export function Navbar() {
 
   const showPanel = useCallback((key: string) => {
     if (unmountTimer.current) clearTimeout(unmountTimer.current);
+    if (key === "loans" || key === "calculators" || key === "cities" || key === "resources") {
+      track({ name: "nav_menu_open", params: { menu_id: key } });
+    }
     setRenderKey(key);
     setActive(key);
     if (!mounted.current) {
@@ -389,7 +394,7 @@ export function Navbar() {
             <Link href="/" className="flex items-center gap-2 group shrink-0">
               <Image
                 src={logo}
-                alt="Credit Expert"
+                alt="Credit Expert India"
                 width={160}
                 height={40}
                 className="h-[34px] sm:h-10 w-auto object-contain group-hover:opacity-80 transition-opacity"
@@ -433,12 +438,16 @@ export function Navbar() {
             <div className="hidden lg:flex items-center justify-end gap-2 shrink-0" onMouseEnter={() => hidePanel()}>
               <Link
                 href="/eligibility"
+                data-analytics-cta="navbar_eligibility"
+                data-analytics-location="navbar"
                 className="h-10 px-5 inline-flex items-center text-base font-medium text-[#0052CC] bg-white border border-[#E2E8F0] rounded hover:bg-[#F8FAFC] transition-colors"
               >
                 Eligibility
               </Link>
               <Link
                 href={assessmentHref}
+                data-analytics-cta="navbar_get_assessment"
+                data-analytics-location="navbar"
                 className="h-10 px-5 inline-flex items-center gap-1 text-base font-medium text-white bg-[#0052CC] hover:bg-[#1741b3] rounded transition-colors"
               >
                 Get assessment <ChevronRight className="h-4 w-4" />
@@ -483,7 +492,6 @@ export function Navbar() {
               initial="initial"
               animate="enter"
               exit="exit"
-              data-lenis-prevent
               role="dialog"
               aria-modal="true"
               aria-label="Menu"
@@ -492,7 +500,7 @@ export function Navbar() {
               {/* Header */}
               <div className="h-[60px] shrink-0 sticky top-0 z-10 bg-white px-4 md:px-6 flex items-center justify-between">
                 <Link href="/" onClick={() => setOpen(false)}>
-                  <Image src={logo} alt="Credit Expert" className="h-[34px] sm:h-10 w-auto object-contain" priority />
+                  <Image src={logo} alt="Credit Expert India" className="h-[34px] sm:h-10 w-auto object-contain" priority />
                 </Link>
                 <button
                   type="button"
@@ -523,7 +531,13 @@ export function Navbar() {
                         <button
                           type="button"
                           aria-expanded={isOpen}
-                          onClick={() => setMobileGroup(isOpen ? null : m.key)}
+                          onClick={() => {
+                            const next = isOpen ? null : m.key;
+                            setMobileGroup(next);
+                            if (next === "loans" || next === "calculators" || next === "cities" || next === "resources") {
+                              track({ name: "nav_menu_open", params: { menu_id: next } });
+                            }
+                          }}
                           className="w-full flex items-center justify-between py-3.5 px-2 text-lg font-semibold text-[#0A2540] tracking-tight cursor-pointer"
                         >
                           {m.label}

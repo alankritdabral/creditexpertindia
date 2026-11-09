@@ -4,6 +4,7 @@ import React from "react";
 import { ArrowRight, Banknote, ChevronRight, CreditCard, Landmark, Layers, Smartphone, type LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { LoanStage, type StageScene } from "./LoanStage";
+import { track } from "@/lib/analytics/track";
 
 type Stat = { lead: string; text: string };
 type Solution = {
@@ -112,6 +113,10 @@ const STACK_STEP = 44;
 export const LoanSolutionsSection = () => {
   // Clicking a strip brings that card forward: scroll until its natural top sits on its pinned slot.
   const bringForward = (idx: number) => {
+    const solution = SOLUTIONS[idx];
+    if (solution) {
+      track({ name: "select_content", params: { content_type: "loan_solution", content_id: solution.id } });
+    }
     const rows = document.querySelectorAll<HTMLElement>("[data-row]");
     const row = rows[idx];
     if (!row) return;
@@ -132,6 +137,8 @@ export const LoanSolutionsSection = () => {
             </h2>
             <Link
               href="/eligibility"
+              data-analytics-cta="loan_solutions_check_eligibility"
+              data-analytics-location="loan_solutions"
               className="mt-6 inline-flex items-center gap-1.5 rounded-full bg-[#0052CC] px-5 py-2.5 text-base font-semibold text-white transition-colors hover:bg-[#0A2540]"
             >
               Check your eligibility <ChevronRight className="w-4 h-4" />
@@ -170,6 +177,8 @@ export const LoanSolutionsSection = () => {
                     href={s.cta.href}
                     aria-label={s.cta.label}
                     onClick={(e) => e.stopPropagation()}
+                    data-analytics-cta={`loan_solutions_${s.id}`}
+                    data-analytics-location="loan_solutions"
                     className="ml-auto shrink-0 inline-flex h-10 items-center gap-1 rounded-md border border-[#BFDBFE] bg-white px-3 sm:px-4 text-sm sm:text-base font-semibold text-[#0052CC] transition-colors hover:border-[#0052CC]"
                   >
                     <span className="sm:hidden">Explore</span>

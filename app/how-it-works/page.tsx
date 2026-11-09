@@ -8,7 +8,7 @@ import { PageIntro, PageProof } from "@/components/page-sections/PageSections";
 export const metadata: Metadata = buildMetadata({
   title: "How It Works",
   description:
-    "Understand our 5-step process from soft profile assessment to lender evaluation and decision.",
+    "Understand our 4-step process from soft profile assessment to lender evaluation and decision.",
   path: "/how-it-works",
 });
 
@@ -21,6 +21,7 @@ export default function HowItWorksPage() {
         body="A step-by-step look at how we go through your debt profile and help you apply with RBI-regulated lenders."
         cta="Start my free assessment"
         image="/Misty India Skyline with Orbital Arcs.webp"
+        imageAlt="An Indian city skyline, representing Credit Expert India's nationwide service"
         points={["Four simple steps", "You can stop at any point", "Nothing is pushed on you"]}
       />
 

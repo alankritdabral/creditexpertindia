@@ -47,6 +47,7 @@ export default function ContactPage() {
         body="Questions about your loans or consolidation options? Call, message or fill in the form and one of our credit specialists will get back to you."
         cta="Leave my details"
         image="/contact.png"
+        imageAlt="A Credit Expert India specialist available to answer questions by phone or WhatsApp"
         points={["Offices in Dehradun, Delhi and Rudrapur", "Usually a reply within 24 hours", "Free to ask"]}
         href="#contact-form"
       />

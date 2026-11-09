@@ -4,14 +4,24 @@ import Link from 'next/link';
 import Image from 'next/image';
 import logoWithName from '@/public/img/logo_with_name.webp';
 import { siteConfig, contact } from '@/lib/config';
-import { ArrowRight, MessageCircle, Facebook, Instagram, Linkedin, Mail, MapPin } from 'lucide-react';
+import { ArrowRight, MessageCircle, Facebook, Instagram, Linkedin, Mail, MapPin, Phone } from 'lucide-react';
+import { clearConsent } from '@/lib/consent';
+import { cities } from '@/lib/cities';
+import { articles } from '@/content/articles';
 
+// Every loan/product and calculator route lives in a footer link so Google
+// can reach it by following a link, not just through the hover-only navbar
+// menu (plans/01-visibility-and-analytics.md Phase 8).
 const linkGroups = [
   {
     title: 'Solutions',
     links: [
       { label: 'Debt Consolidation', href: '/debt-consolidation' },
       { label: 'Personal Loans', href: '/personal-loan' },
+      { label: 'Loan Balance Transfer', href: '/loan-balance-transfer' },
+      { label: 'Credit Card Debt', href: '/credit-card-debt' },
+      { label: 'High-Interest Loans', href: '/high-interest-loan' },
+      { label: 'App Loans', href: '/app-loan' },
       { label: 'Overdraft Options', href: '/personal-loan-overdraft' },
       { label: 'Check Eligibility', href: '/eligibility#credit-profile' },
     ],
@@ -19,6 +29,7 @@ const linkGroups = [
   {
     title: 'Calculators',
     links: [
+      { label: 'All Calculators', href: '/calculators' },
       { label: 'Debt Consolidation Calculator', href: '/calculators/debt-consolidation-calculator' },
       { label: 'Personal Loan EMI Calculator', href: '/personal-loan-emi-calculator' },
       { label: 'EMI Savings Calculator', href: '/emi-savings-calculator' },
@@ -29,10 +40,28 @@ const linkGroups = [
     links: [
       { label: 'About us', href: '/about' },
       { label: 'Contact us', href: '/contact' },
-      { label: 'Learning Center', href: '/learning-center' },
+      { label: 'How it works', href: '/how-it-works' },
       { label: 'FAQ', href: '/faq' },
     ],
   },
+  {
+    title: 'Guides',
+    links: [
+      { label: 'Learning Center', href: '/learning-center' },
+      ...articles.slice(0, 5).map((a) => ({ label: a.title, href: `/learning-center/${a.slug}` })),
+    ],
+  },
+  // Phase 9 (decision D5): only indexed city pages get a footer link, so
+  // this group shrinks to just Delhi today and grows back as more city
+  // pages get real local content and are un-noindexed in lib/cities.ts.
+  ...(cities.some((c) => !c.noindex)
+    ? [
+        {
+          title: 'Personal Loans by City',
+          links: cities.filter((c) => !c.noindex).map((c) => ({ label: c.name, href: `/personal-loan-in-${c.slug}` })),
+        },
+      ]
+    : []),
 ];
 
 const legalLinks = [
@@ -70,6 +99,8 @@ export function Footer() {
             <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
               <Link
                 href="/eligibility#credit-profile"
+                data-analytics-cta="footer_get_free_assessment"
+                data-analytics-location="footer"
                 className="flex items-center gap-2 rounded bg-white px-6 py-3 text-sm font-bold text-brand-black hover:bg-slate-100 transition-colors whitespace-nowrap"
               >
                 Get Free Assessment
@@ -79,6 +110,7 @@ export function Footer() {
                 href={`https://wa.me/${whatsappDigits}?text=Hi%2C%20I%20would%20like%20help%20with%20my%20loans.`}
                 target="_blank"
                 rel="noopener noreferrer"
+                data-analytics-location="footer"
                 className="flex items-center gap-2 rounded bg-[#25D366] px-6 py-3 text-sm font-bold text-white hover:bg-[#1DA851] transition-colors whitespace-nowrap"
               >
                 <MessageCircle className="w-4 h-4" />
@@ -126,12 +158,23 @@ export function Footer() {
 
           {/* Link groups */}
           {linkGroups.map((group) => (
-            <nav key={group.title} aria-label={group.title} className="lg:col-span-2">
+            <nav
+              key={group.title}
+              aria-label={group.title}
+              className={group.links.length > 6 ? 'col-span-2 lg:col-span-4' : 'lg:col-span-2'}
+            >
               <h3 className="text-xs font-bold uppercase tracking-wider text-brand-black mb-5">{group.title}</h3>
-              <ul role="list" className="space-y-3">
+              <ul
+                role="list"
+                className={
+                  group.links.length > 6
+                    ? 'grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-3'
+                    : 'space-y-3'
+                }
+              >
                 {group.links.map((link) => (
                   <li key={link.href}>
-                    <Link href={link.href} className={linkClass}>{link.label}</Link>
+                    <Link href={link.href} className={`${linkClass} line-clamp-1`}>{link.label}</Link>
                   </li>
                 ))}
               </ul>
@@ -143,13 +186,19 @@ export function Footer() {
             <h3 className="text-xs font-bold uppercase tracking-wider text-brand-black mb-5">Contact</h3>
             <ul role="list" className="space-y-3">
               <li>
-                <a href={`mailto:${contact.email}`} className={`${linkClass} flex items-start gap-2 whitespace-nowrap`}>
+                <a href={`tel:+${whatsappDigits}`} data-analytics-location="footer" className={`${linkClass} flex items-start gap-2 whitespace-nowrap`}>
+                  <Phone className="w-4 h-4 mt-0.5 shrink-0" />
+                  {contact.whatsapp}
+                </a>
+              </li>
+              <li>
+                <a href={`mailto:${contact.email}`} data-analytics-location="footer" className={`${linkClass} flex items-start gap-2 whitespace-nowrap`}>
                   <Mail className="w-4 h-4 mt-0.5 shrink-0" />
                   {contact.email}
                 </a>
               </li>
               <li>
-                <a href={`https://wa.me/${whatsappDigits}`} className={`${linkClass} flex items-start gap-2`}>
+                <a href={`https://wa.me/${whatsappDigits}`} data-analytics-location="footer" className={`${linkClass} flex items-start gap-2`}>
                   <MessageCircle className="w-4 h-4 mt-0.5 shrink-0" />
                   {contact.whatsapp}
                 </a>
@@ -189,6 +238,11 @@ export function Footer() {
                     <Link href={link.href} className={linkClass}>{link.label}</Link>
                   </li>
                 ))}
+                <li>
+                  <button type="button" onClick={() => clearConsent()} className={linkClass}>
+                    Cookie settings
+                  </button>
+                </li>
               </ul>
             </nav>
           </div>

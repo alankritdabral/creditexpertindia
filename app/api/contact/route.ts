@@ -1,6 +1,8 @@
 import { adminDb } from "@/lib/firebaseAdmin";
 import { Resend } from "resend";
 import { NextResponse } from "next/server";
+import { sanitizeAttribution } from "@/lib/analytics/sanitizeAttribution";
+import { writeLeadAnalytics } from "@/lib/analytics/leadAnalytics";
 
 // Using process.env.RESEND_API_KEY. For development without the key, we'll instantiate it but sending will fail if empty.
 const resend = new Resend(process.env.RESEND_API_KEY || "missing_key");
@@ -18,7 +20,7 @@ const escapeHtml = (unsafe: string) => {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { name, phone, requirement, consent, netSalary, ongoingEmi } = body;
+    const { name, phone, requirement, consent, netSalary, ongoingEmi, attribution, ga } = body;
 
     if (!name || !phone || !requirement || !netSalary || !ongoingEmi) {
       return NextResponse.json(
@@ -27,17 +29,29 @@ export async function POST(request: Request) {
       );
     }
 
+    // "Being contacted about this enquiry" consent is mandatory — without it
+    // we have no lawful basis to call the person back. Sharing the lead with
+    // partner lenders is a separate, optional choice (RBI Digital Lending
+    // Directions 2025, para 12(iv): explicit consent per third party).
+    if (!consent?.contact) {
+      return NextResponse.json(
+        { error: "Please agree to being contacted about your enquiry." },
+        { status: 400 }
+      );
+    }
+
     const salary = Number(netSalary);
     if (isNaN(salary) || salary <= 45000) {
       return NextResponse.json({ error: "Net salary must be greater than ₹45,000." }, { status: 400 });
     }
-    
+
     const emi = Number(ongoingEmi);
     if (isNaN(emi) || emi > salary * 0.8) {
       return NextResponse.json({ error: "Ongoing EMI cannot be greater than 80% of net salary." }, { status: 400 });
     }
 
     // 1. Save to Firestore (Server-Side using Admin SDK to bypass client security rules)
+    const safeAttribution = sanitizeAttribution(attribution);
     try {
       await adminDb.collection("leads").add({
         name,
@@ -45,7 +59,13 @@ export async function POST(request: Request) {
         requirement,
         netSalary: salary,
         ongoingEmi: emi,
-        consent: !!consent,
+        consent: {
+          contact: true,
+          shareWithLenders: !!consent.shareWithLenders,
+          noticeVersion: consent.noticeVersion || null,
+          recordedAt: new Date(),
+        },
+        attribution: safeAttribution,
         source: "Credit Expert India Contact Form",
         status: "NEW",
         createdAt: new Date(),
@@ -54,6 +74,15 @@ export async function POST(request: Request) {
       console.error("Firestore Admin save error:", dbError);
       // We log but continue, so we can still try to send the email if DB fails
     }
+
+    // A PII-free copy, safe to export to BigQuery and join against GA4
+    // events on ga_client_id (plans/01-…/Phase 5 and 7).
+    const leadRef = await writeLeadAnalytics({
+      leadSource: "contact",
+      attribution: safeAttribution,
+      ga,
+      consent: { contact: true, shareWithLenders: !!consent.shareWithLenders, noticeVersion: consent.noticeVersion },
+    });
 
     const { data, error } = await resend.emails.send({
       from: "alankrit.dabral@creditexpertindia.com",
@@ -111,6 +140,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       success: true,
       messageId: data?.id,
+      leadRef,
     });
   } catch (error) {
     console.error("Contact API error:", error);

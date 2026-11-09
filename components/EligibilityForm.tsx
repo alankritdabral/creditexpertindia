@@ -9,6 +9,14 @@ import { collection, doc, getDoc, setDoc, serverTimestamp } from "firebase/fires
 import { db } from "@/lib/firebaseClient";
 import { searchEmployers, EmployerResult } from "@/lib/employerLookup";
 import { parseBureauData } from "@/lib/bureauParsers";
+import { NOTICE_VERSION } from "@/lib/consent";
+import { track, setJourneyStage } from "@/lib/analytics/track";
+import { bandDuration } from "@/lib/analytics/events";
+import type { Bureau } from "@/lib/analytics/events";
+import { getAttribution } from "@/lib/analytics/attribution";
+import { getGaIds } from "@/lib/analytics/ids";
+import { GA_ID } from "@/lib/analytics/gaId";
+import { setClarityTag } from "@/lib/analytics/clarityTags";
 
 const CreditReportDashboard = dynamic(
   () => import("./CreditReportDashboard").then((mod) => mod.CreditReportDashboard),
@@ -51,7 +59,7 @@ export function EligibilityForm() {
     firstName: "", lastName: "", mobile: "", email: "", city: "", employmentType: "Salaried",
     monthlyIncome: "", employer: "", salaryMode: "Bank Transfer",
     requirement: "",
-    pan: "", dob: "", gender: "male", consent: false, bureau: "experian"
+    pan: "", dob: "", gender: "male", consent: false, consentContact: false, consentShareWithLenders: false, bureau: "experian"
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -60,6 +68,7 @@ export function EligibilityForm() {
   const [otpLoading, setOtpLoading] = useState(false);
   const [otpError, setOtpError] = useState<string | null>(null);
   const [otpCooldown, setOtpCooldown] = useState(0);
+  const [otpChannel, setOtpChannel] = useState<"sms" | "whatsapp">("sms");
   const otpInputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   // Cooldown countdown timer for OTP resend
@@ -82,22 +91,46 @@ export function EligibilityForm() {
 
   const [cibilData, setCibilData] = useState<any>(null);
   const [manualLoans, setManualLoans] = useState<any[]>([]);
+  const hasStartedRef = useRef(false);
+
+  // See the matching comment in ContactForm.tsx: this mount-time fire
+  // approximates the plan's "50% visible" lead_form_view.
+  useEffect(() => {
+    track({ name: "lead_form_view", params: { form_id: "eligibility", form_location: "eligibility_form" } });
+  }, []);
+
+  const trackFormStart = () => {
+    if (hasStartedRef.current) return;
+    hasStartedRef.current = true;
+    track({ name: "lead_form_start", params: { form_id: "eligibility" } });
+  };
 
   const processFetchedReport = (reportData: any) => {
     setCibilData(reportData);
     if (reportData?.credit_report_link) {
       window.open(reportData.credit_report_link, "_blank");
     }
+    track({ name: "credit_report_view", params: { bureau: formData.bureau as Bureau } });
+    setJourneyStage("report_viewed");
     setStep(6);
   };
 
   const handleFetchReport = async () => {
+    track({ name: "lead_form_submit", params: { form_id: "eligibility" } });
+
     if (!formData.consent) {
       setError("Please accept the credit report consent.");
+      track({ name: "lead_form_error", params: { form_id: "eligibility", error_code: "consent_missing", error_field: "consent" } });
+      return;
+    }
+    if (!formData.consentContact) {
+      setError("Please agree to being contacted about this enquiry.");
+      track({ name: "lead_form_error", params: { form_id: "eligibility", error_code: "consent_missing", error_field: "consentContact" } });
       return;
     }
     if (!formData.firstName.trim() || !formData.lastName.trim()) {
       setError("Please enter both First Name and Last Name.");
+      track({ name: "lead_form_error", params: { form_id: "eligibility", error_code: "name_missing" } });
       return;
     }
     const isCrifSelected = formData.bureau.startsWith("crif");
@@ -106,6 +139,7 @@ export function EligibilityForm() {
     if (isExperianSelected) {
       if (!formData.dob) {
         setError("Please enter your Date of Birth.");
+        track({ name: "lead_form_error", params: { form_id: "eligibility", error_code: "dob_missing" } });
         return;
       }
     }
@@ -114,11 +148,13 @@ export function EligibilityForm() {
       const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/i;
       if (!panRegex.test(formData.pan)) {
         setError("Please enter a valid 10-character PAN number.");
+        track({ name: "lead_form_error", params: { form_id: "eligibility", error_code: "pan_invalid" } });
         return;
       }
     }
     if (formData.mobile.length !== 10) {
       setError("Please enter a valid 10-digit mobile number.");
+      track({ name: "lead_form_error", params: { form_id: "eligibility", error_code: "mobile_invalid" } });
       return;
     }
 
@@ -129,6 +165,7 @@ export function EligibilityForm() {
   };
 
   const handleRequestOtp = async (isResend = false) => {
+    track({ name: "otp_request", params: { is_resend: isResend } });
     if (!isResend) {
       setLoading(true);
       setError(null);
@@ -146,6 +183,8 @@ export function EligibilityForm() {
       const data = await res.json();
 
       if (data.success) {
+        track({ name: "otp_sent", params: { otp_channel: data.channel === "whatsapp" ? "whatsapp" : "sms" } });
+        setOtpChannel(data.channel === "whatsapp" ? "whatsapp" : "sms");
         setShowOtpModal(true);
         setOtpCooldown(30);
         setOtpDigits(["", "", "", ""]);
@@ -154,6 +193,8 @@ export function EligibilityForm() {
           otpInputRefs.current[0]?.focus();
         }, 150);
       } else {
+        const errorCode = res.status === 429 ? "rate_limited" : "dispatch_failed";
+        track({ name: "otp_failed", params: { otp_stage: "send", error_code: errorCode } });
         if (isResend) {
           setOtpError(data.error || "Failed to resend verification code.");
         } else {
@@ -162,6 +203,7 @@ export function EligibilityForm() {
       }
     } catch (err: any) {
       console.error("[OTP Request]", err);
+      track({ name: "otp_failed", params: { otp_stage: "send", error_code: "network" } });
       if (isResend) {
         setOtpError("Network error while resending verification code.");
       } else {
@@ -245,13 +287,48 @@ export function EligibilityForm() {
       const data = await res.json();
 
       if (data.success) {
+        track({ name: "otp_verified", params: {} });
+        track({ name: "generate_lead", params: { lead_source: "eligibility", currency: "INR" } });
+        // A PII-free analytics copy, written server-side (contact and
+        // calculator-lead already get theirs from their own API routes —
+        // this flow writes its credit_reports doc straight from the client,
+        // so it has no other server step to piggyback this on).
+        Promise.all([Promise.resolve(getAttribution()), getGaIds(GA_ID)])
+          .then(async ([attribution, ga]) => {
+            setJourneyStage("lead");
+            if (ga.clientId) setClarityTag("ga_client_id", ga.clientId);
+            const res = await fetch("/api/lead-event", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                attribution,
+                ga,
+                consent: {
+                  contact: formData.consentContact,
+                  shareWithLenders: formData.consentShareWithLenders,
+                  noticeVersion: NOTICE_VERSION,
+                },
+              }),
+            });
+            const data = await res.json().catch(() => ({}));
+            if (data.leadAnalyticsRef) setClarityTag("lead_ref", data.leadAnalyticsRef);
+          })
+          .catch((e) => console.warn("[lead-event] failed", e));
         setShowOtpModal(false);
         proceedToFetchReport();
       } else {
+        const lowerError = String(data.error || "").toLowerCase();
+        const errorCode = lowerError.includes("too many")
+          ? "too_many"
+          : lowerError.includes("expired") || lowerError.includes("not requested")
+            ? "expired"
+            : "incorrect";
+        track({ name: "otp_failed", params: { otp_stage: "verify", error_code: errorCode } });
         setOtpError(data.error || "Invalid verification code. Please check and try again.");
       }
     } catch (err: any) {
       console.error("[OTP Verify]", err);
+      track({ name: "otp_failed", params: { otp_stage: "verify", error_code: "network" } });
       setOtpError("Verification network error. Please try again.");
     } finally {
       setOtpLoading(false);
@@ -308,6 +385,7 @@ export function EligibilityForm() {
                       bureau: "crif_v1", 
                       fallbackWarning: "Notice: Loaded cached CRIF report because Experian had previously failed."
                     }));
+                    track({ name: "credit_report_fetch", params: { bureau: "crif", report_outcome: "cache", duration_band: bandDuration(0) } });
                     processFetchedReport(crifData.raw_api_data);
                     setLoading(false);
                     return;
@@ -324,6 +402,14 @@ export function EligibilityForm() {
                   if (data.fallbackData) {
                     setFormData((prev: any) => ({ ...prev, fallbackWarning: `Notice: Loaded cached CRIF report (Experian fallback: ${data.fallbackData.fallback_reason})` }));
                   }
+                  track({
+                    name: "credit_report_fetch",
+                    params: {
+                      bureau: ((data.bureau || formData.bureau).replace(/_v\d+$/, "").replace(/_pdf$/, "") as Bureau) || "experian",
+                      report_outcome: "cache",
+                      duration_band: bandDuration(0),
+                    },
+                  });
                   processFetchedReport(data.raw_api_data);
                   setLoading(false);
                   return;
@@ -453,10 +539,22 @@ export function EligibilityForm() {
         }));
       }
 
+      // Computed once and reused below (for the log call and the tracking
+      // call), rather than calling Date.now() again at each use — the
+      // existing logSystemEvent calls already did this inline; duplicating
+      // that expression a third time would add new instances of this
+      // file's pre-existing react-hooks/purity lint finding for no reason.
+      const bureauDurationMs = fallbackData ? Date.now() - fallbackStartTime : Date.now() - startTime;
+      const bureauForTracking = (usedBureau.replace(/_v\d+$/, "").replace(/_pdf$/, "") as Bureau) || "experian";
+
       if (!res.ok || (data.status && data.status.type !== "success" && !data.success)) {
         const errMsg = data.message || data.error || "Failed to fetch credit report. Please check your details.";
         setError(errMsg);
-        
+        track({
+          name: "credit_report_fetch",
+          params: { bureau: bureauForTracking, report_outcome: "failed", duration_band: bandDuration(bureauDurationMs) },
+        });
+
         await logSystemEvent({
           level: "error",
           event: fallbackData ? "ALL_BUREAUS_FAILED" : "BUREAU_REQUEST_FAILED",
@@ -470,7 +568,7 @@ export function EligibilityForm() {
           },
           message: errMsg,
           identifiers: { pan: formData.pan, mobile: formData.mobile },
-          duration_ms: fallbackData ? Date.now() - fallbackStartTime : Date.now() - startTime
+          duration_ms: bureauDurationMs
         });
       } else {
         await logSystemEvent({
@@ -485,7 +583,11 @@ export function EligibilityForm() {
           },
           message: "Bureau request completed successfully",
           identifiers: { pan: formData.pan, mobile: formData.mobile },
-          duration_ms: fallbackData ? Date.now() - fallbackStartTime : Date.now() - startTime
+          duration_ms: bureauDurationMs
+        });
+        track({
+          name: "credit_report_fetch",
+          params: { bureau: bureauForTracking, report_outcome: fallbackData ? "fallback" : "live", duration_band: bandDuration(bureauDurationMs) },
         });
 
         // Save to Firebase
@@ -521,6 +623,14 @@ export function EligibilityForm() {
             created_at: serverTimestamp(),
             branch: "customer",
             search_tokens: generateSearchTokens(fullName, formData.mobile, safePan),
+            consent: {
+              bureauFetch: formData.consent,
+              contact: formData.consentContact,
+              shareWithLenders: formData.consentShareWithLenders,
+              noticeVersion: NOTICE_VERSION,
+              recordedAt: serverTimestamp(),
+            },
+            attribution: getAttribution(),
             ...(fallbackData && { fallbackData })
           });
         } catch (e) {
@@ -551,7 +661,12 @@ export function EligibilityForm() {
     switch (step) {
       case 1:
         return (
-          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            onChangeCapture={trackFormStart}
+          >
             <div className="flex items-center justify-between mb-6">
               <h3 id="credit-profile-identity" className="text-2xl font-bold text-brand-black scroll-mt-28">Credit Profile & Identity</h3>
             </div>
@@ -618,7 +733,33 @@ export function EligibilityForm() {
                 />
                 <span className="text-xs text-brand-black/70 leading-relaxed">
                   <strong>Credit Report Consent</strong><br />
-                  By continuing, I consent and authorize Credit Expert India to securely retrieve my credit report from the credit bureau.
+                  I confirm I am 18 or older and I consent and authorize Credit Expert India to securely retrieve my credit report from the credit bureau.
+                </span>
+              </label>
+
+              <label className="flex items-start gap-3 p-4 border border-icy-blue rounded-xl cursor-pointer hover:bg-slate-50 transition-colors">
+                <input
+                  type="checkbox"
+                  checked={formData.consentContact}
+                  onChange={e => setFormData({ ...formData, consentContact: e.target.checked })}
+                  className="w-5 h-5 mt-0.5 text-blue-energy accent-blue-energy shrink-0 rounded"
+                />
+                <span className="text-xs text-brand-black/70 leading-relaxed">
+                  <strong>Contact Consent</strong><br />
+                  I agree that Credit Expert India may contact me about this enquiry.
+                </span>
+              </label>
+
+              <label className="flex items-start gap-3 p-4 border border-icy-blue rounded-xl cursor-pointer hover:bg-slate-50 transition-colors">
+                <input
+                  type="checkbox"
+                  checked={formData.consentShareWithLenders}
+                  onChange={e => setFormData({ ...formData, consentShareWithLenders: e.target.checked })}
+                  className="w-5 h-5 mt-0.5 text-blue-energy accent-blue-energy shrink-0 rounded"
+                />
+                <span className="text-xs text-brand-black/70 leading-relaxed">
+                  I'm also open to being contacted by partner lenders (see{" "}
+                  <Link href="/partner-disclosures" className="underline">partner disclosures</Link>). Optional.
                 </span>
               </label>
 
@@ -704,6 +845,7 @@ export function EligibilityForm() {
               exit={{ opacity: 0, scale: 0.95, y: 15 }}
               transition={{ duration: 0.25, ease: "easeOut" }}
               className="bg-white rounded-3xl shadow-2xl border border-slate-100 max-w-md w-full p-6 sm:p-8 relative overflow-hidden text-center"
+              data-clarity-mask="true"
             >
               {/* Background ambient accents */}
               <div className="absolute -top-16 -right-16 w-36 h-36 bg-blue-100/60 rounded-full blur-2xl pointer-events-none" />
@@ -712,6 +854,7 @@ export function EligibilityForm() {
               {/* Close Button */}
               <button
                 onClick={() => {
+                  track({ name: "otp_abandon", params: {} });
                   setShowOtpModal(false);
                   setOtpError(null);
                 }}
@@ -731,7 +874,7 @@ export function EligibilityForm() {
                 Verify Your Mobile
               </h3>
               <p className="text-sm text-slate-500 mt-2 leading-relaxed">
-                We sent a 4-digit verification code via SMS to{" "}
+                We sent a 4-digit verification code via {otpChannel === "whatsapp" ? "WhatsApp" : "SMS"} to{" "}
                 <span className="font-bold text-slate-800">+91 {formData.mobile}</span>
               </p>
 
@@ -796,6 +939,7 @@ export function EligibilityForm() {
                 <button
                   type="button"
                   onClick={() => {
+                    track({ name: "otp_abandon", params: {} });
                     setShowOtpModal(false);
                     setOtpError(null);
                   }}

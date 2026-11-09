@@ -3,33 +3,32 @@ import Link from "next/link";
 import { DebtConsolidationCalculator } from "@/components/DebtConsolidationCalculator";
 import { AnimatedMeshBackground } from "@/components/AnimatedMeshBackground";
 import { siteConfig } from "@/lib/config";
-import { defaultOgImage } from "@/lib/seo";
 import { CheckCircle2, ShieldCheck, ArrowRight, HelpCircle, Layers3, Calculator, Percent, Clock } from "lucide-react";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { jsonLd } from "@/lib/structuredData";
 
 export const metadata: Metadata = {
-  title: "Debt Consolidation Calculator India: Estimate Single EMI & Savings",
-  description: "Free online debt consolidation calculator for Indian borrowers. Combine multiple personal loans, credit card dues, and instant app loans into one single lower EMI with partner banks.",
-  keywords: [
-    "debt consolidation calculator",
-    "debt consolidation calculator India",
-    "loan consolidation calculator",
-    "combine multiple emis calculator",
-    "credit card debt consolidation calculator",
-    "emi savings calculator",
-  ],
+  title: "Debt Consolidation Calculator India",
+  description: "Free debt consolidation calculator for Indian borrowers. Combine personal loans, credit card dues and app loans into one lower EMI.",
   alternates: { canonical: "/calculators/debt-consolidation-calculator" },
   openGraph: {
     title: "Debt Consolidation Calculator India | Credit Expert India",
     description: "Combine multiple loan and credit card EMIs into one single lower monthly payment. Check your potential monthly savings instantly.",
     url: `${siteConfig.url}/calculators/debt-consolidation-calculator`,
+    siteName: siteConfig.name,
     type: "website",
-    images: [defaultOgImage],
+    locale: "en_IN",
+    // Explicit, not inherited: a page with its own (even partial)
+    // `openGraph` object does NOT inherit a parent segment's file-
+    // convention image (see lib/seo.ts's buildMetadata for how this was
+    // found) — only a page with no page-level `openGraph` at all does.
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: siteConfig.name }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Debt Consolidation Calculator India | Credit Expert India",
     description: "Combine multiple loan and credit card EMIs into one single lower monthly payment.",
-    images: [defaultOgImage.url],
+    images: ["/opengraph-image"],
   },
 };
 
@@ -50,37 +49,22 @@ const calculatorSchema = {
       }
     },
     {
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        {
-          "@type": "ListItem",
-          "position": 1,
-          "name": "Home",
-          "item": siteConfig.url
-        },
-        {
-          "@type": "ListItem",
-          "position": 2,
-          "name": "Calculators",
-          "item": `${siteConfig.url}/calculators/debt-consolidation-calculator`
-        },
-        {
-          "@type": "ListItem",
-          "position": 3,
-          "name": "Debt Consolidation Calculator",
-          "item": `${siteConfig.url}/calculators/debt-consolidation-calculator`
-        }
-      ]
-    },
-    {
+      // The 4 questions below are copied verbatim from Section 5 further
+      // down this page ("Frequently Asked Questions About the Calculator")
+      // — kept in sync by hand since, unlike the sitewide FAQ (content/
+      // faq.ts) and the per-product PageFAQ (lib/pageContent.ts), this
+      // page's FAQ text is bespoke prose rather than a shared data array.
+      // A prior version of this schema had a 5th question not on the page
+      // at all, and reworded the other 4; if you edit Section 5's wording,
+      // mirror the change here too.
       "@type": "FAQPage",
       "mainEntity": [
         {
           "@type": "Question",
-          "name": "How does a debt consolidation calculator work?",
+          "name": "How does the debt consolidation calculator work?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "A debt consolidation calculator aggregates your individual loans, credit card balances, and app loans into a single total principal. It computes your current weighted average interest rate and compares your combined existing EMIs against a single new consolidated EMI calculated using prime bank rates."
+            "text": "The calculator adds up all your existing debts (credit cards, personal loans, app loans) and computes your current combined monthly payment and weighted average interest rate. It then calculates the EMI of a single new consolidated loan based on your selected tenure and interest rate, showing you your exact monthly cash-flow difference and total interest impact."
           }
         },
         {
@@ -88,31 +72,23 @@ const calculatorSchema = {
           "name": "Does a lower consolidated EMI mean I pay less overall interest?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Not necessarily. If you lower your monthly EMI by significantly stretching your loan tenure (for example, from 2 years to 5 years), your total interest over the full term might increase. The calculator displays both monthly cash-flow relief and total interest so you can evaluate the true cost."
+            "text": "Not always. If you lower your monthly EMI by stretching the tenure significantly (e.g. from 24 months to 60 months), your total interest over the life of the loan could be higher even though the interest rate is lower. The calculator flags this clearly with an alert banner whenever tenure extension causes higher overall interest."
           }
         },
         {
           "@type": "Question",
-          "name": "What interest rate is used for the consolidated loan?",
+          "name": "What interest rate can I expect for debt consolidation in India?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "In India, debt consolidation personal loans from major partner banks and NBFCs typically range from 9.95% to 16% p.a. for eligible salaried professionals, compared to 36% to 42% p.a. for revolving credit card dues."
+            "text": "For salaried professionals with a CIBIL score of 720+ and stable employment, personal loan consolidation rates typically start from 9.99% to 14.5% p.a. from top partner banks like HDFC, ICICI, Axis, and Kotak. This represents a massive interest reduction compared to credit card finance charges (36% to 42% p.a.)."
           }
         },
         {
           "@type": "Question",
-          "name": "Does using this online debt consolidation calculator impact my CIBIL score?",
+          "name": "Will using this calculator impact my CIBIL score?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "No. Using this calculator is 100% free, anonymous, and does not require an OTP or credit bureau pull. Your CIBIL score is completely unaffected."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Can I combine credit cards, instant app loans, and personal loans together?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Yes. The calculator allows you to add multiple obligations across different lenders, including bank personal loans, credit card outstandings, digital credit lines, and NBFC app loans up to ₹50 Lakhs."
+            "text": "No. This tool is purely illustrative and mathematical. It runs entirely in your browser without requiring a credit bureau pull or login. Your credit score remains 100% untouched."
           }
         }
       ]
@@ -123,11 +99,19 @@ const calculatorSchema = {
 export default function DebtConsolidationCalculatorPage() {
   return (
     <div className="min-h-screen bg-slate-50">
-      
+
+      <Breadcrumbs
+        items={[
+          { name: "Home", path: "/" },
+          { name: "Calculators", path: "/calculators" },
+          { name: "Debt Consolidation Calculator" },
+        ]}
+      />
+
       {/* Schema Script */}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(calculatorSchema) }}
+        dangerouslySetInnerHTML={{ __html: jsonLd(calculatorSchema) }}
       />
 
       {/* Hero Header Section */}
@@ -140,7 +124,7 @@ export default function DebtConsolidationCalculatorPage() {
         <div className="container-narrow text-center relative z-10 px-4">
           <div className="inline-flex items-center gap-2 rounded-full bg-blue-50 border border-blue-200/80 px-4 py-1.5 text-xs font-bold text-blue-700 mb-4">
             <Calculator className="w-3.5 h-3.5" />
-            <span>FREE PUBLIC TOOL • 100% TRANSPARENT • NO LOGIN REQUIRED</span>
+            <span>FREE PUBLIC TOOL • NO LOGIN REQUIRED</span>
           </div>
 
           <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-brand-black leading-tight">
@@ -187,7 +171,7 @@ export default function DebtConsolidationCalculatorPage() {
               Debt consolidation is a financial strategy where a borrower combines several active loans—such as high-interest credit card outstandings (often charging 36% to 42% p.a.), personal loans, and short-term instant app loans—into a <strong>single new loan</strong> from a scheduled bank or RBI-regulated NBFC at a lower interest rate.
             </p>
             <p className="text-sm sm:text-base text-slate-700 leading-relaxed">
-              Instead of juggling 3 to 6 scattered payment dates and paying interest on interest, the borrower makes <strong>one predictable payment each month</strong> on a single set date. For salaried professionals earning over ₹45,000/month with stable employment, partner banks often approve consolidation loans starting around 9.95% to 12.5% p.a.
+              Instead of juggling 3 to 6 scattered payment dates and paying interest on interest, the borrower makes <strong>one predictable payment each month</strong> on a single set date. For salaried professionals earning over ₹45,000/month with stable employment, partner banks often approve consolidation loans starting around 9.99% to 12.5% p.a.
             </p>
           </div>
 
@@ -197,7 +181,7 @@ export default function DebtConsolidationCalculatorPage() {
               The Math Behind the Calculator: Formulas & Definitions
             </h2>
             <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-              Our calculator uses standard actuarial formulas endorsed by banking institutions to evaluate your current versus proposed positions:
+              Our calculator uses the standard loan amortization formula lenders use to evaluate your current versus proposed positions:
             </p>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
@@ -365,7 +349,7 @@ export default function DebtConsolidationCalculatorPage() {
                   What interest rate can I expect for debt consolidation in India?
                 </h3>
                 <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                  For salaried professionals with a CIBIL score of 720+ and stable employment, personal loan consolidation rates typically start from 9.95% to 14.5% p.a. from top partner banks like HDFC, ICICI, Axis, and Kotak. This represents a massive interest reduction compared to credit card finance charges (36% to 42% p.a.).
+                  For salaried professionals with a CIBIL score of 720+ and stable employment, personal loan consolidation rates typically start from 9.99% to 14.5% p.a. from top partner banks like HDFC, ICICI, Axis, and Kotak. This represents a massive interest reduction compared to credit card finance charges (36% to 42% p.a.).
                 </p>
               </div>
 
@@ -383,14 +367,16 @@ export default function DebtConsolidationCalculatorPage() {
           {/* Bottom CTA Banner */}
           <div className="p-8 sm:p-10 rounded-3xl bg-slate-900 text-white text-center space-y-4">
             <h3 className="text-xl sm:text-2xl font-bold">
-              Ready to Explore Real Pre-Approved Options?
+              Ready to Explore Your Real Options?
             </h3>
             <p className="text-xs sm:text-sm text-slate-400 max-w-xl mx-auto">
-              Get an unpressured, confidential assessment from Credit Expert India's senior debt advisors. We work with 50+ RBI-regulated lenders to find the optimal consolidation structure for your profile.
+              Get an unpressured, confidential assessment from Credit Expert India's senior debt advisors. We work with 13 RBI-regulated lenders to find the optimal consolidation structure for your profile.
             </p>
             <div className="pt-2 flex flex-col sm:flex-row justify-center gap-3">
               <Link
                 href="/eligibility"
+                data-analytics-cta="debt_calc_page_check_eligibility"
+                data-analytics-location="debt_calc_page"
                 className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md transition-colors"
               >
                 <span>Check Eligibility Online</span>
@@ -398,6 +384,8 @@ export default function DebtConsolidationCalculatorPage() {
               </Link>
               <Link
                 href="/contact"
+                data-analytics-cta="debt_calc_page_speak_advisor"
+                data-analytics-location="debt_calc_page"
                 className="inline-flex items-center justify-center px-6 py-3.5 rounded-full bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs border border-slate-700 transition-colors"
               >
                 Speak with an Advisor

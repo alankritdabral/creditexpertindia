@@ -32,6 +32,8 @@ export default function NotFound() {
         <div className="mt-9 flex flex-wrap gap-3">
           <Link
             href="/"
+            data-analytics-cta="not_found_home"
+            data-analytics-location="not_found"
             className="inline-flex items-center gap-2 rounded bg-[#0052CC] text-white font-semibold text-base px-[22px] h-[48px] hover:bg-[#0A2540] transition-colors"
           >
             Back to home
@@ -39,6 +41,8 @@ export default function NotFound() {
           </Link>
           <Link
             href="/eligibility"
+            data-analytics-cta="not_found_eligibility"
+            data-analytics-location="not_found"
             className="inline-flex items-center rounded border border-[#0A2540]/20 font-semibold text-base px-[22px] h-[48px] hover:border-[#0A2540] transition-colors"
           >
             Check eligibility

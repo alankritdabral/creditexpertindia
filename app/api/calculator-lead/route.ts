@@ -1,6 +1,8 @@
 import { adminDb } from "@/lib/firebaseAdmin";
 import { Resend } from "resend";
 import { NextResponse } from "next/server";
+import { sanitizeAttribution } from "@/lib/analytics/sanitizeAttribution";
+import { writeLeadAnalytics } from "@/lib/analytics/leadAnalytics";
 
 const resend = new Resend(process.env.RESEND_API_KEY || "missing_key");
 
@@ -29,11 +31,20 @@ export async function POST(request: Request) {
       debtsCount,
       debtsSummary,
       consent,
+      attribution,
+      ga,
     } = body;
 
     if (!name || !phone || !netSalary) {
       return NextResponse.json(
         { error: "Name, phone and salary are required." },
+        { status: 400 }
+      );
+    }
+
+    if (!consent?.contact) {
+      return NextResponse.json(
+        { error: "Please agree to being contacted about this assessment." },
         { status: 400 }
       );
     }
@@ -47,6 +58,7 @@ export async function POST(request: Request) {
     }
 
     // 1. Save to Firestore leads collection
+    const safeAttribution = sanitizeAttribution(attribution);
     let leadRefId = "";
     try {
       const docRef = await adminDb.collection("leads").add({
@@ -61,7 +73,13 @@ export async function POST(request: Request) {
         debtsCount: Number(debtsCount) || 1,
         debtsSummary: debtsSummary || "",
         requirement: "Debt Consolidation Calculator Assessment",
-        consent: !!consent,
+        consent: {
+          contact: true,
+          shareWithLenders: !!consent.shareWithLenders,
+          noticeVersion: consent.noticeVersion || null,
+          recordedAt: new Date(),
+        },
+        attribution: safeAttribution,
         source: "Debt Consolidation Calculator",
         status: "NEW",
         createdAt: new Date(),
@@ -70,6 +88,14 @@ export async function POST(request: Request) {
     } catch (dbError) {
       console.error("Firestore calculator lead save error:", dbError);
     }
+
+    // A PII-free copy, safe to export to BigQuery (plans/01-…/Phase 5 and 7).
+    const leadAnalyticsRef = await writeLeadAnalytics({
+      leadSource: "calculator_lead",
+      attribution: safeAttribution,
+      ga,
+      consent: { contact: true, shareWithLenders: !!consent.shareWithLenders, noticeVersion: consent.noticeVersion },
+    });
 
     // 2. Send instant email alert
     try {
@@ -139,6 +165,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       success: true,
       leadId: leadRefId,
+      leadAnalyticsRef,
     });
   } catch (error: any) {
     console.error("Calculator lead API error:", error);

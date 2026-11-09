@@ -4,7 +4,7 @@ import { buildMetadata } from "@/lib/seo";
 export const metadata: Metadata = buildMetadata({
   title: "Privacy Policy",
   description:
-    "Privacy Policy for Credit Expert India",
+    "What personal information Credit Expert India collects from visitors and how it is used, including for loan enquiries.",
   path: "/privacy-policy",
 });
 
@@ -40,6 +40,22 @@ export default function PrivacyPolicyPage() {
             <li>Send you emails</li>
             <li>Find and prevent fraud</li>
           </ul>
+          {/* NOTE: drafted in plain language to match what the site actually
+              does (lib/consent.ts, components/consent/ConsentBanner.tsx).
+              Not yet reviewed by legal counsel — see
+              plans/01-visibility-and-analytics.md Phase 2, decision D4. */}
+          <h2>Cookies and analytics</h2>
+          <p>
+            We only turn on usage analytics (Google Analytics) and session recordings (Microsoft Clarity) after you accept
+            them, using the banner shown on your first visit. Analytics tells us which pages are visited and how people
+            move through the site; it does not send us your name, phone number or any other personal details. Session
+            recordings show anonymised mouse movement and scrolling, with every form field blanked out, so we can see
+            where visitors get stuck.
+          </p>
+          <p>
+            You can change or withdraw this choice at any time using &quot;Cookie settings&quot; in the footer of every
+            page.
+          </p>
         </div>
       </div>
     </div>

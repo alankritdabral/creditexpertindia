@@ -7,6 +7,8 @@ import { parseBureauData } from "@/lib/bureauParsers";
 import { searchEmployers, EmployerResult } from "@/lib/employerLookup";
 import { generatePDFReport } from "@/lib/pdfGenerator";
 import { CreditReportProvider, useCreditReport } from "@/context/CreditReportContext";
+import { track } from "@/lib/analytics/track";
+import { contact } from "@/lib/config";
 
 export function CreditReportDashboard(props: any) {
   const existingContext = useCreditReport();
@@ -113,6 +115,8 @@ function CreditReportDashboardInner({ bureau, cibilData, formData }: any) {
       link.download = `CEI_${names[section]}_${formData.firstName || 'Report'}.png`;
       link.href = dataUrl;
       link.click();
+      const downloadFormat = section === 'basic' ? 'png_basic' : section === 'loans' ? 'png_loans' : 'png_eligibility';
+      track({ name: "report_download", params: { download_format: downloadFormat } });
     } catch (e) {
       console.error("Failed to capture image", e);
       alert("Failed to download image. See console for details.");
@@ -337,7 +341,12 @@ function CreditReportDashboardInner({ bureau, cibilData, formData }: any) {
   const dashArray = `${scorePercent} 100`;
 
   return (
-    <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="py-2">
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className="py-2"
+      data-clarity-mask="true"
+    >
       <div ref={captureRef} className="bg-white">
         <div ref={basicRef} className={isDownloadingSection === 'basic' ? "bg-white p-4 mb-4" : ""}>
           {/* CIBIL Dashboard */}
@@ -357,14 +366,22 @@ function CreditReportDashboardInner({ bureau, cibilData, formData }: any) {
                 {!isPreparingDownload && (
                   <>
                     {(cibilData?.credit_report_link || cibilData?.data?.pdf_url) && (
-                      <a href={cibilData?.credit_report_link || cibilData?.data?.pdf_url} target="_blank" rel="noopener noreferrer" className="text-xs font-bold px-4 py-1.5 bg-blue-energy text-white rounded-full hover:bg-blue-700 transition-colors shadow-sm flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          track({ name: "report_download", params: { download_format: "bureau_pdf" } });
+                          window.open(cibilData?.credit_report_link || cibilData?.data?.pdf_url, "_blank", "noopener,noreferrer");
+                        }}
+                        className="text-xs font-bold px-4 py-1.5 bg-blue-energy text-white rounded-full hover:bg-blue-700 transition-colors shadow-sm flex items-center gap-1"
+                      >
                         Download Bureau PDF
-                      </a>
+                      </button>
                     )}
                     <button
                       onClick={async () => {
                         if (isDirty) await saveOverridesToDB();
                         generatePDFReport(bureau, cibilData, formData);
+                        track({ name: "report_download", params: { download_format: "cibil_pdf" } });
                       }}
                       className="text-xs font-bold px-4 py-1.5 bg-emerald-600 text-white rounded-full hover:bg-emerald-700 transition-colors shadow-sm flex items-center gap-1"
                     >
@@ -510,7 +527,10 @@ function CreditReportDashboardInner({ bureau, cibilData, formData }: any) {
                 ].map(tab => (
                   <button
                     key={tab.id}
-                    onClick={() => setDashboardTab(tab.id as any)}
+                    onClick={() => {
+                      setDashboardTab(tab.id as any);
+                      track({ name: "report_tab_view", params: { report_tab: tab.id as any } });
+                    }}
                     className={`flex-1 py-2 px-3 text-xs font-bold rounded-lg whitespace-nowrap transition-all ${dashboardTab === tab.id ? 'bg-white text-blue-energy shadow-sm' : 'text-brand-black/70 hover:text-brand-black/90'}`}
                   >
                     {tab.label}
@@ -1732,9 +1752,16 @@ function CreditReportDashboardInner({ bureau, cibilData, formData }: any) {
           )}
 
         </div>
-        <button className="w-full py-4 bg-blue-energy text-white rounded-xl font-medium hover:bg-blue-800 transition-all duration-300 active:scale-95 shadow-sm hover:shadow-md">
+        <a
+          href={`https://wa.me/${contact.whatsapp.replace(/[^0-9]/g, "")}?text=Hi%2C%20I%27d%20like%20to%20talk%20about%20my%20credit%20report.`}
+          target="_blank"
+          rel="noopener noreferrer"
+          data-analytics-cta="dashboard_expert"
+          data-analytics-location="credit_report_dashboard"
+          className="w-full flex items-center justify-center py-4 bg-blue-energy text-white rounded-xl font-medium hover:bg-blue-800 transition-all duration-300 active:scale-95 shadow-sm hover:shadow-md"
+        >
           Speak with a Consolidation Expert
-        </button>
+        </a>
         <p className="text-[11px] text-slate-400 text-center mt-4 leading-tight">
           *These figures are indicative estimates. Final eligibility, rate, amount, tenure and approval are determined by the lender.
         </p>

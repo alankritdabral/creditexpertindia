@@ -1,9 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import * as THREE from 'three';
-import { Html } from '@react-three/drei';
-import { AnimatePresence } from 'framer-motion';
-import { projection, transactions } from './utils';
-import { LoanNotification } from './LoanNotification';
+import { projection } from './utils';
 
 const extrudeSettings = {
   depth: 0.15,
@@ -27,8 +24,6 @@ function StateShape({ shape, id, isActive, isHighlighted, isPrimary, splitX, spl
     const cy = pts.reduce((sum, p) => sum + p.y, 0) / pts.length;
     return [cx, cy, 0.2] as [number, number, number];
   }, [shape]);
-
-  const transaction = useMemo(() => transactions.find(t => t.city === id), [id]);
 
   useFrame((state, delta) => {
     if (materialRef.current) {
@@ -72,14 +67,6 @@ function StateShape({ shape, id, isActive, isHighlighted, isPrimary, splitX, spl
           opacity={0.4} 
         />
       </line>
-      {/* ALWAYS render the Html wrapper if this state has a transaction, to allow AnimatePresence to work */}
-      {isPrimary && transaction && (
-        <Html position={anchorPoint} center zIndexRange={[100, 0]}>
-          <AnimatePresence>
-            {isActive && <LoanNotification transaction={transaction} align={anchorPoint[0] > splitX ? 'left' : 'right'} vAlign={anchorPoint[1] > splitY ? 'bottom' : 'top'} />}
-          </AnimatePresence>
-        </Html>
-      )}
     </group>
   );
 }

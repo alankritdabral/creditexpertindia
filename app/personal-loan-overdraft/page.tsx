@@ -7,7 +7,7 @@ import { LeadForm } from "@/components/LeadForm";
 import { PageIntro, PageProof } from "@/components/page-sections/PageSections";
 
 export const metadata: Metadata = buildMetadata({
-  title: "Overdraft Options for Salaried Employees",
+  title: "Overdraft Options for Salaried Staff",
   description:
     "Explore overdraft and credit-line options for salaried professionals, and see whether a personal loan or consolidation would cost you less.",
   path: "/personal-loan-overdraft",
@@ -27,6 +27,7 @@ export default function Page() {
         body="If your salary doesn't always stretch to month-end, an overdraft or credit line can help. We'll also check if another route would cost you less."
         cta="Check my overdraft options"
         image="/img/od.webp"
+        imageAlt="A salaried professional checking an overdraft credit line on a phone"
         points={["Free assessment", "For salaried professionals", "No pressure to go ahead"]}
       />
 

@@ -1,10 +1,18 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 import { Plus, Trash2, CheckCircle2, AlertTriangle, ArrowRight, TrendingDown, ShieldCheck, Sparkles, RefreshCw, Calculator, HelpCircle, Phone, Lock } from "lucide-react";
 import { DebtItem, DebtType, calculateMultiDebtConsolidation } from "@/lib/calculator";
 import { formatINR } from "@/lib/utils";
 import { claims } from "@/lib/config";
+import { NOTICE_VERSION } from "@/lib/consent";
+import { track, setJourneyStage } from "@/lib/analytics/track";
+import { bandAmount, bandRate, bandSavings } from "@/lib/analytics/events";
+import { getAttribution } from "@/lib/analytics/attribution";
+import { getGaIds } from "@/lib/analytics/ids";
+import { GA_ID } from "@/lib/analytics/gaId";
+import { setClarityTag } from "@/lib/analytics/clarityTags";
+import Link from "next/link";
 
 const DEBT_TYPE_LABELS: Record<DebtType, string> = {
   personal_loan: "Personal Loan",
@@ -57,7 +65,11 @@ export function DebtConsolidationCalculator() {
     phone: "",
     netSalary: "",
     city: "",
-    consent: true,
+    // Was defaulted to true and never validated — a pre-ticked box isn't a
+    // "clear affirmative action" (DPDP Act s.6), so it now defaults false
+    // and is required before submit (see handleLeadSubmit below).
+    consentContact: false,
+    consentShareWithLenders: false,
   });
   const [leadStatus, setLeadStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [leadError, setLeadError] = useState("");
@@ -72,6 +84,29 @@ export function DebtConsolidationCalculator() {
     });
   }, [debts, proposedRate, proposedTenure, processingFeePercent]);
 
+  // calculator_result, debounced on idle like the other two calculators.
+  const resultTrackedOnceRef = useRef(false);
+  useEffect(() => {
+    if (!resultTrackedOnceRef.current) {
+      resultTrackedOnceRef.current = true;
+      track({ name: "calculator_start", params: { calculator_id: "debt_consolidation" } });
+    }
+    const timer = setTimeout(() => {
+      track({
+        name: "calculator_result",
+        params: {
+          calculator_id: "debt_consolidation",
+          loan_amount_band: bandAmount(result.totalPrincipal),
+          rate_band: bandRate(proposedRate),
+          tenure_months: proposedTenure,
+          savings_band: bandSavings(result.monthlyCashflowSavings),
+          debts_count: debts.length,
+        },
+      });
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, [result, proposedRate, proposedTenure, debts.length]);
+
   // Debt list mutations
   const handleAddDebt = () => {
     const newDebt: DebtItem = {
@@ -84,6 +119,7 @@ export function DebtConsolidationCalculator() {
       remainingMonths: 36,
     };
     setDebts([...debts, newDebt]);
+    track({ name: "debt_row_add", params: { debt_type: newDebt.type } });
   };
 
   const handleUpdateDebt = (id: string, field: keyof DebtItem, value: any) => {
@@ -102,9 +138,19 @@ export function DebtConsolidationCalculator() {
   // Lead submission
   const handleLeadSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    track({ name: "lead_form_submit", params: { form_id: "calculator_lead" } });
+
     if (!leadForm.name || !leadForm.phone || !leadForm.netSalary) {
       setLeadError("Please complete all required fields.");
       setLeadStatus("error");
+      track({ name: "lead_form_error", params: { form_id: "calculator_lead", error_code: "name_missing" } });
+      return;
+    }
+
+    if (!leadForm.consentContact) {
+      setLeadError("Please agree to being contacted about this assessment.");
+      setLeadStatus("error");
+      track({ name: "lead_form_error", params: { form_id: "calculator_lead", error_code: "consent_missing" } });
       return;
     }
 
@@ -112,6 +158,7 @@ export function DebtConsolidationCalculator() {
     if (isNaN(salary) || salary <= 25000) {
       setLeadError("Monthly take-home salary must be greater than ₹25,000 for eligibility.");
       setLeadStatus("error");
+      track({ name: "lead_form_error", params: { form_id: "calculator_lead", error_code: "salary_below_min" } });
       return;
     }
 
@@ -119,6 +166,11 @@ export function DebtConsolidationCalculator() {
     setLeadError("");
 
     try {
+      const [attribution, ga] = await Promise.all([
+        Promise.resolve(getAttribution()),
+        getGaIds(GA_ID),
+      ]);
+
       const payload = {
         name: leadForm.name,
         phone: leadForm.phone,
@@ -130,7 +182,13 @@ export function DebtConsolidationCalculator() {
         estimatedMonthlySavings: result.monthlyCashflowSavings,
         debtsCount: debts.length,
         debtsSummary: debts.map(d => `${d.name} (${DEBT_TYPE_LABELS[d.type]}): ${formatINR(d.balance)} @ ${d.interestRate}%`).join("; "),
-        consent: leadForm.consent,
+        consent: {
+          contact: leadForm.consentContact,
+          shareWithLenders: leadForm.consentShareWithLenders,
+          noticeVersion: NOTICE_VERSION,
+        },
+        attribution,
+        ga,
       };
 
       const res = await fetch("/api/calculator-lead", {
@@ -143,11 +201,17 @@ export function DebtConsolidationCalculator() {
         const errData = await res.json().catch(() => ({}));
         throw new Error(errData.error || "Failed to submit assessment request.");
       }
+      const resData = await res.json().catch(() => ({}));
 
       setLeadStatus("success");
+      track({ name: "generate_lead", params: { lead_source: "calculator_lead", currency: "INR" } });
+      setJourneyStage("lead");
+      if (ga.clientId) setClarityTag("ga_client_id", ga.clientId);
+      if (resData.leadId) setClarityTag("lead_ref", resData.leadId);
     } catch (err: any) {
       setLeadError(err.message || "Something went wrong. Please try again.");
       setLeadStatus("error");
+      track({ name: "lead_form_error", params: { form_id: "calculator_lead", error_code: "server" } });
     }
   };
 
@@ -169,7 +233,13 @@ export function DebtConsolidationCalculator() {
             <button
               key={idx}
               type="button"
-              onClick={() => handleApplyPreset(preset.debts)}
+              onClick={() => {
+                handleApplyPreset(preset.debts);
+                track({
+                  name: "debt_preset_apply",
+                  params: { preset_id: preset.name.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "") },
+                });
+              }}
               className="text-xs font-semibold px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-700 border border-slate-200 transition-colors cursor-pointer"
             >
               {preset.name}
@@ -355,7 +425,7 @@ export function DebtConsolidationCalculator() {
                     <label className="text-xs font-bold uppercase tracking-wider text-slate-700">
                       Consolidated Interest Rate (p.a.)
                     </label>
-                    <p className="text-[11px] text-slate-500">Starting from 9.95% p.a.* for eligible salaried profiles</p>
+                    <p className="text-[11px] text-slate-500">Starting from 9.99% p.a.* for eligible salaried profiles</p>
                   </div>
                   <span className="text-sm font-extrabold text-blue-700 bg-blue-50 px-3 py-1 rounded-lg border border-blue-100">
                     {proposedRate}% p.a.
@@ -506,10 +576,15 @@ export function DebtConsolidationCalculator() {
               <div className="pt-2">
                 <button
                   type="button"
-                  onClick={() => setIsModalOpen(true)}
+                  onClick={() => {
+                    setIsModalOpen(true);
+                    track({ name: "lead_form_view", params: { form_id: "calculator_lead", form_location: "calculator" } });
+                  }}
+                  data-analytics-cta="debt_calculator_explore_offers"
+                  data-analytics-location="debt_calculator"
                   className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold text-sm shadow-lg shadow-blue-500/25 flex items-center justify-center gap-2 transition-all cursor-pointer group"
                 >
-                  <span>Explore Pre-Approved Lender Options</span>
+                  <span>Explore Lender Options</span>
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </button>
                 <p className="text-center text-[11px] text-slate-400 mt-2 flex items-center justify-center gap-1">
@@ -529,11 +604,11 @@ export function DebtConsolidationCalculator() {
             <ul className="text-xs text-slate-600 space-y-2">
               <li className="flex items-start gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                <span><strong>50+ RBI-Regulated Lenders:</strong> Compare partner private banks and NBFC networks.</span>
+                <span><strong>13 RBI-Regulated Lenders:</strong> Compare partner private banks and NBFC networks.</span>
               </li>
               <li className="flex items-start gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                <span><strong>Replace 36%-42% Credit Card Dues:</strong> Move high revolving debt to loans from 9.95% p.a.*</span>
+                <span><strong>Replace 36%-42% Credit Card Dues:</strong> Move high revolving debt to loans from 9.99% p.a.*</span>
               </li>
               <li className="flex items-start gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
@@ -648,16 +723,29 @@ export function DebtConsolidationCalculator() {
                   </div>
                 </div>
 
-                <div className="pt-2">
+                <div className="pt-2 space-y-2">
                   <label className="flex items-start gap-2 cursor-pointer text-[11px] text-slate-500 leading-snug">
                     <input
                       type="checkbox"
-                      checked={leadForm.consent}
-                      onChange={(e) => setLeadForm({ ...leadForm, consent: e.target.checked })}
+                      checked={leadForm.consentContact}
+                      onChange={(e) => setLeadForm({ ...leadForm, consentContact: e.target.checked })}
+                      className="mt-0.5 rounded text-blue-600 accent-blue-600"
+                      required
+                    />
+                    <span>
+                      I authorize Credit Expert India to contact me via phone, WhatsApp or email about this assessment. <span className="text-red-500">*</span>
+                    </span>
+                  </label>
+                  <label className="flex items-start gap-2 cursor-pointer text-[11px] text-slate-500 leading-snug">
+                    <input
+                      type="checkbox"
+                      checked={leadForm.consentShareWithLenders}
+                      onChange={(e) => setLeadForm({ ...leadForm, consentShareWithLenders: e.target.checked })}
                       className="mt-0.5 rounded text-blue-600 accent-blue-600"
                     />
                     <span>
-                      I authorize Credit Expert India to contact me via phone, WhatsApp or email to provide loan and debt consolidation options.
+                      I'm also open to being contacted by partner lenders (see{" "}
+                      <Link href="/partner-disclosures" className="underline">partner disclosures</Link>). Optional.
                     </span>
                   </label>
                 </div>

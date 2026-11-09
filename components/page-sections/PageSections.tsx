@@ -2,8 +2,10 @@ import {
   Users, ShieldCheck, Lock, MapPin, Clock, FileText, Scale, CheckCircle2, Percent,
   CalendarCheck, TrendingUp, Wallet, Quote, type LucideIcon,
 } from "lucide-react";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { TrackedAccordion } from "@/components/analytics/TrackedAccordion";
 import { pageContent, stats, testimonials, type PageKey } from "@/lib/pageContent";
+import { jsonLd, pageFaqSchema } from "@/lib/structuredData";
 
 const icons: Record<string, LucideIcon> = {
   users: Users, shield: ShieldCheck, lock: Lock, map: MapPin, clock: Clock, file: FileText,
@@ -78,11 +80,15 @@ export function PageFAQ({ page }: { page: PageKey }) {
   const { faqs } = pageContent[page];
   return (
     <section className="bg-white text-[#0A2540]">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLd(pageFaqSchema(faqs)) }}
+      />
       <div className="max-w-[1220px] mx-auto px-4 md:px-6 lg:px-8 py-16 md:py-24 grid grid-cols-1 lg:grid-cols-[5fr_7fr] gap-8 lg:gap-16">
         <h2 className="text-[40px] sm:text-[56px] leading-[1.02] tracking-[-0.04em] font-bold lg:sticky lg:top-28 self-start">
           Common questions.
         </h2>
-        <Accordion type="single" collapsible className="w-full">
+        <TrackedAccordion faqSet={`page:${page}`} type="single" collapsible className="w-full">
           {faqs.map((f, i) => (
             <AccordionItem value={`f-${i}`} key={f.q} className="border-b-0 mb-2 px-4 md:px-6 data-[state=open]:bg-[#e6eefb] transition-colors">
               <AccordionTrigger className="hover:no-underline text-left gap-6 py-5">
@@ -93,7 +99,7 @@ export function PageFAQ({ page }: { page: PageKey }) {
               </AccordionContent>
             </AccordionItem>
           ))}
-        </Accordion>
+        </TrackedAccordion>
       </div>
     </section>
   );
@@ -111,10 +117,10 @@ export function PageIntro({ page }: { page: PageKey }) {
 
 /** Testimonials + FAQ, placed before the closing lead form. */
 export function PageProof({ page }: { page: PageKey }) {
-  return (
-    <>
-      <Testimonials />
-      <PageFAQ page={page} />
-    </>
-  );
+  // Testimonials used to render here, sourced from lib/pageContent.ts's
+  // `testimonials` array. That array was placeholder copy ("replace with
+  // real, consented customer quotes before launch") attributed to invented
+  // people — removed rather than shown as if real. Add a real, consented
+  // Testimonials section back in once some exist.
+  return <PageFAQ page={page} />;
 }

@@ -6,7 +6,7 @@ import { ProductHero } from "@/components/ProductHero";
 import { PageIntro, PageProof } from "@/components/page-sections/PageSections";
 
 export const metadata: Metadata = buildMetadata({
-  title: "High-Interest Loan Refinancing & Advisory",
+  title: "High-Interest Loan Refinancing",
   description:
     "Explore options to refinance high-rate personal loans and reduce monthly EMI burden with partner banks.",
   path: "/high-interest-loan",
@@ -21,6 +21,7 @@ export default function HighInterestLoanPage() {
         body="If you're paying above 16% a year, refinancing or consolidating with a partner bank might lower your monthly burden. We'll tell you honestly."
         cta="Check my options"
         image="/img/od.webp"
+        imageAlt="A stack of high-interest loan statements being reviewed for refinancing"
         points={["Free assessment", "Honest answer, even if switching isn't worth it", "You stay in control"]}
       />
 

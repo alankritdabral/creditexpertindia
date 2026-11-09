@@ -1,15 +1,35 @@
 export type Article = {
   slug: string;
   title: string;
+  /**
+   * Short title for the <title> tag, kept ≤38 chars so the rendered title
+   * (with the root layout's " | Credit Expert India" template, 22 chars)
+   * stays within Google's ~60-char display budget. `title` is the longer,
+   * more descriptive headline shown as the page's H1 — it isn't shortened,
+   * since that would mean rewriting editorial copy rather than fixing SEO
+   * metadata. Falls back to `title` if omitted.
+   */
+  seoTitle?: string;
   summary: string;
+  /** Real content date (ISO), used for the sitemap and Article JSON-LD (plan Phase 9). Not `new Date()`. */
+  publishedAt: string;
+  updatedAt: string;
   sections: { heading: string; paragraphs: string[] }[];
 };
+
+// All six articles were added in one commit (git log content/articles.ts),
+// so they share one publishedAt/updatedAt for now. Update an article's
+// updatedAt only when its own text materially changes.
+const ARTICLES_ADDED = "2026-11-02T15:06:53+05:30";
 
 export const articles: Article[] = [
   {
     slug: "what-is-emi-and-how-is-it-calculated",
     title: "What is an EMI, and how is it calculated?",
+    seoTitle: "What is an EMI? How It Works",
     summary: "The simple maths behind your monthly loan payment, and why a small change in rate or tenure moves it so much.",
+    publishedAt: ARTICLES_ADDED,
+    updatedAt: ARTICLES_ADDED,
     sections: [
       {
         heading: "EMI in one line",
@@ -37,7 +57,10 @@ export const articles: Article[] = [
   {
     slug: "debt-consolidation-explained-for-salaried-borrowers",
     title: "Debt consolidation, explained for salaried borrowers",
+    seoTitle: "Debt Consolidation Explained",
     summary: "What it means to merge several EMIs into one loan, who it can help, and when it may not be worth it.",
+    publishedAt: ARTICLES_ADDED,
+    updatedAt: ARTICLES_ADDED,
     sections: [
       {
         heading: "What is debt consolidation?",
@@ -63,7 +86,10 @@ export const articles: Article[] = [
   {
     slug: "credit-card-interest-vs-personal-loan-interest",
     title: "Credit-card interest vs personal-loan interest",
+    seoTitle: "Card Interest vs Loan Interest",
     summary: "Why carrying a card balance usually costs far more than a personal loan, and what you can do about it.",
+    publishedAt: ARTICLES_ADDED,
+    updatedAt: ARTICLES_ADDED,
     sections: [
       {
         heading: "Why cards cost more",
@@ -88,7 +114,10 @@ export const articles: Article[] = [
   {
     slug: "personal-loan-balance-transfer-when-it-makes-sense",
     title: "Personal-loan balance transfer: when does it make sense?",
+    seoTitle: "Personal Loan Balance Transfer",
     summary: "Moving an existing loan to a cheaper lender can save money, but only if the numbers work. Here is how to check.",
+    publishedAt: ARTICLES_ADDED,
+    updatedAt: ARTICLES_ADDED,
     sections: [
       {
         heading: "What is a balance transfer?",
@@ -113,7 +142,10 @@ export const articles: Article[] = [
   {
     slug: "salaried-personal-loan-eligibility-checklist",
     title: "Salaried personal-loan eligibility: a simple checklist",
+    seoTitle: "Salaried Loan Eligibility Checklist",
     summary: "The things lenders usually look at, and how to prepare before you apply.",
+    publishedAt: ARTICLES_ADDED,
+    updatedAt: ARTICLES_ADDED,
     sections: [
       {
         heading: "What lenders usually look at",
@@ -139,7 +171,10 @@ export const articles: Article[] = [
   {
     slug: "overdraft-vs-personal-loan",
     title: "Overdraft vs personal loan: which suits you?",
+    seoTitle: "Overdraft vs Personal Loan",
     summary: "Two ways to borrow, two different ways of paying. A quick comparison for salaried borrowers.",
+    publishedAt: ARTICLES_ADDED,
+    updatedAt: ARTICLES_ADDED,
     sections: [
       {
         heading: "How they differ",

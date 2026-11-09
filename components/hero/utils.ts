@@ -1,5 +1,4 @@
 import { geoMercator } from 'd3-geo';
-import * as THREE from 'three';
 
 // Map projection centered on India
 export const projection = geoMercator()

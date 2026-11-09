@@ -13,7 +13,7 @@ export const hero = {
   headline: "Too Many EMIs? Let's Make Them Simpler.",
   subheadline:
     "Consolidate eligible high-interest loans, credit card dues and scattered EMIs into a simpler repayment plan — or explore personal-loan options based on your profile.",
-  highlight: "Rates starting from 9.95% p.a.* for eligible salaried applicants",
+  highlight: "Rates starting from 9.99% p.a.* for eligible salaried applicants",
   ctas: {
     primary: "Check My Options",
     secondary: "Calculate My Savings",
@@ -185,7 +185,7 @@ export const faqs = [
   },
   {
     q: "What interest rate can I get?",
-    a: "Personal loan rates start from 9.95% p.a.* for highly qualified salaried applicants. The actual rate offered depends on your employer category, monthly salary, CIBIL score, and partner lender policy.",
+    a: "Personal loan rates start from 9.99% p.a.* for highly qualified salaried applicants. The actual rate offered depends on your employer category, monthly salary, CIBIL score, and partner lender policy.",
   },
   {
     q: "Does checking eligibility affect my CIBIL score?",

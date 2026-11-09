@@ -6,11 +6,15 @@ type Props = {
   body: string;
   cta: string;
   image: string;
+  /** A real, page-specific description. Falls back to "" (decorative) only
+   * when a caller genuinely has nothing more specific to say than the
+   * title already does. */
+  imageAlt?: string;
   points?: string[];
   href?: string;
 };
 
-export function ProductHero({ title, body, cta, image, points = [], href = "#lead-form" }: Props) {
+export function ProductHero({ title, body, cta, image, imageAlt = "", points = [], href = "#lead-form" }: Props) {
   return (
     <>
     <div className="h-[84px] bg-white" aria-hidden="true" />
@@ -22,6 +26,8 @@ export function ProductHero({ title, body, cta, image, points = [], href = "#lea
         <p className="hero-description mt-6 text-base sm:text-lg lg:text-xl leading-[1.5] text-[#BFDBFE] max-w-xl">{body}</p>
         <a
           href={href}
+          data-analytics-cta={`hero_${cta.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "")}`}
+          data-analytics-location="product_hero"
           className="mt-9 inline-flex items-center gap-2 rounded bg-white text-[#0052CC] font-semibold text-base px-[22px] h-[48px] hover:bg-[#0A2540] hover:text-white transition-colors"
         >
           {cta} <ArrowRight className="w-5 h-5" />
@@ -33,7 +39,7 @@ export function ProductHero({ title, body, cta, image, points = [], href = "#lea
         </ul>
       </div>
       <div className="relative min-h-[320px] lg:min-h-full">
-        <Image src={image} alt="" fill priority sizes="(min-width:1024px) 45vw, 100vw" className="object-cover" />
+        <Image src={image} alt={imageAlt} fill priority sizes="(min-width:1024px) 45vw, 100vw" className="object-cover" />
       </div>
     </section>
     </>

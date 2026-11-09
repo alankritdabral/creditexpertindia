@@ -1,11 +1,17 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Loader2, ArrowRight, CheckCircle2, AlertCircle, ChevronDown, Lock, Check, CheckCheck } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import logo from "@/public/img/logo.webp";
 import { contact } from "@/lib/config";
+import { NOTICE_VERSION } from "@/lib/consent";
+import { track, setJourneyStage } from "@/lib/analytics/track";
+import { getAttribution } from "@/lib/analytics/attribution";
+import { getGaIds } from "@/lib/analytics/ids";
+import { GA_ID } from "@/lib/analytics/gaId";
+import { setClarityTag } from "@/lib/analytics/clarityTags";
 
 const REQUIREMENTS = [
   "Reduce my EMI",
@@ -26,13 +32,28 @@ export function ContactForm() {
     requirement: "",
     netSalary: "",
     ongoingEmi: "",
-    consent: false,
+    consentContact: false,
+    consentShareWithLenders: false,
   });
 
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
+  const hasStartedRef = useRef(false);
+
+  // Approximates the plan's "50% visible" lead_form_view with a mount-time
+  // fire: both pages that render this form put it close to the viewport
+  // (the homepage's #lead-form section, or above the fold on /contact), and
+  // a full IntersectionObserver per form instance was judged not worth the
+  // added complexity for this phase.
+  useEffect(() => {
+    track({ name: "lead_form_view", params: { form_id: "contact", form_location: "contact_form" } });
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    if (!hasStartedRef.current) {
+      hasStartedRef.current = true;
+      track({ name: "lead_form_start", params: { form_id: "contact" } });
+    }
     const { name, value, type } = e.target;
     if (type === "checkbox") {
       const checked = (e.target as HTMLInputElement).checked;
@@ -44,9 +65,12 @@ export function ContactForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    track({ name: "lead_form_submit", params: { form_id: "contact" } });
+
     if (!formData.name || !formData.phone || !formData.requirement || !formData.netSalary || !formData.ongoingEmi) {
       setErrorMessage("Please fill all required fields.");
       setStatus("error");
+      track({ name: "lead_form_error", params: { form_id: "contact", error_code: "name_missing" } });
       return;
     }
 
@@ -54,19 +78,22 @@ export function ContactForm() {
     if (isNaN(salary) || salary <= 45000) {
       setErrorMessage("Net salary must be greater than ₹45,000.");
       setStatus("error");
+      track({ name: "lead_form_error", params: { form_id: "contact", error_code: "salary_below_min" } });
       return;
     }
-    
+
     const emi = Number(formData.ongoingEmi);
     if (isNaN(emi) || emi > salary * 0.8) {
       setErrorMessage("Ongoing EMI cannot be greater than 80% of net salary.");
       setStatus("error");
+      track({ name: "lead_form_error", params: { form_id: "contact", error_code: "emi_too_high" } });
       return;
     }
 
-    if (!formData.consent) {
-      setErrorMessage("Please agree to our contact policy.");
+    if (!formData.consentContact) {
+      setErrorMessage("Please agree to being contacted about your enquiry.");
       setStatus("error");
+      track({ name: "lead_form_error", params: { form_id: "contact", error_code: "consent_missing" } });
       return;
     }
 
@@ -74,10 +101,24 @@ export function ContactForm() {
     setErrorMessage("");
 
     try {
+      const [attribution, ga] = await Promise.all([
+        Promise.resolve(getAttribution()),
+        getGaIds(GA_ID),
+      ]);
+
       const response = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          consent: {
+            contact: formData.consentContact,
+            shareWithLenders: formData.consentShareWithLenders,
+            noticeVersion: NOTICE_VERSION,
+          },
+          attribution,
+          ga,
+        }),
       });
 
       const result = await response.json();
@@ -93,11 +134,17 @@ export function ContactForm() {
             requirement: "",
             netSalary: "",
         ongoingEmi: "",
-        consent: false,
+        consentContact: false,
+        consentShareWithLenders: false,
       });
+      track({ name: "generate_lead", params: { lead_source: "contact", currency: "INR" } });
+      setJourneyStage("lead");
+      if (ga.clientId) setClarityTag("ga_client_id", ga.clientId);
+      if (result.leadRef) setClarityTag("lead_ref", result.leadRef);
     } catch (error: any) {
       console.error("Form submission error:", error);
       setErrorMessage(error.message || "An unexpected error occurred. Please try again.");
+      track({ name: "lead_form_error", params: { form_id: "contact", error_code: "server" } });
       setStatus("error");
     }
   };
@@ -105,7 +152,7 @@ export function ContactForm() {
   const renderRightColumn = () => {
     if (status === "success") {
       return (
-        <div className="bg-emerald-50 border border-emerald-200 rounded-[24px] p-8 text-center shadow-sm h-full flex flex-col justify-center">
+        <div className="bg-emerald-50 border border-emerald-200 rounded-[24px] p-8 text-center shadow-sm h-full flex flex-col justify-center" data-clarity-mask="true">
           <div className="flex justify-center mb-4">
             <CheckCircle2 className="w-12 h-12 text-emerald-500" />
           </div>
@@ -121,12 +168,15 @@ export function ContactForm() {
               href={`https://wa.me/${contact.whatsapp.replace(/[^0-9]/g, "")}`}
               target="_blank"
               rel="noopener noreferrer"
+              data-analytics-location="contact_form_success"
               className="flex-1 px-6 py-3 bg-[#25D366] text-white hover:bg-emerald-600 rounded font-bold transition-all shadow-md shadow-green-600/20 hover:-translate-y-0.5 text-sm sm:text-base flex items-center justify-center gap-2"
             >
               Chat on WhatsApp
             </Link>
             <Link
               href="/eligibility"
+              data-analytics-cta="contact_form_success_check_eligibility"
+              data-analytics-location="contact_form_success"
               className="flex-1 px-6 py-3 bg-[#0052CC] text-white hover:bg-[#0052CC]/90 rounded font-bold transition-all shadow-md shadow-[#0052CC]/20 hover:-translate-y-0.5 text-sm sm:text-base flex items-center justify-center gap-2"
             >
               Check Eligibility
@@ -144,7 +194,7 @@ export function ContactForm() {
     }
 
     return (
-      <div className="bg-white p-6 sm:p-10 relative z-20 flex flex-col scroll-mt-24 rounded-2xl card-elevated" id="contact-form">
+      <div className="bg-white p-6 sm:p-10 relative z-20 flex flex-col scroll-mt-24 rounded-2xl card-elevated" id="contact-form-card">
         <div className="mb-6 md:mb-8 shrink-0">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-2">
             <h2 className="text-[32px] font-bold tracking-[-0.02em] text-[#0A2540]">Leave your details</h2>
@@ -254,12 +304,12 @@ export function ContactForm() {
           </div>
 
           <div className="mt-4 pt-4 shrink-0">
-            <label className="flex items-center gap-3 py-1 rounded-xl cursor-pointer group mb-4">
-              <div className="relative flex items-center justify-center">
+            <label className="flex items-start gap-3 py-1 rounded-xl cursor-pointer group mb-3">
+              <div className="relative flex items-center justify-center mt-0.5">
                 <input
                   type="checkbox"
-                  name="consent"
-                  checked={formData.consent}
+                  name="consentContact"
+                  checked={formData.consentContact}
                   onChange={handleChange}
                   className="peer w-[18px] h-[18px] appearance-none border border-slate-200 rounded-[4px] checked:bg-[#0052CC] checked:border-[#0052CC] transition-colors cursor-pointer"
                   required
@@ -267,7 +317,24 @@ export function ContactForm() {
                 <Check className="absolute w-3 h-3 text-white pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity" strokeWidth={3} />
               </div>
               <span className="text-sm text-[#3C4F69] group-hover:text-[#0A2540] transition-colors">
-                I agree that Credit Expert India may contact me regarding my enquiry.
+                I agree that Credit Expert India may contact me regarding this enquiry. <span className="text-red-500">*</span>
+              </span>
+            </label>
+
+            <label className="flex items-start gap-3 py-1 rounded-xl cursor-pointer group mb-4">
+              <div className="relative flex items-center justify-center mt-0.5">
+                <input
+                  type="checkbox"
+                  name="consentShareWithLenders"
+                  checked={formData.consentShareWithLenders}
+                  onChange={handleChange}
+                  className="peer w-[18px] h-[18px] appearance-none border border-slate-200 rounded-[4px] checked:bg-[#0052CC] checked:border-[#0052CC] transition-colors cursor-pointer"
+                />
+                <Check className="absolute w-3 h-3 text-white pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity" strokeWidth={3} />
+              </div>
+              <span className="text-sm text-[#3C4F69] group-hover:text-[#0A2540] transition-colors">
+                I'm also open to being contacted by Credit Expert India's partner lenders (see{" "}
+                <Link href="/partner-disclosures" className="underline">partner disclosures</Link>). Optional.
               </span>
             </label>
 

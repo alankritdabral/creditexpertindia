@@ -4,10 +4,11 @@ import { CityLoanPage } from "@/components/CityLoanPage";
 import { cities } from "@/lib/cities";
 
 export const metadata: Metadata = buildMetadata({
-  title: "Personal Loan for Salaried Employees in Noida",
+  title: "Personal Loan in Noida",
   description:
-    "Check personal loan and EMI consolidation options for salaried professionals in Noida. Rates from 9.95% p.a.* for eligible applicants. Free assessment.",
+    "Personal loan and EMI consolidation options for salaried staff in Noida. Rates from 9.99% p.a.* for eligible applicants. Free assessment.",
   path: "/personal-loan-in-noida",
+  noindex: true, // not yet rewritten with real local content -- plan decision D5
 });
 
 export default function Page() {

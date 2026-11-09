@@ -117,7 +117,7 @@ export const EligibleLoansSlider = () => {
                     {/* Background Image for glass effect */}
                     <Image
                       src={slide.data.image}
-                      alt="Background"
+                      alt=""
                       fill
                       sizes="(max-width: 768px) 85vw, 380px"
                       className="object-cover opacity-80"
@@ -153,11 +153,10 @@ export const EligibleLoansSlider = () => {
         </motion.div>
         </div>
 
-        {/* Bottom Metrics Bar */}
+        {/* Bottom Metrics Bar. "10,000+ Users" and "4.9 Rating" were
+            removed here: unsourced numbers with nothing behind them. */}
         <div className="px-4 md:px-6 lg:px-12 mt-8 md:mt-12 py-6 md:py-8 flex flex-wrap justify-center gap-2 md:gap-4">
           {[
-            "10,000+ Users",
-            "4.9 Rating",
             "Real-time insights",
             "Secure & compliant"
           ].map((badge, i) => (

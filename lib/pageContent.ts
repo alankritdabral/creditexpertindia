@@ -22,10 +22,12 @@ type PageContent = {
   faqs: Faq[];
 };
 
-// Facts mirror the rest of the site: 50+ partner lenders, rates from 9.95% p.a.*, up to ₹1 Cr and 84 months.
+// These mirror lib/lenderEngine.ts's LENDERS table directly: 13 lenders,
+// lowest headlineRate 9.99, highest maxLoanAmount ₹1 Cr (Kotak), longest
+// maxTenure 84 months. Keep in sync if that table changes.
 export const stats = [
-  { value: "50+", label: "partner banks and NBFCs compared" },
-  { value: "9.95%", label: "p.a.* starting rate for eligible salaried applicants" },
+  { value: "13", label: "partner banks and NBFCs compared" },
+  { value: "9.99%", label: "p.a.* starting rate for eligible salaried applicants" },
   { value: "₹1 Cr", label: "maximum loan amount from select lenders*" },
   { value: "84", label: "months of maximum repayment tenure*" },
 ];
@@ -115,7 +117,7 @@ export const pageContent: Record<PageKey, PageContent> = {
     heading: "Why transfer your loan.",
     intro: "Moving a balance to a partner bank can cut interest if you qualify.",
     benefits: [
-      { icon: "percent", title: "Rates from 9.95%*", text: "For eligible salaried applicants with partner banks." },
+      { icon: "percent", title: "Rates from 9.99%*", text: "For eligible salaried applicants with partner banks." },
       { icon: "scale", title: "Banks compared", text: "We check several lenders so you don't have to." },
       { icon: "wallet", title: "Save each month", text: "A lower rate can mean a smaller EMI or a shorter loan." },
       { icon: "check", title: "No pressure", text: "Switch only if the numbers make sense for you." },
@@ -129,7 +131,7 @@ export const pageContent: Record<PageKey, PageContent> = {
     heading: "Why check with us first.",
     intro: "Compare partner banks in one place before you commit to a loan.",
     benefits: [
-      { icon: "percent", title: "From 9.95% p.a.*", text: "Starting rates for eligible salaried applicants." },
+      { icon: "percent", title: "From 9.99% p.a.*", text: "Starting rates for eligible salaried applicants." },
       { icon: "clock", title: "Quick to check", text: "A soft profile check takes a couple of minutes." },
       { icon: "wallet", title: "Up to ₹1 Cr*", text: "Amounts and tenure vary by lender, up to 84 months." },
       { icon: "check", title: "You decide", text: "No obligation after the assessment." },
@@ -199,7 +201,7 @@ export const pageContent: Record<PageKey, PageContent> = {
     intro: "Local needs, honest guidance, and partner banks compared in one place.",
     benefits: [
       { icon: "map", title: "Help from anywhere", text: "Check your options online, wherever you are." },
-      { icon: "percent", title: "From 9.95% p.a.*", text: "Rates for eligible salaried applicants." },
+      { icon: "percent", title: "From 9.99% p.a.*", text: "Rates for eligible salaried applicants." },
       { icon: "users", title: "Real specialists", text: "A credit expert walks you through the numbers." },
       { icon: "check", title: "No obligation", text: "You decide whether to go ahead." },
     ],

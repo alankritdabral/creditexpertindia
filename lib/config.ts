@@ -1,7 +1,7 @@
 // Centralised claims - keep configurable, never hardcode in components
 export const claims = {
-  personalLoanFrom: "9.95% p.a.*",
-  personalLoanFromNote: "Personal loans starting from 9.95% p.a.* for eligible salaried applicants",
+  personalLoanFrom: "9.99% p.a.*",
+  personalLoanFromNote: "Personal loans starting from 9.99% p.a.* for eligible salaried applicants",
   balanceTransferNote: "Help customers reduce their interest burden, potentially to rates around 11% or lower where eligible.",
   disclaimerShort: "*Rates depend on credit profile, income, employer, existing obligations, loan amount, tenure and lender policy. For eligible applicants only.",
   disclaimerFull: "Your actual rate, EMI, savings and eligibility depend on your financial profile and the respective lender's criteria.",
@@ -45,5 +45,8 @@ export const lendingPartners = {
 export const siteConfig = {
   name: "Credit Expert India",
   tagline: "Paying Too Much Interest on Your Loans? Let's Find a Better Way Forward.",
-  url: "https://creditexpertindia.com",
+  // Must match the primary domain in Vercel (Project → Settings → Domains).
+  // Vercel 308-redirects the apex (creditexpertindia.com) to www, so canonicals,
+  // og:url, sitemap <loc> and the robots Sitemap: line must all use www.
+  url: "https://www.creditexpertindia.com",
 };
