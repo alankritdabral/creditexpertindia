@@ -118,7 +118,7 @@ export function EligibilityForm() {
   const handleFetchReport = async () => {
     track({ name: "lead_form_submit", params: { form_id: "eligibility" } });
 
-    if (!formData.consent || !formData.consentContact) {
+    if (!formData.consent || !formData.consentContact || !formData.consentShareWithLenders) {
       setError("Please accept the consent checkbox to continue.");
       track({ name: "lead_form_error", params: { form_id: "eligibility", error_code: "consent_missing", error_field: "consent" } });
       return;
@@ -722,26 +722,14 @@ export function EligibilityForm() {
               <label className="flex items-start gap-3 p-4 border border-icy-blue rounded-xl cursor-pointer hover:bg-slate-50 transition-colors mt-4">
                 <input
                   type="checkbox"
-                  checked={formData.consent && formData.consentContact}
-                  onChange={e => setFormData({ ...formData, consent: e.target.checked, consentContact: e.target.checked })}
+                  checked={formData.consent && formData.consentContact && formData.consentShareWithLenders}
+                  onChange={e => setFormData({ ...formData, consent: e.target.checked, consentContact: e.target.checked, consentShareWithLenders: e.target.checked })}
                   className="w-5 h-5 mt-0.5 text-blue-energy accent-blue-energy shrink-0 rounded"
                 />
                 <span className="text-xs text-brand-black/70 leading-relaxed">
                   <strong>Consent</strong><br />
-                  I confirm I am 21 or older and I consent and authorize Credit Expert India to securely retrieve my credit report from the credit bureau, and to contact me about this enquiry.
-                </span>
-              </label>
-
-              <label className="flex items-start gap-3 p-4 border border-icy-blue rounded-xl cursor-pointer hover:bg-slate-50 transition-colors">
-                <input
-                  type="checkbox"
-                  checked={formData.consentShareWithLenders}
-                  onChange={e => setFormData({ ...formData, consentShareWithLenders: e.target.checked })}
-                  className="w-5 h-5 mt-0.5 text-blue-energy accent-blue-energy shrink-0 rounded"
-                />
-                <span className="text-xs text-brand-black/70 leading-relaxed">
-                  I'm also open to being contacted by partner lenders (see{" "}
-                  <Link href="/partner-disclosures" className="underline">partner disclosures</Link>). Optional.
+                  I confirm I am 21 or older and I consent and authorize Credit Expert India to securely retrieve my credit report from the credit bureau, to contact me about this enquiry, and to share my details with partner lenders (see{" "}
+                  <Link href="/partner-disclosures" className="underline">partner disclosures</Link>).
                 </span>
               </label>
 
