@@ -118,14 +118,9 @@ export function EligibilityForm() {
   const handleFetchReport = async () => {
     track({ name: "lead_form_submit", params: { form_id: "eligibility" } });
 
-    if (!formData.consent) {
-      setError("Please accept the credit report consent.");
+    if (!formData.consent || !formData.consentContact) {
+      setError("Please accept the consent checkbox to continue.");
       track({ name: "lead_form_error", params: { form_id: "eligibility", error_code: "consent_missing", error_field: "consent" } });
-      return;
-    }
-    if (!formData.consentContact) {
-      setError("Please agree to being contacted about this enquiry.");
-      track({ name: "lead_form_error", params: { form_id: "eligibility", error_code: "consent_missing", error_field: "consentContact" } });
       return;
     }
     if (!formData.firstName.trim() || !formData.lastName.trim()) {
@@ -727,26 +722,13 @@ export function EligibilityForm() {
               <label className="flex items-start gap-3 p-4 border border-icy-blue rounded-xl cursor-pointer hover:bg-slate-50 transition-colors mt-4">
                 <input
                   type="checkbox"
-                  checked={formData.consent}
-                  onChange={e => setFormData({ ...formData, consent: e.target.checked })}
+                  checked={formData.consent && formData.consentContact}
+                  onChange={e => setFormData({ ...formData, consent: e.target.checked, consentContact: e.target.checked })}
                   className="w-5 h-5 mt-0.5 text-blue-energy accent-blue-energy shrink-0 rounded"
                 />
                 <span className="text-xs text-brand-black/70 leading-relaxed">
-                  <strong>Credit Report Consent</strong><br />
-                  I confirm I am 18 or older and I consent and authorize Credit Expert India to securely retrieve my credit report from the credit bureau.
-                </span>
-              </label>
-
-              <label className="flex items-start gap-3 p-4 border border-icy-blue rounded-xl cursor-pointer hover:bg-slate-50 transition-colors">
-                <input
-                  type="checkbox"
-                  checked={formData.consentContact}
-                  onChange={e => setFormData({ ...formData, consentContact: e.target.checked })}
-                  className="w-5 h-5 mt-0.5 text-blue-energy accent-blue-energy shrink-0 rounded"
-                />
-                <span className="text-xs text-brand-black/70 leading-relaxed">
-                  <strong>Contact Consent</strong><br />
-                  I agree that Credit Expert India may contact me about this enquiry.
+                  <strong>Consent</strong><br />
+                  I confirm I am 21 or older and I consent and authorize Credit Expert India to securely retrieve my credit report from the credit bureau, and to contact me about this enquiry.
                 </span>
               </label>
 
