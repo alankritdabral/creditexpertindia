@@ -12,6 +12,7 @@ import { ClarityLoader } from "@/components/analytics/Clarity";
 import { siteConfig } from "@/lib/config";
 import { GA_ID } from "@/lib/analytics/gaId";
 import { jsonLd, organizationSchema, websiteSchema } from "@/lib/structuredData";
+import { Analytics } from "@vercel/analytics/next";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -142,6 +143,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ClickTracker />
         <WebVitals />
         <ClarityLoader />
+        <Analytics />
       </body>
     </html>
   );
