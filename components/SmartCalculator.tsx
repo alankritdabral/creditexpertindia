@@ -80,11 +80,11 @@ export function SmartCalculator() {
   ) => (
     <div className="mb-9">
       <div className="flex items-baseline justify-between gap-4 mb-4">
-        <label className="text-lg font-medium text-[#0A2540]">{label}</label>
-        <span className="text-[32px] md:text-[32px] font-bold tracking-[-0.03em] text-[#0A2540]">{display}</span>
+        <label className="text-lg font-medium text-[#2E2E2E]">{label}</label>
+        <span className="text-[32px] md:text-[32px] font-bold tracking-[-0.03em] text-[#2E2E2E]">{display}</span>
       </div>
       {slider}
-      <div className="flex justify-between text-sm text-[#3C4F69] mt-2">
+      <div className="flex justify-between text-sm text-[#575757] mt-2">
         <span>{min}</span>
         <span>{max}</span>
       </div>
@@ -92,13 +92,13 @@ export function SmartCalculator() {
   );
 
   return (
-    <div id="calculator" className="w-full grid grid-cols-1 lg:grid-cols-[5fr_7fr] text-[#0A2540]">
+    <div id="calculator" className="w-full grid grid-cols-1 lg:grid-cols-[5fr_7fr] text-[#2E2E2E]">
       {/* Left: the human part */}
-      <div className="bg-[#0052CC] text-white px-4 md:px-10 lg:pl-[max(2rem,calc((100vw-1220px)/2+2rem))] lg:pr-14 py-14 md:py-20">
+      <div className="bg-[#FF5A00] text-[#2E2E2E] px-4 md:px-10 lg:pl-[max(2rem,calc((100vw-1220px)/2+2rem))] lg:pr-14 py-14 md:py-20">
         <h2 className="text-[40px] sm:text-[56px] lg:text-[56px] leading-[1.02] tracking-[-0.04em] font-bold">
           What would your EMI look like?
         </h2>
-        <p className="mt-6 text-lg md:text-xl leading-relaxed text-[#BFDBFE] max-w-md">
+        <p className="mt-6 text-lg md:text-xl leading-relaxed text-[#2E2E2E] max-w-md">
           Move the sliders until it matches your loan. This is the same quick maths we do ourselves
           before we ever pick up the phone.
         </p>
@@ -106,18 +106,18 @@ export function SmartCalculator() {
           href="#lead-form"
           data-analytics-cta="smart_calculator_talk_to_us"
           data-analytics-location="smart_calculator"
-          className="mt-9 inline-flex items-center gap-2 rounded bg-white text-[#0052CC] font-bold text-lg px-7 py-4 hover:bg-[#0A2540] hover:text-white transition-colors"
+          className="mt-9 inline-flex items-center gap-2 rounded bg-white text-[#2E2E2E] font-bold text-lg px-7 py-4 hover:bg-[#2E2E2E] hover:text-white transition-colors"
         >
           Talk to us instead <ArrowRight className="w-5 h-5" />
         </a>
-        <p className="mt-10 text-sm text-[#b8ccff] max-w-sm leading-relaxed">
+        <p className="mt-10 text-sm text-[#2E2E2E] max-w-sm leading-relaxed">
           These are estimates only. Your actual EMI and rate depend on the lender and on your
           eligibility.
         </p>
       </div>
 
       {/* Right: sliders and the answer */}
-      <div className="bg-[#f3f7fd] px-4 md:px-10 lg:pr-[max(2rem,calc((100vw-1220px)/2+2rem))] lg:pl-14 py-14 md:py-20">
+      <div className="bg-[#F7E0D4] px-4 md:px-10 lg:pr-[max(2rem,calc((100vw-1220px)/2+2rem))] lg:pl-14 py-14 md:py-20">
         {field(
           "How much is the loan?",
           inr(principal),
@@ -173,21 +173,21 @@ export function SmartCalculator() {
           "30 years"
         )}
 
-        <div className="bg-[#0A2540] text-white p-7 md:p-9 mt-2" aria-live="polite">
-          <p className="text-[#BFDBFE] text-base">You&apos;d pay about</p>
+        <div className="bg-[#2E2E2E] text-white p-7 md:p-9 mt-2" aria-live="polite">
+          <p className="text-[#FFD2B8] text-base">You&apos;d pay about</p>
           <p className="text-[48px] md:text-[56px] font-bold tracking-[-0.04em] leading-none mt-1">
             {inr(emi)}
-            <span className="text-xl font-medium text-[#BFDBFE] tracking-normal"> a month</span>
+            <span className="text-xl font-medium text-[#FFD2B8] tracking-normal"> a month</span>
           </p>
-          <p className="mt-5 text-base md:text-lg leading-relaxed text-[#BFDBFE]">
+          <p className="mt-5 text-base md:text-lg leading-relaxed text-[#FFD2B8]">
             That&apos;s {inr(totalPayment)} over the whole loan, and {inr(totalInterest)} of it is
             interest.
           </p>
           {savings > 0 ? (
             <p className="mt-5 pt-5 border-t border-white/15 text-base md:text-lg leading-relaxed">
               At 9.99%*, your EMI could be around{" "}
-              <b className="text-[#BFDBFE]">{inr(baseEmi)}</b>. That&apos;s roughly{" "}
-              <b className="text-[#BFDBFE]">{inr(savings)}</b> saved overall.
+              <b className="text-[#FFD2B8]">{inr(baseEmi)}</b>. That&apos;s roughly{" "}
+              <b className="text-[#FFD2B8]">{inr(savings)}</b> saved overall.
             </p>
           ) : (
             <p className="mt-5 pt-5 border-t border-white/15 text-base md:text-lg leading-relaxed">
@@ -195,7 +195,7 @@ export function SmartCalculator() {
             </p>
           )}
         </div>
-        <p className="mt-4 text-sm text-[#3C4F69]">*Indicative only, subject to lender approval.</p>
+        <p className="mt-4 text-sm text-[#575757]">*Indicative only, subject to lender approval.</p>
       </div>
     </div>
   );

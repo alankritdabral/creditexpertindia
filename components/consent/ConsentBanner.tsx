@@ -63,14 +63,14 @@ export function ConsentBanner() {
       role="dialog"
       aria-modal="false"
       aria-label={consentNotice.heading}
-      className="fixed inset-x-0 bottom-0 z-[100] border-t border-slate-200 bg-white px-4 py-5 shadow-[0_-8px_30px_rgba(10,37,64,0.12)] sm:px-6"
+      className="fixed inset-x-0 bottom-0 z-[100] border-t border-slate-200 bg-white px-4 py-5 shadow-[0_-8px_30px_rgba(10, 10, 10,0.12)] sm:px-6"
     >
       <div className="mx-auto flex max-w-[1220px] flex-col gap-4">
         <div>
-          <p className="text-sm font-bold text-[#0A2540]">{consentNotice.heading}</p>
-          <p className="mt-1 text-sm leading-relaxed text-[#3C4F69]">
+          <p className="text-sm font-bold text-[#2E2E2E]">{consentNotice.heading}</p>
+          <p className="mt-1 text-sm leading-relaxed text-[#575757]">
             {consentNotice.body}{" "}
-            <Link href={consentNotice.privacyPolicyHref} className="font-semibold text-[#0052CC] underline">
+            <Link href={consentNotice.privacyPolicyHref} className="font-semibold text-[#2E2E2E] underline">
               {consentNotice.privacyPolicyLabel}
             </Link>
           </p>
@@ -84,11 +84,11 @@ export function ConsentBanner() {
                   type="checkbox"
                   checked={draft[item.key]}
                   onChange={(e) => setDraft((prev) => ({ ...prev, [item.key]: e.target.checked }))}
-                  className="mt-1 h-4 w-4 shrink-0 accent-[#0052CC]"
+                  className="mt-1 h-4 w-4 shrink-0 accent-[#E04F00]"
                 />
                 <span>
-                  <span className="block text-sm font-semibold text-[#0A2540]">{item.label}</span>
-                  <span className="block text-xs text-[#3C4F69]">{item.description}</span>
+                  <span className="block text-sm font-semibold text-[#2E2E2E]">{item.label}</span>
+                  <span className="block text-xs text-[#575757]">{item.description}</span>
                 </span>
               </label>
             ))}
@@ -100,7 +100,7 @@ export function ConsentBanner() {
             <button
               type="button"
               onClick={() => setExpanded(true)}
-              className="order-3 text-sm font-semibold text-[#0052CC] underline sm:order-1 sm:mr-auto"
+              className="order-3 text-sm font-semibold text-[#2E2E2E] underline sm:order-1 sm:mr-auto"
             >
               {consentNotice.chooseLabel}
             </button>
@@ -109,7 +109,7 @@ export function ConsentBanner() {
             <button
               type="button"
               onClick={() => choice(draft.analytics ? "granted" : "denied", draft.recordings ? "granted" : "denied")}
-              className="order-1 rounded-lg bg-[#0052CC] px-5 py-2.5 text-sm font-bold text-white hover:bg-[#0052CC]/90 sm:order-3"
+              className="order-1 rounded-lg bg-[#FF5A00] px-5 py-2.5 text-sm font-bold text-[#2E2E2E] hover:bg-[#FF5A00]/90 sm:order-3"
             >
               {consentNotice.saveLabel}
             </button>
@@ -118,14 +118,14 @@ export function ConsentBanner() {
               <button
                 type="button"
                 onClick={() => choice("denied", "denied")}
-                className="order-2 rounded-lg border border-slate-300 px-5 py-2.5 text-sm font-bold text-[#0A2540] hover:border-slate-400 sm:order-2"
+                className="order-2 rounded-lg border border-slate-300 px-5 py-2.5 text-sm font-bold text-[#2E2E2E] hover:border-slate-400 sm:order-2"
               >
                 {consentNotice.rejectLabel}
               </button>
               <button
                 type="button"
                 onClick={() => choice("granted", "granted")}
-                className="order-1 rounded-lg bg-[#0052CC] px-5 py-2.5 text-sm font-bold text-white hover:bg-[#0052CC]/90 sm:order-3"
+                className="order-1 rounded-lg bg-[#FF5A00] px-5 py-2.5 text-sm font-bold text-[#2E2E2E] hover:bg-[#FF5A00]/90 sm:order-3"
               >
                 {consentNotice.acceptLabel}
               </button>

@@ -42,12 +42,12 @@ export default function FAQPage() {
         body="Clear, honest answers about loan options and how we help. If yours isn't here, just ask us directly."
         cta="Ask us directly"
         image="/Misty India Skyline with Orbital Arcs.webp"
-        imageAlt="An Indian city skyline, representing Credit Expert India's nationwide service"
+        imageAlt="An Indian city skyline, representing Amortas's nationwide service"
         points={["Straight answers, no jargon", "Free to ask", "A real person replies"]}
       />
 
-      <section className="bg-white">
-        <div className="max-w-[1220px] mx-auto px-4 md:px-6 lg:px-8 py-16 md:py-24">
+      <section className="section-tint">
+        <div className="max-w-[1220px] mx-auto px-4 md:px-6 lg:px-8 py-12 md:py-[72px]">
           <FAQ />
         </div>
       </section>

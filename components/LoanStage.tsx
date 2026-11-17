@@ -79,10 +79,10 @@ function StageChipCard({ chip, index, active, focal, instant }: { chip: StageChi
             ? { ...SPRING, delay: 0.1 + index * 0.06 }
             : { duration: 0.35, ease: [0.5, 0, 0.75, 0], delay: index * 0.03 }
       }
-      className="absolute rounded-xl bg-white border border-[#0066FF]/15 shadow-sm flex items-center px-3"
+      className="absolute rounded-xl bg-white border border-[#FF5A00]/15 shadow-sm flex items-center px-3"
       style={{ left: CHIP_LEFT, top, width: CHIP_W, height: ROW_H }}
     >
-      <div className="relative w-8 h-8 shrink-0 rounded-lg bg-[#F3F9FF] border border-[#0066FF]/20 text-[#0052CC]">
+      <div className="relative w-8 h-8 shrink-0 rounded-lg bg-[#F7E0D4] border border-[#FF5A00]/20 text-[#E04F00]">
         <AnimatePresence mode="popLayout" initial={false}>
           <motion.span
             key={chip.name}
@@ -97,7 +97,7 @@ function StageChipCard({ chip, index, active, focal, instant }: { chip: StageChi
         </AnimatePresence>
       </div>
       <div className="ml-2.5">
-        <p className="text-sm leading-tight font-bold text-[#0A2540] tabular-nums">
+        <p className="text-sm leading-tight font-bold text-[#2E2E2E] tabular-nums">
           <AnimatedNumber value={chip.amount} format={fmtMoney} instant={instant} />
         </p>
         <div className="relative h-[14px] w-[100px] mt-0.5">
@@ -108,7 +108,7 @@ function StageChipCard({ chip, index, active, focal, instant }: { chip: StageChi
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -6 }}
               transition={{ duration: instant ? 0 : 0.25 }}
-              className="text-[11px] leading-[14px] text-[#0A2540] opacity-70 whitespace-nowrap"
+              className="text-[11px] leading-[14px] text-[#2E2E2E] opacity-70 whitespace-nowrap"
             >
               {chip.name}
             </motion.p>
@@ -130,21 +130,21 @@ function RateCard({ rate, active, y, instant }: { rate: StageRate; active: boole
         initial={false}
         animate={active ? { opacity: 1, y, scale: 1 } : { opacity: 0, y: y + 30, scale: 0.94 }}
         transition={instant ? { duration: 0 } : active ? { ...SPRING, delay: 0.3 } : { duration: 0.25 }}
-        className="rounded-2xl p-5 flex items-center justify-between bg-white shadow-[0_12px_35px_rgba(7,27,79,0.08)] border border-[#E2E8F0]"
+        className="rounded-2xl p-5 flex items-center justify-between bg-white shadow-[0_12px_35px_rgba(10, 10, 10,0.08)] border border-[#E5E5E5]"
         style={{ width: RATE_W, height: RATE_H }}
       >
         <div>
-          <p className="text-[32px] font-bold text-[#0A2540] leading-none mb-1 tabular-nums">
+          <p className="text-[32px] font-bold text-[#2E2E2E] leading-none mb-1 tabular-nums">
             <AnimatedNumber value={rate.from} format={fmtFor(rate.from)} instant={instant} />
           </p>
-          <p className="text-sm text-[#0A2540] opacity-70 font-medium">Current rate</p>
+          <p className="text-sm text-[#2E2E2E] opacity-70 font-medium">Current rate</p>
         </div>
-        <ArrowRight className="w-6 h-6 text-[#0052CC]" strokeWidth={1.5} />
+        <ArrowRight className="w-6 h-6 text-[#E04F00]" strokeWidth={1.5} />
         <div className="text-right">
-          <p className="text-[32px] font-bold text-[#15803D] leading-none mb-1 tabular-nums">
+          <p className="text-[32px] font-bold text-[#10B981] leading-none mb-1 tabular-nums">
             <AnimatedNumber value={rate.to} format={fmtFor(rate.to)} instant={instant} />
           </p>
-          <p className="text-sm text-[#0A2540] opacity-70 font-medium">Potential rate*</p>
+          <p className="text-sm text-[#2E2E2E] opacity-70 font-medium">Potential rate*</p>
         </div>
       </motion.div>
     </div>
@@ -205,7 +205,7 @@ export function LoanStage({ scene, className, style, still }: { scene: StageScen
     <div
       aria-hidden="true"
       style={style}
-      className={`relative rounded-md bg-[linear-gradient(160deg,#eaf3ff,#f7fbff_55%,#dcebff)] border border-[#E2E8F0] overflow-hidden flex items-center justify-center h-[340px] sm:h-[420px] ${className ?? ""}`}
+      className={`relative rounded-md bg-[linear-gradient(160deg,#F7E0D4,#FFFFFF_55%,#FFE0CC)] border border-[#E5E5E5] overflow-hidden flex items-center justify-center h-[340px] sm:h-[420px] ${className ?? ""}`}
     >
       <motion.div
         initial={false}
@@ -244,7 +244,7 @@ export function LoanStage({ scene, className, style, still }: { scene: StageScen
               <path
                 key={i}
                 d={`M ${CHIP_LEFT + CHIP_W} ${y} C 240 ${y}, 270 ${CY}, ${HUB_LEFT - 6} ${CY}`}
-                stroke="#0066FF"
+                stroke="#FF5A00"
                 strokeWidth="1.5"
                 strokeDasharray="3 5"
                 fill="none"
@@ -260,7 +260,7 @@ export function LoanStage({ scene, className, style, still }: { scene: StageScen
             initial={false}
             animate={kind === "phone" || kind === "card" ? { ...shell, opacity: instant ? 0 : [1, 1, 0] } : shell}
             transition={instant ? { duration: 0 } : { duration: 0.55, ease: EASE, opacity: { duration: 0.3, ...(kind === "phone" || kind === "card" ? { duration: 1, times: [0, 0.6, 1] } : {}) } }}
-            className="bg-[#0A2540]"
+            className="bg-[#2E2E2E]"
           />
         </div>
 
@@ -280,13 +280,13 @@ export function LoanStage({ scene, className, style, still }: { scene: StageScen
           <motion.div
             animate={hubPulse}
             className="w-full h-full rounded-xl flex flex-col items-center justify-center text-white shadow-lg"
-            style={{ background: "linear-gradient(135deg, #0A2540 0%, #0052CC 100%)" }}
+            style={{ background: "linear-gradient(135deg, #2E2E2E 0%, #E04F00 100%)" }}
           >
-            <p className="text-xs font-medium text-[#BFDBFE] mb-2">ONE EMI</p>
+            <p className="text-xs font-medium text-[#FFD2B8] mb-2">ONE EMI</p>
             <p className="text-[21px] font-bold mb-1.5 tabular-nums">
               <AnimatedNumber value={emi} format={fmtMoney} instant={instant} />
             </p>
-            <p className="text-xs text-[#BFDBFE]">per month</p>
+            <p className="text-xs text-[#FFD2B8]">per month</p>
           </motion.div>
         </motion.div>
 

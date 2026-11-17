@@ -52,12 +52,12 @@ export function DebtConsolidation() {
   const [activeScenario, setActiveScenario] = useState(SCENARIOS[0]);
 
   return (
-    <section id="debt-consolidation" className="bg-white text-[#0A2540]">
-      <div className="max-w-[1220px] mx-auto px-4 md:px-6 lg:px-8 py-16 md:py-24">
+    <section id="debt-consolidation" className="section-tint text-[#2E2E2E]">
+      <div className="max-w-[1220px] mx-auto px-4 md:px-6 lg:px-8 py-12 md:py-[72px]">
         <h2 className="text-[40px] sm:text-[56px] leading-[1.02] tracking-[-0.04em] font-bold max-w-3xl">
           Here&apos;s what it could look like.
         </h2>
-        <p className="mt-5 text-lg md:text-xl leading-relaxed text-[#3C4F69] max-w-2xl">
+        <p className="mt-5 text-lg md:text-xl leading-relaxed text-[#575757] max-w-2xl">
           Pick the situation closest to yours. These are examples, not offers, but they show how
           scattered payments can become one.
         </p>
@@ -71,8 +71,8 @@ export function DebtConsolidation() {
               onClick={() => setActiveScenario(s)}
               className={`rounded px-5 py-3 text-base font-semibold transition-colors cursor-pointer ${
                 activeScenario.id === s.id
-                  ? "bg-[#0052CC] text-white"
-                  : "bg-[#EAF3FF] text-[#0A2540] hover:bg-[#d6e4fa]"
+                  ? "bg-[#FF5A00] text-[#2E2E2E]"
+                  : "bg-[#F7E0D4] text-[#2E2E2E] hover:bg-[#D4D4D4]"
               }`}
             >
               {s.name}
@@ -81,13 +81,13 @@ export function DebtConsolidation() {
         </div>
 
         <div className="mt-8 grid gap-6 lg:grid-cols-2">
-          <div className="bg-[#EAF3FF] p-7 md:p-9">
+          <div className="bg-[#F7E0D4] p-7 md:p-9">
             <h3 className="text-2xl md:text-[32px] font-bold tracking-[-0.02em]">Today, you juggle:</h3>
-            <ul className="mt-6 divide-y divide-[#E2E8F0]">
+            <ul className="mt-6 divide-y divide-[#E5E5E5]">
               {activeScenario.before.map((item) => (
                 <li key={item.name} className="flex items-baseline justify-between gap-4 py-3.5">
                   <span className="text-lg">
-                    {item.name} <span className="text-[#3C4F69]">({item.rate})</span>
+                    {item.name} <span className="text-[#575757]">({item.rate})</span>
                   </span>
                   <span className="text-lg font-bold">{item.emi}</span>
                 </li>
@@ -98,16 +98,16 @@ export function DebtConsolidation() {
             </p>
           </div>
 
-          <div className="bg-[#0A2540] text-white p-7 md:p-9">
+          <div className="bg-[#2E2E2E] text-white p-7 md:p-9">
             <h3 className="text-2xl md:text-[32px] font-bold tracking-[-0.02em]">As one loan, maybe:</h3>
             <p className="mt-6 text-[56px] md:text-[56px] font-bold tracking-[-0.04em] leading-none">
               {activeScenario.afterEmi}
-              <span className="text-xl font-medium text-[#BFDBFE] tracking-normal"> a month*</span>
+              <span className="text-xl font-medium text-[#FFD2B8] tracking-normal"> a month*</span>
             </p>
-            <p className="mt-4 text-lg text-[#BFDBFE]">
-              That&apos;s about <b className="text-[#BFDBFE]">{activeScenario.savingsMo}</b> less every month, at a rate around {activeScenario.afterRate}
+            <p className="mt-4 text-lg text-[#FFD2B8]">
+              That&apos;s about <b className="text-[#FFD2B8]">{activeScenario.savingsMo}</b> less every month, at a rate around {activeScenario.afterRate}
             </p>
-            <ul className="mt-6 space-y-2 text-lg text-[#BFDBFE]">
+            <ul className="mt-6 space-y-2 text-lg text-[#FFD2B8]">
               <li>One due date every month, easy to track.</li>
               <li>A lower yearly interest rate.</li>
               <li>Less pressure on your credit score from high card balances.</li>
@@ -116,14 +116,14 @@ export function DebtConsolidation() {
         </div>
 
         <div className="mt-8 flex flex-col sm:flex-row sm:items-center gap-6 justify-between">
-          <p className="text-sm text-[#3C4F69] max-w-xl">
+          <p className="text-sm text-[#575757] max-w-xl">
             Illustrative examples only. Final terms are set by partner lenders after checking your profile.
           </p>
           <a
             href="#lead-form"
             data-analytics-cta="debt_consolidation_check_options"
             data-analytics-location="debt_consolidation_scenarios"
-            className="inline-flex items-center justify-center gap-2 rounded bg-[#0052CC] hover:bg-[#0A2540] transition-colors text-white font-bold text-lg px-7 py-4"
+            className="inline-flex items-center justify-center gap-2 rounded bg-[#FF5A00] hover:bg-[#2E2E2E] transition-colors text-[#2E2E2E] hover:text-white font-bold text-lg px-7 py-4"
           >
             Check my options <ArrowRight className="h-5 w-5" />
           </a>

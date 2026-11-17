@@ -7,7 +7,7 @@ import { contact } from "@/lib/config";
 export const metadata: Metadata = buildMetadata({
   title: "Partner Disclosures",
   description:
-    "How Credit Expert India works with lending partners, how we are compensated, and what we never guarantee about loan approval.",
+    "How Amortas works with lending partners, how we are compensated, and what we never guarantee about loan approval.",
   path: "/partner-disclosures",
 });
 
@@ -21,7 +21,7 @@ export default function PartnerDisclosuresPage() {
         </h1>
         <div className="prose prose-slate max-w-none">
           <p>
-            Credit Expert India operates as an independent loan facilitator. We are not a lender, bank, or NBFC (Non-Banking Financial Company).
+            Amortas operates as an independent loan facilitator. We are not a lender, bank, or NBFC (Non-Banking Financial Company).
           </p>
           <p>
             Our services aim to connect individuals with potential lending partners based on their financial profile and needs. We currently work with the RBI-registered banks and NBFCs listed below to provide a range of debt consolidation and personal loan options. This list changes from time to time as our lending network grows.
@@ -34,7 +34,7 @@ export default function PartnerDisclosuresPage() {
           </ul>
           <h2>How We Are Compensated</h2>
           <p>
-            Credit Expert India may receive compensation from our lending partners when a user is successfully matched, applies for, or is approved for a loan product through our platform. This compensation is paid by the lender, never by you, and does not impact the interest rates or fees that are offered to you.
+            Amortas may receive compensation from our lending partners when a user is successfully matched, applies for, or is approved for a loan product through our platform. This compensation is paid by the lender, never by you, and does not impact the interest rates or fees that are offered to you.
           </p>
           <h2>No Guarantee of Approval</h2>
           <p>
@@ -54,7 +54,7 @@ export default function PartnerDisclosuresPage() {
               See plans/01-visibility-and-analytics.md Phase 9, decision D7. */}
           <h2>Grievance Redressal</h2>
           <p>
-            If you have a complaint about your experience with Credit Expert India or about how a lending partner has handled your application, please write to us
+            If you have a complaint about your experience with Amortas or about how a lending partner has handled your application, please write to us
             {" "}<a href={`mailto:${contact.email}`}>{contact.email}</a> or call{" "}
             <a href={`tel:+${contact.whatsapp.replace(/[^0-9]/g, "")}`}>{contact.whatsapp}</a>. We aim to resolve every complaint within 30 days.
             If you remain unsatisfied after 30 days, and your complaint concerns a regulated lending partner, you may escalate it to the RBI's Complaint Management System

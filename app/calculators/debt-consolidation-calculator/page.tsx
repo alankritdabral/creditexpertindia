@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   description: "Free debt consolidation calculator for Indian borrowers. Combine personal loans, credit card dues and app loans into one lower EMI.",
   alternates: { canonical: "/calculators/debt-consolidation-calculator" },
   openGraph: {
-    title: "Debt Consolidation Calculator India | Credit Expert India",
+    title: "Debt Consolidation Calculator India | Amortas",
     description: "Combine multiple loan and credit card EMIs into one single lower monthly payment. Check your potential monthly savings instantly.",
     url: `${siteConfig.url}/calculators/debt-consolidation-calculator`,
     siteName: siteConfig.name,
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Debt Consolidation Calculator India | Credit Expert India",
+    title: "Debt Consolidation Calculator India | Amortas",
     description: "Combine multiple loan and credit card EMIs into one single lower monthly payment.",
     images: ["/opengraph-image"],
   },
@@ -119,7 +119,7 @@ export default function DebtConsolidationCalculatorPage() {
       <section className="relative w-full pt-32 pb-16 lg:pt-36 lg:pb-20 bg-background overflow-hidden border-b border-icy-blue">
         <div className="absolute inset-0 -z-10 h-full w-full">
           <AnimatedMeshBackground />
-          <div className="absolute top-0 right-0 w-full h-full max-w-[60%] transform origin-top-right -skew-y-12 bg-gradient-to-bl from-[#E2E8F0]/40 to-transparent pointer-events-none" />
+          <div className="absolute top-0 right-0 w-full h-full max-w-[60%] transform origin-top-right -skew-y-12 bg-gradient-to-bl from-[#E5E5E5]/40 to-transparent pointer-events-none" />
         </div>
 
         <div className="container-narrow text-center relative z-10 px-4">
@@ -157,7 +157,7 @@ export default function DebtConsolidationCalculatorPage() {
       </section>
 
       {/* Educational & SEO Content Guide */}
-      <section className="py-16 bg-white border-t border-slate-200">
+      <section className="py-16 section-tint border-t border-slate-200">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 space-y-12">
           
           {/* Section 1: How It Works */}
@@ -371,7 +371,7 @@ export default function DebtConsolidationCalculatorPage() {
               Ready to Explore Your Real Options?
             </h3>
             <p className="text-xs sm:text-sm text-slate-400 max-w-xl mx-auto">
-              Get an unpressured, confidential assessment from Credit Expert India's senior debt advisors. We work with 13 RBI-regulated lenders to find the optimal consolidation structure for your profile.
+              Get an unpressured, confidential assessment from Amortas's senior debt advisors. We work with 13 RBI-regulated lenders to find the optimal consolidation structure for your profile.
             </p>
             <div className="pt-2 flex flex-col sm:flex-row justify-center gap-3">
               <Link

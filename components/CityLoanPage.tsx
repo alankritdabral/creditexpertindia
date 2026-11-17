@@ -41,8 +41,8 @@ export function CityLoanPage({ city }: { city: City }) {
 
       <PageIntro page="city" />
 
-      <section className="bg-white text-[#0A2540]">
-        <div className="max-w-[1220px] mx-auto px-4 md:px-6 lg:px-8 py-16 md:py-24 grid gap-12 lg:grid-cols-[5fr_7fr] lg:gap-20">
+      <section className="section-tint text-[#2E2E2E]">
+        <div className="max-w-[1220px] mx-auto px-4 md:px-6 lg:px-8 py-12 md:py-[72px] grid gap-12 lg:grid-cols-[5fr_7fr] lg:gap-20">
           <h2 className="text-[40px] sm:text-[56px] leading-[1.02] tracking-[-0.04em] font-bold">
             What we can help you with in {city.name}.
           </h2>
@@ -52,9 +52,9 @@ export function CityLoanPage({ city }: { city: City }) {
               { t: "One EMI instead of many", d: "Combine personal loans, card dues and app loans if it genuinely lowers your cost." },
               { t: "A cheaper rate on a loan you already have", d: "See whether moving your balance to a partner bank would save you money." },
             ].map((i, n) => (
-              <div key={i.t} className={`px-5 md:px-7 py-7 ${n % 2 === 0 ? "bg-[#EAF3FF]" : ""}`}>
+              <div key={i.t} className={`px-5 md:px-7 py-7 ${n % 2 === 0 ? "bg-[#F7E0D4]" : ""}`}>
                 <h3 className="text-2xl md:text-[32px] leading-tight tracking-[-0.02em] font-bold">{i.t}</h3>
-                <p className="mt-2 text-lg text-[#3C4F69] leading-relaxed max-w-lg">{i.d}</p>
+                <p className="mt-2 text-lg text-[#575757] leading-relaxed max-w-lg">{i.d}</p>
               </div>
             ))}
           </div>
@@ -62,14 +62,14 @@ export function CityLoanPage({ city }: { city: City }) {
       </section>
 
       {office && (
-        <section className="bg-white text-[#0A2540] border-t border-[#E2E8F0]">
+        <section className="section-tint text-[#2E2E2E] border-t border-[#E5E5E5]">
           <div className="max-w-[1220px] mx-auto px-4 md:px-6 lg:px-8 py-14 md:py-20">
             <h2 className="text-[32px] md:text-[40px] leading-[1.05] tracking-[-0.03em] font-bold">
               Visit us in {city.name}.
             </h2>
             <div className="mt-6 flex items-start gap-3 max-w-2xl">
-              <MapPin className="h-6 w-6 shrink-0 text-[#0052CC] mt-0.5" />
-              <p className="text-lg text-[#3C4F69] leading-relaxed">{office.fullAddress}</p>
+              <MapPin className="h-6 w-6 shrink-0 text-[#E04F00] mt-0.5" />
+              <p className="text-lg text-[#575757] leading-relaxed">{office.fullAddress}</p>
             </div>
           </div>
         </section>
@@ -81,7 +81,7 @@ export function CityLoanPage({ city }: { city: City }) {
       <LeadForm />
 
       {others.length > 0 && (
-        <section className="bg-[#EAF3FF] text-[#0A2540]">
+        <section className="bg-[#F7E0D4] text-[#2E2E2E]">
           <div className="max-w-[1220px] mx-auto px-4 md:px-6 lg:px-8 py-14 md:py-20">
             <h2 className="text-[32px] md:text-[40px] leading-[1.05] tracking-[-0.03em] font-bold">
               Personal loans in other cities
@@ -91,14 +91,14 @@ export function CityLoanPage({ city }: { city: City }) {
                 <li key={c.slug}>
                   <Link
                     href={`/personal-loan-in-${c.slug}`}
-                    className="inline-block rounded bg-white hover:bg-[#0052CC] hover:text-white transition-colors px-5 py-3 text-base font-semibold"
+                    className="inline-block rounded bg-white hover:bg-[#FF5A00] hover:text-[#2E2E2E] transition-colors px-5 py-3 text-base font-semibold"
                   >
                     {c.name}
                   </Link>
                 </li>
               ))}
             </ul>
-            <p className="mt-8 text-sm text-[#3C4F69] max-w-3xl">
+            <p className="mt-8 text-sm text-[#575757] max-w-3xl">
               *Rates depend on credit profile, income, employer, existing obligations, loan amount, tenure and
               lender policy. For eligible salaried applicants only. Approval is decided by the lender.
             </p>

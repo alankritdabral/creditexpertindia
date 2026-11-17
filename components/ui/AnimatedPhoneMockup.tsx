@@ -13,17 +13,17 @@ if (typeof window !== "undefined") {
 const INJECTED_STYLES = `
   /* Realistic iPhone Mockup Hardware */
   .iphone-bezel {
-      background-color: #0A2540;
+      background-color: #2E2E2E;
       box-shadow: 
-          inset 0 0 0 2px #0A2540, 
-          inset 0 0 0 7px #0A2540, 
-          0 40px 80px -15px rgba(7,27,79,0.5),
-          0 15px 25px -5px rgba(7,27,79,0.4);
+          inset 0 0 0 2px #2E2E2E, 
+          inset 0 0 0 7px #2E2E2E, 
+          0 40px 80px -15px rgba(10, 10, 10,0.5),
+          0 15px 25px -5px rgba(10, 10, 10,0.4);
       transform-style: preserve-3d;
   }
 
   .hardware-btn {
-      background: linear-gradient(90deg, #404040 0%, #171717 100%);
+      background: linear-gradient(90deg, #575757 0%, #3A3A3A 100%);
       box-shadow: 
           -2px 0 5px rgba(0,0,0,0.8),
           inset -1px 0 1px rgba(255,255,255,0.15),
@@ -34,8 +34,8 @@ const INJECTED_STYLES = `
   /* Gradient UI Elements */
   .ambient-gradient {
       background: 
-          radial-gradient(circle at 70% 25%, rgba(45, 140, 255, 0.25), transparent 45%),
-          linear-gradient(180deg, #0A2540 0%, #0c2b69 55%, #0A2540 100%);
+          radial-gradient(circle at 70% 25%, rgba(255, 90, 0, 0.25), transparent 45%),
+          linear-gradient(180deg, #2E2E2E 0%, #2E2E2E 55%, #2E2E2E 100%);
   }
 
   .phone-screen {
@@ -74,8 +74,8 @@ const INJECTED_STYLES = `
   }
 
   .glass-arrow {
-      background: rgba(45,140,255, 0.22);
-      border: 1px solid rgba(45,140,255, 0.35);
+      background: rgba(255, 90, 0, 0.22);
+      border: 1px solid rgba(255, 90, 0, 0.35);
   }
   
   .savings-icon-container {
@@ -237,9 +237,9 @@ export function AnimatedPhoneMockup({ className }: { className?: string }) {
                   <p ref={currentRef} className="ui-slide-right text-[32px] font-bold text-white leading-none">₹0</p>
                   <p className="ui-fade-up text-sm text-white/[0.55] font-normal mt-1">per month</p>
                 </div>
-                <div className="ui-scale-in bg-[rgba(45,140,255,0.15)] border border-[rgba(45,140,255,0.45)] text-[#BFDBFE] px-2.5 py-1.5 rounded-[12px] flex flex-col items-center">
+                <div className="ui-scale-in bg-[rgba(255, 90, 0,0.15)] border border-[rgba(255, 90, 0,0.45)] text-[#FFD2B8] px-2.5 py-1.5 rounded-[12px] flex flex-col items-center">
                   <span className="text-sm font-semibold leading-none mb-0.5">16.5%</span>
-                  <span className="text-[11px] font-medium leading-none text-[#BFDBFE]">interest rate</span>
+                  <span className="text-[11px] font-medium leading-none text-[#FFD2B8]">interest rate</span>
                 </div>
               </div>
             </div>
@@ -269,9 +269,9 @@ export function AnimatedPhoneMockup({ className }: { className?: string }) {
                   <p ref={newRef} className="ui-slide-right text-[32px] font-bold text-white leading-none">₹0</p>
                   <p className="ui-fade-up text-sm text-white/[0.55] font-normal mt-1">per month</p>
                 </div>
-                <div className="ui-scale-in bg-[rgba(18,184,120,0.20)] border border-[rgba(18,184,120,0.50)] text-[#15803D] px-2.5 py-1.5 rounded-[12px] flex flex-col items-center">
+                <div className="ui-scale-in bg-[rgba(18,184,120,0.20)] border border-[rgba(18,184,120,0.50)] text-[#10B981] px-2.5 py-1.5 rounded-[12px] flex flex-col items-center">
                   <span className="text-sm font-semibold leading-none mb-0.5">9.99%</span>
-                  <span className="text-[11px] font-medium leading-none text-[#15803D]">interest rate</span>
+                  <span className="text-[11px] font-medium leading-none text-[#10B981]">interest rate</span>
                 </div>
               </div>
             </div>

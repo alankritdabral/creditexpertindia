@@ -65,7 +65,7 @@ export const pageContent: Record<PageKey, PageContent> = {
       { icon: "map", title: "Offices in 3 cities", text: "Visit us in Dehradun, Delhi or Rudrapur." },
     ],
     faqs: [
-      { q: "Who is Credit Expert India for?", a: "Salaried professionals juggling multiple EMIs, card dues or high-interest loans who want a clearer way forward." },
+      { q: "Who is Amortas for?", a: "Salaried professionals juggling multiple EMIs, card dues or high-interest loans who want a clearer way forward." },
       { q: "Are you a lender?", a: "No. We help you compare options with partner banks and NBFCs. The final decision always rests with the lender." },
       ...commonFaq,
     ],

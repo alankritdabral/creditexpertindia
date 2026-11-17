@@ -189,11 +189,11 @@ export const faqs = [
   },
   {
     q: "Does checking eligibility affect my CIBIL score?",
-    a: "No. Initial eligibility assessment on Credit Expert India is a soft profile check and does not impact your CIBIL score. A hard enquiry is only conducted by partner banks if you decide to formally submit a loan application.",
+    a: "No. Initial eligibility assessment on Amortas is a soft profile check and does not impact your CIBIL score. A hard enquiry is only conducted by partner banks if you decide to formally submit a loan application.",
   },
   {
     q: "Do you guarantee loan approval?",
-    a: "No. Credit Expert India does not guarantee loan approval. Final approval, interest rate, loan amount, and tenure are strictly determined by the respective partner bank or NBFC based on their underwriting criteria.",
+    a: "No. Amortas does not guarantee loan approval. Final approval, interest rate, loan amount, and tenure are strictly determined by the respective partner bank or NBFC based on their underwriting criteria.",
   },
   {
     q: "What documents are required?",
@@ -201,7 +201,7 @@ export const faqs = [
   },
   {
     q: "Are there processing fees?",
-    a: "Initial credit advisory on Credit Expert India is 100% free. Any loan processing fees or stamp duty charges are charged directly by the lending bank/NBFC and will be clearly disclosed before loan agreement signing.",
+    a: "Initial credit advisory on Amortas is 100% free. Any loan processing fees or stamp duty charges are charged directly by the lending bank/NBFC and will be clearly disclosed before loan agreement signing.",
   },
 ];
 
@@ -209,7 +209,7 @@ export const testimonials = [
   {
     name: "Rahul S.",
     role: "Software Engineer, Bengaluru",
-    text: "I had 2 personal loans and ₹1.8 Lakhs in credit card debt with 3 different due dates. Credit Expert India helped me consolidate everything into one single EMI, reducing my monthly outflow substantially.",
+    text: "I had 2 personal loans and ₹1.8 Lakhs in credit card debt with 3 different due dates. Amortas helped me consolidate everything into one single EMI, reducing my monthly outflow substantially.",
     rating: 5,
   },
   {

@@ -26,12 +26,12 @@ export default function Page() {
 
       <PageIntro page="emi-calculator" />
       <SmartCalculator />
-      <section className="bg-white text-[#0A2540]">
-        <div className="max-w-[1220px] mx-auto px-4 md:px-6 lg:px-8 py-16 md:py-24 grid gap-12 lg:grid-cols-[5fr_7fr] lg:gap-20">
+      <section className="section-tint text-[#2E2E2E]">
+        <div className="max-w-[1220px] mx-auto px-4 md:px-6 lg:px-8 py-12 md:py-[72px] grid gap-12 lg:grid-cols-[5fr_7fr] lg:gap-20">
           <h2 className="text-[40px] sm:text-[56px] leading-[1.02] tracking-[-0.04em] font-bold">
             How the EMI is worked out.
           </h2>
-          <div className="space-y-5 text-lg leading-relaxed text-[#3C4F69] max-w-xl">
+          <div className="space-y-5 text-lg leading-relaxed text-[#575757] max-w-xl">
             <p>
               EMI = P × r × (1 + r)<sup>n</sup> ÷ ((1 + r)<sup>n</sup> − 1), where P is the loan amount, r is the
               monthly interest rate (annual rate ÷ 12 ÷ 100) and n is the number of months.

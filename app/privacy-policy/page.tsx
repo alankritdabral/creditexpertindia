@@ -4,7 +4,7 @@ import { buildMetadata } from "@/lib/seo";
 export const metadata: Metadata = buildMetadata({
   title: "Privacy Policy",
   description:
-    "What personal information Credit Expert India collects from visitors and how it is used, including for loan enquiries.",
+    "What personal information Amortas collects from visitors and how it is used, including for loan enquiries.",
   path: "/privacy-policy",
 });
 
@@ -17,7 +17,7 @@ export default function PrivacyPolicyPage() {
         </h1>
         <div className="prose prose-slate max-w-none">
           <p>
-            At Credit Expert India, accessible from creditexpertindia.com, one of our main priorities is the privacy of our visitors. This Privacy Policy document contains types of information that is collected and recorded by Credit Expert India and how we use it.
+            At Amortas, accessible from creditexpertindia.com, one of our main priorities is the privacy of our visitors. This Privacy Policy document contains types of information that is collected and recorded by Amortas and how we use it.
           </p>
           <p>
             If you have additional questions or require more information about our Privacy Policy, do not hesitate to contact us.

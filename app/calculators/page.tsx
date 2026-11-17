@@ -34,12 +34,12 @@ export default function CalculatorsPage() {
     <div className="min-h-screen bg-white">
       <div className="h-[84px]" aria-hidden="true" />
       <Breadcrumbs items={[{ name: "Home", path: "/" }, { name: "Calculators" }]} />
-      <section className="bg-white">
+      <section className="section-tint">
         <div className="max-w-[1220px] mx-auto px-4 md:px-6 lg:px-8 py-14 md:py-20">
-          <h1 className="text-[40px] sm:text-[56px] leading-[1.02] tracking-[-0.04em] font-bold text-[#0A2540] max-w-2xl">
+          <h1 className="text-[40px] sm:text-[56px] leading-[1.02] tracking-[-0.04em] font-bold text-[#2E2E2E] max-w-2xl">
             Loan and EMI calculators.
           </h1>
-          <p className="mt-5 text-lg md:text-xl leading-relaxed text-[#3C4F69] max-w-xl">
+          <p className="mt-5 text-lg md:text-xl leading-relaxed text-[#575757] max-w-xl">
             Free to use, no sign-up, no impact on your credit score. Pick the one that matches what you're trying to work out.
           </p>
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -49,14 +49,14 @@ export default function CalculatorsPage() {
                 href={c.href}
                 data-analytics-cta={`calculators_hub_${c.href.split("/").pop()}`}
                 data-analytics-location="calculators_hub"
-                className="group flex flex-col rounded-2xl border border-[#0052CC]/10 bg-[#EAF3FF] p-6 hover:border-[#0052CC]/30 transition-colors"
+                className="group flex flex-col rounded-2xl border border-[#E04F00]/10 bg-[#F7E0D4] p-6 hover:border-[#E04F00]/30 transition-colors"
               >
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#0052CC] text-white">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#FF5A00] text-[#2E2E2E]">
                   <Calculator className="h-6 w-6" />
                 </div>
-                <h2 className="mt-5 text-xl font-bold tracking-[-0.02em] text-[#0A2540]">{c.title}</h2>
-                <p className="mt-2 text-base leading-relaxed text-[#3C4F69] flex-1">{c.description}</p>
-                <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-[#0052CC] group-hover:underline">
+                <h2 className="mt-5 text-xl font-bold tracking-[-0.02em] text-[#2E2E2E]">{c.title}</h2>
+                <p className="mt-2 text-base leading-relaxed text-[#575757] flex-1">{c.description}</p>
+                <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-[#2E2E2E] group-hover:underline">
                   Open calculator <ArrowRight className="h-4 w-4" />
                 </span>
               </Link>

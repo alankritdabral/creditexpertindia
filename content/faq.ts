@@ -11,7 +11,7 @@
  */
 export const siteFaqs = [
   {
-    question: "What does Credit Expert India do?",
+    question: "What does Amortas do?",
     answer: "We help customers understand their existing debt or borrowing requirements and explore suitable loan, consolidation or repayment options based on their situation."
   },
   {

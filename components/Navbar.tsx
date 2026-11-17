@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import logo from "@/public/img/logo.webp";
+import { Logo } from "@/components/Logo";
 import { ArrowRight, X, Mail, ShieldCheck, ChevronDown, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
@@ -20,9 +20,9 @@ type Menu = {
   narrow?: boolean;
 };
 
-const G1 = "linear-gradient(90deg,#0052CC,#BFDBFE 55%,#ff9a3c)";
-const G2 = "linear-gradient(90deg,#0052CC,#BFDBFE 55%,#ffd24d)";
-const G3 = "linear-gradient(90deg,#0052CC,#a98bff 60%,#ff6fb5)";
+const G1 = "linear-gradient(90deg,#E04F00,#FFD2B8 55%,#ff9a3c)";
+const G2 = "linear-gradient(90deg,#E04F00,#FFD2B8 55%,#ffd24d)";
+const G3 = "linear-gradient(90deg,#E04F00,#FFDA00 60%,#ff6fb5)";
 
 const promoAssessment = {
   img: "/img/multipleloans.webp",
@@ -270,7 +270,7 @@ export function Navbar() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
-            className="hidden lg:block fixed inset-0 z-40 bg-[#0a2540]/10 pointer-events-none"
+            className="hidden lg:block fixed inset-0 z-40 bg-[#2E2E2E]/10 pointer-events-none"
           />
         )}
       </AnimatePresence>
@@ -297,7 +297,7 @@ export function Navbar() {
             aria-hidden
             className={`hidden lg:block absolute -inset-x-5 inset-y-[8px] rounded-xl border transition-[background-color,box-shadow,border-color] duration-200 ${
               barHover || active
-                ? "bg-white border-[#E2E8F0] shadow-[0_8px_24px_-12px_rgba(10,37,64,0.25)]"
+                ? "bg-white border-[#2E2E2E] shadow-[4px_4px_0_0_#2E2E2E]"
                 : "bg-transparent border-transparent"
             }`}
           />
@@ -319,7 +319,7 @@ export function Navbar() {
                 transition:
                   "clip-path 0.2s cubic-bezier(0.45,0.05,0.55,0.95), height 0.28s cubic-bezier(0.45,0.05,0.55,0.95), width 0.28s cubic-bezier(0.45,0.05,0.55,0.95)",
               }}
-              className="hidden lg:block absolute left-[-28px] top-[6px] z-0 bg-white rounded-md border border-[#E2E8F0] overflow-hidden shadow-[0_18px_36px_-18px_rgba(0,0,0,0.1),0_30px_45px_-30px_rgba(50,50,93,0.25)]"
+              className="hidden lg:block absolute left-[-28px] top-[6px] z-0 bg-white rounded-md border-2 border-[#2E2E2E] overflow-hidden shadow-[6px_6px_0_0_#FF5A00]"
             >
               <div ref={panelInner}>
                 <motion.div key={renderMenu.key} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.16 }}>
@@ -328,7 +328,7 @@ export function Navbar() {
                       <div className={`grid gap-10 pb-10 ${renderMenu.columns.length === 1 ? "grid-cols-1 max-w-sm" : renderMenu.columns.length === 2 ? "grid-cols-2" : "grid-cols-3"}`}>
                         {renderMenu.columns.map((col) => (
                           <div key={col.title}>
-                            <p className="text-base font-medium text-[#0A2540] pb-3 mb-4 relative">
+                            <p className="text-base font-medium text-[#2E2E2E] pb-3 mb-4 relative">
                               {col.title}
                               <span className="absolute left-0 right-0 bottom-0 h-px" style={{ background: col.gradient || G1 }} />
                             </p>
@@ -336,8 +336,8 @@ export function Navbar() {
                               {col.links.map((l) => (
                                 <li key={l.href + l.label}>
                                   <Link href={l.href} className="group block">
-                                    <span className="block text-base font-medium text-[#0052CC] group-hover:text-[#0A2540] transition-colors">{l.label}</span>
-                                    {l.desc && <span className="block text-sm leading-snug text-[#3C4F69] mt-0.5">{l.desc}</span>}
+                                    <span className="block text-base font-bold text-[#2E2E2E] group-hover:text-[#2E2E2E] transition-colors font-bold">{l.label}</span>
+                                    {l.desc && <span className="block text-sm leading-snug text-[#575757] mt-0.5">{l.desc}</span>}
                                   </Link>
                                 </li>
                               ))}
@@ -346,8 +346,8 @@ export function Navbar() {
                         ))}
                       </div>
                       {renderMenu.footer && (
-                        <div className="-mx-12 px-12 py-5 border-t border-[#E2E8F0]">
-                          <Link href={renderMenu.footer.href} className="text-base font-medium text-[#0052CC] hover:text-[#0A2540] inline-flex items-center gap-1">
+                        <div className="-mx-12 px-12 py-5 border-t border-[#E5E5E5]">
+                          <Link href={renderMenu.footer.href} className="text-base font-bold text-[#2E2E2E] hover:text-[#2E2E2E] inline-flex items-center gap-1">
                             {renderMenu.footer.label} <ChevronRight className="h-4 w-4" />
                           </Link>
                         </div>
@@ -355,27 +355,27 @@ export function Navbar() {
                     </div>
   
                     {renderMenu.sidebar && (
-                      <div className="bg-[#F8FAFC] border-l border-[#E2E8F0] pt-[84px] px-8 pb-8">
-                        <p className="text-base font-medium text-[#0A2540] mb-4">{renderMenu.sidebar.title}</p>
+                      <div className="bg-[#FAFAFA] border-l border-[#E5E5E5] pt-[84px] px-8 pb-8">
+                        <p className="text-base font-medium text-[#2E2E2E] mb-4">{renderMenu.sidebar.title}</p>
                         <ul className="space-y-4">
                           {renderMenu.sidebar.links.map((l) => (
                             <li key={l.href}>
                               <Link href={l.href} className="group block">
-                                <span className="block text-base font-medium text-[#0052CC] group-hover:text-[#0A2540] transition-colors">{l.label}</span>
-                                {l.desc && <span className="block text-sm text-[#3C4F69] mt-0.5">{l.desc}</span>}
+                                <span className="block text-base font-bold text-[#2E2E2E] group-hover:text-[#2E2E2E] transition-colors font-bold">{l.label}</span>
+                                {l.desc && <span className="block text-sm text-[#575757] mt-0.5">{l.desc}</span>}
                               </Link>
                             </li>
                           ))}
                         </ul>
                         {renderMenu.sidebar.promo && (
-                          <Link href={renderMenu.sidebar.promo.href} className="group mt-6 block bg-white border border-[#E2E8F0] rounded overflow-hidden">
+                          <Link href={renderMenu.sidebar.promo.href} className="group mt-6 block bg-white border border-[#E5E5E5] rounded overflow-hidden">
                             <div className="relative h-[80px]">
                               <Image src={renderMenu.sidebar.promo.img} alt="" fill sizes="320px" className="object-cover" />
                             </div>
                             <div className="p-4">
-                              <p className="text-base font-medium text-[#0A2540]">{renderMenu.sidebar.promo.title}</p>
-                              <p className="mt-1 text-sm leading-snug text-[#3C4F69]">{renderMenu.sidebar.promo.text}</p>
-                              <p className="mt-3 text-base font-medium text-[#0052CC] inline-flex items-center gap-1 group-hover:gap-2 transition-all">
+                              <p className="text-base font-medium text-[#2E2E2E]">{renderMenu.sidebar.promo.title}</p>
+                              <p className="mt-1 text-sm leading-snug text-[#575757]">{renderMenu.sidebar.promo.text}</p>
+                              <p className="mt-3 text-base font-bold text-[#2E2E2E] inline-flex items-center gap-1 group-hover:gap-2 transition-all">
                                 {renderMenu.sidebar.promo.cta} <ChevronRight className="h-4 w-4" />
                               </p>
                             </div>
@@ -391,16 +391,7 @@ export function Navbar() {
 
           {/* The bar */}
           <div className="relative z-10 flex items-center justify-between h-full">
-            <Link href="/" className="flex items-center gap-2 group shrink-0">
-              <Image
-                src={logo}
-                alt="Credit Expert India"
-                width={160}
-                height={40}
-                className="h-[34px] sm:h-10 w-auto object-contain group-hover:opacity-80 transition-opacity"
-                priority
-              />
-            </Link>
+            <Logo />
 
             <nav className="hidden lg:flex flex-1 items-center ml-10" aria-label="Main">
               <ul className="flex items-center gap-1">
@@ -422,8 +413,8 @@ export function Navbar() {
                         }}
                         onFocus={() => openMenu(m.key, true)}
                         onClick={() => (isOpen ? hidePanel() : openMenu(m.key, true))}
-                        className={`h-10 px-3 text-base flex items-center gap-1 rounded transition-colors duration-200 cursor-pointer ${
-                          dim ? "text-[#64748B]" : "text-[#0A2540]"
+                        className={`h-10 px-3 text-base font-bold flex items-center gap-1 rounded transition-colors duration-200 cursor-pointer hover:text-[#FF5A00] ${
+                          dim ? "text-[#737373]" : "text-[#2E2E2E]"
                         }`}
                       >
                         {m.label}
@@ -440,7 +431,7 @@ export function Navbar() {
                 href="/eligibility"
                 data-analytics-cta="navbar_eligibility"
                 data-analytics-location="navbar"
-                className="h-10 px-5 inline-flex items-center text-base font-medium text-[#0052CC] bg-white border border-[#E2E8F0] rounded hover:bg-[#F8FAFC] transition-colors"
+                className="h-10 px-5 inline-flex items-center text-base font-bold text-[#2E2E2E] bg-white border-2 border-[#2E2E2E] rounded hover:bg-[#F7E0D4] transition-colors"
               >
                 Eligibility
               </Link>
@@ -448,7 +439,7 @@ export function Navbar() {
                 href={assessmentHref}
                 data-analytics-cta="navbar_get_assessment"
                 data-analytics-location="navbar"
-                className="h-10 px-5 inline-flex items-center gap-1 text-base font-medium text-white bg-[#0052CC] hover:bg-[#1741b3] rounded transition-colors"
+                className="h-10 px-5 inline-flex items-center gap-1 text-base font-bold text-[#2E2E2E] hover:text-white bg-[#FF5A00] border-2 border-[#2E2E2E] shadow-[3px_3px_0_0_#2E2E2E] hover:bg-[#2E2E2E] rounded transition-colors"
               >
                 Get assessment <ChevronRight className="h-4 w-4" />
               </Link>
@@ -460,7 +451,7 @@ export function Navbar() {
               aria-label="Open menu"
               aria-expanded={open}
               onClick={() => setOpen(!open)}
-              className="relative w-[44px] h-[44px] rounded-md bg-[#0052CC] hover:bg-[#0A2540] flex items-center justify-center cursor-pointer lg:hidden z-50 transition-colors shadow-sm"
+              className="relative w-[44px] h-[44px] rounded-md bg-[#FF5A00] hover:bg-[#2E2E2E] flex items-center justify-center cursor-pointer lg:hidden z-50 transition-colors shadow-sm"
             >
               <div className="relative w-5 h-[14px] flex flex-col justify-between items-center">
                 <span className={`block h-[2px] w-5 bg-white transition-transform duration-300 ${open ? "rotate-45 translate-y-[6px]" : ""}`}></span>
@@ -482,7 +473,7 @@ export function Navbar() {
               initial="initial"
               animate="enter"
               exit="exit"
-              className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"
+              className="absolute inset-0 bg-[#2E2E2E]/60"
               onClick={() => setOpen(false)}
             />
 
@@ -495,18 +486,16 @@ export function Navbar() {
               role="dialog"
               aria-modal="true"
               aria-label="Menu"
-              className="absolute top-0 right-0 h-[100dvh] w-full bg-white shadow-2xl overflow-y-auto overscroll-contain flex flex-col pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]"
+              className="absolute top-0 right-0 h-[100dvh] w-full bg-white border-l-2 border-[#2E2E2E] overflow-y-auto overscroll-contain flex flex-col pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]"
             >
               {/* Header */}
               <div className="h-[60px] shrink-0 sticky top-0 z-10 bg-white px-4 md:px-6 flex items-center justify-between">
-                <Link href="/" onClick={() => setOpen(false)}>
-                  <Image src={logo} alt="Credit Expert India" className="h-[34px] sm:h-10 w-auto object-contain" priority />
-                </Link>
+                <Logo onClick={() => setOpen(false)} />
                 <button
                   type="button"
                   aria-label="Close menu"
                   onClick={() => setOpen(false)}
-                  className="relative w-[44px] h-[44px] rounded-md bg-[#0052CC] hover:bg-[#0A2540] flex items-center justify-center cursor-pointer transition-colors shadow-sm"
+                  className="relative w-[44px] h-[44px] rounded-md bg-[#FF5A00] hover:bg-[#2E2E2E] flex items-center justify-center cursor-pointer transition-colors shadow-sm"
                 >
                   <X className="w-5 h-5 text-white" />
                 </button>
@@ -518,7 +507,7 @@ export function Navbar() {
                   <Link
                     href="/"
                     onClick={() => setOpen(false)}
-                    className="flex items-center justify-between py-3.5 px-2 text-lg font-semibold text-[#0A2540] tracking-tight"
+                    className="flex items-center justify-between py-3.5 px-2 text-lg font-semibold text-[#2E2E2E] tracking-tight"
                   >
                     Home
                   </Link>
@@ -527,7 +516,7 @@ export function Navbar() {
                     const isOpen = mobileGroup === m.key;
                     const groups = [...m.columns, ...(m.sidebar ? [{ title: m.sidebar.title, links: m.sidebar.links }] : [])];
                     return (
-                      <div key={m.key} className="border-t border-[#E2E8F0]">
+                      <div key={m.key} className="border-t border-[#E5E5E5]">
                         <button
                           type="button"
                           aria-expanded={isOpen}
@@ -538,7 +527,7 @@ export function Navbar() {
                               track({ name: "nav_menu_open", params: { menu_id: next } });
                             }
                           }}
-                          className="w-full flex items-center justify-between py-3.5 px-2 text-lg font-semibold text-[#0A2540] tracking-tight cursor-pointer"
+                          className="w-full flex items-center justify-between py-3.5 px-2 text-lg font-semibold text-[#2E2E2E] tracking-tight cursor-pointer"
                         >
                           {m.label}
                           <ChevronDown className={`h-5 w-5 text-slate-400 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
@@ -555,13 +544,13 @@ export function Navbar() {
                               <div className="px-2 pb-4 space-y-5">
                                 {groups.map((g) => (
                                   <div key={g.title}>
-                                    <p className="text-sm font-semibold text-[#64748B] mb-2">{g.title}</p>
+                                    <p className="text-sm font-semibold text-[#737373] mb-2">{g.title}</p>
                                     <ul className="space-y-3">
                                       {g.links.map((l) => (
                                         <li key={l.href + l.label}>
                                           <Link href={l.href} onClick={() => setOpen(false)} className="block">
-                                            <span className="block text-base font-medium text-[#0052CC]">{l.label}</span>
-                                            {l.desc && <span className="block text-sm text-[#3C4F69]">{l.desc}</span>}
+                                            <span className="block text-base font-bold text-[#2E2E2E]">{l.label}</span>
+                                            {l.desc && <span className="block text-sm text-[#575757]">{l.desc}</span>}
                                           </Link>
                                         </li>
                                       ))}
@@ -579,20 +568,19 @@ export function Navbar() {
                   <Link
                     href="/eligibility"
                     onClick={() => setOpen(false)}
-                    className="flex items-center justify-between py-3.5 px-2 text-lg font-semibold text-[#0A2540] tracking-tight border-t border-[#E2E8F0]"
+                    className="flex items-center justify-between py-3.5 px-2 text-lg font-semibold text-[#2E2E2E] tracking-tight border-t border-[#E5E5E5]"
                   >
                     Eligibility
                   </Link>
                 </div>
 
-                <div className="my-4 border-t border-[#E2E8F0]" />
+                <div className="my-4 border-t border-[#E5E5E5]" />
 
                 {/* Primary CTA */}
                 <Link
                   href={pathname === "/" ? "#lead-form" : pathname === "/eligibility" ? "#credit-profile" : "/eligibility#credit-profile"}
                   onClick={() => setOpen(false)}
-                  className="mx-2 mb-4 group flex items-center justify-between p-3 rounded text-white active:scale-[0.98] transition-transform shadow-lg shadow-blue-900/20"
-                  style={{ background: 'linear-gradient(135deg, #0B5ED7, #0751C9)' }}
+                  className="mx-2 mb-4 group flex items-center justify-between p-3 rounded text-[#2E2E2E] active:scale-[0.98] transition-transform border-2 border-[#2E2E2E] shadow-[4px_4px_0_0_#2E2E2E] bg-[#FF5A00]"
                 >
                   <span className="text-base font-semibold pl-2">Get Free Assessment</span>
                   <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
@@ -608,9 +596,9 @@ export function Navbar() {
                     className="group flex items-center p-2 rounded-xl hover:bg-slate-50 transition-colors"
                   >
                     <div className="w-9 h-9 rounded-[10px] bg-slate-50 flex items-center justify-center mr-3 group-hover:bg-slate-100 transition-colors">
-                      <Mail className="w-[16px] h-[16px] text-[#0A2540]" />
+                      <Mail className="w-[16px] h-[16px] text-[#2E2E2E]" />
                     </div>
-                    <span className="text-base font-medium text-[#0A2540] flex-1 tracking-tight">Contact Us</span>
+                    <span className="text-base font-medium text-[#2E2E2E] flex-1 tracking-tight">Contact Us</span>
                     <ArrowRight className="w-3.5 h-3.5 text-slate-300 group-hover:text-slate-400 group-hover:translate-x-1 transition-all" />
                   </Link>
                 </div>
@@ -618,13 +606,13 @@ export function Navbar() {
 
               {/* Decorative Wave & Trust */}
               <div className="relative mt-auto pt-2 pb-4 px-6 overflow-hidden">
-                <div className="relative z-10 flex items-center justify-center space-x-2 text-[#64748B]">
+                <div className="relative z-10 flex items-center justify-center space-x-2 text-[#737373]">
                   <ShieldCheck className="w-3.5 h-3.5" />
                   <span className="text-xs font-medium tracking-wide">Secure • Private • Transparent</span>
                 </div>
                 
                 {/* Subtle Wave SVG */}
-                <svg className="absolute bottom-0 left-0 w-full text-[#E2E8F0]/40 pointer-events-none" viewBox="0 0 1440 120" fill="none" preserveAspectRatio="none">
+                <svg className="absolute bottom-0 left-0 w-full text-[#E5E5E5]/40 pointer-events-none" viewBox="0 0 1440 120" fill="none" preserveAspectRatio="none">
                   <path d="M0,0 C240,100 480,100 720,50 C960,0 1200,0 1440,50 L1440,120 L0,120 Z" fill="currentColor" />
                 </svg>
               </div>

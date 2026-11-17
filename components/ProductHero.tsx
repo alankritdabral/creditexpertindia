@@ -18,21 +18,21 @@ export function ProductHero({ title, body, cta, image, imageAlt = "", points = [
   return (
     <>
     <div className="h-[84px] bg-white" aria-hidden="true" />
-    <section className="w-full grid grid-cols-1 lg:grid-cols-[6fr_5fr] bg-[#0052CC] text-white">
+    <section className="w-full grid grid-cols-1 lg:grid-cols-[6fr_5fr] bg-[#FF5A00] text-[#2E2E2E]">
       <div className="px-4 md:px-10 lg:pl-[max(2rem,calc((100vw-1220px)/2+2rem))] lg:pr-14 pt-14 pb-14 lg:pt-24 lg:pb-24">
         <h1 className="hero-title text-[clamp(36px,10vw,44px)] sm:text-5xl lg:text-[56px] leading-[1.02] tracking-[-0.04em] font-medium max-w-2xl">
           {title}
         </h1>
-        <p className="hero-description mt-6 text-base sm:text-lg lg:text-xl leading-[1.5] text-[#BFDBFE] max-w-xl">{body}</p>
+        <p className="hero-description mt-6 text-base sm:text-lg lg:text-xl leading-[1.5] text-[#FFD2B8] max-w-xl">{body}</p>
         <a
           href={href}
           data-analytics-cta={`hero_${cta.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "")}`}
           data-analytics-location="product_hero"
-          className="mt-9 inline-flex items-center gap-2 rounded bg-white text-[#0052CC] font-semibold text-base px-[22px] h-[48px] hover:bg-[#0A2540] hover:text-white transition-colors"
+          className="mt-9 inline-flex items-center gap-2 rounded bg-white text-[#2E2E2E] font-semibold text-base px-[22px] h-[48px] hover:bg-[#2E2E2E] hover:text-white transition-colors"
         >
           {cta} <ArrowRight className="w-5 h-5" />
         </a>
-        <ul className="mt-10 space-y-2 text-base sm:text-lg text-[#BFDBFE]">
+        <ul className="mt-10 space-y-2 text-base sm:text-lg text-[#FFD2B8]">
           {points.map((p) => (
             <li key={p}>{p}</li>
           ))}

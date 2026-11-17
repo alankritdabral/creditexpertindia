@@ -599,7 +599,7 @@ export function DebtConsolidationCalculator() {
           {/* Trust Highlights */}
           <div className="rounded-2xl bg-white p-5 border border-slate-200 space-y-3 card-elevated">
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900">
-              Why Consolidate With Credit Expert India?
+              Why Consolidate With Amortas?
             </h3>
             <ul className="text-xs text-slate-600 space-y-2">
               <li className="flex items-start gap-2">
@@ -733,7 +733,7 @@ export function DebtConsolidationCalculator() {
                       required
                     />
                     <span>
-                      I authorize Credit Expert India to contact me via phone, WhatsApp or email about this assessment. <span className="text-red-500">*</span>
+                      I authorize Amortas to contact me via phone, WhatsApp or email about this assessment. <span className="text-red-500">*</span>
                     </span>
                   </label>
                   <label className="flex items-start gap-2 cursor-pointer text-[11px] text-slate-500 leading-snug">

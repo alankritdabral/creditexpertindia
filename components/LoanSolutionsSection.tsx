@@ -29,7 +29,7 @@ const SOLUTIONS: Solution[] = [
       { lead: "No obligation", text: "to proceed after you see your options" },
     ],
     cta: { label: "Check your EMI options", href: "#calculator" },
-    scene: { kind: "phone", tint: "rgba(0,102,255,0.08)" },
+    scene: { kind: "phone", tint: "rgba(255, 90, 0,0.08)" },
   },
   {
     id: "credit-card",
@@ -42,7 +42,7 @@ const SOLUTIONS: Solution[] = [
       { lead: "One fixed EMI", text: "instead of a revolving balance" },
     ],
     cta: { label: "Explore card debt options", href: "/credit-card-debt" },
-    scene: { kind: "card", tint: "rgba(0,102,255,0.06)", rate: { from: 45, to: 11 } },
+    scene: { kind: "card", tint: "rgba(255, 90, 0,0.06)", rate: { from: 45, to: 11 } },
   },
   {
     id: "app-loans",
@@ -57,7 +57,7 @@ const SOLUTIONS: Solution[] = [
     cta: { label: "See app loan options", href: "/app-loan" },
     scene: {
       kind: "merge",
-      tint: "rgba(0,102,255,0.12)",
+      tint: "rgba(255, 90, 0,0.12)",
       emi: 15999,
       chips: [
         { amount: 8000, name: "App loan A", icon: Smartphone },
@@ -80,7 +80,7 @@ const SOLUTIONS: Solution[] = [
     cta: { label: "Explore debt consolidation", href: "/debt-consolidation" },
     scene: {
       kind: "merge",
-      tint: "rgba(0,82,204,0.14)",
+      tint: "rgba(224, 79, 0,0.14)",
       emi: 24999,
       chips: [
         { amount: 12500, name: "Personal Loan", icon: Banknote },
@@ -101,7 +101,7 @@ const SOLUTIONS: Solution[] = [
       { lead: "See what you may qualify for", text: "before you decide" },
     ],
     cta: { label: "Check overdraft options", href: "/personal-loan-overdraft" },
-    scene: { kind: "rate", tint: "rgba(15,118,110,0.07)", rate: { from: 14, to: 11.75 } },
+    scene: { kind: "rate", tint: "rgba(255, 218, 0,0.07)", rate: { from: 14, to: 11.75 } },
   },
 ];
 
@@ -127,24 +127,24 @@ export const LoanSolutionsSection = () => {
   };
 
   return (
-    <section className="w-full bg-white">
-      <div className="max-w-[1220px] mx-auto px-4 md:px-6 lg:px-8 py-16 md:py-24">
+    <section className="w-full section-tint">
+      <div className="max-w-[1220px] mx-auto px-4 md:px-6 lg:px-8 py-12 md:py-[72px]">
         {/* Header: title + action on the left, description on the right (Stripe's section-header) */}
         <header className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:gap-8 lg:items-start">
           <div className="lg:col-span-5">
-            <h2 className="text-[32px] sm:text-[44px] leading-[1.08] tracking-[-0.03em] font-semibold text-[#0A2540]">
-              Bring your eligible loans <span className="text-[#0052CC]">together</span>
+            <h2 className="text-[32px] sm:text-[44px] leading-[1.08] tracking-[-0.03em] font-semibold text-[#2E2E2E]">
+              Bring your eligible loans <span className="bg-[#FFDA00] px-2 -mx-1 box-decoration-clone">together</span>
             </h2>
             <Link
               href="/eligibility"
               data-analytics-cta="loan_solutions_check_eligibility"
               data-analytics-location="loan_solutions"
-              className="mt-6 inline-flex items-center gap-1.5 rounded-full bg-[#0052CC] px-5 py-2.5 text-base font-semibold text-white transition-colors hover:bg-[#0A2540]"
+              className="mt-6 inline-flex items-center gap-1.5 rounded-full bg-[#FF5A00] px-5 py-2.5 text-base font-semibold text-[#2E2E2E] hover:text-white transition-colors hover:bg-[#2E2E2E]"
             >
               Check your eligibility <ChevronRight className="w-4 h-4" />
             </Link>
           </div>
-          <p className="lg:col-span-6 lg:col-start-7 text-lg md:text-xl text-[#3C4F69] lg:pt-2">
+          <p className="lg:col-span-6 lg:col-start-7 text-lg md:text-xl text-[#575757] lg:pt-2">
             One simpler way to manage multiple debts. Different debts. Different stories. One smarter way forward.
           </p>
         </header>
@@ -158,10 +158,10 @@ export const LoanSolutionsSection = () => {
                 data-row
                 // Later cards sit above earlier ones, so each slides over the one before it.
                 style={{ ["--slot" as string]: `${STACK_TOP + idx * STACK_STEP}px`, zIndex: idx + 1 }}
-                className="sticky top-[var(--slot)] bg-white border-t border-dashed border-[#E2E8F0] first:border-t-0 shadow-[0_-6px_10px_-8px_rgba(10,37,64,0.22)]"
+                className="sticky top-[var(--slot)] bg-white border-t border-dashed border-[#E5E5E5] first:border-t-0 shadow-[0_-6px_10px_-8px_rgba(10, 10, 10,0.22)]"
               >
                 <div onClick={() => bringForward(idx)} className="flex items-center gap-0 py-2 cursor-pointer group">
-                  <span aria-hidden className="w-10 h-10 shrink-0 rounded-md flex items-center justify-center bg-[#0052CC] text-white">
+                  <span aria-hidden className="w-10 h-10 shrink-0 rounded-md flex items-center justify-center bg-[#FF5A00] text-white">
                     <Icon className="w-5 h-5" />
                   </span>
 
@@ -170,7 +170,7 @@ export const LoanSolutionsSection = () => {
                     id={`sol-btn-${s.id}`}
                     className="flex-1 min-w-0 px-4 text-left bg-transparent border-0 appearance-none cursor-pointer focus-visible:outline-none"
                   >
-                    <h3 className="text-base sm:text-lg leading-10 font-semibold text-[#0052CC] transition-colors group-hover:text-[#0A2540]">{s.label}</h3>
+                    <h3 className="text-base sm:text-lg leading-10 font-semibold text-[#2E2E2E] transition-colors group-hover:text-[#2E2E2E]">{s.label}</h3>
                   </button>
 
                   <Link
@@ -179,7 +179,7 @@ export const LoanSolutionsSection = () => {
                     onClick={(e) => e.stopPropagation()}
                     data-analytics-cta={`loan_solutions_${s.id}`}
                     data-analytics-location="loan_solutions"
-                    className="ml-auto shrink-0 inline-flex h-10 items-center gap-1 rounded-md border border-[#BFDBFE] bg-white px-3 sm:px-4 text-sm sm:text-base font-semibold text-[#0052CC] transition-colors hover:border-[#0052CC]"
+                    className="ml-auto shrink-0 inline-flex h-10 items-center gap-1 rounded-md border border-[#FFD2B8] bg-white px-3 sm:px-4 text-sm sm:text-base font-semibold text-[#2E2E2E] transition-colors hover:border-[#E04F00]"
                   >
                     <span className="sm:hidden">Explore</span>
                     <span className="hidden sm:inline">Learn more</span>
@@ -192,7 +192,7 @@ export const LoanSolutionsSection = () => {
                   id={`sol-panel-${s.id}`}
                   className="grid grid-cols-1 min-w-0 pt-1 pb-8 lg:grid-cols-[5fr_7fr] lg:gap-x-12 lg:grid-rows-[auto_auto_1fr] lg:pb-12"
                 >
-                  <p className="pb-3 text-[18px] lg:text-[32px] leading-[1.3] lg:leading-[1.15] tracking-[-0.01em] lg:tracking-[-0.02em] lg:font-semibold text-[#0A2540] lg:col-start-1 lg:row-start-1 lg:pt-4">
+                  <p className="pb-3 text-[18px] lg:text-[32px] leading-[1.3] lg:leading-[1.15] tracking-[-0.01em] lg:tracking-[-0.02em] lg:font-semibold text-[#2E2E2E] lg:col-start-1 lg:row-start-1 lg:pt-4">
                     {s.headline}
                   </p>
 
@@ -202,8 +202,8 @@ export const LoanSolutionsSection = () => {
 
                   <div className="grid gap-4 pt-4 pb-2 lg:col-start-1 lg:row-start-2 lg:pt-6">
                     {s.stats.map((st) => (
-                      <p key={st.lead} className="text-base text-[#3C4F69] [text-wrap:pretty]">
-                        <strong className="font-semibold text-[#0A2540]">{st.lead}</strong> {st.text}
+                      <p key={st.lead} className="text-base text-[#575757] [text-wrap:pretty]">
+                        <strong className="font-semibold text-[#2E2E2E]">{st.lead}</strong> {st.text}
                       </p>
                     ))}
                   </div>
@@ -213,7 +213,7 @@ export const LoanSolutionsSection = () => {
           })}
         </div>
 
-        <p className="mt-8 text-sm text-[#3C4F69]">*Illustrative figures only. Final rates and terms are set by partner lenders after checking your profile.</p>
+        <p className="mt-8 text-sm text-[#575757]">*Illustrative figures only. Final rates and terms are set by partner lenders after checking your profile.</p>
       </div>
     </section>
   );

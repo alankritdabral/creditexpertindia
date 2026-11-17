@@ -3,7 +3,7 @@ export type Article = {
   title: string;
   /**
    * Short title for the <title> tag, kept ≤38 chars so the rendered title
-   * (with the root layout's " | Credit Expert India" template, 22 chars)
+   * (with the root layout's " | Amortas" template, 22 chars)
    * stays within Google's ~60-char display budget. `title` is the longer,
    * more descriptive headline shown as the page's H1 — it isn't shortened,
    * since that would mean rewriting editorial copy rather than fixing SEO

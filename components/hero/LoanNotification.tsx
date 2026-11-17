@@ -3,16 +3,16 @@ import { motion } from 'framer-motion';
 import { Building, Home, GitMerge, TrendingDown, CreditCard, Percent, ArrowRightLeft, Landmark, PiggyBank, Smartphone, ChevronRight } from 'lucide-react';
 
 const typeConfig = {
-  home: { icon: Home, color: "from-blue-800 to-blue-500", shadow: "rgba(59,130,246,0.4)" },
-  merge: { icon: GitMerge, color: "from-purple-800 to-purple-500", shadow: "rgba(168,85,247,0.4)" },
+  home: { icon: Home, color: "from-blue-800 to-blue-500", shadow: "rgba(255, 90, 0,0.4)" },
+  merge: { icon: GitMerge, color: "from-purple-800 to-purple-500", shadow: "rgba(255, 90, 0,0.4)" },
   reduce: { icon: TrendingDown, color: "from-green-800 to-green-500", shadow: "rgba(34,197,94,0.4)" },
   card: { icon: CreditCard, color: "from-orange-800 to-orange-500", shadow: "rgba(249,115,22,0.4)" },
-  percent: { icon: Percent, color: "from-teal-800 to-teal-500", shadow: "rgba(20,184,166,0.4)" },
-  transfer: { icon: ArrowRightLeft, color: "from-blue-800 to-blue-500", shadow: "rgba(99,102,241,0.4)" },
+  percent: { icon: Percent, color: "from-teal-800 to-teal-500", shadow: "rgba(255, 218, 0,0.4)" },
+  transfer: { icon: ArrowRightLeft, color: "from-blue-800 to-blue-500", shadow: "rgba(255, 90, 0,0.4)" },
   bank: { icon: Landmark, color: "from-rose-800 to-rose-500", shadow: "rgba(244,63,94,0.4)" },
   save: { icon: PiggyBank, color: "from-emerald-800 to-emerald-500", shadow: "rgba(16,185,129,0.4)" },
-  app: { icon: Smartphone, color: "from-cyan-800 to-cyan-500", shadow: "rgba(6,182,212,0.4)" },
-  default: { icon: Building, color: "from-[#0A2540] to-[#0066FF]", shadow: "rgba(59,130,246,0.4)" }
+  app: { icon: Smartphone, color: "from-cyan-800 to-cyan-500", shadow: "rgba(255, 218, 0,0.4)" },
+  default: { icon: Building, color: "from-[#2E2E2E] to-[#FF5A00]", shadow: "rgba(255, 90, 0,0.4)" }
 };
 
 export interface Transaction {
@@ -79,7 +79,7 @@ export function LoanNotification({ transaction, align = 'right', vAlign = 'top' 
       >
         <div className="absolute w-[22px] h-[22px] rounded-full border border-blue-400/60 animate-[ping_2s_ease-out_infinite]"></div>
         <div className="absolute w-[14px] h-[14px] rounded-full bg-blue-500/40"></div>
-        <div className="relative w-[6px] h-[6px] rounded-full bg-white shadow-[0_0_8px_2px_rgba(59,130,246,0.8)]"></div>
+        <div className="relative w-[6px] h-[6px] rounded-full bg-white shadow-[0_0_8px_2px_rgba(255, 90, 0,0.8)]"></div>
       </motion.div>
 
       {/* Connector Line - Animated */}
@@ -102,12 +102,12 @@ export function LoanNotification({ transaction, align = 'right', vAlign = 'top' 
           animate={{ pathLength: 1, opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.6, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
-          className="drop-shadow-[0_0_3px_rgba(59,130,246,0.6)]"
+          className="drop-shadow-[0_0_3px_rgba(255, 90, 0,0.6)]"
         />
         <defs>
           <linearGradient id="connectorGradient" {...gradientCoords}>
-            <stop offset="0%" stopColor="rgba(59,130,246,0)" />
-            <stop offset="100%" stopColor="rgba(59,130,246,1)" />
+            <stop offset="0%" stopColor="rgba(255, 90, 0,0)" />
+            <stop offset="100%" stopColor="rgba(255, 90, 0,1)" />
           </linearGradient>
         </defs>
       </motion.svg>
@@ -132,7 +132,7 @@ export function LoanNotification({ transaction, align = 'right', vAlign = 'top' 
           backdropFilter: 'blur(18px)',
           WebkitBackdropFilter: 'blur(18px)',
           border: '1px solid rgba(255,255,255,0.5)',
-          boxShadow: '0 8px 32px rgba(36, 63, 145, 0.15), 0 0 15px rgba(59, 130, 246, 0.1), inset 0 0 0 1px rgba(255,255,255,0.5)',
+          boxShadow: '0 8px 32px rgba(10, 10, 10, 0.15), 0 0 15px rgba(255, 90, 0, 0.1), inset 0 0 0 1px rgba(255,255,255,0.5)',
           borderRadius: '16px',
           transformOrigin: `${isTop ? 'bottom' : 'top'} ${isLeft ? 'right' : 'left'}`
         }}
@@ -145,20 +145,20 @@ export function LoanNotification({ transaction, align = 'right', vAlign = 'top' 
         {/* Content */}
         <div className="flex-1 flex flex-col justify-center min-w-[100px]">
           <div className="flex justify-between items-center mb-0.5">
-            <span className="font-semibold text-[#0A2540] text-sm sm:text-sm md:text-base truncate max-w-[130px]">{transaction.title || transaction.city}</span>
+            <span className="font-semibold text-[#2E2E2E] text-sm sm:text-sm md:text-base truncate max-w-[130px]">{transaction.title || transaction.city}</span>
           </div>
-          <div className="text-base sm:text-lg md:text-lg font-bold text-[#0A2540] leading-none mb-1 md:mb-1.5 tracking-tight">
+          <div className="text-base sm:text-lg md:text-lg font-bold text-[#2E2E2E] leading-none mb-1 md:mb-1.5 tracking-tight">
             {transaction.amount}
           </div>
-          <div className="flex items-center gap-1.5 text-xs md:text-sm text-[#3C4F69] font-medium whitespace-nowrap">
-            <span className="w-2 h-2 rounded-full bg-[#15803D] shadow-[0_0_6px_rgba(16,185,129,0.5)]"></span>
+          <div className="flex items-center gap-1.5 text-xs md:text-sm text-[#575757] font-medium whitespace-nowrap">
+            <span className="w-2 h-2 rounded-full bg-[#10B981] shadow-[0_0_6px_rgba(16,185,129,0.5)]"></span>
             {transaction.status || 'Loan Disbursed'}
           </div>
         </div>
 
         {/* Right Arrow */}
         <div className="shrink-0 pl-1">
-          <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-[#0A2540]/40" />
+          <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-[#2E2E2E]/40" />
         </div>
       </motion.div>
     </motion.div>

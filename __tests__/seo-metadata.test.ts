@@ -18,7 +18,7 @@ import path from "path";
 import { buildMetadata } from "@/lib/seo";
 import { articles } from "@/content/articles";
 
-const TITLE_TEMPLATE_SUFFIX = " | Credit Expert India".length; // lib/config.ts siteConfig.name
+const TITLE_TEMPLATE_SUFFIX = " | Amortas".length; // lib/config.ts siteConfig.name
 const MAX_RENDERED_TITLE = 60;
 const MIN_DESCRIPTION = 50;
 const MAX_DESCRIPTION = 160;

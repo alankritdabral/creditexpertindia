@@ -9,7 +9,7 @@ export default function manifest(): MetadataRoute.Manifest {
     start_url: "/",
     display: "standalone",
     background_color: "#ffffff",
-    theme_color: "#0052CC",
+    theme_color: "#FF5A00",
     // Static copies under public/ — app/icon.png and app/apple-icon.png are
     // Next's own file-convention icons (auto-served at a generated, hashed
     // path for <link rel="icon">), not guaranteed to be reachable at a

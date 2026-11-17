@@ -714,7 +714,7 @@ export function EligibilityForm() {
                 />
                 <span className="text-xs text-brand-black/70 leading-relaxed">
                   <strong>Consent</strong><br />
-                  I confirm I am 21 or older and I consent and authorize Credit Expert India to securely retrieve my credit report from the credit bureau, to contact me about this enquiry, and to share my details with partner lenders (see{" "}
+                  I confirm I am 21 or older and I consent and authorize Amortas to securely retrieve my credit report from the credit bureau, to contact me about this enquiry, and to share my details with partner lenders (see{" "}
                   <Link href="/partner-disclosures" className="underline">partner disclosures</Link>).
                 </span>
               </label>
@@ -747,15 +747,15 @@ export function EligibilityForm() {
     <div id="check-eligibility" className="w-full max-w-[1220px] mx-auto flex flex-col justify-center h-full">
       <div className={step === 1 ? "grid grid-cols-1 lg:grid-cols-[5fr_7fr] gap-10 lg:gap-16 items-start" : ""}>
         {step === 1 ? (
-          <div className="bg-primary-hover text-white p-8 md:p-12 lg:sticky lg:top-28">
+          <div className="bg-[#FF5A00] text-[#2E2E2E] p-8 md:p-12 lg:sticky lg:top-28">
             <h2 className="text-3xl sm:text-4xl leading-[1.15] tracking-tight font-semibold">
               See what you could save, in about two minutes.
             </h2>
-            <p className="mt-5 text-base leading-7 text-white/85">
+            <p className="mt-5 text-base leading-7 text-[#2E2E2E]">
               Tell us a little about yourself. We look at your credit profile the way a lender would,
               so what we tell you is realistic, not a sales pitch.
             </p>
-            <ul className="mt-8 space-y-3 text-base leading-6 text-white">
+            <ul className="mt-8 space-y-3 text-base leading-6 text-[#2E2E2E]">
               {[
                 "We never ask you to pay anything.",
                 "Your details stay with us unless you say otherwise.",

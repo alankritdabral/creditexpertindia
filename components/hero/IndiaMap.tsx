@@ -27,14 +27,14 @@ function StateShape({ shape, id, isActive, isHighlighted, isPrimary, splitX, spl
 
   useFrame((state, delta) => {
     if (materialRef.current) {
-      const targetColor = new THREE.Color(isHighlighted ? "#0066FF" : "#0A2540"); // Brighter blue for fill
-      const targetEmissive = new THREE.Color(isHighlighted ? "#0066FF" : "#0A2540"); // Stronger emissive for glow
+      const targetColor = new THREE.Color(isHighlighted ? "#FF5A00" : "#2E2E2E"); // Brighter blue for fill
+      const targetEmissive = new THREE.Color(isHighlighted ? "#FF5A00" : "#2E2E2E"); // Stronger emissive for glow
       materialRef.current.color.lerp(targetColor, delta * 5);
       materialRef.current.emissive.lerp(targetEmissive, delta * 5);
       materialRef.current.emissiveIntensity = THREE.MathUtils.lerp(materialRef.current.emissiveIntensity, isHighlighted ? 0.6 : 0.2, delta * 5);
     }
     if (lineMaterialRef.current) {
-      const targetColor = new THREE.Color(isHighlighted ? "#60A5FA" : "#0066FF"); // Bright border
+      const targetColor = new THREE.Color(isHighlighted ? "#FF9A5C" : "#FF5A00"); // Bright border
       lineMaterialRef.current.color.lerp(targetColor, delta * 5);
       lineMaterialRef.current.opacity = THREE.MathUtils.lerp(lineMaterialRef.current.opacity, isHighlighted ? 0.9 : 0.4, delta * 5);
     }
@@ -46,8 +46,8 @@ function StateShape({ shape, id, isActive, isHighlighted, isPrimary, splitX, spl
         <extrudeGeometry args={[shape, extrudeSettings]} />
         <meshStandardMaterial 
           ref={materialRef}
-          color="#0A2540"
-          emissive="#0A2540"
+          color="#2E2E2E"
+          emissive="#2E2E2E"
           emissiveIntensity={0.2}
           roughness={0.8}
           metalness={0.2}
@@ -62,7 +62,7 @@ function StateShape({ shape, id, isActive, isHighlighted, isPrimary, splitX, spl
         </bufferGeometry>
         <lineBasicMaterial 
           ref={lineMaterialRef}
-          color="#0066FF"
+          color="#FF5A00"
           transparent 
           opacity={0.4} 
         />

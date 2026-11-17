@@ -29,11 +29,11 @@ export default async function Image({ params }: { params: Promise<{ slug: string
           flexDirection: "column",
           justifyContent: "space-between",
           padding: "80px",
-          backgroundColor: "#0052CC",
-          backgroundImage: "linear-gradient(135deg, #0052CC 0%, #0A2540 100%)",
+          backgroundColor: "#E04F00",
+          backgroundImage: "linear-gradient(135deg, #E04F00 0%, #2E2E2E 100%)",
         }}
       >
-        <div style={{ display: "flex", fontSize: 24, fontWeight: 600, color: "#BFDBFE" }}>
+        <div style={{ display: "flex", fontSize: 24, fontWeight: 600, color: "#FFD2B8" }}>
           {siteConfig.name} — Learning Center
         </div>
         <div style={{ display: "flex", fontSize: 54, fontWeight: 700, color: "#ffffff", lineHeight: 1.15, maxWidth: 1000 }}>
